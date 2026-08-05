@@ -6,6 +6,8 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { CallIcon as Phone, CheckmarkCircle01Icon as CheckCircle2, SecurityCheckIcon as ShieldCheck, FlashIcon as Zap } from '@hugeicons/core-free-icons';
 import { cn } from "@/lib/utils"
 
+import { Input } from "@/components/ui/input"
+
 export default function FeaturesPage() {
   const { profile, updateProfile, isLoading } = useProfile()
 
@@ -20,12 +22,22 @@ export default function FeaturesPage() {
     },
     {
       id: 'voice_calls',
-      name: 'Voice Call Reminders',
-      description: 'Automatically call parties when their cheques are due. Professional automated voice reminders to ensure timely payment.',
+      name: 'Daily Voice Call Summary',
+      description: 'Receive a daily automated voice call at 9 AM IST with a summary of cheques hitting your bank accounts today. Consolidates cheques across all your businesses.',
       icon: Phone,
-      checked: (profile?.reminders_per_day ?? 0) > 0, // Placeholder logic for now
-      disabled: true,
-      badge: 'Coming Soon'
+      checked: !!profile?.voice_call_enabled,
+      onChange: (val: boolean) => updateProfile({ voice_call_enabled: val }),
+      extra: (
+        <div className="mt-4 space-y-2">
+          <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Your Phone Number</label>
+          <Input 
+            placeholder="+91 00000 00000"
+            defaultValue={profile?.phone || ''}
+            onBlur={(e) => updateProfile({ phone: e.target.value })}
+            className="h-11 rounded-lg"
+          />
+        </div>
+      )
     },
     {
       id: 'advanced_security',
@@ -72,6 +84,7 @@ export default function FeaturesPage() {
               <p className="text-sm text-muted-foreground leading-relaxed font-normal">
                 {feature.description}
               </p>
+              {feature.extra}
             </div>
 
             <div className="mt-2 flex items-center justify-between border-t pt-4 border-primary/5">

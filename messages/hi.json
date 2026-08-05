@@ -7,6 +7,10 @@
     "support": "सहायता",
     "legal": "कानूनी",
     "dangerZone": "खतरे का क्षेत्र",
-    "signOut": "साइन आउट"
+    "signOut": "साइन आउट",
+    "voiceCallSummary": "वॉयस कॉल सारांश",
+    "enableDailyCall": "दैनिक कॉल सक्षम करें",
+    "phoneNumber": "फ़ोन नंबर",
+    "phoneNumberPlaceholder": "+91 00000 00000"
   }
 }

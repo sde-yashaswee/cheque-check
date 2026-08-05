@@ -14,6 +14,8 @@ export interface Profile {
   reminders_per_day: number;
   default_reminder_days: number;
   received_cheques_enabled: boolean;
+  phone: string | null;
+  voice_call_enabled: boolean;
   avatar_url?: string | null;
   created_at: string;
   updated_at: string;
