@@ -97,12 +97,15 @@ function ToastDescription({
 function ToastAction({
   className,
   render = <Button variant="outline" size="sm" />,
+  nativeButton,
   ...props
 }: ToastPrimitive.Action.Props) {
+  const isNativeButton = nativeButton ?? (React.isValidElement(render) && (render.type === "button" || render.type === Button))
   return (
     <ToastPrimitive.Action
       data-slot="toast-action"
       render={render}
+      nativeButton={isNativeButton}
       className={cn("shrink-0", className)}
       {...props}
     />
@@ -113,13 +116,16 @@ function ToastClose({
   className,
   children,
   render = <Button variant="ghost" size="icon-sm" />,
+  nativeButton,
   ...props
 }: ToastPrimitive.Close.Props) {
+  const isNativeButton = nativeButton ?? (React.isValidElement(render) && (render.type === "button" || render.type === Button))
   return (
     <ToastPrimitive.Close
       data-slot="toast-close"
       aria-label="Close toast"
       render={render}
+      nativeButton={isNativeButton}
       className={cn(
         "relative shrink-0 text-muted-foreground after:absolute after:-inset-2 after:content-[''] hover:text-foreground",
         className

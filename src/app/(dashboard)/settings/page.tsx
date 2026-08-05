@@ -4,7 +4,7 @@ import { useBusiness } from "@/hooks/use-business"
 import { useProfile } from "@/hooks/use-profile"
 import { Button } from "@/components/ui/button"
 import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowRight01Icon as ChevronRight, Logout01Icon as LogOut, UserIcon as User, Notification01Icon as Bell, GlobalIcon as Globe, CreditCardIcon as CreditCard, File01Icon as FileSpreadsheet, Building03Icon as Building2, LayoutGridIcon as LayoutGrid, FlashIcon as Zap, TranslateIcon as Languages, Delete02Icon as Trash2 } from '@hugeicons/core-free-icons';
+import { ArrowRight01Icon as ChevronRight, Logout01Icon as LogOut, UserIcon as User, Notification01Icon as Bell, GlobalIcon as Globe, CreditCardIcon as CreditCard, File01Icon as FileSpreadsheet, Building03Icon as Building2, LayoutGridIcon as LayoutGrid, FlashIcon as Zap, TranslateIcon as Languages, Delete02Icon as Trash2, Clock01Icon as Clock } from '@hugeicons/core-free-icons';
 import { useRouter } from "next/navigation"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-dialog"
 import { useQuery } from "@tanstack/react-query"
@@ -62,6 +62,13 @@ export default function SettingsPage() {
     { label: 'Hinglish', value: 'hinglish' },
   ]
 
+  const timezoneOptions = [
+    { label: 'IST (UTC+5:30)', value: 'Asia/Kolkata' },
+    { label: 'UTC', value: 'UTC' },
+    { label: 'EST (UTC-5)', value: 'America/New_York' },
+    { label: 'GMT (UTC+0)', value: 'Europe/London' },
+  ]
+
   const remindersPerDayOptions = [
     { label: '1 time/day', value: '1' },
     { label: '2 times/day', value: '2' },
@@ -76,6 +83,8 @@ export default function SettingsPage() {
 
   const remainingDays = profile ? 30 - differenceInDays(new Date(), new Date(profile.created_at)) : 0
 
+  const selectorWidth = "h-9 w-[180px]"
+
   const sections = [
     {
       title: 'General',
@@ -88,7 +97,7 @@ export default function SettingsPage() {
               options={currencyOptions} 
               value={profile?.currency} 
               onValueChange={(val) => updateProfile({ currency: val })}
-              className="h-9 w-[120px]"
+              className={selectorWidth}
             />
           )
         },
@@ -100,7 +109,19 @@ export default function SettingsPage() {
               options={dateFormatOptions} 
               value={profile?.date_format} 
               onValueChange={(val) => updateProfile({ date_format: val })}
-              className="h-9 w-[150px]"
+              className={selectorWidth}
+            />
+          )
+        },
+        { 
+          name: 'Time Zone', 
+          icon: Clock,
+          component: (
+            <Combobox 
+              options={timezoneOptions} 
+              value={profile?.time_zone} 
+              onValueChange={(val) => updateProfile({ time_zone: val })}
+              className={selectorWidth}
             />
           )
         },
@@ -110,9 +131,9 @@ export default function SettingsPage() {
           component: (
             <Combobox 
               options={languageOptions} 
-              value="en" 
-              onValueChange={() => {}}
-              className="h-9 w-[120px]"
+              value={profile?.language || "en"} 
+              onValueChange={(val) => updateProfile({ language: val })}
+              className={selectorWidth}
             />
           )
         },
@@ -136,7 +157,7 @@ export default function SettingsPage() {
               options={remindersPerDayOptions} 
               value={profile?.reminders_per_day?.toString()} 
               onValueChange={(val) => updateProfile({ reminders_per_day: parseInt(val) })}
-              className="h-9 w-[140px]"
+              className={selectorWidth}
             />
           )
         },
@@ -148,7 +169,7 @@ export default function SettingsPage() {
               options={reminderFrequencyOptions} 
               value={profile?.default_reminder_days?.toString()} 
               onValueChange={(val) => updateProfile({ default_reminder_days: parseInt(val) })}
-              className="h-9 w-[150px]"
+              className={selectorWidth}
             />
           )
         },
@@ -184,13 +205,13 @@ export default function SettingsPage() {
         {sections.map((section) => (
           <div key={section.title} className="space-y-3">
             <h3 className="px-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{section.title}</h3>
-            <div className="divide-y rounded-lg border bg-card overflow-hidden border-gray-100">
+            <div className="divide-y divide-border/50 rounded-lg border bg-card overflow-hidden">
               {section.items.map((item: any) => {
                 const content = (
                   <div key={item.name} className={cn("flex items-center justify-between p-4 transition-colors", (item.action || item.href) && "cursor-pointer active:bg-muted/50 hover:bg-muted/30")} onClick={item.action}>
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-muted/50 text-muted-foreground">
-                        <item.icon className="h-4 w-4" />
+                        <HugeiconsIcon icon={item.icon} className="h-4 w-4" />
                       </div>
                       <span className="text-sm font-semibold">{item.name}</span>
                     </div>

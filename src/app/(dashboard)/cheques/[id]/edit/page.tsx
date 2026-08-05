@@ -1,0 +1,206 @@
+'use client'
+
+import { useEditCheque } from '@/hooks/use-edit-cheque'
+import { PartyService } from '@/services/party.service'
+import { AccountService } from '@/services/account.service'
+import { useQuery } from '@tanstack/react-query'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useParams } from 'next/navigation'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Tick02Icon as Check, Delete02Icon as Trash2, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft } from '@hugeicons/core-free-icons';
+import { cn } from '@/lib/utils'
+import { useBusiness } from '@/hooks/use-business'
+import { Combobox } from '@/components/ui/combobox'
+import { Skeleton } from '@/components/ui/skeleton'
+import { DeleteConfirmationDialog } from '@/components/ui/delete-dialog'
+import { Party, AccountWithRelations } from '@/types'
+
+export default function EditChequePage() {
+  const { id } = useParams() as { id: string }
+  const { activeBusiness } = useBusiness()
+  const businessId = activeBusiness?.id
+
+  const {
+    form,
+    cheque,
+    isLoading,
+    isSaving,
+    onSubmit,
+    onDelete,
+  } = useEditCheque(id)
+
+  const { register, setValue, watch, formState: { errors } } = form
+
+  const { data: parties } = useQuery({
+    queryKey: ['parties', businessId],
+    queryFn: () => PartyService.getAll(businessId!),
+    enabled: !!businessId,
+  })
+
+  const { data: accounts } = useQuery({
+    queryKey: ['accounts', businessId],
+    queryFn: () => AccountService.getAll(businessId!),
+    enabled: !!businessId,
+  })
+
+  const partyOptions = parties?.map((p: Party) => ({ 
+    label: p.name, 
+    value: p.id,
+    color: p.color,
+    icon: p.icon
+  })) || []
+
+  const accountOptions = accounts?.map((b: AccountWithRelations) => ({ 
+    label: `${b.bank?.name || 'Bank'} (${b.account_number.slice(-4)})`, 
+    value: b.id,
+    color: b.color,
+    icon: b.icon
+  })) || []
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-2xl space-y-8 pb-20">
+        <Skeleton className="h-14 w-full rounded-lg" />
+        <Skeleton className="h-14 w-full rounded-lg" />
+        <Skeleton className="h-14 w-full rounded-lg" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+      <form onSubmit={onSubmit} className="space-y-6">
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Cheque Type</Label>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setValue('type', 'Outward')}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-3 rounded-lg p-6 border transition-all active:scale-[0.98]",
+                  watch('type') === 'Outward' 
+                    ? "bg-primary/5 border-primary" 
+                    : "bg-card border-primary/5"
+                )}
+              >
+                <div className={cn(
+                  "h-12 w-12 rounded-sm flex items-center justify-center transition-colors",
+                  watch('type') === 'Outward' ? "bg-primary text-white" : "bg-primary/10 text-primary"
+                )}>
+                  <HugeiconsIcon icon={ArrowUpRight} className="h-6 w-6" />
+                </div>
+                <span className={cn(
+                  "font-semibold text-xs uppercase tracking-wider",
+                  watch('type') === 'Outward' ? "text-primary" : "text-muted-foreground"
+                )}>Issued</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setValue('type', 'Inward')}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-3 rounded-lg p-6 border transition-all active:scale-[0.98]",
+                  watch('type') === 'Inward' 
+                    ? "bg-green-500/5 border-green-500" 
+                    : "bg-card border-primary/5"
+                )}
+              >
+                <div className={cn(
+                  "h-12 w-12 rounded-sm flex items-center justify-center transition-colors",
+                  watch('type') === 'Inward' ? "bg-green-500 text-white" : "bg-green-500/10 text-green-600"
+                )}>
+                  <HugeiconsIcon icon={ArrowDownLeft} className="h-6 w-6" />
+                </div>
+                <span className={cn(
+                  "font-semibold text-xs uppercase tracking-wider",
+                  watch('type') === 'Inward' ? "text-green-600" : "text-muted-foreground"
+                )}>Received</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="amount" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Amount</Label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-semibold opacity-30">₹</span>
+              <Input 
+                id="amount" 
+                type="number" 
+                {...register('amount')} 
+                className="h-16 pl-10 text-3xl font-semibold border-none bg-canvas-parchment rounded-sm" 
+              />
+            </div>
+            {errors.amount && <p className="text-xs text-destructive ml-1">{errors.amount.message as string}</p>}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="cheque_number" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Cheque Number</Label>
+              <Input id="cheque_number" {...register('cheque_number')} placeholder="6-digit number" className="h-12 rounded-sm bg-canvas-parchment border-none" />
+              {errors.cheque_number && <p className="text-xs text-destructive ml-1">{errors.cheque_number.message as string}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cheque_date" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Cheque Date</Label>
+              <Input id="cheque_date" type="date" {...register('cheque_date')} className="h-12 rounded-sm bg-canvas-parchment border-none" />
+              {errors.cheque_date && <p className="text-xs text-destructive ml-1">{errors.cheque_date.message as string}</p>}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Select Party</Label>
+            <Combobox 
+              options={partyOptions} 
+              value={watch('party_id')} 
+              onValueChange={(val) => setValue('party_id', val)} 
+              placeholder="Choose a party"
+            />
+            {errors.party_id && <p className="text-xs text-destructive ml-1">{errors.party_id.message as string}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Select Account</Label>
+            <Combobox 
+              options={accountOptions} 
+              value={watch('account_id')} 
+              onValueChange={(val) => setValue('account_id', val)} 
+              placeholder="Choose an account"
+            />
+            {errors.account_id && <p className="text-xs text-destructive ml-1">{errors.account_id.message as string}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="notes" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Notes</Label>
+            <Input id="notes" {...register('notes')} placeholder="Add any notes here" className="h-12 rounded-sm bg-canvas-parchment border-none" />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="deposit_date" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Expected Deposit Date</Label>
+            <Input id="deposit_date" type="date" {...register('deposit_date')} className="h-12 rounded-sm bg-canvas-parchment border-none" />
+          </div>
+        </div>
+
+        <div className="pt-4 flex flex-col gap-3">
+          <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
+            {isSaving ? 'Saving...' : 'Update Cheque'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
+          </Button>
+
+          <DeleteConfirmationDialog 
+            title="Delete Cheque?"
+            description="This will permanently delete this cheque record."
+            confirmName={cheque?.cheque_number || 'Cheque'}
+            onDelete={async () => { onDelete() }}
+            trigger={
+              <Button type="button" variant="ghost" className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">
+                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" /> Delete Cheque
+              </Button>
+            }
+          />
+        </div>
+      </form>
+    </div>
+  )
+}

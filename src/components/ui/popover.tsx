@@ -4,13 +4,14 @@ import * as React from "react"
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover"
 
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 function Popover({ ...props }: PopoverPrimitive.Root.Props) {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />
 }
 
-function PopoverTrigger({ render, ...props }: PopoverPrimitive.Trigger.Props) {
-  const isNativeButton = React.isValidElement(render) && render.type === "button"
+function PopoverTrigger({ render, nativeButton, ...props }: PopoverPrimitive.Trigger.Props) {
+  const isNativeButton = nativeButton ?? (!render || (React.isValidElement(render) && (render.type === "button" || render.type === Button)))
   return (
     <PopoverPrimitive.Trigger
       data-slot="popover-trigger"

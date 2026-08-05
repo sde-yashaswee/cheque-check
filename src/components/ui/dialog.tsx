@@ -12,8 +12,8 @@ function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
 }
 
-function DialogTrigger({ render, ...props }: DialogPrimitive.Trigger.Props) {
-  const isNativeButton = React.isValidElement(render) && render.type === "button"
+function DialogTrigger({ render, nativeButton, ...props }: DialogPrimitive.Trigger.Props) {
+  const isNativeButton = nativeButton ?? (!render || (React.isValidElement(render) && (render.type === "button" || render.type === Button)))
   return (
     <DialogPrimitive.Trigger
       data-slot="dialog-trigger"
@@ -24,8 +24,8 @@ function DialogTrigger({ render, ...props }: DialogPrimitive.Trigger.Props) {
   )
 }
 
-function DialogClose({ render, ...props }: DialogPrimitive.Close.Props) {
-  const isNativeButton = React.isValidElement(render) && render.type === "button"
+function DialogClose({ render, nativeButton, ...props }: DialogPrimitive.Close.Props) {
+  const isNativeButton = nativeButton ?? (!render || (React.isValidElement(render) && (render.type === "button" || render.type === Button)))
   return (
     <DialogPrimitive.Close
       data-slot="dialog-close"
@@ -77,8 +77,9 @@ function DialogContent({
       >
         {children}
         {showCloseButton && (
-          <DialogPrimitive.Close
+          <DialogClose
             data-slot="dialog-close"
+            nativeButton
             render={
               <Button
                 variant="ghost"
@@ -89,7 +90,7 @@ function DialogContent({
           >
             <HugeiconsIcon icon={XIcon}             />
             <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
+          </DialogClose>
         )}
       </DialogPrimitive.Popup>
     </DialogPortal>
@@ -125,9 +126,9 @@ function DialogFooter({
     >
       {children}
       {showCloseButton && (
-        <DialogPrimitive.Close render={<Button variant="outline" />}>
+        <DialogClose nativeButton render={<Button variant="outline" />}>
           Close
-        </DialogPrimitive.Close>
+        </DialogClose>
       )}
     </div>
   )

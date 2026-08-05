@@ -16,10 +16,13 @@ import { ChequeService } from '@/services/cheque.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useBusiness } from '@/hooks/use-business'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import Image from 'next/image'
+
+import Link from 'next/link'
 
 interface ChequeCardProps {
   cheque: ChequeWithRelations
-  onStatusUpdate: (id: string, status: ChequeStatus) => void
+  onStatusUpdate?: (id: string, status: ChequeStatus) => void
 }
 
 export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
@@ -37,11 +40,13 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
   })
 
   const currency = profile?.currency || '₹'
-  const dateFormat = profile?.date_format || 'dd/MM/yyyy'
+  const dateFormat = (profile?.date_format || 'dd/MM/yyyy')
+    .replace(/DD/g, 'dd')
+    .replace(/YYYY/g, 'yyyy')
 
   const handlers = useSwipeable({
     onSwiping: (e) => {
-      if (cheque.status === 'Cleared' || cheque.status === 'Bounced') return
+      if (!onStatusUpdate || cheque.status === 'Cleared' || cheque.status === 'Bounced') return
       
       const newOffset = e.deltaX
       setOffset(newOffset)
@@ -51,7 +56,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
       else setSwiping(null)
     },
     onSwipedLeft: (e) => {
-      if (cheque.status === 'Cleared' || cheque.status === 'Bounced') return
+      if (!onStatusUpdate || cheque.status === 'Cleared' || cheque.status === 'Bounced') return
       if (e.absX > 150) {
         onStatusUpdate(cheque.id, 'Bounced')
       }
@@ -59,7 +64,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
       setSwiping(null)
     },
     onSwipedRight: (e) => {
-      if (cheque.status === 'Cleared' || cheque.status === 'Bounced') return
+      if (!onStatusUpdate || cheque.status === 'Cleared' || cheque.status === 'Bounced') return
       if (e.absX > 150) {
         onStatusUpdate(cheque.id, 'Cleared')
       }
@@ -105,7 +110,8 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
         className="relative z-10 border bg-card p-5 shadow-sm active:scale-[0.99] transition-transform"
       >
-        <div className="flex justify-between items-start">
+        <Link href={`/cheques/${cheque.id}`} className="absolute inset-0 z-0" />
+        <div className="flex justify-between items-start relative z-10 pointer-events-none">
           <div className="flex items-start gap-3">
             <EntityAvatar 
               name={cheque.party?.name || '?'} 
@@ -120,12 +126,12 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
                 {cheque.image_url && (
                   <Dialog>
                     <DialogTrigger render={
-                      <button className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center text-primary transition-transform active:scale-90">
+                      <button className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center text-primary transition-transform active:scale-90 pointer-events-auto">
                         <HugeiconsIcon icon={ImageIcon} className="h-3 w-3" />
                       </button>
                     } />
                     <DialogContent className="max-w-lg p-0 overflow-hidden bg-transparent border-none shadow-none">
-                      <img src={cheque.image_url} alt="Cheque Scan" className="w-full h-auto rounded-3xl" />
+                      <Image src={cheque.image_url} alt="Cheque Scan" width={800} height={400} className="w-full h-auto rounded-3xl" />
                     </DialogContent>
                   </Dialog>
                 )}
@@ -138,9 +144,9 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
               {format(new Date(cheque.cheque_date), dateFormat)}
             </p>
             <div className="mt-1 flex items-center justify-end gap-1.5">
-              <span className="text-[10px] text-muted-foreground">{(cheque.account as any)?.bank?.name}</span>
+              <span className="text-[10px] text-muted-foreground">{cheque.account?.bank?.name}</span>
               <EntityAvatar 
-                name={(cheque.account as any)?.bank?.name || '?'} 
+                name={cheque.account?.bank?.name || '?'} 
                 color={cheque.account?.color} 
                 icon={cheque.account?.icon}
                 size="sm"
@@ -148,24 +154,27 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
             </div>
           </div>
         </div>
-        <div className="mt-4 flex justify-between items-center border-t pt-4">
+        <div className="mt-4 flex justify-between items-center border-t pt-4 relative z-10">
           <div className="flex items-center gap-2">
             <p className="text-xs text-muted-foreground">Cheque #{cheque.cheque_number}</p>
-            <DeleteConfirmationDialog 
-              title="Delete Cheque?"
-              description="This will permanently delete this cheque record."
-              confirmName={cheque.cheque_number}
-              onDelete={async () => { deleteMutation.mutate() }}
-              trigger={
-                <button className="text-muted-foreground hover:text-destructive transition-colors">
-                  <HugeiconsIcon icon={Trash2} className="h-3 w-3" />
-                </button>
-              }
-            />
+            <div className="pointer-events-auto">
+              <DeleteConfirmationDialog 
+                title="Delete Cheque?"
+                description="This will permanently delete this cheque record."
+                confirmName={cheque.cheque_number}
+                onDelete={async () => { deleteMutation.mutate() }}
+                trigger={
+                  <button className="text-muted-foreground hover:text-destructive transition-colors">
+                    <HugeiconsIcon icon={Trash2} className="h-3 w-3" />
+                  </button>
+                }
+              />
+            </div>
           </div>
-          <StatusPill status={statusLabel as any} />
+          <StatusPill status={statusLabel as ChequeStatus} />
         </div>
       </motion.div>
     </div>
   )
 }
+

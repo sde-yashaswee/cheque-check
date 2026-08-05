@@ -26,9 +26,9 @@ const CURRENCY_OPTIONS = [
 ]
 
 const DATE_FORMAT_OPTIONS = [
-  { label: 'DD/MM/YYYY', value: 'DD/MM/YYYY' },
-  { label: 'MM/DD/YYYY', value: 'MM/DD/YYYY' },
-  { label: 'YYYY-MM-DD', value: 'YYYY-MM-DD' },
+  { label: 'DD/MM/YYYY', value: 'dd/MM/yyyy' },
+  { label: 'MM/DD/YYYY', value: 'MM/dd/yyyy' },
+  { label: 'YYYY-MM-DD', value: 'yyyy-MM-dd' },
 ]
 
 const TIME_FORMAT_OPTIONS = [
@@ -76,7 +76,7 @@ export default function OnboardingPage() {
     businessAddress: '',
     businessColor: '#0066cc',
     currency: '₹',
-    dateFormat: 'DD/MM/YYYY',
+    dateFormat: 'dd/MM/yyyy',
     timeFormat: '12h',
     timeZone: 'Asia/Kolkata',
     language: 'en',
@@ -89,7 +89,7 @@ export default function OnboardingPage() {
       setFormData(prev => ({
         ...prev,
         currency: profile.currency || '₹',
-        dateFormat: profile.date_format || 'DD/MM/YYYY',
+        dateFormat: profile.date_format || 'dd/MM/yyyy',
         timeFormat: profile.time_format || '12h',
         timeZone: profile.time_zone || 'Asia/Kolkata',
         language: profile.language || 'en',

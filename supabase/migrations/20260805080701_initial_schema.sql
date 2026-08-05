@@ -11,7 +11,7 @@ CREATE TABLE profiles (
   name TEXT,
   email TEXT,
   currency TEXT DEFAULT '₹',
-  date_format TEXT DEFAULT 'DD/MM/YYYY',
+  date_format TEXT DEFAULT 'dd/MM/yyyy',
   reminders_per_day INT DEFAULT 1,
   default_reminder_days INT DEFAULT 3,
   received_cheques_enabled BOOLEAN DEFAULT TRUE,

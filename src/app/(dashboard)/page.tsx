@@ -13,6 +13,9 @@ import { useProfile } from "@/hooks/use-profile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { useChequeStats } from "@/hooks/use-cheque-stats";
+import { DataState } from "@/components/ui/data-state";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Building03Icon, Calendar01Icon, PieChartIcon } from "@hugeicons/core-free-icons";
 
 export default function HomePage() {
   const { activeBusiness } = useBusiness()
@@ -55,27 +58,36 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20 pt-2">
-      {!activeBusiness && !isLoading ? (
-        <div className="py-20 text-center">
-          <p className="text-body text-muted-foreground">Create a business to get started.</p>
-          <Link href="/businesses/create" className="mt-4 block">
-            <Button className="rounded-full">Create Business</Button>
-          </Link>
-        </div>
-      ) : isLoading ? (
-        <>
-          <Skeleton className="h-40 w-full rounded-lg" />
-          <div className="grid grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-24 w-full rounded-lg" />
-            ))}
-          </div>
-          <div className="space-y-4">
-            <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-32 w-full rounded-lg" />
-          </div>
-        </>
-      ) : (
+      <DataState
+        isLoading={isLoading}
+        data={activeBusiness ? [activeBusiness] : []}
+        allData={activeBusiness ? [activeBusiness] : []}
+        loadingComponent={
+          <>
+            <Skeleton className="h-40 w-full rounded-lg" />
+            <div className="grid grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-24 w-full rounded-lg" />
+              ))}
+            </div>
+            <div className="space-y-4">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-32 w-full rounded-lg" />
+            </div>
+          </>
+        }
+        emptyState={
+          <EmptyState
+            icon={Building03Icon}
+            title="Welcome to Cheque Check"
+            description="You need to create or select a business to start tracking cheques."
+            action={{
+              label: "Create Business",
+              href: "/businesses/create"
+            }}
+          />
+        }
+      >
         <>
           {/* Outstanding Card */}
           <div className="rounded-lg bg-primary p-8 text-primary-foreground relative overflow-hidden">
@@ -115,9 +127,12 @@ export default function HomePage() {
           <div className="space-y-4">
             <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1">Today&apos;s Cheques</h2>
             {todayCheques.length === 0 ? (
-              <div className="rounded-lg border border-dashed p-10 text-center bg-canvas-parchment/30">
-                <p className="text-sm text-muted-foreground font-normal">Enjoy your day! No cheques due.</p>
-              </div>
+              <EmptyState
+                icon={Calendar01Icon}
+                title="No cheques due today"
+                description="Enjoy your day! You have no upcoming cheques for today."
+                className="py-10 bg-canvas-parchment/30"
+              />
             ) : (
               <div className="space-y-4">
                 {todayCheques.map((cheque) => (
@@ -186,13 +201,18 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="flex h-full items-center justify-center">
-                   <p className="text-sm text-muted-foreground italic">No data to display</p>
+                   <EmptyState
+                     icon={PieChartIcon}
+                     title="No data yet"
+                     description="Add cheques to see your statistics."
+                     className="border-none p-0"
+                   />
                 </div>
               )}
             </div>
           </div>
         </>
-      )}
+      </DataState>
 
       <Link href="/cheques/create">
         <Button className="fixed bottom-24 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900" size="icon">
@@ -202,4 +222,5 @@ export default function HomePage() {
     </div>
   );
 }
+
 

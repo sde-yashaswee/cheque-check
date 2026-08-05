@@ -127,7 +127,9 @@ export default function BusinessesPage() {
                       }
                     />
                    </div>
-                   <HugeiconsIcon icon={ArrowRight} className="h-5 w-5 text-muted-foreground opacity-20 transition-opacity group-hover:opacity-100" />
+                   <Link href={`/businesses/${business.id}`} onClick={(e) => e.stopPropagation()}>
+                    <HugeiconsIcon icon={ArrowRight} className="h-5 w-5 text-muted-foreground opacity-20 transition-opacity group-hover:opacity-100 hover:text-primary hover:opacity-100" />
+                   </Link>
                 </div>
               </div>
 

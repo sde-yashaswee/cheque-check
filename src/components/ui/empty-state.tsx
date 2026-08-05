@@ -1,8 +1,7 @@
 import * as React from "react"
+import { HugeiconsIcon } from "@hugeicons/react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { HugeiconsIcon } from '@hugeicons/react'
 
 interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: any
@@ -53,10 +52,9 @@ export function EmptyState({
               {action.label}
             </Button>
           ) : action.href ? (
-            <Button
-              className="rounded-full px-8"
-              render={<Link href={action.href}>{action.label}</Link>}
-            />
+            <Button asChild className="rounded-full px-8">
+              <a href={action.href}>{action.label}</a>
+            </Button>
           ) : (
             <Button className="rounded-full px-8">{action.label}</Button>
           )}
@@ -65,3 +63,4 @@ export function EmptyState({
     </div>
   )
 }
+
