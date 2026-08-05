@@ -15,7 +15,7 @@ export default function FeaturesPage() {
       name: 'Receiving Cheques Mode',
       description: 'Enable this if your business also receives cheques from parties. Adds "Inward" cheque support throughout the app.',
       icon: CheckCircle2,
-      checked: profile?.received_cheques_enabled,
+      checked: !!profile?.received_cheques_enabled,
       onChange: (val: boolean) => updateProfile({ received_cheques_enabled: val })
     },
     {
@@ -49,7 +49,7 @@ export default function FeaturesPage() {
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="grid gap-4">
         {features.map((feature) => (
-          <div 
+          <div
             key={feature.id}
             className={cn(
               "relative flex flex-col gap-4 rounded-lg border bg-card p-6 transition-all border-primary/5",

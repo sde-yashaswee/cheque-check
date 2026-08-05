@@ -143,7 +143,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background dark:bg-black selection:bg-primary/10 transition-colors duration-500">
+    <div className="min-h-full bg-background dark:bg-black selection:bg-primary/10 transition-colors duration-500">
       <div className="mx-auto max-w-2xl px-6 py-12 md:py-24 space-y-12">
         
         {/* Header */}

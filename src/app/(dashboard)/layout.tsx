@@ -10,7 +10,7 @@ export default function DashboardLayout({
 }) {
   return (
     <OnboardingCheck>
-      <div className="flex min-h-screen flex-col pb-16">
+      <div className="flex min-h-full flex-col pb-16">
         <ScrollToTop />
         <TopNav />
         <main className="flex-1 px-4 pt-6 md:px-8">
