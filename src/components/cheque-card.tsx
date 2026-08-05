@@ -8,6 +8,8 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useProfile } from '@/hooks/use-profile'
 import { format } from 'date-fns'
+import { StatusPill } from '@/components/ui/status-pill'
+import { EntityAvatar } from '@/components/ui/entity-avatar'
 
 interface ChequeCardProps {
   cheque: ChequeWithRelations
@@ -52,14 +54,6 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
     trackMouse: true,
   })
 
-  const statusColors = {
-    Upcoming: 'bg-primary/10 text-primary',
-    Cleared: 'bg-green-500/10 text-green-600',
-    Bounced: 'bg-destructive/10 text-destructive',
-    Today: 'bg-orange-500/10 text-orange-600',
-    Overdue: 'bg-gray-500/10 text-gray-600',
-  }
-
   const getStatusDisplay = () => {
     if (cheque.status === 'Cleared') return 'Cleared'
     if (cheque.status === 'Bounced') return 'Bounced'
@@ -97,25 +91,37 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
         className="relative z-10 border bg-card p-5 shadow-sm active:scale-[0.99] transition-transform"
       >
         <div className="flex justify-between items-start">
-          <div>
-            <p className="text-xl font-bold">{currency}{cheque.amount.toLocaleString()}</p>
-            <p className="text-body-strong">{cheque.party?.name}</p>
+          <div className="flex items-start gap-3">
+            <EntityAvatar 
+              name={cheque.party?.name || '?'} 
+              color={(cheque.party as any)?.color} 
+              icon={(cheque.party as any)?.icon}
+              size="md"
+              className="mt-1"
+            />
+            <div>
+              <p className="text-xl font-bold">{currency}{cheque.amount.toLocaleString()}</p>
+              <p className="text-body-strong">{cheque.party?.name}</p>
+            </div>
           </div>
           <div className="text-right">
             <p className="text-xs font-semibold text-muted-foreground uppercase">
               {format(new Date(cheque.cheque_date), dateFormat)}
             </p>
-            <p className="text-xs text-muted-foreground">{cheque.bank?.bank_name}</p>
+            <div className="mt-1 flex items-center justify-end gap-1.5">
+              <span className="text-[10px] text-muted-foreground">{cheque.bank?.bank_name}</span>
+              <EntityAvatar 
+                name={cheque.bank?.bank_name || '?'} 
+                color={(cheque.bank as any)?.color} 
+                icon={(cheque.bank as any)?.icon}
+                size="sm"
+              />
+            </div>
           </div>
         </div>
         <div className="mt-4 flex justify-between items-center border-t pt-4">
           <p className="text-xs text-muted-foreground">Cheque #{cheque.cheque_number}</p>
-          <div className={cn(
-            "rounded-pill px-2 py-1 text-[10px] font-bold uppercase",
-            statusColors[statusLabel as keyof typeof statusColors] || statusColors.Upcoming
-          )}>
-            {statusLabel}
-          </div>
+          <StatusPill status={statusLabel as any} />
         </div>
       </motion.div>
     </div>

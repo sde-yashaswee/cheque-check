@@ -10,9 +10,10 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { ChequeStatus } from '@/types'
 import { useBusiness } from '@/hooks/use-business'
-
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
+import { StatusPill } from '@/components/ui/status-pill'
+import { cn } from '@/lib/utils'
 
 export default function ChequesPage() {
   const [search, setSearch] = useState('')
@@ -61,19 +62,24 @@ export default function ChequesPage() {
               <Filter className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-48 p-2" align="end">
+          <PopoverContent className="w-56 p-2 rounded-3xl" align="end">
             <div className="flex flex-col gap-1">
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-3 py-2">Filter Status</p>
               {['All', 'Issued', 'Received', 'Cleared', 'Bounced'].map((s) => (
                 <button
                   key={s}
                   onClick={() => setFilter(s as any)}
                   className={cn(
-                    "flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted",
-                    filter === s ? "text-primary" : "text-muted-foreground"
+                    "flex items-center justify-between rounded-2xl px-3 py-2.5 text-sm font-bold transition-all active:scale-95",
+                    filter === s ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted"
                   )}
                 >
                   {s}
-                  {filter === s && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                  {filter === s ? (
+                    <div className="h-2 w-2 rounded-full bg-white shadow-sm" />
+                  ) : (
+                    <StatusPill status={s as any} className="scale-75 origin-right opacity-50" />
+                  )}
                 </button>
               ))}
             </div>
@@ -85,7 +91,7 @@ export default function ChequesPage() {
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-32 w-full" />
+              <Skeleton key={i} className="h-32 w-full rounded-3xl" />
             ))}
           </div>
         ) : filteredCheques?.length === 0 ? (
@@ -103,15 +109,11 @@ export default function ChequesPage() {
         )}
       </div>
 
-
       <Link href="/cheques/create">
-        <Button className="fixed bottom-20 right-6 h-14 w-14 rounded-full shadow-lg" size="icon">
-          <Plus className="h-6 w-6" />
+        <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full shadow-2xl z-40 border-4 border-white dark:border-zinc-900" size="icon">
+          <Plus className="h-8 w-8" />
         </Button>
       </Link>
     </div>
   )
 }
-
-// Add this at the bottom to avoid cn not found error
-import { cn } from '@/lib/utils'

@@ -23,6 +23,8 @@ export interface Business {
   phone: string | null;
   address: string | null;
   logo_url: string | null;
+  color?: string;
+  icon?: string;
   created_at: string;
   updated_at: string;
 }
@@ -35,6 +37,8 @@ export interface Party {
   email: string | null;
   address: string | null;
   notes: string | null;
+  color?: string;
+  icon?: string;
   created_at: string;
   updated_at: string;
 }
@@ -46,6 +50,8 @@ export interface Bank {
   account_name: string;
   account_number: string;
   ifsc_code: string | null;
+  color?: string;
+  icon?: string;
   created_at: string;
   updated_at: string;
 }

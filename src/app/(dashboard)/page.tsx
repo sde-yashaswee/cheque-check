@@ -11,10 +11,10 @@ import Link from "next/link";
 import { ChequeStatus, ChequeWithRelations } from "@/types";
 import { useState } from "react";
 import { GlobalSearch } from "@/components/global-search";
-
 import { useProfile } from "@/hooks/use-profile";
 import { Landmark, Building2, Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StatusPill } from "@/components/ui/status-pill";
 
 export default function HomePage() {
   const { activeBusiness } = useBusiness()
@@ -72,58 +72,62 @@ export default function HomePage() {
         </div>
       ) : isLoading ? (
         <>
-          <Skeleton className="h-40 w-full rounded-lg" />
+          <Skeleton className="h-40 w-full rounded-3xl" />
           <div className="grid grid-cols-2 gap-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Skeleton key={i} className="h-24 w-full" />
+              <Skeleton key={i} className="h-24 w-full rounded-3xl" />
             ))}
           </div>
           <div className="space-y-4">
             <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full rounded-3xl" />
+            <Skeleton className="h-32 w-full rounded-3xl" />
           </div>
         </>
       ) : (
         <>
           {/* Outstanding Card */}
-
-          <div className="rounded-lg bg-primary p-6 text-primary-foreground shadow-product">
-            <p className="text-sm font-medium opacity-80">Outstanding</p>
-            <p className="mt-1 text-display-lg">{currency}{outstanding.toLocaleString()}</p>
-            <div className="mt-6 flex gap-8 border-t border-white/20 pt-4">
-              <div>
-                <p className="text-xs opacity-80 uppercase tracking-wider">Issued</p>
-                <p className="text-lg font-semibold">{currency}{(issued / 100000).toFixed(1)}L</p>
-              </div>
-              <div>
-                <p className="text-xs opacity-80 uppercase tracking-wider">Received</p>
-                <p className="text-lg font-semibold">{currency}{(received / 100000).toFixed(1)}L</p>
+          <div className="rounded-3xl bg-primary p-8 text-primary-foreground shadow-product relative overflow-hidden">
+            <div className="relative z-10">
+              <p className="text-xs font-black opacity-70 uppercase tracking-widest">Total Outstanding</p>
+              <p className="mt-2 text-4xl font-black">{currency}{outstanding.toLocaleString()}</p>
+              <div className="mt-8 flex gap-8 border-t border-white/10 pt-6">
+                <div>
+                  <p className="text-[10px] font-black opacity-60 uppercase tracking-widest">Issued</p>
+                  <p className="text-xl font-bold">{currency}{(issued / 100000).toFixed(1)}L</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black opacity-60 uppercase tracking-widest">Received</p>
+                  <p className="text-xl font-bold">{currency}{(received / 100000).toFixed(1)}L</p>
+                </div>
               </div>
             </div>
+            {/* Abstract Background Element */}
+            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/5 blur-3xl" />
+            <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-black/5 blur-3xl" />
           </div>
 
           {/* Quick Actions */}
           <div className="space-y-4">
-            <h2 className="text-lead font-semibold">Quick Actions</h2>
+            <h2 className="text-xs font-black text-muted-foreground uppercase tracking-widest px-1">Quick Actions</h2>
             <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
               <Link href="/banks" className="flex flex-col items-center gap-2 min-w-[80px]">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-canvas-parchment text-primary shadow-sm">
+                <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-canvas-parchment text-primary shadow-sm ring-1 ring-primary/5 transition-transform active:scale-90">
                   <Landmark className="h-6 w-6" />
                 </div>
-                <span className="text-[11px] font-medium">Banks</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Banks</span>
               </Link>
               <Link href="/parties" className="flex flex-col items-center gap-2 min-w-[80px]">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-canvas-parchment text-primary shadow-sm">
+                <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-canvas-parchment text-primary shadow-sm ring-1 ring-primary/5 transition-transform active:scale-90">
                   <Users className="h-6 w-6" />
                 </div>
-                <span className="text-[11px] font-medium">Parties</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Parties</span>
               </Link>
-              <Link href="/businesses/create" className="flex flex-col items-center gap-2 min-w-[80px]">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-canvas-parchment text-primary shadow-sm">
+              <Link href="/businesses" className="flex flex-col items-center gap-2 min-w-[80px]">
+                <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-canvas-parchment text-primary shadow-sm ring-1 ring-primary/5 transition-transform active:scale-90">
                   <Building2 className="h-6 w-6" />
                 </div>
-                <span className="text-[11px] font-medium">Businesses</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Business</span>
               </Link>
             </div>
           </div>
@@ -131,31 +135,30 @@ export default function HomePage() {
           {/* Status Grid */}
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: "Today", count: todayCheques.length, amount: `${currency}${(todayCheques.reduce((a, c) => a + c.amount, 0) / 100000).toFixed(1)}L` },
-              { label: "Upcoming", count: upcomingCount, amount: "-" },
-              { label: "Overdue", count: overdueCount, amount: "-" },
-              { label: "Cleared", count: cheques?.filter((c) => c.status === 'Cleared').length || 0, amount: "-" },
-              { label: "Bounced", count: cheques?.filter((c) => c.status === 'Bounced').length || 0, amount: "-" },
-              { label: "Received", count: cheques?.filter((c) => c.type === 'Inward').length || 0, amount: "-" },
+              { label: "Today", count: todayCheques.length, amount: `${currency}${(todayCheques.reduce((a, c) => a + c.amount, 0) / 100000).toFixed(1)}L`, status: 'Today' },
+              { label: "Upcoming", count: upcomingCount, amount: "-", status: 'Upcoming' },
+              { label: "Overdue", count: overdueCount, amount: "-", status: 'Overdue' },
+              { label: "Cleared", count: cheques?.filter((c) => c.status === 'Cleared').length || 0, amount: "-", status: 'Cleared' },
+              { label: "Bounced", count: cheques?.filter((c) => c.status === 'Bounced').length || 0, amount: "-", status: 'Bounced' },
+              { label: "Received", count: cheques?.filter((c) => c.type === 'Inward').length || 0, amount: "-", status: 'Received' },
             ].map((status) => (
-              <div key={status.label} className="rounded-lg border bg-card p-4 transition-transform active:scale-95">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{status.label}</p>
-                <p className="mt-2 text-xl font-bold">{status.count}</p>
-                <p className="text-sm text-muted-foreground">{status.amount !== '-' ? status.amount : ''}</p>
+              <div key={status.label} className="group relative rounded-3xl border bg-card p-5 transition-all active:scale-95 hover:shadow-md overflow-hidden">
+                <div className="flex justify-between items-start relative z-10">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{status.label}</p>
+                  <StatusPill status={status.status as any} className="scale-75 origin-right" />
+                </div>
+                <p className="mt-4 text-3xl font-black">{status.count}</p>
+                <p className="text-xs font-bold text-muted-foreground mt-1">{status.amount !== '-' ? status.amount : ''}</p>
               </div>
             ))}
           </div>
 
           {/* Today's Cheques */}
-          <div className="space-y-4">
-            <h2 className="text-lead font-semibold">Today&apos;s Cheques</h2>
-            {isLoading ? (
-              <div className="space-y-4">
-                {[1, 2].map((i) => <div key={i} className="h-24 w-full animate-pulse rounded-lg bg-canvas-parchment" />)}
-              </div>
-            ) : todayCheques.length === 0 ? (
-              <div className="rounded-lg border border-dashed p-8 text-center">
-                <p className="text-sm text-muted-foreground">No cheques due today.</p>
+          <div className="space-y-4 pt-4">
+            <h2 className="text-xs font-black text-muted-foreground uppercase tracking-widest px-1">Today&apos;s Cheques</h2>
+            {todayCheques.length === 0 ? (
+              <div className="rounded-3xl border border-dashed p-10 text-center bg-canvas-parchment/30">
+                <p className="text-sm text-muted-foreground font-medium">Enjoy your day! No cheques due.</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -173,8 +176,8 @@ export default function HomePage() {
       )}
 
       <Link href="/cheques/create">
-        <Button className="fixed bottom-20 right-6 h-14 w-14 rounded-full shadow-lg z-40" size="icon">
-          <Plus className="h-6 w-6" />
+        <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full shadow-2xl z-40 border-4 border-white dark:border-zinc-900" size="icon">
+          <Plus className="h-8 w-8" />
         </Button>
       </Link>
     </div>

@@ -7,18 +7,16 @@ import { chequeSchema } from '@/validators'
 import { ChequeService } from '@/services/cheque.service'
 import { PartyService } from '@/services/party.service'
 import { BankService } from '@/services/bank.service'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
-
 import { Combobox } from '@/components/ui/combobox'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { EntityAvatar } from '@/components/ui/entity-avatar'
 
 export default function CreateChequePage() {
   const [step, setStep] = useState(1)
@@ -68,8 +66,21 @@ export default function CreateChequePage() {
   const nextStep = () => setStep(s => Math.min(s + 1, 3))
   const prevStep = () => setStep(s => Math.max(s - 1, 1))
 
-  const partyOptions = parties?.map(p => ({ label: p.name, value: p.id })) || []
-  const bankOptions = banks?.map(b => ({ label: `${b.bank_name} (${b.account_number.slice(-4)})`, value: b.id })) || []
+  const partyOptions = parties?.map(p => ({ 
+    label: p.name, 
+    value: p.id,
+    color: (p as any).color,
+    icon: (p as any).icon
+  })) || []
+
+  const bankOptions = banks?.map(b => ({ 
+    label: `${b.bank_name} (${b.account_number.slice(-4)})`, 
+    value: b.id,
+    color: (b as any).color,
+    icon: (b as any).icon
+  })) || []
+
+  const selectedParty = parties?.find(p => p.id === watch('party_id'))
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
@@ -79,9 +90,12 @@ export default function CreateChequePage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
         )}
+        <div>
+          <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Step {step} of 3</p>
+          <h2 className="text-display-sm font-bold">New Cheque</h2>
+        </div>
       </div>
 
-      {/* Progress Bar */}
       <div className="flex gap-2">
         {[1, 2, 3].map((s) => (
           <div 
@@ -142,7 +156,7 @@ export default function CreateChequePage() {
               </div>
             </div>
             
-            <Button type="button" className="w-full rounded-pill h-14 text-lg" onClick={nextStep}>
+            <Button type="button" className="w-full rounded-pill h-14 text-lg" onClick={nextStep} disabled={!watch('amount')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -172,7 +186,7 @@ export default function CreateChequePage() {
               {errors.bank_id && <p className="text-xs text-destructive">{errors.bank_id.message as string}</p>}
             </div>
 
-            <Button type="button" className="w-full rounded-pill h-14 text-lg" onClick={nextStep}>
+            <Button type="button" className="w-full rounded-pill h-14 text-lg" onClick={nextStep} disabled={!watch('party_id') || !watch('bank_id')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -190,23 +204,33 @@ export default function CreateChequePage() {
               <Input id="deposit_date" type="date" {...register('deposit_date')} className="h-12" />
             </div>
 
-            <div className="rounded-lg bg-canvas-parchment p-6 space-y-4">
-              <h3 className="font-bold">Summary</h3>
-              <div className="flex justify-between text-sm">
+            <div className="rounded-3xl bg-primary/5 p-6 space-y-4 border border-primary/10">
+              <h3 className="font-bold text-primary uppercase tracking-widest text-[10px]">Summary</h3>
+              <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Amount</span>
-                <span className="font-bold">₹{Number(watch('amount') || 0).toLocaleString()}</span>
+                <span className="text-xl font-black">₹{Number(watch('amount') || 0).toLocaleString()}</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Number</span>
-                <span className="font-medium">#{watch('cheque_number')}</span>
+                <span className="font-bold font-mono bg-white px-2 py-0.5 rounded shadow-sm">#{watch('cheque_number')}</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Party</span>
-                <span className="font-medium">{parties?.find(p => p.id === watch('party_id'))?.name || '-'}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold">{selectedParty?.name || '-'}</span>
+                  {selectedParty && (
+                    <EntityAvatar 
+                      name={selectedParty.name} 
+                      color={(selectedParty as any).color} 
+                      icon={(selectedParty as any).icon} 
+                      size="sm" 
+                    />
+                  )}
+                </div>
               </div>
             </div>
 
-            <Button type="submit" className="w-full rounded-pill h-14 text-lg" disabled={mutation.isPending}>
+            <Button type="submit" className="w-full rounded-pill h-14 text-lg shadow-product" disabled={mutation.isPending}>
               {mutation.isPending ? 'Saving...' : 'Save Cheque'} <Check className="ml-2 h-5 w-5" />
             </Button>
           </div>

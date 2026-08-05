@@ -19,8 +19,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
+import { EntityAvatar } from "@/components/ui/entity-avatar"
+
 interface ComboboxProps {
-  options: { label: string; value: string }[]
+  options: { label: string; value: string; color?: string; icon?: string }[]
   value?: string
   onValueChange: (value: string) => void
   placeholder?: string
@@ -38,18 +40,29 @@ export function Combobox({
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
 
+  const selectedOption = options.find((option) => option.value === value)
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         className={cn(buttonVariants({ variant: "outline" }), "w-full justify-between h-12", className)}
       >
-        {value
-          ? options.find((option) => option.value === value)?.label
-          : placeholder}
+        <div className="flex items-center gap-2 overflow-hidden">
+          {selectedOption && (
+            <EntityAvatar 
+              name={selectedOption.label} 
+              color={selectedOption.color} 
+              icon={selectedOption.icon} 
+              size="sm" 
+            />
+          )}
+          <span className="truncate">
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+        </div>
         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
-
         <Command>
           <CommandInput placeholder={placeholder} />
           <CommandList>
@@ -63,14 +76,18 @@ export function Combobox({
                     onValueChange(currentValue === value ? "" : currentValue)
                     setOpen(false)
                   }}
+                  className="flex items-center justify-between"
                 >
+                  <div className="flex items-center gap-2">
+                    <EntityAvatar name={option.label} color={option.color} icon={option.icon} size="sm" />
+                    {option.label}
+                  </div>
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "h-4 w-4",
                       value === option.value ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  {option.label}
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -80,3 +97,4 @@ export function Combobox({
     </Popover>
   )
 }
+

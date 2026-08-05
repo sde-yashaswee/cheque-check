@@ -116,38 +116,8 @@ export default function SettingsPage() {
     {
       title: 'Management',
       items: [
-        { name: 'My Businesses', icon: Building2, href: '/businesses/create' },
+        { name: 'My Businesses', icon: Building2, href: '/businesses' },
         { name: 'Bank Accounts', icon: Landmark, href: '/banks' },
-      ]
-    },
-    {
-      title: 'Reminders',
-      items: [
-        { name: 'Received Cheques Mode', toggle: true, icon: Bell, checked: profile?.received_cheques_enabled, onChange: (val: boolean) => updateProfile({ received_cheques_enabled: val }) },
-        { 
-          name: 'Reminders Per Day', 
-          icon: Bell,
-          component: (
-            <Combobox 
-              options={remindersPerDayOptions} 
-              value={profile?.reminders_per_day?.toString()} 
-              onValueChange={(val) => updateProfile({ reminders_per_day: parseInt(val) })}
-              className="h-9 w-[140px]"
-            />
-          )
-        },
-        { 
-          name: 'Reminder Frequency', 
-          icon: Bell,
-          component: (
-            <Combobox 
-              options={reminderFrequencyOptions} 
-              value={profile?.default_reminder_days?.toString()} 
-              onValueChange={(val) => updateProfile({ default_reminder_days: parseInt(val) })}
-              className="h-9 w-[150px]"
-            />
-          )
-        },
       ]
     },
     {
