@@ -1,6 +1,6 @@
 'use client'
 
-import { Plus } from "lucide-react";
+import { Plus, Search as SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BusinessSwitcher } from "@/components/business-switcher";
 import { useBusiness } from "@/hooks/use-business";
@@ -8,15 +8,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChequeService } from "@/services/cheque.service";
 import { ChequeCard } from "@/components/cheque-card";
 import Link from "next/link";
-import { ChequeStatus } from "@/types";
+import { ChequeStatus, ChequeWithRelations } from "@/types";
+import { useState } from "react";
+import { GlobalSearch } from "@/components/global-search";
 
 export default function HomePage() {
   const { activeBusiness } = useBusiness()
   const queryClient = useQueryClient()
+  const [searchOpen, setSearchOpen] = useState(false)
 
-  const { data: cheques, isLoading } = useQuery({
+  const { data: cheques, isLoading } = useQuery<ChequeWithRelations[]>({
     queryKey: ['cheques', activeBusiness?.id],
-    queryFn: () => ChequeService.getAll(activeBusiness!.id),
+    queryFn: () => ChequeService.getAll(activeBusiness!.id) as Promise<ChequeWithRelations[]>,
     enabled: !!activeBusiness?.id,
   })
 
@@ -30,22 +33,29 @@ export default function HomePage() {
 
   // Derived stats
   const today = new Date().toISOString().split('T')[0]
-  const todayCheques = cheques?.filter((c: any) => c.cheque_date === today) || []
-  const outstanding = cheques?.reduce((acc: number, curr: any) => {
+  const todayCheques = cheques?.filter((c) => c.cheque_date === today) || []
+  const outstanding = cheques?.reduce((acc: number, curr) => {
     if (curr.status === 'Cleared') return acc
     return curr.type === 'Outward' ? acc + curr.amount : acc - curr.amount
   }, 0) || 0
 
-  const issued = cheques?.filter((c: any) => c.type === 'Outward').reduce((acc: number, curr: any) => acc + curr.amount, 0) || 0
-  const received = cheques?.filter((c: any) => c.type === 'Inward').reduce((acc: number, curr: any) => acc + curr.amount, 0) || 0
+  const issued = cheques?.filter((c) => c.type === 'Outward').reduce((acc, curr) => acc + curr.amount, 0) || 0
+  const received = cheques?.filter((c) => c.type === 'Inward').reduce((acc, curr) => acc + curr.amount, 0) || 0
 
-  const upcomingCount = cheques?.filter((c: any) => c.cheque_date > today && c.status !== 'Cleared').length || 0
-  const overdueCount = cheques?.filter((c: any) => c.cheque_date < today && c.status !== 'Cleared').length || 0
+  const upcomingCount = cheques?.filter((c) => c.cheque_date > today && c.status !== 'Cleared').length || 0
+  const overdueCount = cheques?.filter((c) => c.cheque_date < today && c.status !== 'Cleared').length || 0
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-8">
-      <BusinessSwitcher />
+      <div className="flex items-center justify-between">
+        <BusinessSwitcher />
+        <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="rounded-full">
+          <SearchIcon className="h-5 w-5" />
+        </Button>
+      </div>
 
+      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+      
       <h1 className="text-display-lg">Home</h1>
 
       {!activeBusiness ? (
@@ -76,12 +86,12 @@ export default function HomePage() {
           {/* Status Grid */}
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: "Today", count: todayCheques.length, amount: `₹${(todayCheques.reduce((a: number, c: any) => a + c.amount, 0) / 100000).toFixed(1)}L` },
+              { label: "Today", count: todayCheques.length, amount: `₹${(todayCheques.reduce((a, c) => a + c.amount, 0) / 100000).toFixed(1)}L` },
               { label: "Upcoming", count: upcomingCount, amount: "-" },
               { label: "Overdue", count: overdueCount, amount: "-" },
-              { label: "Cleared", count: cheques?.filter((c: any) => c.status === 'Cleared').length || 0, amount: "-" },
-              { label: "Bounced", count: cheques?.filter((c: any) => c.status === 'Bounced').length || 0, amount: "-" },
-              { label: "Received", count: cheques?.filter((c: any) => c.type === 'Inward').length || 0, amount: "-" },
+              { label: "Cleared", count: cheques?.filter((c) => c.status === 'Cleared').length || 0, amount: "-" },
+              { label: "Bounced", count: cheques?.filter((c) => c.status === 'Bounced').length || 0, amount: "-" },
+              { label: "Received", count: cheques?.filter((c) => c.type === 'Inward').length || 0, amount: "-" },
             ].map((status) => (
               <div key={status.label} className="rounded-lg border bg-card p-4 transition-transform active:scale-95">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{status.label}</p>
@@ -94,11 +104,13 @@ export default function HomePage() {
           {/* Today's Cheques */}
           <div className="space-y-4">
             <h2 className="text-lead font-semibold">Today&apos;s Cheques</h2>
-            {todayCheques.length === 0 ? (
+            {isLoading ? (
+              <p>Loading...</p>
+            ) : todayCheques.length === 0 ? (
               <p className="text-sm text-muted-foreground">No cheques due today.</p>
             ) : (
               <div className="space-y-4">
-                {todayCheques.map((cheque: any) => (
+                {todayCheques.map((cheque) => (
                   <ChequeCard 
                     key={cheque.id} 
                     cheque={cheque} 

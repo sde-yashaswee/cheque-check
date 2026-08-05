@@ -148,7 +148,7 @@ export default function CreateChequePage() {
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
               <Label>Select Party</Label>
-              <Select onValueChange={(val) => setValue('party_id', val)} defaultValue={watch('party_id')}>
+              <Select onValueChange={(val) => setValue('party_id', val || "")} defaultValue={watch('party_id') || ""}>
                 <SelectTrigger className="h-12">
                   <SelectValue placeholder="Choose a party" />
                 </SelectTrigger>
@@ -164,7 +164,7 @@ export default function CreateChequePage() {
 
             <div className="space-y-2">
               <Label>Select Bank</Label>
-              <Select onValueChange={(val) => setValue('bank_id', val)} defaultValue={watch('bank_id')}>
+              <Select onValueChange={(val) => setValue('bank_id', val || "")} defaultValue={watch('bank_id') || ""}>
                 <SelectTrigger className="h-12">
                   <SelectValue placeholder="Choose a bank" />
                 </SelectTrigger>
@@ -200,7 +200,7 @@ export default function CreateChequePage() {
               <h3 className="font-bold">Summary</h3>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Amount</span>
-                <span className="font-bold">₹{watch('amount').toLocaleString()}</span>
+                <span className="font-bold">₹{Number(watch('amount') || 0).toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Number</span>

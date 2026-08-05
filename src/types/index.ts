@@ -68,3 +68,8 @@ export interface Cheque {
   created_at: string;
   updated_at: string;
 }
+
+export interface ChequeWithRelations extends Cheque {
+  party?: { name: string };
+  bank?: { bank_name: string };
+}

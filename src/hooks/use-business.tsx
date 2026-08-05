@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useMemo } from 'react'
 import { Business } from '@/types'
 import { BusinessService } from '@/services/business.service'
 import { useQuery } from '@tanstack/react-query'
@@ -20,13 +20,17 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
     queryFn: () => BusinessService.getAll(),
   })
 
-  const [activeBusiness, setActiveBusiness] = useState<Business | null>(null)
+  const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (businesses && businesses.length > 0 && !activeBusiness) {
-      setActiveBusiness(businesses[0])
-    }
-  }, [businesses, activeBusiness])
+  const activeBusiness = useMemo(() => {
+    if (!businesses || businesses.length === 0) return null
+    if (!selectedBusinessId) return businesses[0]
+    return businesses.find(b => b.id === selectedBusinessId) || businesses[0]
+  }, [businesses, selectedBusinessId])
+
+  const setActiveBusiness = (business: Business) => {
+    setSelectedBusinessId(business.id)
+  }
 
   return (
     <BusinessContext.Provider value={{ 

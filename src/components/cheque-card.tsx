@@ -1,14 +1,14 @@
 'use client'
 
 import { useSwipeable } from 'react-swipeable'
-import { Cheque, ChequeStatus } from '@/types'
+import { ChequeStatus, ChequeWithRelations } from '@/types'
 import { cn } from '@/lib/utils'
 import { Check, X } from 'lucide-react'
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 interface ChequeCardProps {
-  cheque: any // Using any because of the join with party/bank
+  cheque: ChequeWithRelations
   onStatusUpdate: (id: string, status: ChequeStatus) => void
 }
 
@@ -54,11 +54,9 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
     Overdue: 'bg-gray-500/10 text-gray-600',
   }
 
-  // Calculate time state for display
   const getStatusDisplay = () => {
     if (cheque.status === 'Cleared') return 'Cleared'
     if (cheque.status === 'Bounced') return 'Bounced'
-    // Simple today logic for now
     const today = new Date().toISOString().split('T')[0]
     if (cheque.cheque_date === today) return 'Today'
     if (cheque.cheque_date < today) return 'Overdue'
@@ -69,7 +67,6 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
 
   return (
     <div className="relative overflow-hidden rounded-lg">
-      {/* Background Swipe Actions */}
       <div className="absolute inset-0 flex items-center justify-between px-6">
         <div className={cn(
           "flex items-center gap-2 transition-opacity",
@@ -87,7 +84,6 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
         </div>
       </div>
 
-      {/* Main Card */}
       <motion.div
         {...handlers}
         style={{ x: offset }}

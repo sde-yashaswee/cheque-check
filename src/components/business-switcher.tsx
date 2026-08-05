@@ -11,12 +11,14 @@ export function BusinessSwitcher() {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <button className="flex items-center gap-2 rounded-pill bg-canvas-parchment px-4 py-2 text-sm font-semibold transition-transform active:scale-95 dark:bg-surface-tile-1">
-          <ChevronDown className="h-4 w-4" />
-          <span>{activeBusiness?.name || 'Select Business'}</span>
-        </button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <button className="flex items-center gap-2 rounded-pill bg-canvas-parchment px-4 py-2 text-sm font-semibold transition-transform active:scale-95 dark:bg-surface-tile-1">
+            <ChevronDown className="h-4 w-4" />
+            <span>{activeBusiness?.name || 'Select Business'}</span>
+          </button>
+        }
+      />
       <DialogContent className="sm:max-w-[425px] rounded-t-[32px] sm:rounded-lg">
         <DialogHeader>
           <DialogTitle>Switch Business</DialogTitle>
