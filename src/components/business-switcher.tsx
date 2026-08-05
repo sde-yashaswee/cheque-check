@@ -9,12 +9,14 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command"
 import { EntityAvatar } from "./ui/entity-avatar"
+import { useTranslations } from 'next-intl'
 
 interface BusinessSwitcherProps {
   trigger?: React.ReactElement
 }
 
 export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
+  const t = useTranslations('Businesses')
   const { activeBusiness, businesses, setActiveBusiness } = useBusiness()
   const [open, setOpen] = useState(false)
 
@@ -31,7 +33,7 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
                 imageUrl={activeBusiness?.logo_url}
                 size="md" 
               />
-              <span>{activeBusiness?.name || 'Select Business'}</span>
+              <span>{activeBusiness?.name || t('selectBusiness')}</span>
             </div>
           </button>
         )}
@@ -40,11 +42,11 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
         <Command className="bg-popover">
           <div className="px-5 py-4 border-b border-primary/5 bg-muted/30 flex items-center gap-2">
             <HugeiconsIcon icon={Building} className="h-3 w-3 text-muted-foreground opacity-80" />
-            <h2 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-80">Switch Business</h2>
+            <h2 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-80">{t('switchBusiness')}</h2>
           </div>
-          <CommandInput placeholder="Search business..." className="h-14 border-none" />
+          <CommandInput placeholder={t('searchBusiness')} className="h-14 border-none" />
           <CommandList className="max-h-[350px] p-2">
-            <CommandEmpty className="py-8 text-center text-sm text-muted-foreground font-medium">No business found.</CommandEmpty>
+            <CommandEmpty className="py-8 text-center text-sm text-muted-foreground font-medium">{t('noBusinessFound')}</CommandEmpty>
             <CommandGroup>
               {businesses.map((business) => (
                 <CommandItem
@@ -74,7 +76,7 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
                       {business.name}
                     </span>
                     {activeBusiness?.id === business.id && (
-                      <span className="text-[10px] text-primary/70 font-semibold uppercase tracking-wider">Active Now</span>
+                      <span className="text-[10px] text-primary/70 font-semibold uppercase tracking-wider">{t('activeNow')}</span>
                     )}
                   </div>
                   {activeBusiness?.id === business.id && (
@@ -93,7 +95,7 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <HugeiconsIcon icon={Plus} className="h-6 w-6" />
                 </div>
-                <span className="font-bold text-sm uppercase tracking-widest">Add New Business</span>
+                <span className="font-bold text-sm uppercase tracking-widest">{t('addNewBusiness')}</span>
               </CommandItem>
             </Link>
           </div>

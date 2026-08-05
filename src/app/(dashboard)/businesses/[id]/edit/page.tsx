@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import dynamic from 'next/dynamic'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
+import { useTranslations } from 'next-intl'
 
 const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-dialog').then(mod => mod.DeleteConfirmationDialog), {
   loading: () => <Skeleton className="h-14 w-full rounded-full" />,
@@ -18,6 +19,8 @@ const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-di
 })
 
 export default function EditBusinessPage() {
+  const t = useTranslations('Businesses')
+  const tc = useTranslations('Common')
   const { id } = useParams() as { id: string }
   
   const {
@@ -59,7 +62,7 @@ export default function EditBusinessPage() {
       <form onSubmit={onSubmit} className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Business Name</Label>
+            <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('businessName')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={Store} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
               <Input 
@@ -73,7 +76,7 @@ export default function EditBusinessPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Phone Number</Label>
+            <Label htmlFor="phone" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('phoneNumber')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={Phone} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
               <Input 
@@ -86,7 +89,7 @@ export default function EditBusinessPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Email</Label>
+            <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tc('email')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={Mail} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
               <Input id="email" {...register('email')} placeholder="business@email.com" className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm" />
@@ -94,7 +97,7 @@ export default function EditBusinessPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Address</Label>
+            <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tc('address')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={MapPin} className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50" />
               <Input id="address" {...register('address')} placeholder="Business location" className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm" />
@@ -102,7 +105,7 @@ export default function EditBusinessPage() {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Business Color</Label>
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('businessColor')}</Label>
             <div className="flex flex-wrap gap-3 p-1">
               {colors.map((c) => (
                 <button
@@ -122,17 +125,17 @@ export default function EditBusinessPage() {
 
         <div className="pt-4 flex flex-col gap-3">
           <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-            {isSaving ? 'Saving...' : 'Update Business'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
+            {isSaving ? tc('saving') : t('updateBusiness')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
           </Button>
 
           <DeleteConfirmationDialog 
-            title="Delete Business?"
-            description="This will permanently delete this business and all associated data."
+            title={t('deleteConfirmTitle')}
+            description={t('deleteConfirmDesc')}
             confirmName={business?.name || ''}
             onDelete={async () => { onDelete() }}
             trigger={
               <Button type="button" variant="ghost" className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">
-                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" /> Delete Business
+                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" /> {t('deleteBusiness')}
               </Button>
             }
           />

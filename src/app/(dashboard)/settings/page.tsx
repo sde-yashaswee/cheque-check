@@ -102,7 +102,7 @@ export default function SettingsPage() {
       icon: LayoutGrid,
       items: [
         { 
-          name: 'Currency', 
+          name: t('currency'), 
           icon: CreditCard,
           component: (
             <Combobox 
@@ -114,7 +114,7 @@ export default function SettingsPage() {
           )
         },
         { 
-          name: 'Date Format', 
+          name: t('dateFormat'), 
           icon: Globe,
           component: (
             <Combobox 
@@ -126,7 +126,7 @@ export default function SettingsPage() {
           )
         },
         { 
-          name: 'Time Zone', 
+          name: t('timeZone'), 
           icon: Clock,
           component: (
             <Combobox 
@@ -138,7 +138,7 @@ export default function SettingsPage() {
           )
         },
         { 
-          name: 'Language', 
+          name: t('language'), 
           icon: Languages,
           component: (
             <Combobox 
@@ -159,8 +159,8 @@ export default function SettingsPage() {
       title: t('management'),
       icon: Building2,
       items: [
-        { name: 'My Businesses', icon: Building2, href: '/businesses' },
-        { name: 'Features', icon: LayoutGrid, href: '/features' },
+        { name: t('myBusinesses'), icon: Building2, href: '/businesses' },
+        { name: t('features'), icon: LayoutGrid, href: '/features' },
       ]
     },
     {
@@ -168,7 +168,7 @@ export default function SettingsPage() {
       icon: Bell,
       items: [
         { 
-          name: 'Reminders Per Day', 
+          name: t('remindersPerDay'), 
           icon: Bell,
           component: (
             <Combobox 
@@ -180,7 +180,7 @@ export default function SettingsPage() {
           )
         },
         { 
-          name: 'Reminder Frequency', 
+          name: t('reminderFrequency'), 
           icon: Zap,
           component: (
             <Combobox 
@@ -197,25 +197,25 @@ export default function SettingsPage() {
       title: t('dataAndReports'),
       icon: FileSpreadsheet,
       items: [
-        { name: 'Export Cheques (CSV)', icon: FileSpreadsheet, action: () => handleExport(cheques, activeBusiness?.name || '') },
+        { name: t('exportCheques'), icon: FileSpreadsheet, action: () => handleExport(cheques, activeBusiness?.name || '') },
       ]
     },
     {
       title: t('support'),
       icon: Help,
       items: [
-        { name: "What's New", icon: Megaphone, href: '/settings/whats-new' },
-        { name: 'Help & Support', icon: Help, href: '/settings/help-and-support' },
-        { name: 'About App', icon: Info, href: '/settings/about' },
+        { name: t('whatsNew'), icon: Megaphone, href: '/settings/whats-new' },
+        { name: t('helpAndSupport'), icon: Help, href: '/settings/help-and-support' },
+        { name: t('aboutApp'), icon: Info, href: '/settings/about' },
       ]
     },
     {
       title: t('legal'),
       icon: Shield,
       items: [
-        { name: 'Privacy Policy', icon: Shield, href: '/settings/privacy-policy' },
-        { name: 'Terms & Conditions', icon: License, href: '/settings/terms-and-conditions' },
-        { name: 'Refund Policy', icon: Money, href: '/settings/refund-policy' },
+        { name: t('privacyPolicy'), icon: Shield, href: '/settings/privacy-policy' },
+        { name: t('termsAndConditions'), icon: License, href: '/settings/terms-and-conditions' },
+        { name: t('refundPolicy'), icon: Money, href: '/settings/refund-policy' },
       ]
     }
   ]
@@ -225,19 +225,19 @@ export default function SettingsPage() {
       {/* Profile Section */}
       <div className="flex items-center gap-4 rounded-lg bg-canvas-parchment p-5 dark:bg-surface-tile-1">
         <EditableAvatar
-          name={profile?.name || 'User'}
+          name={profile?.name || t('user')}
           imageUrl={profile?.avatar_url}
           size="md"
           onUpload={async (url) => { await updateProfile({ avatar_url: url }) }}
           onDelete={async () => { await updateProfile({ avatar_url: null }) }}
         />
         <div className="flex-1">
-          <p className="font-semibold text-lg leading-tight">{profile?.name || 'User'}</p>
+          <p className="font-semibold text-lg leading-tight">{profile?.name || t('user')}</p>
           <p className="text-xs text-muted-foreground font-semibold">{profile?.email}</p>
         </div>
         <div className="text-right">
-          <p className="text-sm font-semibold text-primary">{remainingDays} days</p>
-          <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Trial</p>
+          <p className="text-sm font-semibold text-primary">{t('days', { count: remainingDays })}</p>
+          <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{t('trial')}</p>
         </div>
       </div>
 
@@ -286,8 +286,8 @@ export default function SettingsPage() {
         </div>
         <div className="divide-y rounded-lg border border-destructive/20 bg-destructive/5 overflow-hidden">
           <DeleteConfirmationDialog 
-            title="Delete Entire Profile?"
-            description="This will permanently delete your account and all associated data."
+            title={t('deleteProfileTitle')}
+            description={t('deleteProfileDescription')}
             confirmName={profile?.name || profile?.email || ''}
             onDelete={handleDeleteProfile}
             trigger={
@@ -296,7 +296,7 @@ export default function SettingsPage() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-destructive/10 text-destructive">
                     <HugeiconsIcon icon={Trash2} className="h-4 w-4" />
                   </div>
-                  <span className="text-sm font-semibold text-destructive">Delete My Account</span>
+                  <span className="text-sm font-semibold text-destructive">{t('deleteMyAccount')}</span>
                 </div>
                 <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-destructive opacity-30" />
               </div>

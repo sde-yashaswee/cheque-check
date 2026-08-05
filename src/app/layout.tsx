@@ -4,7 +4,7 @@ import "./globals.css";
 import Providers from "@/components/providers";
 import { Toaster } from "@/components/ui/toast";
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, getLocale } from 'next-intl/server';
+import { getMessages, getLocale, getTranslations } from 'next-intl/server';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -23,6 +23,7 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const t = await getTranslations('Common');
 
   return (
     <html lang={locale} className={`${inter.variable}`}>
@@ -47,8 +48,8 @@ export default async function RootLayout({
               <path d="M12 17h.01" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold mb-2 text-white">Please Rotate Your Device</h2>
-          <p className="text-zinc-400">This app is designed to be used in portrait mode.</p>
+          <h2 className="text-2xl font-bold mb-2 text-white">{t('rotateDevice')}</h2>
+          <p className="text-zinc-400">{t('portraitModeOnly')}</p>
         </div>
       </body>
     </html>

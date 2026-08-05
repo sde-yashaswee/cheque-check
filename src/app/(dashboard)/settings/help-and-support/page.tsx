@@ -2,12 +2,15 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowLeft01Icon as ArrowLeft, HelpCircleIcon as Help, Mail01Icon as Mail, MessageQuestionIcon as FAQ, Book02Icon as Docs } from "@hugeicons/core-free-icons"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { useTranslations } from "next-intl"
 
 export default function HelpAndSupportPage() {
+  const t = useTranslations("Settings")
+
   const faqs = [
-    { q: "How do I add a new business?", a: "Go to Settings > My Businesses and click on the 'Add Business' button." },
-    { q: "Can I export my data?", a: "Yes, you can export all your cheques to a CSV file from Settings > Data & Reports." },
-    { q: "What happens if a cheque bounces?", a: "You can update the status of any cheque to 'Bounced' from the cheque detail page." },
+    { q: t("faq1Q"), a: t("faq1A") },
+    { q: t("faq2Q"), a: t("faq2A") },
+    { q: t("faq3Q"), a: t("faq3A") },
   ]
 
   return (
@@ -16,27 +19,27 @@ export default function HelpAndSupportPage() {
         <Link href="/settings" className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 hover:bg-muted/80 transition-colors">
           <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5" />
         </Link>
-        <h1 className="text-2xl font-bold">Help & Support</h1>
+        <h1 className="text-2xl font-bold">{t("helpAndSupport")}</h1>
       </div>
 
       <div className="space-y-8 px-2">
         <div className="grid grid-cols-2 gap-4">
           <Link href="mailto:support@chequecheck.com" className="flex flex-col items-center justify-center p-6 rounded-lg border bg-card hover:bg-muted/30 transition-all space-y-2 text-center">
             <HugeiconsIcon icon={Mail} className="h-8 w-8 text-primary" />
-            <span className="font-bold">Email Us</span>
-            <span className="text-xs text-muted-foreground">Get help via email</span>
+            <span className="font-bold">{t("emailUs")}</span>
+            <span className="text-xs text-muted-foreground">{t("getHelpViaEmail")}</span>
           </Link>
           <div className="flex flex-col items-center justify-center p-6 rounded-lg border bg-card hover:bg-muted/30 transition-all space-y-2 text-center">
             <HugeiconsIcon icon={Docs} className="h-8 w-8 text-primary" />
-            <span className="font-bold">Guides</span>
-            <span className="text-xs text-muted-foreground">Step-by-step tutorials</span>
+            <span className="font-bold">{t("guides")}</span>
+            <span className="text-xs text-muted-foreground">{t("stepByStepTutorials")}</span>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="flex items-center gap-2 px-2">
             <HugeiconsIcon icon={FAQ} className="h-4 w-4 text-muted-foreground" />
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Frequently Asked Questions</h2>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t("faqsTitle")}</h2>
           </div>
           <div className="divide-y rounded-lg border bg-card overflow-hidden">
             {faqs.map((faq, i) => (
@@ -49,11 +52,11 @@ export default function HelpAndSupportPage() {
         </div>
 
         <div className="rounded-lg bg-primary/5 border border-primary/20 p-6 text-center space-y-2">
-          <h3 className="font-bold">Still need help?</h3>
-          <p className="text-sm text-muted-foreground">Our support team is available Monday to Friday, 9 AM - 6 PM IST.</p>
+          <h3 className="font-bold">{t("stillNeedHelp")}</h3>
+          <p className="text-sm text-muted-foreground">{t("supportAvailability")}</p>
           <Link href="mailto:support@chequecheck.com">
             <Button variant="outline" className="mt-4 rounded-full">
-              Contact Support
+              {t("contactSupport")}
             </Button>
           </Link>
         </div>

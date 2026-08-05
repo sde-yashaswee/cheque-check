@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils"
 import dynamic from 'next/dynamic'
 import { DataState } from "@/components/ui/data-state"
 import { EmptyState } from "@/components/ui/empty-state"
+import { useTranslations } from 'next-intl'
 
 const DeleteConfirmationDialog = dynamic(() => import("@/components/ui/delete-dialog").then(mod => mod.DeleteConfirmationDialog), {
   loading: () => <Skeleton className="h-8 w-8 rounded-full" />,
@@ -20,6 +21,8 @@ const DeleteConfirmationDialog = dynamic(() => import("@/components/ui/delete-di
 })
 
 export default function BusinessesPage() {
+  const t = useTranslations('Businesses')
+  const tc = useTranslations('Common')
   const { profile } = useProfile()
   const currency = profile?.currency || '₹'
 
@@ -48,7 +51,7 @@ export default function BusinessesPage() {
           <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input 
             className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
-            placeholder="Search businesses..." 
+            placeholder={t('searchPlaceholder')} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -72,17 +75,17 @@ export default function BusinessesPage() {
           loadingComponent={
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                <Skeleton className="h-32 w-full rounded-lg" key={i} />
               ))}
             </div>
           }
           emptyState={
             <EmptyState
               icon={Building2}
-              title="No businesses found"
-              description="Create a business profile to start managing your accounts, parties, and cheques."
+              title={t('noBusinessesTitle')}
+              description={t('noBusinessesDesc')}
               action={{
-                label: "Create your first business",
+                label: t('createFirstBusiness'),
                 href: "/businesses/create"
               }}
             />
@@ -108,18 +111,18 @@ export default function BusinessesPage() {
                   />
                   <div>
                     <h3 className="text-lg font-semibold">{business.name}</h3>
-                    <p className="text-[10px] text-muted-foreground font-semibold truncate max-w-[150px]">{business.email || 'No email'}</p>
+                    <p className="text-[10px] text-muted-foreground font-semibold truncate max-w-[150px]">{business.email || tc('noEmail')}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-center gap-2">
                    {activeBusiness?.id === business.id && (
-                    <span className="rounded-full bg-primary px-2 py-0.5 text-[8px] font-semibold text-white uppercase">Active</span>
+                    <span className="rounded-full bg-primary px-2 py-0.5 text-[8px] font-semibold text-white uppercase">{tc('active')}</span>
                    )}
                    <div onClick={(e) => e.stopPropagation()}>
                     <DeleteConfirmationDialog 
-                      title="Delete Business?"
-                      description="This will permanently delete this business and all associated data."
+                      title={t('deleteConfirmTitle')}
+                      description={t('deleteConfirmDesc')}
                       confirmName={business.name}
                       onDelete={async () => { deleteBusiness(business.id) }}
                       trigger={
@@ -144,7 +147,7 @@ export default function BusinessesPage() {
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary">
                     <HugeiconsIcon icon={FileText} className="h-3 w-3" />
                   </div>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Upcoming</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{t('upcoming')}</span>
                 </div>
                 <p className="font-semibold text-primary">
                   {currency}{getUpcomingTotal(business.id).toLocaleString()}
