@@ -11,10 +11,12 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useBusiness } from '@/hooks/use-business'
 
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
 export default function CreatePartyPage() {
   const router = useRouter()
   const { activeBusiness } = useBusiness()
-  const [loading, setLoading] = useState(false)
+  const queryClient = useQueryClient()
   
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(partySchema),
@@ -27,18 +29,17 @@ export default function CreatePartyPage() {
     }
   })
 
-  const onSubmit = async (data: any) => {
-    if (!activeBusiness) return
-    setLoading(true)
-    try {
-      await PartyService.create({ ...data, business_id: activeBusiness.id })
+  const mutation = useMutation({
+    mutationFn: (data: any) => PartyService.create({ ...data, business_id: activeBusiness!.id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['parties', activeBusiness?.id] })
       router.push('/parties')
-    } catch (error) {
-      console.error(error)
-      alert('Failed to create party')
-    } finally {
-      setLoading(false)
     }
+  })
+
+  const onSubmit = (data: any) => {
+    if (!activeBusiness) return
+    mutation.mutate(data)
   }
 
   return (
@@ -74,8 +75,8 @@ export default function CreatePartyPage() {
           <Input id="notes" {...register('notes')} placeholder="Any additional details" />
         </div>
 
-        <Button type="submit" className="w-full rounded-pill h-12 text-lg" disabled={loading}>
-          {loading ? 'Creating...' : 'Create Party'}
+        <Button type="submit" className="w-full rounded-pill h-12 text-lg" disabled={mutation.isPending}>
+          {mutation.isPending ? 'Creating...' : 'Create Party'}
         </Button>
       </form>
     </div>

@@ -17,12 +17,15 @@ import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 
+import { Combobox } from '@/components/ui/combobox'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
 export default function CreateChequePage() {
   const [step, setStep] = useState(1)
   const router = useRouter()
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
-  const [loading, setLoading] = useState(false)
+  const queryClient = useQueryClient()
 
   const { data: parties } = useQuery({
     queryKey: ['parties', businessId],
@@ -50,21 +53,23 @@ export default function CreateChequePage() {
     }
   })
 
-  const onSubmit = async (data: any) => {
-    setLoading(true)
-    try {
-      await ChequeService.create({ ...data, business_id: businessId })
+  const mutation = useMutation({
+    mutationFn: (data: any) => ChequeService.create({ ...data, business_id: businessId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
       router.push('/cheques')
-    } catch (error) {
-      console.error(error)
-      alert('Failed to create cheque')
-    } finally {
-      setLoading(false)
     }
+  })
+
+  const onSubmit = (data: any) => {
+    mutation.mutate(data)
   }
 
   const nextStep = () => setStep(s => Math.min(s + 1, 3))
   const prevStep = () => setStep(s => Math.max(s - 1, 1))
+
+  const partyOptions = parties?.map(p => ({ label: p.name, value: p.id })) || []
+  const bankOptions = banks?.map(b => ({ label: `${b.bank_name} (${b.account_number.slice(-4)})`, value: b.id })) || []
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
@@ -148,33 +153,23 @@ export default function CreateChequePage() {
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
               <Label>Select Party</Label>
-              <Select onValueChange={(val) => setValue('party_id', val || "")} defaultValue={watch('party_id') || ""}>
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="Choose a party" />
-                </SelectTrigger>
-                <SelectContent>
-                  {parties?.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                  ))}
-                  {parties?.length === 0 && <SelectItem value="none" disabled>No parties added</SelectItem>}
-                </SelectContent>
-              </Select>
+              <Combobox 
+                options={partyOptions} 
+                value={watch('party_id')} 
+                onValueChange={(val) => setValue('party_id', val)} 
+                placeholder="Choose a party"
+              />
               {errors.party_id && <p className="text-xs text-destructive">{errors.party_id.message as string}</p>}
             </div>
 
             <div className="space-y-2">
               <Label>Select Bank</Label>
-              <Select onValueChange={(val) => setValue('bank_id', val || "")} defaultValue={watch('bank_id') || ""}>
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="Choose a bank" />
-                </SelectTrigger>
-                <SelectContent>
-                  {banks?.map((b) => (
-                    <SelectItem key={b.id} value={b.id}>{b.bank_name}</SelectItem>
-                  ))}
-                  {banks?.length === 0 && <SelectItem value="none" disabled>No banks added</SelectItem>}
-                </SelectContent>
-              </Select>
+              <Combobox 
+                options={bankOptions} 
+                value={watch('bank_id')} 
+                onValueChange={(val) => setValue('bank_id', val)} 
+                placeholder="Choose a bank"
+              />
               {errors.bank_id && <p className="text-xs text-destructive">{errors.bank_id.message as string}</p>}
             </div>
 
@@ -212,8 +207,8 @@ export default function CreateChequePage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full rounded-pill h-14 text-lg" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Cheque'} <Check className="ml-2 h-5 w-5" />
+            <Button type="submit" className="w-full rounded-pill h-14 text-lg" disabled={mutation.isPending}>
+              {mutation.isPending ? 'Saving...' : 'Save Cheque'} <Check className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}

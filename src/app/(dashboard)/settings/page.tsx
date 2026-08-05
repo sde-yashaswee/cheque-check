@@ -1,18 +1,24 @@
 'use client'
 
 import { useBusiness } from "@/hooks/use-business"
+import { useProfile } from "@/hooks/use-profile"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { ChevronRight, LogOut, User, Bell, Globe, CreditCard, Download, FileSpreadsheet } from "lucide-react"
+import { ChevronRight, LogOut, User, Bell, Globe, CreditCard, Download, FileSpreadsheet, Building2, Landmark } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { ReportService } from "@/services/report.service"
 import { useQuery } from "@tanstack/react-query"
 import { ChequeService } from "@/services/cheque.service"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
+import { Combobox } from "@/components/ui/combobox"
+import { format, differenceInDays } from "date-fns"
 
 export default function SettingsPage() {
-  const { activeBusiness } = useBusiness()
+  const { activeBusiness, businesses } = useBusiness()
+  const { profile, updateProfile, isLoading: profileLoading } = useProfile()
   const supabase = createClient()
   const router = useRouter()
 
@@ -32,19 +38,63 @@ export default function SettingsPage() {
     router.push('/login')
   }
 
+  const currencyOptions = [
+    { label: '₹ (INR)', value: '₹' },
+    { label: '$ (USD)', value: '$' },
+    { label: '€ (EUR)', value: '€' },
+    { label: '£ (GBP)', value: '£' },
+  ]
+
+  const dateFormatOptions = [
+    { label: 'DD/MM/YYYY', value: 'dd/MM/yyyy' },
+    { label: 'MM/DD/YYYY', value: 'MM/dd/yyyy' },
+    { label: 'YYYY-MM-DD', value: 'yyyy-MM-dd' },
+  ]
+
+  const remainingDays = profile ? 30 - differenceInDays(new Date(), new Date(profile.created_at)) : 0
+
   const sections = [
     {
       title: 'General',
       items: [
-        { name: 'Currency', value: '₹ (INR)', icon: CreditCard },
-        { name: 'Date Format', value: 'DD/MM/YYYY', icon: Globe },
+        { 
+          name: 'Currency', 
+          icon: CreditCard,
+          component: (
+            <Combobox 
+              options={currencyOptions} 
+              value={profile?.currency} 
+              onValueChange={(val) => updateProfile({ currency: val })}
+              className="h-9 w-[120px]"
+            />
+          )
+        },
+        { 
+          name: 'Date Format', 
+          icon: Globe,
+          component: (
+            <Combobox 
+              options={dateFormatOptions} 
+              value={profile?.date_format} 
+              onValueChange={(val) => updateProfile({ date_format: val })}
+              className="h-9 w-[150px]"
+            />
+          )
+        },
+      ]
+    },
+    {
+      title: 'Management',
+      items: [
+        { name: 'My Businesses', icon: Building2, href: '/businesses/create' },
+        { name: 'Bank Accounts', icon: Landmark, href: '/banks' },
       ]
     },
     {
       title: 'Reminders',
       items: [
-        { name: 'Voice Calls', toggle: true, icon: Bell },
-        { name: 'Reminder Frequency', value: '1 time/day', icon: Bell },
+        { name: 'Voice Calls', toggle: true, icon: Bell, checked: profile?.received_cheques_enabled, onChange: (val: boolean) => updateProfile({ received_cheques_enabled: val }) },
+        { name: 'Reminder Frequency', value: `${profile?.reminders_per_day || 1} time/day`, icon: Bell },
       ]
     },
     {
@@ -65,10 +115,13 @@ export default function SettingsPage() {
           <User className="h-6 w-6" />
         </div>
         <div className="flex-1">
-          <p className="font-bold">John Doe</p>
-          <p className="text-xs text-muted-foreground">john@example.com</p>
+          <p className="font-bold">{profile?.name || 'User'}</p>
+          <p className="text-xs text-muted-foreground">{profile?.email}</p>
         </div>
-        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        <div className="text-right">
+          <p className="text-xs font-semibold text-primary">{remainingDays} days</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Remaining</p>
+        </div>
       </div>
 
       {/* Settings Sections */}
@@ -77,22 +130,31 @@ export default function SettingsPage() {
           <div key={section.title} className="space-y-3">
             <h3 className="px-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{section.title}</h3>
             <div className="divide-y rounded-lg border bg-card">
-              {section.items.map((item: any) => (
-                <div key={item.name} className={cn("flex items-center justify-between p-4", item.action && "cursor-pointer active:bg-muted")} onClick={item.action}>
-                  <div className="flex items-center gap-3">
-                    <item.icon className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-body">{item.name}</span>
-                  </div>
-                  {item.toggle ? (
-                    <Switch defaultChecked />
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      {item.value && <span className="text-sm text-muted-foreground">{item.value}</span>}
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              {section.items.map((item: any) => {
+                const content = (
+                  <div key={item.name} className={cn("flex items-center justify-between p-4", (item.action || item.href) && "cursor-pointer active:bg-muted")} onClick={item.action}>
+                    <div className="flex items-center gap-3">
+                      <item.icon className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-body">{item.name}</span>
                     </div>
-                  )}
-                </div>
-              ))}
+                    {item.component ? (
+                      item.component
+                    ) : item.toggle ? (
+                      <Switch checked={item.checked} onCheckedChange={item.onChange} />
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        {item.value && <span className="text-sm text-muted-foreground">{item.value}</span>}
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    )}
+                  </div>
+                )
+
+                if (item.href) {
+                  return <Link href={item.href} key={item.name}>{content}</Link>
+                }
+                return content
+              })}
             </div>
           </div>
         ))}
@@ -108,9 +170,10 @@ export default function SettingsPage() {
 
       <div className="text-center">
         <p className="text-xs text-muted-foreground">Cheque Reminder v1.0.0</p>
+        <p className="text-[10px] text-muted-foreground mt-1">
+          {format(new Date(), "PPpp")}
+        </p>
       </div>
     </div>
   )
 }
-
-import { cn } from "@/lib/utils"

@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
 import { BusinessProvider } from '@/hooks/use-business'
+import { ProfileProvider } from '@/hooks/use-profile'
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -15,9 +16,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BusinessProvider>
-        {children}
-      </BusinessProvider>
+      <ProfileProvider>
+        <BusinessProvider>
+          {children}
+        </BusinessProvider>
+      </ProfileProvider>
     </QueryClientProvider>
   )
 }

@@ -1,0 +1,7 @@
+One issue is that there is no direct navigation to the banks page or to create a new bank account. I need a direct navigation in my application to go there, not necessarily in the bottom nav tab bar, but a sensible way for the user to access it. 
+
+Second issue, whenever any data is being Whenever any data is being mutated, the application UI is not updated. It is only updated when I refresh the page, which should not happen. Use React Query to invalidate all the cache queries so that the UI updates in real time without having to refresh the page. 
+
+Now, the party and bank selector should not be like this. There should be a text field where I can input that text, and based on whatever I am inputting, you should filter the results in the drop-down, okay? 
+
+The settings page is now completely unusable. There is nothing we can interact with, okay? For example, currency, date, and time format. You should change this, and the change should affect the entire application as well. Also, the user should not be able to access the main pages when not authenticated. You should send him back to the auth pages, okay? The middleware is missing for some reason. Make the complete settings page usable. The user card should show the active user, the date, time, currency format, and remaining dates, and all that should work as intended. Please check why it is not working; it should work out of the box. 

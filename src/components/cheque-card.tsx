@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils'
 import { Check, X } from 'lucide-react'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useProfile } from '@/hooks/use-profile'
+import { format } from 'date-fns'
 
 interface ChequeCardProps {
   cheque: ChequeWithRelations
@@ -15,6 +17,10 @@ interface ChequeCardProps {
 export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
   const [offset, setOffset] = useState(0)
   const [swiping, setSwiping] = useState<'clear' | 'bounce' | null>(null)
+  const { profile } = useProfile()
+
+  const currency = profile?.currency || '₹'
+  const dateFormat = profile?.date_format || 'dd/MM/yyyy'
 
   const handlers = useSwipeable({
     onSwiping: (e) => {
@@ -92,11 +98,13 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
       >
         <div className="flex justify-between items-start">
           <div>
-            <p className="text-xl font-bold">₹{cheque.amount.toLocaleString()}</p>
+            <p className="text-xl font-bold">{currency}{cheque.amount.toLocaleString()}</p>
             <p className="text-body-strong">{cheque.party?.name}</p>
           </div>
           <div className="text-right">
-            <p className="text-xs font-semibold text-muted-foreground uppercase">{cheque.cheque_date}</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase">
+              {format(new Date(cheque.cheque_date), dateFormat)}
+            </p>
             <p className="text-xs text-muted-foreground">{cheque.bank?.bank_name}</p>
           </div>
         </div>
