@@ -16,6 +16,13 @@ const navItems = [
 export function BottomNav() {
   const pathname = usePathname()
 
+  // Only show bottom nav on main top-level routes
+  const isMainTab = ['/', '/cheques', '/parties', '/accounts', '/settings', '/businesses', '/features'].includes(pathname)
+
+  if (!isMainTab) {
+    return null
+  }
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-16 items-center justify-around bg-canvas-parchment/80 px-4 pb-safe backdrop-blur-md dark:bg-black/80 border-t border-primary/5">
       {navItems.map((item) => {

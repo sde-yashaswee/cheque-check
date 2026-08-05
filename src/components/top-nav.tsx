@@ -11,28 +11,54 @@ import { GlobalSearch } from "@/components/global-search"
 import { useState } from "react"
 import Link from 'next/link'
 
-const routeTitles: Record<string, string> = {
-  '/': 'Dashboard',
-  '/cheques': 'Cheques',
-  '/cheques/create': 'New Cheque',
-  '/parties': 'Parties',
-  '/parties/create': 'New Party',
-  '/accounts': 'Accounts',
-  '/accounts/create': 'Add Account',
-  '/settings': 'Settings',
-  '/businesses': 'Businesses',
-  '/businesses/create': 'New Business',
-  '/features': 'Features',
+const getTitle = (pathname: string) => {
+  if (pathname === '/') return 'ChequeCheck'
+  if (pathname === '/settings') return 'Settings'
+  if (pathname === '/features') return 'Features'
+
+  const segments = pathname.split('/').filter(Boolean)
+  if (segments.length === 0) return 'ChequeCheck'
+
+  const resource = segments[0] // cheques, parties, accounts, businesses
+  const id = segments[1]
+  const action = segments[2]
+
+  const resourceMap: Record<string, string> = {
+    cheques: 'Cheque',
+    parties: 'Party',
+    accounts: 'Account',
+    businesses: 'Business'
+  }
+
+  const resourceName = resourceMap[resource] || resource.charAt(0).toUpperCase() + resource.slice(1)
+
+  if (segments.length === 1) {
+    return resource.charAt(0).toUpperCase() + resource.slice(1)
+  }
+
+  if (id === 'create') {
+    if (resource === 'accounts') return 'Add Account'
+    return `New ${resourceName}`
+  }
+
+  if (id && !action) {
+    return `View ${resourceName}`
+  }
+
+  if (id && action === 'edit') {
+    return `Edit ${resourceName}`
+  }
+
+  return 'Dashboard'
 }
 
 export function TopNav() {
   const pathname = usePathname()
   const router = useRouter()
-  const { profile } = useProfile()
   const { activeBusiness } = useBusiness()
   const [searchOpen, setSearchOpen] = useState(false)
 
-  const title = routeTitles[pathname] || 'Dashboard'
+  const title = getTitle(pathname)
   const isMainTab = ['/', '/cheques', '/parties', '/accounts', '/settings', '/businesses'].includes(pathname)
 
   return (

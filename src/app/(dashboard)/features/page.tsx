@@ -47,11 +47,6 @@ export default function FeaturesPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
-      <div>
-        <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Enhance your experience</p>
-        <h2 className="text-display-sm font-semibold">Features</h2>
-      </div>
-
       <div className="grid gap-4">
         {features.map((feature) => (
           <div 
