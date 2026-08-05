@@ -17,7 +17,8 @@ import {
   Building2, 
   Landmark, 
   LayoutGrid, 
-  Zap 
+  Zap,
+  Languages
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
@@ -45,12 +46,12 @@ export default function SettingsPage() {
   if (profileLoading) {
     return (
       <div className="mx-auto max-w-2xl space-y-8 pb-20">
-        <Skeleton className="h-20 w-full" />
+        <Skeleton className="h-20 w-full rounded-3xl" />
         <div className="space-y-8">
           {[1, 2, 3].map((i) => (
             <div key={i} className="space-y-3">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-48 w-full" />
+              <Skeleton className="h-4 w-24 rounded-full" />
+              <Skeleton className="h-48 w-full rounded-3xl" />
             </div>
           ))}
         </div>
@@ -82,6 +83,12 @@ export default function SettingsPage() {
     { label: 'DD/MM/YYYY', value: 'dd/MM/yyyy' },
     { label: 'MM/DD/YYYY', value: 'MM/dd/yyyy' },
     { label: 'YYYY-MM-DD', value: 'yyyy-MM-dd' },
+  ]
+
+  const languageOptions = [
+    { label: 'English', value: 'en' },
+    { label: 'Hindi', value: 'hi' },
+    { label: 'Hinglish', value: 'hinglish' },
   ]
 
   const remindersPerDayOptions = [
@@ -123,6 +130,18 @@ export default function SettingsPage() {
               value={profile?.date_format} 
               onValueChange={(val) => updateProfile({ date_format: val })}
               className="h-9 w-[150px]"
+            />
+          )
+        },
+        { 
+          name: 'Language', 
+          icon: Languages,
+          component: (
+            <Combobox 
+              options={languageOptions} 
+              value="en" 
+              onValueChange={() => {}}
+              className="h-9 w-[120px]"
             />
           )
         },
@@ -174,19 +193,19 @@ export default function SettingsPage() {
   ]
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+    <div className="mx-auto max-w-2xl space-y-8 pb-20 pt-4">
       {/* Profile Section */}
-      <div className="flex items-center gap-4 rounded-lg bg-canvas-parchment p-4 dark:bg-surface-tile-1">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <User className="h-6 w-6" />
+      <div className="flex items-center gap-4 rounded-3xl bg-canvas-parchment p-5 dark:bg-surface-tile-1">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white">
+          <User className="h-7 w-7" />
         </div>
         <div className="flex-1">
-          <p className="font-bold">{profile?.name || 'User'}</p>
-          <p className="text-xs text-muted-foreground">{profile?.email}</p>
+          <p className="font-bold text-lg leading-tight">{profile?.name || 'User'}</p>
+          <p className="text-xs text-muted-foreground font-medium">{profile?.email}</p>
         </div>
         <div className="text-right">
-          <p className="text-xs font-semibold text-primary">{remainingDays} days</p>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Remaining</p>
+          <p className="text-sm font-bold text-primary">{remainingDays} days</p>
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Trial</p>
         </div>
       </div>
 
@@ -194,14 +213,16 @@ export default function SettingsPage() {
       <div className="space-y-8">
         {sections.map((section) => (
           <div key={section.title} className="space-y-3">
-            <h3 className="px-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{section.title}</h3>
-            <div className="divide-y rounded-lg border bg-card">
+            <h3 className="px-2 text-[10px] font-medium text-muted-foreground uppercase tracking-[0.2em]">{section.title}</h3>
+            <div className="divide-y rounded-3xl border bg-card overflow-hidden">
               {section.items.map((item: any) => {
                 const content = (
-                  <div key={item.name} className={cn("flex items-center justify-between p-4", (item.action || item.href) && "cursor-pointer active:bg-muted")} onClick={item.action}>
+                  <div key={item.name} className={cn("flex items-center justify-between p-4 transition-colors", (item.action || item.href) && "cursor-pointer active:bg-muted/50 hover:bg-muted/30")} onClick={item.action}>
                     <div className="flex items-center gap-3">
-                      <item.icon className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-body">{item.name}</span>
+                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted/50 text-muted-foreground">
+                        <item.icon className="h-4 w-4" />
+                      </div>
+                      <span className="text-sm font-medium">{item.name}</span>
                     </div>
                     {item.component ? (
                       item.component
@@ -209,8 +230,8 @@ export default function SettingsPage() {
                       <Switch checked={item.checked} onCheckedChange={item.onChange} />
                     ) : (
                       <div className="flex items-center gap-2">
-                        {item.value && <span className="text-sm text-muted-foreground">{item.value}</span>}
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        {item.value && <span className="text-xs font-medium text-muted-foreground">{item.value}</span>}
+                        <ChevronRight className="h-4 w-4 text-muted-foreground opacity-30" />
                       </div>
                     )}
                   </div>
@@ -228,15 +249,15 @@ export default function SettingsPage() {
 
       <Button 
         variant="destructive" 
-        className="w-full rounded-pill h-12" 
+        className="w-full rounded-pill h-14 text-lg font-medium" 
         onClick={handleLogout}
       >
-        <LogOut className="mr-2 h-4 w-4" /> Sign Out
+        <LogOut className="mr-2 h-5 w-5" /> Sign Out
       </Button>
 
-      <div className="text-center">
-        <p className="text-xs text-muted-foreground">CheckCheck v1.0.0</p>
-        <p className="text-[10px] text-muted-foreground mt-1">
+      <div className="text-center pb-8">
+        <p className="text-xs text-muted-foreground font-medium opacity-50 uppercase tracking-widest">CheckCheck v1.0.0</p>
+        <p className="text-[10px] text-muted-foreground mt-2 opacity-30">
           {format(new Date(), "PPpp")}
         </p>
       </div>

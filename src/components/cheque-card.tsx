@@ -94,8 +94,8 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
           <div className="flex items-start gap-3">
             <EntityAvatar 
               name={cheque.party?.name || '?'} 
-              color={(cheque.party as any)?.color} 
-              icon={(cheque.party as any)?.icon}
+              color={cheque.party?.color} 
+              icon={cheque.party?.icon}
               size="md"
               className="mt-1"
             />
@@ -112,8 +112,8 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
               <span className="text-[10px] text-muted-foreground">{cheque.bank?.bank_name}</span>
               <EntityAvatar 
                 name={cheque.bank?.bank_name || '?'} 
-                color={(cheque.bank as any)?.color} 
-                icon={(cheque.bank as any)?.icon}
+                color={cheque.bank?.color} 
+                icon={cheque.bank?.icon}
                 size="sm"
               />
             </div>

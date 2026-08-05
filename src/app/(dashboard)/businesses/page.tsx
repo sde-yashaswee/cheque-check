@@ -70,8 +70,8 @@ export default function BusinessesPage() {
             <div 
               key={business.id}
               className={cn(
-                "group relative flex flex-col gap-6 rounded-3xl border p-6 shadow-sm transition-all active:scale-[0.98] cursor-pointer",
-                activeBusiness?.id === business.id ? "bg-primary/5 border-primary/20 ring-1 ring-primary/20 shadow-md" : "bg-card hover:bg-muted/50"
+                "group relative flex flex-col gap-6 rounded-3xl border p-6 transition-all active:scale-[0.98] cursor-pointer",
+                activeBusiness?.id === business.id ? "bg-primary/5 border-primary/20 ring-1 ring-primary/20" : "bg-card hover:bg-muted/50"
               )}
               onClick={() => setActiveBusiness(business)}
             >
@@ -95,7 +95,7 @@ export default function BusinessesPage() {
                 </div>
                 <div className="flex items-center gap-2">
                    {activeBusiness?.id === business.id && (
-                    <span className="rounded-full bg-primary px-2 py-0.5 text-[8px] font-black text-white uppercase">Active</span>
+                    <span className="rounded-full bg-primary px-2 py-0.5 text-[8px] font-bold text-white uppercase">Active</span>
                    )}
                    <ArrowRight className="h-5 w-5 text-muted-foreground opacity-20 transition-opacity group-hover:opacity-100" />
                 </div>
@@ -104,7 +104,7 @@ export default function BusinessesPage() {
               <div className="mt-2 flex items-center justify-between border-t border-dashed pt-4">
                 <div className="space-y-0.5">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Upcoming Value</p>
-                  <p className="text-2xl font-black text-primary">
+                  <p className="text-2xl font-bold text-primary">
                     {chequesLoading ? '...' : `${currency}${getUpcomingTotal(business.id).toLocaleString()}`}
                   </p>
                 </div>

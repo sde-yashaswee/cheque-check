@@ -64,8 +64,8 @@ export default function PartiesPage() {
               <div className="group flex items-center gap-4 rounded-3xl border bg-card p-4 transition-all active:scale-98 hover:shadow-md">
                 <EntityAvatar 
                   name={party.name} 
-                  color={(party as any).color} 
-                  icon={(party as any).icon} 
+                  color={party.color} 
+                  icon={party.icon} 
                   size="lg" 
                 />
                 <div className="flex-1 min-w-0">

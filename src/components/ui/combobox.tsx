@@ -72,12 +72,6 @@ export function Combobox({
           <CommandList className="max-h-[300px]">
             <CommandEmpty className="py-6 text-center text-sm">
               <p className="text-muted-foreground">{emptyMessage}</p>
-              {createUrl && (
-                <Link href={createUrl} className="mt-4 inline-flex items-center gap-2 text-primary font-bold hover:underline">
-                  <PlusCircle className="h-4 w-4" />
-                  {createLabel}
-                </Link>
-              )}
             </CommandEmpty>
             <CommandGroup>
               {options.map((option) => (

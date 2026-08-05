@@ -6,20 +6,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 
-export function BusinessSwitcher() {
+interface BusinessSwitcherProps {
+  trigger?: React.ReactElement
+}
+
+export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
   const { activeBusiness, businesses, setActiveBusiness } = useBusiness()
 
   return (
     <Dialog>
       <DialogTrigger
-        render={
+        render={trigger || (
           <button className="flex items-center gap-2 rounded-pill bg-canvas-parchment px-4 py-2 text-sm font-semibold transition-transform active:scale-95 dark:bg-surface-tile-1">
             <ChevronDown className="h-4 w-4" />
             <span>{activeBusiness?.name || 'Select Business'}</span>
           </button>
-        }
+        )}
       />
-      <DialogContent className="sm:max-w-[425px] rounded-3xl overflow-hidden shadow-2xl border-none">
+      <DialogContent className="sm:max-w-[425px] rounded-3xl overflow-hidden border bg-popover shadow-lg">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle className="text-xl font-black uppercase tracking-tight">Switch Business</DialogTitle>
         </DialogHeader>

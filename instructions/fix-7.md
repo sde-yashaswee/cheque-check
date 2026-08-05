@@ -1,0 +1,4 @@
+There are multiple problems : first of all. Please Follow the @design.MD file, for Apple Design Reference, please use, this Functionality wise it looks perfect, but why did you touch the frontend styling of components, previosu style looked fine, don't need this new frontend styling changes, if you have added something new don't change it, just change the styling things you have changed.
+2. The Stroip besign under the top nav bar looked super good, please bring that back, I don't need the business switcher on the top nav bar, it should be below the top nvabr like a strip, we implemented before.
+3. Like You have added more shadows to sign out button, please remove that, doesn't look that great.
+4. Please Funtionality wise don't change things just the new styling you have brought is not looking good, preiovus stylw was good.

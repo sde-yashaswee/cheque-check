@@ -76,6 +76,6 @@ export interface Cheque {
 }
 
 export interface ChequeWithRelations extends Cheque {
-  party?: { name: string };
-  bank?: { bank_name: string };
+  party?: { name: string; color?: string; icon?: string };
+  bank?: { bank_name: string; color?: string; icon?: string };
 }

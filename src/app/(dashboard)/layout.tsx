@@ -1,5 +1,6 @@
 import { BottomNav } from "@/components/bottom-nav";
 import { TopNav } from "@/components/top-nav";
+import { ScrollToTop } from "@/components/scroll-to-top";
 
 export default function DashboardLayout({
   children,
@@ -8,6 +9,7 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col pb-16">
+      <ScrollToTop />
       <TopNav />
       <main className="flex-1 px-4 pt-6 md:px-8">
         {children}

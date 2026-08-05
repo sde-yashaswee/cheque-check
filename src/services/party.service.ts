@@ -15,6 +15,17 @@ export class PartyService {
     return data as Party[]
   }
 
+  static async getById(id: string) {
+    const { data, error } = await supabase
+      .from('parties')
+      .select('*')
+      .eq('id', id)
+      .single()
+    
+    if (error) throw error
+    return data as Party
+  }
+
   static async create(party: Omit<Party, 'id' | 'created_at' | 'updated_at'>) {
     const { data, error } = await supabase
       .from('parties')

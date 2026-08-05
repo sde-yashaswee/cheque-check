@@ -43,32 +43,34 @@ export default function BanksPage() {
           </div>
         ) : (
           banks?.map((bank) => (
-            <div key={bank.id} className="group relative rounded-3xl border bg-card p-6 transition-all active:scale-98 hover:shadow-md">
-              <div className="flex items-start gap-4">
-                <EntityAvatar 
-                  name={bank.bank_name} 
-                  color={(bank as any).color} 
-                  icon={(bank as any).icon} 
-                  size="lg" 
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <p className="text-lg font-bold truncate">{bank.bank_name}</p>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground opacity-40 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mt-0.5">{bank.account_name}</p>
-                  
-                  <div className="mt-4 flex items-center justify-between border-t border-dashed pt-4">
-                    <p className="text-xs font-mono text-muted-foreground tracking-tighter">
-                      {bank.account_number.replace(/\d(?=\d{4})/g, "•")}
-                    </p>
-                    <span className="rounded-full bg-primary/5 px-2 py-0.5 text-[9px] font-black text-primary uppercase tracking-widest">
-                      {bank.ifsc_code || 'No IFSC'}
-                    </span>
+            <Link key={bank.id} href={`/banks/${bank.id}`}>
+              <div className="group relative rounded-3xl border bg-card p-6 transition-all active:scale-98 hover:shadow-md">
+                <div className="flex items-start gap-4">
+                  <EntityAvatar 
+                    name={bank.bank_name} 
+                    color={bank.color} 
+                    icon={bank.icon} 
+                    size="lg" 
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <p className="text-lg font-bold truncate">{bank.bank_name}</p>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground opacity-40 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mt-0.5">{bank.account_name}</p>
+                    
+                    <div className="mt-4 flex items-center justify-between border-t border-dashed pt-4">
+                      <p className="text-xs font-mono text-muted-foreground tracking-tighter">
+                        {bank.account_number.replace(/\d(?=\d{4})/g, "•")}
+                      </p>
+                      <span className="rounded-full bg-primary/5 px-2 py-0.5 text-[9px] font-black text-primary uppercase tracking-widest">
+                        {bank.ifsc_code || 'No IFSC'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))
         )}
       </div>

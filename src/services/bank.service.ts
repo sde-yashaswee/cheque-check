@@ -15,6 +15,17 @@ export class BankService {
     return data as Bank[]
   }
 
+  static async getById(id: string) {
+    const { data, error } = await supabase
+      .from('banks')
+      .select('*')
+      .eq('id', id)
+      .single()
+    
+    if (error) throw error
+    return data as Bank
+  }
+
   static async create(bank: Omit<Bank, 'id' | 'created_at' | 'updated_at'>) {
     const { data, error } = await supabase
       .from('banks')
