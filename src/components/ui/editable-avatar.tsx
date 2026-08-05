@@ -106,36 +106,38 @@ export function EditableAvatar({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <button 
-          className={cn(
-            "relative group rounded-full overflow-hidden border-2 border-background transition-all active:scale-95",
-            sizeClasses[size],
-            className
-          )}
-        >
-          {imageUrl ? (
-            <img 
-              src={imageUrl} 
-              alt={name} 
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <EntityAvatar 
-              name={name} 
-              color={color} 
-              icon={icon} 
-              size={size === 'xl' ? 'lg' : size} 
-              className="h-full w-full"
-            />
-          )}
-          
-          {/* Edit Overlay */}
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <HugeiconsIcon icon={Camera} className="text-white h-1/3 w-1/3" />
-          </div>
-        </button>
-      </DialogTrigger>
+      <DialogTrigger 
+        render={
+          <button 
+            className={cn(
+              "relative group rounded-full overflow-hidden border-2 border-background transition-all active:scale-95",
+              sizeClasses[size],
+              className
+            )}
+          >
+            {imageUrl ? (
+              <img 
+                src={imageUrl} 
+                alt={name} 
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <EntityAvatar 
+                name={name} 
+                color={color} 
+                icon={icon} 
+                size={size === 'xl' ? 'lg' : size} 
+                className="h-full w-full"
+              />
+            )}
+            
+            {/* Edit Overlay */}
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <HugeiconsIcon icon={Camera} className="text-white h-1/3 w-1/3" />
+            </div>
+          </button>
+        }
+      />
       
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

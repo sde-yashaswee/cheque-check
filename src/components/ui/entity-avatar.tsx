@@ -8,11 +8,12 @@ interface EntityAvatarProps {
   name: string
   color?: string
   icon?: string
+  imageUrl?: string | null
   className?: string
   size?: 'sm' | 'md' | 'lg'
 }
 
-export function EntityAvatar({ name, color, icon, className, size = 'md' }: EntityAvatarProps) {
+export function EntityAvatar({ name, color, icon, imageUrl, className, size = 'md' }: EntityAvatarProps) {
   // Use a default color based on the first letter if none provided
   const defaultColor = color || '#007AFF'
   
@@ -33,13 +34,15 @@ export function EntityAvatar({ name, color, icon, className, size = 'md' }: Enti
   return (
     <div 
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-full text-white",
+        "flex shrink-0 items-center justify-center rounded-full text-white overflow-hidden",
         sizeClasses[size],
         className
       )}
-      style={{ backgroundColor: defaultColor }}
+      style={{ backgroundColor: imageUrl ? 'transparent' : defaultColor }}
     >
-      {IconComponent ? (
+      {imageUrl ? (
+        <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
+      ) : IconComponent ? (
         <HugeiconsIcon icon={IconComponent} className={iconSizeClasses[size]} />
       ) : (
         <span className={cn(

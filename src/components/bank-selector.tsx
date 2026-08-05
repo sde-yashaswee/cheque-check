@@ -51,6 +51,7 @@ export function BankSelector({
               {selectedBank ? (
                 <EntityAvatar 
                   name={selectedBank.name} 
+                  imageUrl={selectedBank.logo_url}
                   size="sm" 
                 />
               ) : (
@@ -83,7 +84,7 @@ export function BankSelector({
                   className="flex items-center justify-between py-3 px-4 cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <EntityAvatar name={bank.name} size="sm" />
+                    <EntityAvatar name={bank.name} imageUrl={bank.logo_url} size="sm" />
                     <span className="font-bold">{bank.name}</span>
                   </div>
                   <HugeiconsIcon icon={Check}                     className={cn(

@@ -8,6 +8,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command"
+import { EntityAvatar } from "./ui/entity-avatar"
 
 interface BusinessSwitcherProps {
   trigger?: React.ReactElement
@@ -22,7 +23,16 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
       <DialogTrigger render={trigger || (
           <button className="flex items-center gap-2 rounded-pill bg-canvas-parchment px-4 py-2 text-sm font-semibold transition-transform active:scale-95 dark:bg-surface-tile-1">
             <HugeiconsIcon icon={ChevronDown} className="h-4 w-4" />
-            <span>{activeBusiness?.name || 'Select Business'}</span>
+            <div className="flex items-center gap-2">
+              <EntityAvatar 
+                name={activeBusiness?.name || 'B'} 
+                color={activeBusiness?.color} 
+                icon={activeBusiness?.icon} 
+                imageUrl={activeBusiness?.logo_url}
+                size="md" 
+              />
+              <span>{activeBusiness?.name || 'Select Business'}</span>
+            </div>
           </button>
         )}
       />
@@ -48,12 +58,14 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
                     activeBusiness?.id === business.id ? "bg-primary/10" : "hover:bg-muted"
                   )}
                 >
-                  <div className={cn(
-                    "flex h-10 w-10 items-center justify-center rounded-lg font-bold text-sm shadow-sm",
-                    activeBusiness?.id === business.id ? "bg-primary text-white" : "bg-muted text-muted-foreground"
-                  )}>
-                    {business.name?.charAt(0).toUpperCase() || 'B'}
-                  </div>
+                  <EntityAvatar 
+                    name={business.name} 
+                    color={business.color} 
+                    icon={business.icon} 
+                    imageUrl={business.logo_url}
+                    size="lg" 
+                    className="rounded-lg shadow-sm"
+                  />
                   <div className="flex flex-col flex-1 truncate">
                     <span className={cn(
                       "font-bold text-[15px] truncate",

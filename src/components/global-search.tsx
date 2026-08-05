@@ -10,6 +10,7 @@ import { AccountService } from '@/services/account.service'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { EntityAvatar } from '@/components/ui/entity-avatar'
 
 export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
   const [query, setQuery] = useState('')
@@ -85,14 +86,14 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
                 onSelect={() => navigateTo(`/cheques`)}
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10 text-primary">
+                <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10 text-primary shrink-0">
                   <HugeiconsIcon icon={FileText} className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold">₹{c.amount.toLocaleString()}</p>
                   <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider">{c.party?.name} • #{c.cheque_number}</p>
                 </div>
-                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 shrink-0" />
               </CommandItem>
             ))}
           </CommandGroup>
@@ -106,14 +107,19 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
                 onSelect={() => navigateTo(`/parties/${p.id}`)}
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-green-500/10 text-green-600">
-                  <HugeiconsIcon icon={Users} className="h-5 w-5" />
-                </div>
+                <EntityAvatar 
+                  name={p.name} 
+                  color={p.color} 
+                  icon={p.icon} 
+                  imageUrl={p.avatar_url}
+                  size="lg" 
+                  className="rounded-sm shrink-0"
+                />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold">{p.name}</p>
                   <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider">{p.contact}</p>
                 </div>
-                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 shrink-0" />
               </CommandItem>
             ))}
           </CommandGroup>
@@ -127,14 +133,19 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
                 onSelect={() => navigateTo(`/accounts/${a.id}`)}
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-muted text-muted-foreground">
-                  <HugeiconsIcon icon={Building2} className="h-5 w-5" />
-                </div>
+                <EntityAvatar 
+                  name={a.bank?.name || 'A'} 
+                  color={a.color} 
+                  icon={a.icon} 
+                  imageUrl={a.bank?.logo_url}
+                  size="lg" 
+                  className="rounded-sm shrink-0"
+                />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold">{a.bank?.name || 'Bank'}</p>
                   <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider">{a.account_name} • {a.account_number}</p>
                 </div>
-                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 shrink-0" />
               </CommandItem>
             ))}
           </CommandGroup>

@@ -103,6 +103,7 @@ export default function BusinessesPage() {
                     name={business.name} 
                     color={business.color} 
                     icon={business.icon} 
+                    imageUrl={business.logo_url}
                     size="lg" 
                   />
                   <div>

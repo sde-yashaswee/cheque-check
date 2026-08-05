@@ -50,14 +50,16 @@ export default function CreateChequePage() {
     label: p.name, 
     value: p.id,
     color: (p as any).color,
-    icon: (p as any).icon
+    icon: (p as any).icon,
+    imageUrl: (p as any).avatar_url
   })) || []
 
   const accountOptions = accounts?.map(b => ({ 
     label: `${(b as any).bank?.name || 'Bank'} (${b.account_number.slice(-4)})`, 
     value: b.id,
     color: (b as any).color,
-    icon: (b as any).icon
+    icon: (b as any).icon,
+    imageUrl: (b as any).bank?.logo_url
   })) || []
 
   const selectedParty = parties?.find(p => p.id === watch('party_id'))
@@ -285,6 +287,7 @@ export default function CreateChequePage() {
                       name={selectedParty.name} 
                       color={(selectedParty as any).color} 
                       icon={(selectedParty as any).icon} 
+                      imageUrl={(selectedParty as any).avatar_url}
                       size="sm" 
                     />
                   )}

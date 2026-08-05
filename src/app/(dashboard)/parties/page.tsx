@@ -91,6 +91,7 @@ export default function PartiesPage() {
                   name={party.name} 
                   color={party.color} 
                   icon={party.icon} 
+                  imageUrl={party.avatar_url}
                   size="lg" 
                 />
                 <div className="flex-1 min-w-0">

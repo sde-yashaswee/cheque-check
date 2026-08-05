@@ -131,6 +131,7 @@ export default function AccountsPage() {
                     name={account.bank?.name || 'A'} 
                     color={account.color} 
                     icon={account.icon} 
+                    imageUrl={account.bank?.logo_url}
                     size="lg" 
                   />
                   <div className="flex-1 min-w-0">

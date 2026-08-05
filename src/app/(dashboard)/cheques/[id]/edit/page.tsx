@@ -54,14 +54,16 @@ export default function EditChequePage() {
     label: p.name, 
     value: p.id,
     color: p.color,
-    icon: p.icon
+    icon: p.icon,
+    imageUrl: p.avatar_url
   })) || []
 
   const accountOptions = accounts?.map((b: AccountWithRelations) => ({ 
     label: `${b.bank?.name || 'Bank'} (${b.account_number.slice(-4)})`, 
     value: b.id,
     color: b.color,
-    icon: b.icon
+    icon: b.icon,
+    imageUrl: b.bank?.logo_url
   })) || []
 
   if (isLoading) {

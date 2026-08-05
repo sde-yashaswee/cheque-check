@@ -80,6 +80,7 @@ export default function ChequeDetailPage() {
                   name={cheque.party?.name} 
                   color={cheque.party?.color} 
                   icon={cheque.party?.icon} 
+                  imageUrl={cheque.party?.avatar_url}
                 />
                 <div>
                   <p className="font-semibold">{cheque.party?.name}</p>
@@ -95,6 +96,7 @@ export default function ChequeDetailPage() {
                   name={cheque.account?.bank?.name || 'A'} 
                   color={cheque.account?.color} 
                   icon={cheque.account?.icon} 
+                  imageUrl={cheque.account?.bank?.logo_url}
                 />
                 <div>
                   <p className="font-semibold">{cheque.account?.bank?.name}</p>

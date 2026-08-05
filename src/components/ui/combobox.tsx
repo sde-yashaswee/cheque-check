@@ -23,7 +23,7 @@ import { EntityAvatar } from "@/components/ui/entity-avatar"
 import Link from "next/link"
 
 interface ComboboxProps {
-  options: { label: string; value: string; color?: string; icon?: string }[]
+  options: { label: string; value: string; color?: string; icon?: string; imageUrl?: string | null }[]
   value?: string
   onValueChange: (value: string) => void
   placeholder?: string
@@ -58,6 +58,7 @@ export function Combobox({
               name={selectedOption.label} 
               color={selectedOption.color} 
               icon={selectedOption.icon} 
+              imageUrl={selectedOption.imageUrl}
               size="sm" 
             />
           )}
@@ -86,7 +87,7 @@ export function Combobox({
                   className="flex items-center justify-between py-3 px-4"
                 >
                   <div className="flex items-center gap-2">
-                    <EntityAvatar name={option.label} color={option.color} icon={option.icon} size="sm" />
+                    <EntityAvatar name={option.label} color={option.color} icon={option.icon} imageUrl={option.imageUrl} size="sm" />
                     <span className="font-semibold">{option.label}</span>
                   </div>
                   <HugeiconsIcon icon={Check}                     className={cn(

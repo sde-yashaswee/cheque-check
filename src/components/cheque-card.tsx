@@ -123,6 +123,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
               name={cheque.party?.name || '?'} 
               color={cheque.party?.color} 
               icon={cheque.party?.icon}
+              imageUrl={cheque.party?.avatar_url}
               size="md"
               className="mt-1"
             />
@@ -155,6 +156,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
                 name={cheque.account?.bank?.name || '?'} 
                 color={cheque.account?.color} 
                 icon={cheque.account?.icon}
+                imageUrl={cheque.account?.bank?.logo_url}
                 size="sm"
               />
             </div>

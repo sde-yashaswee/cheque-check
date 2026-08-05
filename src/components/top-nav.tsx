@@ -111,9 +111,18 @@ export function TopNav() {
         <BusinessSwitcher 
           trigger={
             <button className="flex h-8 w-full items-center bg-primary/5 px-4 text-[10px] font-semibold text-primary uppercase tracking-wider backdrop-blur-sm transition-colors hover:bg-primary/10 active:bg-primary/20 cursor-pointer border-b border-primary/5">
-              <span className="opacity-60 mr-1.5">Business:</span> 
-              {activeBusiness.name}
-              <HugeiconsIcon icon={ChevronDown} className="ml-1.5 h-3 w-3 opacity-60" />
+              <span className="opacity-60 mr-1.5 font-bold">Business:</span> 
+              <div className="flex items-center gap-1.5 overflow-hidden">
+                <div className="h-4 w-4 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center shrink-0">
+                  {activeBusiness.logo_url ? (
+                    <img src={activeBusiness.logo_url} alt={activeBusiness.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <span className="text-[8px] font-bold">{activeBusiness.name?.charAt(0)}</span>
+                  )}
+                </div>
+                <span className="truncate">{activeBusiness.name}</span>
+              </div>
+              <HugeiconsIcon icon={ChevronDown} className="ml-1.5 h-3 w-3 opacity-60 shrink-0" />
             </button>
           }
         />
