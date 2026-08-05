@@ -5,6 +5,8 @@ export const businessSchema = z.object({
   email: z.string().email().optional().or(z.literal('')),
   phone: z.string().optional().or(z.literal('')),
   address: z.string().optional().or(z.literal('')),
+  color: z.string().optional(),
+  icon: z.string().optional(),
 })
 
 export const partySchema = z.object({
@@ -13,6 +15,8 @@ export const partySchema = z.object({
   email: z.string().email().optional().or(z.literal('')),
   address: z.string().optional().or(z.literal('')),
   notes: z.string().optional().or(z.literal('')),
+  color: z.string().optional(),
+  icon: z.string().optional(),
 })
 
 export const bankSchema = z.object({
@@ -20,6 +24,8 @@ export const bankSchema = z.object({
   account_name: z.string().min(1, 'Account holder name is required'),
   account_number: z.string().min(1, 'Account number is required'),
   ifsc_code: z.string().optional().or(z.literal('')),
+  color: z.string().optional(),
+  icon: z.string().optional(),
 })
 
 export const chequeSchema = z.object({

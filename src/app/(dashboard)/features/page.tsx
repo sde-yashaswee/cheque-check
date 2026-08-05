@@ -22,7 +22,7 @@ export default function FeaturesPage() {
       name: 'Voice Call Reminders',
       description: 'Automatically call parties when their cheques are due. Professional automated voice reminders to ensure timely payment.',
       icon: Phone,
-      checked: profile?.reminders_per_day > 0, // Placeholder logic for now
+      checked: (profile?.reminders_per_day ?? 0) > 0, // Placeholder logic for now
       disabled: true,
       badge: 'Coming Soon'
     },
