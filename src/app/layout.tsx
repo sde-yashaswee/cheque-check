@@ -20,10 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable}`}>
-      <body className="bg-zinc-950 font-sans text-foreground selection:bg-primary/10 antialiased flex items-center justify-center min-h-[100dvh] overflow-hidden">
+      <body className="bg-primary font-sans text-foreground selection:bg-primary/10 antialiased flex items-center justify-center min-h-[100dvh] overflow-hidden">
         
         {/* Mock Phone Container: Centered on large screens, full screen on mobile */}
-        <div className="relative w-full h-[100dvh] bg-background sm:h-[90dvh] sm:max-h-[932px] sm:max-w-[430px] sm:rounded-[2.5rem] sm:border-[8px] sm:border-zinc-800 sm:shadow-2xl overflow-hidden flex flex-col [transform:translateZ(0)]">
+        <div className="relative w-full h-[100dvh] bg-background sm:h-[90dvh] sm:max-h-[932px] sm:max-w-[430px] sm:rounded-xl sm:border-[4px] sm:border-white sm:shadow-2xl overflow-hidden flex flex-col [transform:translateZ(0)]">
           <Providers>
             {/* Inner Scrollable Area: All content scrolls inside here */}
             <div className="flex-1 overflow-y-auto overflow-x-hidden relative flex flex-col">
