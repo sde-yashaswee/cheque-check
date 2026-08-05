@@ -7,17 +7,16 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useBusiness } from '@/hooks/use-business'
 
 export default function PartiesPage() {
   const [search, setSearch] = useState('')
-  
-  // Note: We'd normally get the active business ID from a context/store
-  // For now, we'll assume a stub business ID if none exists
-  const businessId = 'stub-id' 
+  const { activeBusiness } = useBusiness()
+  const businessId = activeBusiness?.id
 
   const { data: parties, isLoading } = useQuery({
     queryKey: ['parties', businessId],
-    queryFn: () => PartyService.getAll(businessId),
+    queryFn: () => PartyService.getAll(businessId!),
     enabled: !!businessId,
   })
 

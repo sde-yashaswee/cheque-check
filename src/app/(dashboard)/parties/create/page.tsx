@@ -9,9 +9,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { useBusiness } from '@/hooks/use-business'
 
 export default function CreatePartyPage() {
   const router = useRouter()
+  const { activeBusiness } = useBusiness()
   const [loading, setLoading] = useState(false)
   
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -26,10 +28,10 @@ export default function CreatePartyPage() {
   })
 
   const onSubmit = async (data: any) => {
+    if (!activeBusiness) return
     setLoading(true)
     try {
-      // businessId should come from active business context
-      await PartyService.create({ ...data, business_id: 'stub-id' })
+      await PartyService.create({ ...data, business_id: activeBusiness.id })
       router.push('/parties')
     } catch (error) {
       console.error(error)
