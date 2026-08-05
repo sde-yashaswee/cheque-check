@@ -11,6 +11,7 @@ import { ChequeStatus, ChequeWithRelations } from "@/types";
 import { useProfile } from "@/hooks/use-profile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { useChequeStats } from "@/hooks/use-cheque-stats";
 
 export default function HomePage() {
   const { activeBusiness } = useBusiness()
@@ -23,6 +24,17 @@ export default function HomePage() {
     enabled: !!activeBusiness?.id,
   })
 
+  const {
+    todayCheques,
+    outstanding,
+    issuedCount,
+    receivedCount,
+    clearedCount,
+    bouncedCount,
+    upcomingCount,
+    overdueCount
+  } = useChequeStats(cheques)
+
   const mutation = useMutation({
     mutationFn: ({ id, status }: { id: string, status: ChequeStatus }) => 
       ChequeService.updateStatus(id, status),
@@ -31,60 +43,44 @@ export default function HomePage() {
     }
   })
 
-  // Derived stats
-  const todayDate = new Date().toISOString().split('T')[0]
-  const todayCheques = cheques?.filter((c) => c.cheque_date === todayDate) || []
-  const outstanding = cheques?.reduce((acc: number, curr) => {
-    if (curr.status === 'Cleared') return acc
-    return curr.type === 'Outward' ? acc + curr.amount : acc - curr.amount
-  }, 0) || 0
-
-  const issuedCount = cheques?.filter((c) => c.type === 'Outward').length || 0
-  const receivedCount = cheques?.filter((c) => c.type === 'Inward').length || 0
-  const clearedCount = cheques?.filter((c) => c.status === 'Cleared').length || 0
-  const bouncedCount = cheques?.filter((c) => c.status === 'Bounced').length || 0
-
-  const upcomingCount = cheques?.filter((c) => c.cheque_date > todayDate && c.status !== 'Cleared').length || 0
-  const overdueCount = cheques?.filter((c) => c.cheque_date < todayDate && c.status !== 'Cleared').length || 0
-
   const currency = profile?.currency || '₹'
 
   const chartData = [
-    { name: 'Issued', value: issuedCount, color: '#EAB308' },   // Yellow
-    { name: 'Received', value: receivedCount, color: '#2563EB' }, // Blue
-    { name: 'Cleared', value: clearedCount, color: '#22C55E' },  // Green
-    { name: 'Bounced', value: bouncedCount, color: '#EF4444' },  // Red
+    { name: 'Issued', value: issuedCount, color: '#0066cc' },   // Action Blue
+    { name: 'Received', value: receivedCount, color: '#2997ff' }, // Sky Blue
+    { name: 'Cleared', value: clearedCount, color: '#34C759' },  // iOS Green
+    { name: 'Bounced', value: bouncedCount, color: '#FF3B30' },  // iOS Red
   ].filter(d => d.value > 0);
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20 pt-2">
       {!activeBusiness && !isLoading ? (
         <div className="py-20 text-center">
-          <p className="text-muted-foreground">Create a business to get started.</p>
+          <p className="text-body text-muted-foreground">Create a business to get started.</p>
           <Link href="/businesses/create" className="mt-4 block">
-            <Button className="rounded-pill">Create Business</Button>
+            <Button className="rounded-full">Create Business</Button>
           </Link>
         </div>
       ) : isLoading ? (
         <>
-          <Skeleton className="h-40 w-full rounded-3xl" />
+          <Skeleton className="h-40 w-full rounded-lg" />
           <div className="grid grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-24 w-full rounded-3xl" />
+              <Skeleton key={i} className="h-24 w-full rounded-lg" />
             ))}
           </div>
           <div className="space-y-4">
             <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-32 w-full rounded-3xl" />
+            <Skeleton className="h-32 w-full rounded-lg" />
           </div>
         </>
       ) : (
         <>
           {/* Outstanding Card */}
-          <div className="rounded-3xl bg-primary p-8 text-primary-foreground relative overflow-hidden shadow-sm">
+          <div className="rounded-lg bg-primary p-8 text-primary-foreground relative overflow-hidden">
             <div className="relative z-10">
-              <p className="text-xs font-bold opacity-70 uppercase tracking-widest">Total Outstanding</p>
-              <p className="mt-2 text-4xl font-black">{currency}{outstanding.toLocaleString()}</p>
+              <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">Total Outstanding</p>
+              <p className="mt-2 text-4xl font-semibold">{currency}{outstanding.toLocaleString()}</p>
             </div>
             <div className="absolute -right-10 -bottom-10 opacity-10 rotate-12">
               <FileText size={200} />
@@ -93,22 +89,22 @@ export default function HomePage() {
 
           {/* Quick Actions */}
           <div className="space-y-4">
-            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1">Quick Actions</h2>
+            <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1">Quick Actions</h2>
             <div className="flex gap-4">
               <Link href="/cheques/create?type=Outward" className="flex-1">
-                <div className="flex flex-col items-center gap-2 rounded-3xl bg-canvas-parchment p-4 transition-transform active:scale-95 shadow-sm border border-primary/5">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 transition-transform active:scale-95 border border-primary/5">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/10 text-primary">
                     <ArrowUpRight className="h-6 w-6" />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-primary">Issue Cheque</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">Issue Cheque</span>
                 </div>
               </Link>
               <Link href="/cheques/create?type=Inward" className="flex-1">
-                <div className="flex flex-col items-center gap-2 rounded-3xl bg-canvas-parchment p-4 transition-transform active:scale-95 shadow-sm border border-primary/5">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-500/10 text-green-600">
+                <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 transition-transform active:scale-95 border border-primary/5">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-green-500/10 text-green-600">
                     <ArrowDownLeft className="h-6 w-6" />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-green-600">Receive Cheque</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-green-600">Receive Cheque</span>
                 </div>
               </Link>
             </div>
@@ -116,10 +112,10 @@ export default function HomePage() {
 
           {/* Today's Cheques */}
           <div className="space-y-4">
-            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1">Today&apos;s Cheques</h2>
+            <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1">Today&apos;s Cheques</h2>
             {todayCheques.length === 0 ? (
-              <div className="rounded-3xl border border-dashed p-10 text-center bg-canvas-parchment/30">
-                <p className="text-sm text-muted-foreground font-medium">Enjoy your day! No cheques due.</p>
+              <div className="rounded-lg border border-dashed p-10 text-center bg-canvas-parchment/30">
+                <p className="text-sm text-muted-foreground font-normal">Enjoy your day! No cheques due.</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -134,24 +130,24 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Today/Upcoming/Overdue Cards - MOVED ABOVE PIE CHART */}
+          {/* Today/Upcoming/Overdue Cards */}
           <div className="grid grid-cols-3 gap-3">
             {[
               { label: "Today", count: todayCheques.length, color: 'bg-primary/5' },
               { label: "Upcoming", count: upcomingCount, color: 'bg-green-500/5' },
               { label: "Overdue", count: overdueCount, color: 'bg-red-500/5' },
             ].map((status) => (
-              <div key={status.label} className={`group relative rounded-2xl border ${status.color} p-4 transition-all active:scale-95 overflow-hidden`}>
-                <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{status.label}</p>
-                <p className="mt-2 text-2xl font-black">{status.count}</p>
+              <div key={status.label} className={`group relative rounded-lg border ${status.color} p-4 transition-all active:scale-95 overflow-hidden`}>
+                <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">{status.label}</p>
+                <p className="mt-2 text-2xl font-semibold">{status.count}</p>
               </div>
             ))}
           </div>
 
           {/* Statistics Pie Chart */}
           <div className="space-y-4 pt-4">
-            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1">Statistics</h2>
-            <div className="rounded-3xl border bg-card p-6 h-[300px] relative">
+            <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1">Statistics</h2>
+            <div className="rounded-lg border bg-card p-6 h-[300px] relative">
               {chartData.length > 0 ? (
                 <div className="relative h-full w-full">
                   <ResponsiveContainer width="100%" height="100%">
@@ -170,21 +166,21 @@ export default function HomePage() {
                         ))}
                       </Pie>
                       <Tooltip 
-                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                        itemStyle={{ fontWeight: 'bold' }}
+                        contentStyle={{ borderRadius: '11px', border: 'none' }}
+                        itemStyle={{ fontWeight: '600' }}
                       />
                       <Legend 
                         verticalAlign="bottom" 
                         height={36} 
                         iconType="circle"
-                        formatter={(value) => <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{value}</span>}
+                        formatter={(value) => <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{value}</span>}
                       />
                     </PieChart>
                   </ResponsiveContainer>
                   {/* TOTAL TEXT IN THE CENTER */}
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -mt-4 flex flex-col items-center justify-center pointer-events-none">
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Total</p>
-                    <p className="text-2xl font-black leading-none">{cheques?.length || 0}</p>
+                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Total</p>
+                    <p className="text-2xl font-semibold leading-none">{cheques?.length || 0}</p>
                   </div>
                 </div>
               ) : (
@@ -198,10 +194,11 @@ export default function HomePage() {
       )}
 
       <Link href="/cheques/create">
-        <Button className="fixed bottom-24 right-6 h-16 w-16 rounded-full shadow-lg z-40 border-4 border-white dark:border-zinc-900" size="icon">
+        <Button className="fixed bottom-24 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900" size="icon">
           <Plus className="h-8 w-8" />
         </Button>
       </Link>
     </div>
   );
 }
+

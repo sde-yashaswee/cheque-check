@@ -3,8 +3,6 @@
 import { useBusiness } from "@/hooks/use-business"
 import { useProfile } from "@/hooks/use-profile"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { 
   ChevronRight, 
   LogOut, 
@@ -12,19 +10,14 @@ import {
   Bell, 
   Globe, 
   CreditCard, 
-  Download, 
   FileSpreadsheet, 
   Building2, 
-  Landmark, 
   LayoutGrid, 
   Zap,
   Languages,
   Trash2
 } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
-import { ReportService } from "@/services/report.service"
-import { ProfileService } from "@/services/profile.service"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-dialog"
 import { useQuery } from "@tanstack/react-query"
 import { ChequeService } from "@/services/cheque.service"
@@ -33,12 +26,12 @@ import Link from "next/link"
 import { Combobox } from "@/components/ui/combobox"
 import { format, differenceInDays } from "date-fns"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useSettings } from "@/hooks/use-settings"
 
 export default function SettingsPage() {
-  const { activeBusiness, businesses } = useBusiness()
+  const { activeBusiness } = useBusiness()
   const { profile, updateProfile, isLoading: profileLoading } = useProfile()
-  const supabase = createClient()
-  const router = useRouter()
+  const { handleExport, handleLogout, handleDeleteProfile } = useSettings()
 
   const { data: cheques } = useQuery({
     queryKey: ['cheques', activeBusiness?.id],
@@ -49,35 +42,17 @@ export default function SettingsPage() {
   if (profileLoading) {
     return (
       <div className="mx-auto max-w-2xl space-y-8 pb-20">
-        <Skeleton className="h-20 w-full rounded-3xl" />
+        <Skeleton className="h-20 w-full rounded-lg" />
         <div className="space-y-8">
           {[1, 2, 3].map((i) => (
             <div key={i} className="space-y-3">
               <Skeleton className="h-4 w-24 rounded-full" />
-              <Skeleton className="h-48 w-full rounded-3xl" />
+              <Skeleton className="h-48 w-full rounded-lg" />
             </div>
           ))}
         </div>
       </div>
     )
-  }
-
-  const handleExport = () => {
-    if (!cheques || cheques.length === 0) {
-      alert("No cheques found to export.")
-      return
-    }
-    ReportService.exportToCSV(cheques, `${activeBusiness?.name || 'Business'}_Cheques.csv`)
-  }
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/login')
-  }
-
-  const handleDeleteProfile = async () => {
-    await ProfileService.delete()
-    router.push('/login')
   }
 
   const currencyOptions = [
@@ -194,7 +169,7 @@ export default function SettingsPage() {
     {
       title: 'Data & Reports',
       items: [
-        { name: 'Export Cheques (CSV)', icon: FileSpreadsheet, action: handleExport },
+        { name: 'Export Cheques (CSV)', icon: FileSpreadsheet, action: () => handleExport(cheques, activeBusiness?.name || '') },
       ]
     }
   ]
@@ -202,17 +177,17 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20 pt-4">
       {/* Profile Section */}
-      <div className="flex items-center gap-4 rounded-3xl bg-canvas-parchment p-5 dark:bg-surface-tile-1">
+      <div className="flex items-center gap-4 rounded-lg bg-canvas-parchment p-5 dark:bg-surface-tile-1">
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white">
           <User className="h-7 w-7" />
         </div>
         <div className="flex-1">
-          <p className="font-bold text-lg leading-tight">{profile?.name || 'User'}</p>
-          <p className="text-xs text-muted-foreground font-medium">{profile?.email}</p>
+          <p className="font-semibold text-lg leading-tight">{profile?.name || 'User'}</p>
+          <p className="text-xs text-muted-foreground font-semibold">{profile?.email}</p>
         </div>
         <div className="text-right">
-          <p className="text-sm font-bold text-primary">{remainingDays} days</p>
-          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Trial</p>
+          <p className="text-sm font-semibold text-primary">{remainingDays} days</p>
+          <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Trial</p>
         </div>
       </div>
 
@@ -220,24 +195,22 @@ export default function SettingsPage() {
       <div className="space-y-8">
         {sections.map((section) => (
           <div key={section.title} className="space-y-3">
-            <h3 className="px-2 text-[10px] font-medium text-muted-foreground uppercase tracking-[0.2em]">{section.title}</h3>
-            <div className="divide-y rounded-3xl border bg-card overflow-hidden">
+            <h3 className="px-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{section.title}</h3>
+            <div className="divide-y rounded-lg border bg-card overflow-hidden border-primary/5">
               {section.items.map((item: any) => {
                 const content = (
                   <div key={item.name} className={cn("flex items-center justify-between p-4 transition-colors", (item.action || item.href) && "cursor-pointer active:bg-muted/50 hover:bg-muted/30")} onClick={item.action}>
                     <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted/50 text-muted-foreground">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-muted/50 text-muted-foreground">
                         <item.icon className="h-4 w-4" />
                       </div>
-                      <span className="text-sm font-medium">{item.name}</span>
+                      <span className="text-sm font-semibold">{item.name}</span>
                     </div>
                     {item.component ? (
                       item.component
-                    ) : item.toggle ? (
-                      <Switch checked={item.checked} onCheckedChange={item.onChange} />
                     ) : (
                       <div className="flex items-center gap-2">
-                        {item.value && <span className="text-xs font-medium text-muted-foreground">{item.value}</span>}
+                        {item.value && <span className="text-xs font-semibold text-muted-foreground">{item.value}</span>}
                         <ChevronRight className="h-4 w-4 text-muted-foreground opacity-30" />
                       </div>
                     )}
@@ -255,20 +228,20 @@ export default function SettingsPage() {
       </div>
 
       <div className="space-y-3">
-        <h3 className="px-2 text-[10px] font-medium text-destructive uppercase tracking-[0.2em]">Danger Zone</h3>
-        <div className="divide-y rounded-3xl border border-destructive/20 bg-destructive/5 overflow-hidden">
+        <h3 className="px-2 text-[10px] font-semibold text-destructive uppercase tracking-wider">Danger Zone</h3>
+        <div className="divide-y rounded-lg border border-destructive/20 bg-destructive/5 overflow-hidden">
           <DeleteConfirmationDialog 
             title="Delete Entire Profile?"
-            description="This will permanently delete your account, all businesses, parties, accounts, and cheques. This action is irreversible."
+            description="This will permanently delete your account and all associated data."
             confirmName={profile?.name || profile?.email || ''}
             onDelete={handleDeleteProfile}
             trigger={
               <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-destructive/10 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-destructive/10 text-destructive">
                     <Trash2 className="h-4 w-4" />
                   </div>
-                  <span className="text-sm font-bold text-destructive">Delete My Account</span>
+                  <span className="text-sm font-semibold text-destructive">Delete My Account</span>
                 </div>
                 <ChevronRight className="h-4 w-4 text-destructive opacity-30" />
               </div>
@@ -279,18 +252,19 @@ export default function SettingsPage() {
 
       <Button 
         variant="destructive" 
-        className="w-full rounded-pill h-14 text-lg font-medium" 
+        className="w-full rounded-full h-14 text-lg font-semibold" 
         onClick={handleLogout}
       >
         <LogOut className="mr-2 h-5 w-5" /> Sign Out
       </Button>
 
       <div className="text-center pb-8">
-        <p className="text-xs text-muted-foreground font-medium opacity-50 uppercase tracking-widest">ChequeCheck v1.0.0</p>
-        <p className="text-[10px] text-muted-foreground mt-2 opacity-30">
+        <p className="text-xs text-muted-foreground font-semibold opacity-50 uppercase tracking-wider">ChequeCheck v1.0.0</p>
+        <p className="text-[10px] text-muted-foreground mt-2 opacity-30 font-semibold">
           {format(new Date(), "PPpp")}
         </p>
       </div>
     </div>
   )
 }
+

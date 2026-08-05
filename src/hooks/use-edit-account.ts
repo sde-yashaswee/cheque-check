@@ -1,0 +1,63 @@
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { accountSchema } from '@/validators'
+import { AccountService } from '@/services/account.service'
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
+
+export function useEditAccount(id: string, businessId: string | undefined) {
+  const router = useRouter()
+  const queryClient = useQueryClient()
+  
+  const { data: account, isLoading, error } = useQuery({
+    queryKey: ['account', id],
+    queryFn: () => AccountService.getById(id),
+  })
+
+  const form = useForm({
+    resolver: zodResolver(accountSchema),
+  })
+
+  const { reset } = form
+
+  useEffect(() => {
+    if (account) {
+      reset({
+        bank_id: account.bank_id || '',
+        account_name: account.account_name,
+        account_number: account.account_number,
+        ifsc_code: account.ifsc_code || '',
+        color: account.color,
+      })
+    }
+  }, [account, reset])
+
+  const updateMutation = useMutation({
+    mutationFn: (data: any) => AccountService.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts', businessId] })
+      queryClient.invalidateQueries({ queryKey: ['account', id] })
+      router.back()
+    }
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: () => AccountService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts', businessId] })
+      router.push('/accounts')
+    }
+  })
+
+  return {
+    form,
+    account,
+    isLoading,
+    error,
+    isSaving: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
+    onSubmit: form.handleSubmit((data) => updateMutation.mutate(data)),
+    onDelete: () => deleteMutation.mutate(),
+  }
+}

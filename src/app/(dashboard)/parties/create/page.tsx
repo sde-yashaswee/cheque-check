@@ -1,60 +1,28 @@
 'use client'
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { partySchema } from '@/validators'
-import { PartyService } from '@/services/party.service'
+import { useCreateParty } from '@/hooks/use-create-party'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, ArrowRight, Check, User, Phone, MapPin, Palette } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, User, Phone, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export default function CreatePartyPage() {
-  const [step, setStep] = useState(1)
   const router = useRouter()
   const { activeBusiness } = useBusiness()
-  const queryClient = useQueryClient()
   
-  const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm({
-    resolver: zodResolver(partySchema),
-    defaultValues: {
-      name: '',
-      contact: '',
-      email: '',
-      address: '',
-      notes: '',
-    }
-  })
+  const {
+    form,
+    step,
+    nextStep,
+    prevStep,
+    isSaving,
+    onSubmit,
+  } = useCreateParty(activeBusiness?.id)
 
-  const mutation = useMutation({
-    mutationFn: (data: any) => PartyService.create({ ...data, business_id: activeBusiness!.id }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['parties', activeBusiness?.id] })
-      router.back()
-    }
-  })
-
-  const nextStep = async () => {
-    let isValid = false
-    if (step === 1) {
-      isValid = await trigger(['name'])
-    } else if (step === 2) {
-      isValid = await trigger(['contact'])
-    }
-    
-    if (isValid) setStep(s => Math.min(s + 1, 3))
-  }
-  const prevStep = () => setStep(s => Math.max(s - 1, 1))
-
-  const onSubmit = (data: any) => {
-    if (!activeBusiness) return
-    mutation.mutate(data)
-  }
+  const { register, watch, setValue, formState: { errors } } = form
 
   const colors = ['#FF3B30', '#FF9500', '#FFCC00', '#34C759', '#007AFF', '#5856D6', '#AF52DE']
 
@@ -65,8 +33,8 @@ export default function CreatePartyPage() {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Step {step} of 3</p>
-          <h2 className="text-display-sm font-bold">New Party</h2>
+          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Step {step} of 3</p>
+          <h2 className="text-display-sm font-semibold">New Party</h2>
         </div>
       </div>
 
@@ -82,35 +50,35 @@ export default function CreatePartyPage() {
         ))}
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={onSubmit} className="space-y-8">
         {step === 1 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Party Name <span className="text-destructive">*</span></Label>
+                <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Party Name</Label>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
                   <Input 
                     id="name" 
                     {...register('name')} 
                     placeholder="Enter full name" 
-                    className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-medium rounded-2xl shadow-sm"
+                    className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-semibold rounded-sm"
                   />
                 </div>
-                {errors.name && <p className="text-xs text-destructive">{errors.name.message as string}</p>}
+                {errors.name && <p className="text-xs text-destructive ml-1">{errors.name.message as string}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Theme Color</Label>
+                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Theme Color</Label>
                 <div className="flex flex-wrap gap-3 p-1">
                   {colors.map((c) => (
                     <button
                       key={c}
                       type="button"
-                      onClick={() => (setValue as any)('color', c)}
+                      onClick={() => setValue('color', c)}
                       className={cn(
-                        "h-10 w-10 rounded-full transition-all active:scale-90 ring-offset-2",
-                        watch('color' as any) === c ? "ring-2 ring-primary scale-110 shadow-md" : "hover:scale-105"
+                        "h-10 w-10 rounded-full transition-all active:scale-[0.9] ring-offset-2",
+                        watch('color' as any) === c ? "ring-2 ring-primary scale-110" : "hover:scale-105"
                       )}
                       style={{ backgroundColor: c }}
                     />
@@ -119,7 +87,7 @@ export default function CreatePartyPage() {
               </div>
             </div>
             
-            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('name')}>
+            <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('name')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -128,25 +96,25 @@ export default function CreatePartyPage() {
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="contact" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Contact Number <span className="text-destructive">*</span></Label>
+              <Label htmlFor="contact" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Contact Number</Label>
               <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
                 <Input 
                   id="contact" 
                   {...register('contact')} 
                   placeholder="Phone number" 
-                  className="h-14 pl-12 bg-canvas-parchment border-none rounded-2xl shadow-sm"
+                  className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
                 />
               </div>
-              {errors.contact && <p className="text-xs text-destructive">{errors.contact.message as string}</p>}
+              {errors.contact && <p className="text-xs text-destructive ml-1">{errors.contact.message as string}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email</Label>
-              <Input id="email" {...register('email')} placeholder="email@address.com" className="h-14 bg-canvas-parchment border-none rounded-2xl shadow-sm" />
+              <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Email</Label>
+              <Input id="email" {...register('email')} placeholder="email@address.com" className="h-14 bg-canvas-parchment border-none rounded-sm" />
             </div>
 
-            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('contact')}>
+            <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('contact')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -155,31 +123,31 @@ export default function CreatePartyPage() {
         {step === 3 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="address" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Address</Label>
+              <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Address</Label>
               <div className="relative">
-                <MapPin className="absolute left-4 top-4 h-5 w-5 text-muted-foreground" />
-                <Input id="address" {...register('address')} placeholder="Location details" className="h-14 pl-12 bg-canvas-parchment border-none rounded-2xl shadow-sm" />
+                <MapPin className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50" />
+                <Input id="address" {...register('address')} placeholder="Location details" className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="notes" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Notes</Label>
-              <Input id="notes" {...register('notes')} placeholder="Any additional notes" className="h-14 bg-canvas-parchment border-none rounded-2xl shadow-sm" />
+              <Label htmlFor="notes" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Notes</Label>
+              <Input id="notes" {...register('notes')} placeholder="Any additional notes" className="h-14 bg-canvas-parchment border-none rounded-sm" />
             </div>
 
-            <div className="rounded-3xl bg-primary/5 p-6 space-y-4 border border-primary/10 shadow-sm">
-              <h3 className="font-bold text-primary uppercase tracking-widest text-[10px]">Review Information</h3>
+            <div className="rounded-lg bg-primary/5 p-6 space-y-4 border border-primary/10">
+              <h3 className="font-semibold text-primary uppercase tracking-wider text-[10px]">Review Information</h3>
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full" style={{ backgroundColor: watch('color' as any) || '#34C759' }} />
                 <div>
-                  <p className="font-bold">{watch('name')}</p>
+                  <p className="font-semibold">{watch('name')}</p>
                   <p className="text-xs text-muted-foreground">{watch('contact')}</p>
                 </div>
               </div>
             </div>
 
-            <Button type="submit" className="w-full rounded-pill h-14 text-lg shadow-product" disabled={mutation.isPending}>
-              {mutation.isPending ? 'Saving...' : 'Create Party'} <Check className="ml-2 h-5 w-5" />
+            <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
+              {isSaving ? 'Saving...' : 'Create Party'} <Check className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -187,3 +155,4 @@ export default function CreatePartyPage() {
     </div>
   )
 }
+

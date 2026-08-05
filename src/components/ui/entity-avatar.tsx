@@ -32,7 +32,7 @@ export function EntityAvatar({ name, color, icon, className, size = 'md' }: Enti
   return (
     <div 
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-full text-white shadow-sm",
+        "flex shrink-0 items-center justify-center rounded-full text-white",
         sizeClasses[size],
         className
       )}

@@ -143,10 +143,10 @@ export default function OnboardingPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-canvas-parchment px-6 dark:bg-black">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-white shadow-product mb-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-primary text-white mb-4">
             <Wallet className="h-8 w-8" />
           </div>
-          <h1 className="text-display-sm font-black tracking-tight">Welcome to ChequeCheck</h1>
+          <h1 className="text-display-md font-semibold tracking-tight">Welcome to ChequeCheck</h1>
           <p className="text-body text-muted-foreground mt-2">Let&apos;s get you set up in a few seconds.</p>
           
           <div className="flex items-center gap-2 mt-6">
@@ -156,10 +156,10 @@ export default function OnboardingPage() {
           </div>
         </div>
 
-        <div className="rounded-3xl bg-white p-8 shadow-sm dark:bg-surface-tile-1 border border-primary/5">
+        <div className="rounded-lg bg-white p-8 dark:bg-surface-tile-1 border border-primary/5">
           {step === 1 && (
             <form onSubmit={handleStep1} className="space-y-4">
-              <div className="flex items-center gap-2 mb-4 text-primary font-bold">
+              <div className="flex items-center gap-2 mb-4 text-primary font-semibold">
                 <Building2 className="h-5 w-5" />
                 <span>Business Information</span>
               </div>
@@ -171,7 +171,7 @@ export default function OnboardingPage() {
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
                   required
-                  className="h-12 bg-canvas-parchment border-none rounded-xl"
+                  className="h-12 bg-canvas-parchment border-none rounded-sm"
                 />
               </div>
               <div className="space-y-2">
@@ -182,7 +182,7 @@ export default function OnboardingPage() {
                   placeholder="contact@business.com" 
                   value={businessEmail}
                   onChange={(e) => setBusinessEmail(e.target.value)}
-                  className="h-12 bg-canvas-parchment border-none rounded-xl"
+                  className="h-12 bg-canvas-parchment border-none rounded-sm"
                 />
               </div>
               <div className="space-y-2">
@@ -192,10 +192,10 @@ export default function OnboardingPage() {
                   placeholder="+91 98765 43210" 
                   value={businessPhone}
                   onChange={(e) => setBusinessPhone(e.target.value)}
-                  className="h-12 bg-canvas-parchment border-none rounded-xl"
+                  className="h-12 bg-canvas-parchment border-none rounded-sm"
                 />
               </div>
-              <Button type="submit" className="w-full rounded-pill h-12 text-lg shadow-product" disabled={loading || !businessName}>
+              <Button type="submit" className="w-full rounded-full h-12 text-lg" disabled={loading || !businessName}>
                 {loading ? 'Saving...' : 'Next Step'} <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </form>
@@ -203,7 +203,7 @@ export default function OnboardingPage() {
 
           {step === 2 && (
             <form onSubmit={handleStep2} className="space-y-6">
-              <div className="flex items-center gap-2 mb-4 text-primary font-bold">
+              <div className="flex items-center gap-2 mb-4 text-primary font-semibold">
                 <Settings2 className="h-5 w-5" />
                 <span>General Preferences</span>
               </div>
@@ -257,10 +257,10 @@ export default function OnboardingPage() {
               </div>
 
               <div className="flex gap-3">
-                <Button type="button" variant="outline" className="flex-1 rounded-pill h-12" onClick={() => setStep(1)}>
+                <Button type="button" variant="outline" className="flex-1 rounded-full h-12" onClick={() => setStep(1)}>
                    Back
                 </Button>
-                <Button type="submit" className="flex-[2] rounded-pill h-12 text-lg shadow-product">
+                <Button type="submit" className="flex-[2] rounded-full h-12 text-lg">
                   Next Step <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>
@@ -269,7 +269,7 @@ export default function OnboardingPage() {
 
           {step === 3 && (
             <form onSubmit={handleStep3} className="space-y-6">
-              <div className="flex items-center gap-2 mb-4 text-primary font-bold">
+              <div className="flex items-center gap-2 mb-4 text-primary font-semibold">
                 <Bell className="h-5 w-5" />
                 <span>Reminder Preferences</span>
               </div>
@@ -297,10 +297,10 @@ export default function OnboardingPage() {
               </div>
 
               <div className="flex gap-3">
-                <Button type="button" variant="outline" className="flex-1 rounded-pill h-12" onClick={() => setStep(2)}>
+                <Button type="button" variant="outline" className="flex-1 rounded-full h-12" onClick={() => setStep(2)}>
                    Back
                 </Button>
-                <Button type="submit" className="flex-[2] rounded-pill h-12 text-lg shadow-product" disabled={loading}>
+                <Button type="submit" className="flex-[2] rounded-full h-12 text-lg" disabled={loading}>
                   {loading ? 'Saving...' : 'Finish Setup'} <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>
@@ -313,10 +313,10 @@ export default function OnboardingPage() {
                 <CheckCircle2 className="h-10 w-10" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold">You&apos;re all set!</h2>
+                <h2 className="text-2xl font-semibold">You&apos;re all set!</h2>
                 <p className="text-muted-foreground">Your business and preferences have been configured.</p>
               </div>
-              <Button onClick={finishOnboarding} className="w-full rounded-pill h-12 text-lg shadow-product">
+              <Button onClick={finishOnboarding} className="w-full rounded-full h-12 text-lg">
                 Go to Dashboard
               </Button>
             </div>
@@ -325,4 +325,5 @@ export default function OnboardingPage() {
       </div>
     </div>
   )
+
 }

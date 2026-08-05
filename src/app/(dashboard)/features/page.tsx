@@ -47,8 +47,8 @@ export default function FeaturesPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div>
-        <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Enhance your experience</p>
-        <h2 className="text-display-sm font-bold">Features</h2>
+        <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Enhance your experience</p>
+        <h2 className="text-display-sm font-semibold">Features</h2>
       </div>
 
       <div className="grid gap-4">
@@ -56,29 +56,29 @@ export default function FeaturesPage() {
           <div 
             key={feature.id}
             className={cn(
-              "relative flex flex-col gap-4 rounded-3xl border bg-card p-6 shadow-sm transition-all",
+              "relative flex flex-col gap-4 rounded-lg border bg-card p-6 transition-all border-primary/5",
               feature.disabled && "opacity-60 grayscale-[0.5]"
             )}
           >
             <div className="flex items-start justify-between">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/10 text-primary">
                 <feature.icon className="h-6 w-6" />
               </div>
               {feature.badge && (
-                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary uppercase">
+                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-semibold text-primary uppercase">
                   {feature.badge}
                 </span>
               )}
             </div>
             
             <div className="space-y-1">
-              <h3 className="font-bold text-lg">{feature.name}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <h3 className="font-semibold text-lg">{feature.name}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed font-normal">
                 {feature.description}
               </p>
             </div>
 
-            <div className="mt-2 flex items-center justify-between border-t pt-4">
+            <div className="mt-2 flex items-center justify-between border-t pt-4 border-primary/5">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 {feature.disabled ? 'Coming Soon' : 'Enable Feature'}
               </span>
@@ -93,4 +93,5 @@ export default function FeaturesPage() {
       </div>
     </div>
   )
+
 }

@@ -49,7 +49,7 @@ export function Combobox({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
-        className={cn(buttonVariants({ variant: "outline" }), "w-full justify-between h-12 rounded-xl", className)}
+        className={cn(buttonVariants({ variant: "outline" }), "w-full justify-between h-12 rounded-sm border-primary/10", className)}
       >
         <div className="flex items-center gap-2 overflow-hidden">
           {selectedOption && (
@@ -60,18 +60,18 @@ export function Combobox({
               size="sm" 
             />
           )}
-          <span className="truncate">
+          <span className="truncate font-semibold">
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 rounded-2xl overflow-hidden shadow-2xl border-none" align="start">
+      <PopoverContent className="w-full p-0 rounded-lg overflow-hidden border border-primary/5" align="start">
         <Command className="rounded-none">
           <CommandInput placeholder={placeholder} className="h-12" />
           <CommandList className="max-h-[300px]">
             <CommandEmpty className="py-6 text-center text-sm">
-              <p className="text-muted-foreground">{emptyMessage}</p>
+              <p className="text-muted-foreground font-semibold">{emptyMessage}</p>
             </CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
@@ -86,7 +86,7 @@ export function Combobox({
                 >
                   <div className="flex items-center gap-2">
                     <EntityAvatar name={option.label} color={option.color} icon={option.icon} size="sm" />
-                    <span className="font-medium">{option.label}</span>
+                    <span className="font-semibold">{option.label}</span>
                   </div>
                   <Check
                     className={cn(
@@ -103,7 +103,7 @@ export function Combobox({
               <CommandSeparator />
               <div className="p-1">
                 <Link href={createUrl}>
-                  <div className="flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-bold text-primary hover:bg-primary/5 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors cursor-pointer">
                     <PlusCircle className="h-4 w-4" />
                     {createLabel}
                   </div>
@@ -115,4 +115,5 @@ export function Combobox({
       </PopoverContent>
     </Popover>
   )
+
 }

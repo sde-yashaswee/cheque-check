@@ -21,7 +21,7 @@ function Command({
     <CommandPrimitive
       data-slot="command"
       className={cn(
-        "flex size-full flex-col overflow-hidden rounded-xl! bg-popover p-1 text-popover-foreground",
+        "flex size-full flex-col overflow-hidden rounded-lg bg-popover p-1 text-popover-foreground",
         className
       )}
       {...props}
@@ -51,12 +51,12 @@ function CommandDialog({
       </DialogHeader>
       <DialogContent
         className={cn(
-          "top-1/3 translate-y-0 overflow-hidden rounded-xl! p-0",
+          "top-1/3 translate-y-0 overflow-hidden rounded-lg p-0",
           className
         )}
         showCloseButton={showCloseButton}
       >
-        <Command className="**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium **:[[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:py-3 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
+        <Command className="**:[[cmdk-group-heading]]:px-4 **:[[cmdk-group-heading]]:font-semibold **:[[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:py-3 [&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-4 [&_[cmdk-item]]:py-4 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
           {children}
         </Command>
       </DialogContent>
@@ -69,21 +69,22 @@ function CommandInput({
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.Input>) {
   return (
-    <div data-slot="command-input-wrapper" className="p-1 pb-0">
-      <div className="relative flex items-center h-8! rounded-lg! border border-input/30 bg-input/30 shadow-none!">
+    <div data-slot="command-input-wrapper" className="p-3 pb-0">
+      <div className="relative flex items-center h-10 rounded-full border border-input/30 bg-canvas-parchment dark:bg-input/30">
         <CommandPrimitive.Input
           data-slot="command-input"
           className={cn(
-            "w-full px-8 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
+            "w-full px-10 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50 font-semibold",
             className
           )}
           {...props}
         />
-        <SearchIcon className="absolute left-2 size-4 shrink-0 opacity-50" />
+        <SearchIcon className="absolute left-3.5 size-4 shrink-0 opacity-50" />
       </div>
     </div>
   )
 }
+
 
 function CommandList({
   className,

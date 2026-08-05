@@ -25,14 +25,14 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
           </button>
         )}
       />
-      <PopoverContent className="w-[280px] p-0 rounded-3xl overflow-hidden border shadow-2xl" align="start">
+      <PopoverContent className="w-[280px] p-0 rounded-lg overflow-hidden border border-primary/5" align="start">
         <Command className="bg-popover">
-          <div className="px-4 py-3 border-b">
-            <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-70">Switch Business</h2>
+          <div className="px-4 py-3 border-b border-primary/5">
+            <h2 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground opacity-70">Switch Business</h2>
           </div>
           <CommandInput placeholder="Search business..." className="h-12 border-none" />
           <CommandList className="max-h-[300px]">
-            <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">No business found.</CommandEmpty>
+            <CommandEmpty className="py-6 text-center text-sm text-muted-foreground font-semibold">No business found.</CommandEmpty>
             <CommandGroup>
               {businesses.map((business) => (
                 <CommandItem
@@ -47,39 +47,40 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
                   )}
                 >
                   <div className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-lg font-bold text-xs",
+                    "flex h-8 w-8 items-center justify-center rounded-sm font-semibold text-xs",
                     activeBusiness?.id === business.id ? "bg-primary text-white" : "bg-muted text-muted-foreground"
                   )}>
                     {business.name.charAt(0).toUpperCase()}
                   </div>
                   <span className={cn(
-                    "flex-1 font-bold text-sm truncate",
+                    "flex-1 font-semibold text-sm truncate",
                     activeBusiness?.id === business.id ? "text-primary" : "text-foreground"
                   )}>
                     {business.name}
                   </span>
                   {activeBusiness?.id === business.id && (
-                    <Check className="h-4 w-4 text-primary font-black" />
+                    <Check className="h-4 w-4 text-primary font-semibold" />
                   )}
                 </CommandItem>
               ))}
             </CommandGroup>
           </CommandList>
-          <CommandSeparator />
+          <CommandSeparator className="bg-primary/5" />
           <CommandList>
             <CommandGroup>
               <Link href="/businesses/create" onClick={() => setOpen(false)}>
                 <CommandItem className="flex items-center gap-3 px-4 py-4 cursor-pointer text-primary hover:bg-primary/5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-primary/10">
                     <Plus className="h-5 w-5" />
                   </div>
-                  <span className="font-black text-sm uppercase tracking-tight">Add New Business</span>
+                  <span className="font-semibold text-sm uppercase tracking-wider">Add New Business</span>
                 </CommandItem>
               </Link>
             </CommandGroup>
           </CommandList>
         </Command>
       </PopoverContent>
+
     </Popover>
   )
 }

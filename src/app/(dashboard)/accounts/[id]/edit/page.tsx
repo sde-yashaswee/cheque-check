@@ -1,16 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { accountSchema } from '@/validators'
-import { AccountService } from '@/services/account.service'
+import { useEditAccount } from '@/hooks/use-edit-account'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter, useParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { Check, User, CreditCard, Hash, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -19,115 +14,82 @@ import { BankSelector } from '@/components/bank-selector'
 
 export default function EditAccountPage() {
   const { id } = useParams() as { id: string }
-  const router = useRouter()
   const { activeBusiness } = useBusiness()
-  const queryClient = useQueryClient()
   
-  const { data: account, isLoading } = useQuery({
-    queryKey: ['account', id],
-    queryFn: () => AccountService.getById(id),
-  })
+  const {
+    form,
+    account,
+    isLoading,
+    isSaving,
+    onSubmit,
+    onDelete,
+  } = useEditAccount(id, activeBusiness?.id)
 
-  const { register, handleSubmit, watch, setValue, formState: { errors }, reset } = useForm({
-    resolver: zodResolver(accountSchema),
-  })
-
-  useEffect(() => {
-    if (account) {
-      reset({
-        bank_id: account.bank_id || '',
-        account_name: account.account_name,
-        account_number: account.account_number,
-        ifsc_code: account.ifsc_code || '',
-        color: account.color,
-      })
-    }
-  }, [account, reset])
-
-  const mutation = useMutation({
-    mutationFn: (data: any) => AccountService.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['accounts', activeBusiness?.id] })
-      queryClient.invalidateQueries({ queryKey: ['account', id] })
-      router.back()
-    }
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: () => AccountService.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['accounts', activeBusiness?.id] })
-      router.push('/accounts')
-    }
-  })
-
-  const onSubmit = (data: any) => {
-    mutation.mutate(data)
-  }
+  const { register, watch, setValue, formState: { errors } } = form
 
   const colors = ['#007AFF', '#5856D6', '#AF52DE', '#FF2D55', '#FF3B30', '#FF9500', '#34C759']
 
   if (isLoading) {
     return (
       <div className="mx-auto max-w-2xl space-y-8 pb-20">
-        <Skeleton className="h-14 w-full rounded-2xl" />
-        <Skeleton className="h-14 w-full rounded-2xl" />
-        <Skeleton className="h-14 w-full rounded-2xl" />
+        <Skeleton className="h-14 w-full rounded-lg" />
+        <Skeleton className="h-14 w-full rounded-lg" />
+        <Skeleton className="h-14 w-full rounded-lg" />
       </div>
     )
   }
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={onSubmit} className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Bank <span className="text-destructive">*</span></Label>
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Bank</Label>
             <BankSelector 
               value={watch('bank_id')}
               onValueChange={(val) => setValue('bank_id', val)}
             />
-            {errors.bank_id && <p className="text-xs text-destructive">{errors.bank_id.message as string}</p>}
+            {errors.bank_id && <p className="text-xs text-destructive ml-1">{errors.bank_id.message as string}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="account_name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Account Holder Name <span className="text-destructive">*</span></Label>
+            <Label htmlFor="account_name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Account Holder Name</Label>
             <div className="relative">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
               <Input 
                 id="account_name" 
                 {...register('account_name')} 
                 placeholder="e.g. John Doe" 
-                className="h-14 pl-12 bg-canvas-parchment border-none rounded-2xl shadow-sm"
+                className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
               />
             </div>
-            {errors.account_name && <p className="text-xs text-destructive">{errors.account_name.message as string}</p>}
+            {errors.account_name && <p className="text-xs text-destructive ml-1">{errors.account_name.message as string}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="account_number" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Account Number <span className="text-destructive">*</span></Label>
+            <Label htmlFor="account_number" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Account Number</Label>
             <div className="relative">
-              <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
               <Input 
                 id="account_number" 
                 {...register('account_number')} 
                 placeholder="Enter full number" 
-                className="h-14 pl-12 bg-canvas-parchment border-none rounded-2xl shadow-sm"
+                className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
               />
             </div>
-            {errors.account_number && <p className="text-xs text-destructive">{errors.account_number.message as string}</p>}
+            {errors.account_number && <p className="text-xs text-destructive ml-1">{errors.account_number.message as string}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="ifsc_code" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">IFSC Code</Label>
+            <Label htmlFor="ifsc_code" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">IFSC Code</Label>
             <div className="relative">
-              <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input id="ifsc_code" {...register('ifsc_code')} placeholder="BANK0123456" className="h-14 pl-12 bg-canvas-parchment border-none uppercase rounded-2xl shadow-sm" />
+              <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+              <Input id="ifsc_code" {...register('ifsc_code')} placeholder="BANK0123456" className="h-14 pl-12 bg-canvas-parchment border-none uppercase rounded-sm" />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Brand Color</Label>
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Brand Color</Label>
             <div className="flex flex-wrap gap-3 p-1">
               {colors.map((c) => (
                 <button
@@ -135,8 +97,8 @@ export default function EditAccountPage() {
                   type="button"
                   onClick={() => setValue('color' as any, c)}
                   className={cn(
-                    "h-10 w-10 rounded-full transition-all active:scale-90 ring-offset-2",
-                    watch('color' as any) === c ? "ring-2 ring-primary scale-110 shadow-md" : "hover:scale-105"
+                    "h-10 w-10 rounded-full transition-all active:scale-[0.9] ring-offset-2",
+                    watch('color' as any) === c ? "ring-2 ring-primary scale-110" : "hover:scale-105"
                   )}
                   style={{ backgroundColor: c }}
                 />
@@ -146,17 +108,17 @@ export default function EditAccountPage() {
         </div>
 
         <div className="pt-4 flex flex-col gap-3">
-          <Button type="submit" className="w-full rounded-pill h-14 text-lg shadow-product" disabled={mutation.isPending}>
-            {mutation.isPending ? 'Saving...' : 'Update Account'} <Check className="ml-2 h-5 w-5" />
+          <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
+            {isSaving ? 'Saving...' : 'Update Account'} <Check className="ml-2 h-5 w-5" />
           </Button>
 
           <DeleteConfirmationDialog 
             title="Delete Account?"
-            description="This will permanently delete this account and all associated cheque history. This action cannot be undone."
+            description="This will permanently delete this account and all associated history."
             confirmName={account?.bank?.name || 'Account'}
-            onDelete={async () => { deleteMutation.mutate() }}
+            onDelete={async () => { onDelete() }}
             trigger={
-              <Button type="button" variant="ghost" className="w-full rounded-pill h-14 text-muted-foreground hover:text-destructive transition-colors">
+              <Button type="button" variant="ghost" className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">
                 <Trash2 className="mr-2 h-5 w-5" /> Delete Account
               </Button>
             }
@@ -166,3 +128,4 @@ export default function EditAccountPage() {
     </div>
   )
 }
+

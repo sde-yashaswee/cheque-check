@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { createClient } from '@/lib/supabase/client'
+import { AuthService } from '@/services/auth.service'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Wallet, Eye, EyeOff } from 'lucide-react'
@@ -14,46 +14,46 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const supabase = createClient()
   const router = useRouter()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    if (error) {
+    try {
+      const { error } = await AuthService.loginWithPassword(email, password)
+      if (error) {
+        alert(error.message)
+      } else {
+        router.push('/')
+      }
+    } catch (error: any) {
       alert(error.message)
-    } else {
-      router.push('/')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const handleOAuthLogin = async (provider: 'google' | 'facebook') => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-    if (error) alert(error.message)
+    try {
+      const { error } = await AuthService.loginWithOAuth(provider)
+      if (error) alert(error.message)
+    } catch (error: any) {
+      alert(error.message)
+    }
   }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-canvas-parchment px-6 dark:bg-black">
       <div className="w-full max-w-sm space-y-8">
         <div className="flex flex-col items-center text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-white shadow-product">
+          <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-primary text-white">
             <Wallet className="h-8 w-8" />
           </div>
-          <h1 className="mt-6 text-display-md font-black tracking-tight">ChequeCheck</h1>
+          <h1 className="mt-6 text-display-md font-semibold tracking-tight">ChequeCheck</h1>
           <p className="text-body text-muted-foreground">Never miss a cheque again.</p>
         </div>
 
-        <div className="space-y-4 rounded-3xl bg-white p-8 shadow-sm dark:bg-surface-tile-1 border border-primary/5">
+        <div className="space-y-4 rounded-lg bg-white p-8 dark:bg-surface-tile-1 border border-primary/5">
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -64,7 +64,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-12 bg-canvas-parchment border-none rounded-xl"
+                className="h-12 bg-canvas-parchment border-none rounded-sm"
               />
             </div>
             <div className="space-y-2">
@@ -77,7 +77,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-12 bg-canvas-parchment border-none rounded-xl pr-10"
+                  className="h-12 bg-canvas-parchment border-none rounded-sm pr-10"
                 />
                 <button
                   type="button"
@@ -88,7 +88,7 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
-            <Button type="submit" className="w-full rounded-pill h-12 text-lg shadow-product" disabled={loading}>
+            <Button type="submit" className="w-full rounded-full h-12 text-lg" disabled={loading}>
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
@@ -103,7 +103,7 @@ export default function LoginPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-12 rounded-xl" onClick={() => handleOAuthLogin('google')}>
+            <Button variant="outline" className="h-12 rounded-sm font-normal" onClick={() => handleOAuthLogin('google')}>
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -112,7 +112,7 @@ export default function LoginPage() {
               </svg>
               Google
             </Button>
-            <Button variant="outline" className="h-12 rounded-xl" onClick={() => handleOAuthLogin('facebook')}>
+            <Button variant="outline" className="h-12 rounded-sm font-normal" onClick={() => handleOAuthLogin('facebook')}>
               <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
@@ -123,7 +123,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="font-semibold text-primary hover:underline">
+          <Link href="/signup" className="font-medium text-primary hover:underline">
             Sign up
           </Link>
         </p>
@@ -131,3 +131,4 @@ export default function LoginPage() {
     </div>
   )
 }
+
