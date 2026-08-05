@@ -11,7 +11,13 @@ import { useProfile } from '@/hooks/use-profile'
 import { format } from 'date-fns'
 import { StatusPill } from '@/components/ui/status-pill'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
-import { DeleteConfirmationDialog } from '@/components/ui/delete-dialog'
+import dynamic from 'next/dynamic'
+import { Skeleton } from '@/components/ui/skeleton'
+
+const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-dialog').then(mod => mod.DeleteConfirmationDialog), {
+  loading: () => <Skeleton className="h-10 w-full rounded-lg" />,
+  ssr: false
+})
 import { ChequeService } from '@/services/cheque.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useBusiness } from '@/hooks/use-business'

@@ -17,6 +17,13 @@ export function useEditAccount(id: string, businessId: string | undefined) {
 
   const form = useForm({
     resolver: zodResolver(accountSchema),
+    defaultValues: {
+      bank_id: '',
+      account_name: '',
+      account_number: '',
+      ifsc_code: '',
+      color: '#007AFF',
+    }
   })
 
   const { reset } = form

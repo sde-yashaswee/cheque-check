@@ -137,7 +137,10 @@ export default function CreatePartyPage() {
             </div>
 
             <div className="rounded-lg bg-primary/5 p-6 space-y-4 border border-primary/10">
-              <h3 className="font-semibold text-primary uppercase tracking-wider text-[10px]">Review Information</h3>
+              <div className="flex items-center gap-2">
+                <HugeiconsIcon icon={User} className="h-3 w-3 text-primary opacity-80" />
+                <h3 className="font-semibold text-primary uppercase tracking-wider text-[10px]">Review Information</h3>
+              </div>
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full" style={{ backgroundColor: watch('color' as any) || '#34C759' }} />
                 <div>

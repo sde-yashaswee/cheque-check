@@ -18,6 +18,15 @@ export function useEditBusiness(id: string) {
 
   const form = useForm<z.infer<typeof businessSchema>>({
     resolver: zodResolver(businessSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      color: '#007AFF',
+      icon: 'Store',
+      logo_url: null,
+    }
   })
 
   const { reset } = form
@@ -31,6 +40,7 @@ export function useEditBusiness(id: string) {
         address: business.address || '',
         color: business.color || '#007AFF',
         icon: business.icon || 'Store',
+        logo_url: business.logo_url || null,
       })
     }
   }, [business, reset])

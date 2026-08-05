@@ -10,8 +10,17 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { Tick02Icon as Check, UserIcon as User, CreditCardIcon as CreditCard, HashtagIcon as Hash, Delete02Icon as Trash2 } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
-import { DeleteConfirmationDialog } from '@/components/ui/delete-dialog'
-import { BankSelector } from '@/components/bank-selector'
+import dynamic from 'next/dynamic'
+
+const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-dialog').then(mod => mod.DeleteConfirmationDialog), {
+  loading: () => <Skeleton className="h-14 w-full rounded-full" />,
+  ssr: false
+})
+
+const BankSelector = dynamic(() => import('@/components/bank-selector').then(mod => mod.BankSelector), {
+  loading: () => <Skeleton className="h-14 w-full rounded-2xl" />,
+  ssr: false
+})
 
 export default function EditAccountPage() {
   const { id } = useParams() as { id: string }

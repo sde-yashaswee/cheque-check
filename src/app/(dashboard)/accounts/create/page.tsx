@@ -9,7 +9,13 @@ import { useBusiness } from '@/hooks/use-business'
 import { HugeiconsIcon } from '@hugeicons/react';
 import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, CreditCardIcon as CreditCard, UserIcon as User, HashtagIcon as Hash } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
-import { BankSelector } from '@/components/bank-selector'
+import { Skeleton } from '@/components/ui/skeleton'
+import dynamic from 'next/dynamic'
+
+const BankSelector = dynamic(() => import('@/components/bank-selector').then(mod => mod.BankSelector), {
+  loading: () => <Skeleton className="h-14 w-full rounded-2xl" />,
+  ssr: false
+})
 
 export default function CreateAccountPage() {
   const router = useRouter()

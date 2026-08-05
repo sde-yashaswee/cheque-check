@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { HugeiconsIcon } from '@hugeicons/react';
 import { ArrowRight01Icon as ChevronRight, Logout01Icon as LogOut, UserIcon as User, Notification01Icon as Bell, GlobalIcon as Globe, CreditCardIcon as CreditCard, File01Icon as FileSpreadsheet, Building03Icon as Building2, LayoutGridIcon as LayoutGrid, FlashIcon as Zap, TranslateIcon as Languages, Delete02Icon as Trash2, Clock01Icon as Clock } from '@hugeicons/core-free-icons';
 import { useRouter } from "next/navigation"
-import { DeleteConfirmationDialog } from "@/components/ui/delete-dialog"
+import dynamic from 'next/dynamic'
 import { useQuery } from "@tanstack/react-query"
 import { ChequeService } from "@/services/cheque.service"
 import { cn } from "@/lib/utils"
@@ -15,6 +15,12 @@ import { Combobox } from "@/components/ui/combobox"
 import { format, differenceInDays } from "date-fns"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSettings } from "@/hooks/use-settings"
+import { EditableAvatar } from "@/components/ui/editable-avatar"
+
+const DeleteConfirmationDialog = dynamic(() => import("@/components/ui/delete-dialog").then(mod => mod.DeleteConfirmationDialog), {
+  loading: () => <Skeleton className="h-16 w-full rounded-lg" />,
+  ssr: false
+})
 
 export default function SettingsPage() {
   const { activeBusiness } = useBusiness()
@@ -88,6 +94,7 @@ export default function SettingsPage() {
   const sections = [
     {
       title: 'General',
+      icon: LayoutGrid,
       items: [
         { 
           name: 'Currency', 
@@ -141,6 +148,7 @@ export default function SettingsPage() {
     },
     {
       title: 'Management',
+      icon: Building2,
       items: [
         { name: 'My Businesses', icon: Building2, href: '/businesses' },
         { name: 'Features', icon: LayoutGrid, href: '/features' },
@@ -148,6 +156,7 @@ export default function SettingsPage() {
     },
     {
       title: 'Reminders',
+      icon: Bell,
       items: [
         { 
           name: 'Reminders Per Day', 
@@ -177,6 +186,7 @@ export default function SettingsPage() {
     },
     {
       title: 'Data & Reports',
+      icon: FileSpreadsheet,
       items: [
         { name: 'Export Cheques (CSV)', icon: FileSpreadsheet, action: () => handleExport(cheques, activeBusiness?.name || '') },
       ]
@@ -187,9 +197,13 @@ export default function SettingsPage() {
     <div className="mx-auto max-w-2xl space-y-8 pb-20 pt-4">
       {/* Profile Section */}
       <div className="flex items-center gap-4 rounded-lg bg-canvas-parchment p-5 dark:bg-surface-tile-1">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white">
-          <HugeiconsIcon icon={User} className="h-7 w-7" />
-        </div>
+        <EditableAvatar
+          name={profile?.name || 'User'}
+          imageUrl={profile?.avatar_url}
+          size="md"
+          onUpload={async (url) => { await updateProfile({ avatar_url: url }) }}
+          onDelete={async () => { await updateProfile({ avatar_url: null }) }}
+        />
         <div className="flex-1">
           <p className="font-semibold text-lg leading-tight">{profile?.name || 'User'}</p>
           <p className="text-xs text-muted-foreground font-semibold">{profile?.email}</p>
@@ -200,11 +214,13 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Settings Sections */}
       <div className="space-y-8">
-        {sections.map((section) => (
+        {sections.map((section: any) => (
           <div key={section.title} className="space-y-3">
-            <h3 className="px-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{section.title}</h3>
+            <div className="flex items-center gap-2 px-2">
+              <HugeiconsIcon icon={section.icon} className="h-3 w-3 text-muted-foreground opacity-80" />
+              <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{section.title}</h3>
+            </div>
             <div className="divide-y divide-border/50 rounded-lg border bg-card overflow-hidden">
               {section.items.map((item: any) => {
                 const content = (
@@ -237,7 +253,10 @@ export default function SettingsPage() {
       </div>
 
       <div className="space-y-3">
-        <h3 className="px-2 text-[10px] font-semibold text-destructive uppercase tracking-wider">Danger Zone</h3>
+        <div className="flex items-center gap-2 px-2">
+          <HugeiconsIcon icon={Trash2} className="h-3 w-3 text-destructive opacity-80" />
+          <h3 className="text-[10px] font-semibold text-destructive uppercase tracking-wider">Danger Zone</h3>
+        </div>
         <div className="divide-y rounded-lg border border-destructive/20 bg-destructive/5 overflow-hidden">
           <DeleteConfirmationDialog 
             title="Delete Entire Profile?"

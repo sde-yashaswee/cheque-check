@@ -7,9 +7,13 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { ArrowLeft01Icon as ChevronLeft, UserIcon as User, ArrowDown01Icon as ChevronDown, Search01Icon as Search } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import { BusinessSwitcher } from "@/components/business-switcher"
-import { GlobalSearch } from "@/components/global-search"
 import { useState } from "react"
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
+
+const GlobalSearch = dynamic(() => import("@/components/global-search").then(mod => mod.GlobalSearch), {
+  ssr: false
+})
 
 const getTitle = (pathname: string) => {
   if (pathname === '/') return 'ChequeCheck'
@@ -56,6 +60,7 @@ export function TopNav() {
   const pathname = usePathname()
   const router = useRouter()
   const { activeBusiness } = useBusiness()
+  const { profile } = useProfile()
   const [searchOpen, setSearchOpen] = useState(false)
 
   const title = getTitle(pathname)
@@ -91,8 +96,12 @@ export function TopNav() {
           </Button>
 
           <Link href="/settings">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-all active:scale-95">
-              <HugeiconsIcon icon={User} className="h-4 w-4" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-all active:scale-95 overflow-hidden">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt={profile.name || 'User'} className="h-full w-full object-cover" />
+              ) : (
+                <HugeiconsIcon icon={User} className="h-4 w-4" />
+              )}
             </div>
           </Link>
         </div>

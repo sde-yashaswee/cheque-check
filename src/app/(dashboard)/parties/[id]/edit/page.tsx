@@ -10,7 +10,13 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { Tick02Icon as Check, UserIcon as User, CallIcon as Phone, Location01Icon as MapPin, Delete02Icon as Trash2 } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
-import { DeleteConfirmationDialog } from '@/components/ui/delete-dialog'
+import dynamic from 'next/dynamic'
+import { EditableAvatar } from '@/components/ui/editable-avatar'
+
+const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-dialog').then(mod => mod.DeleteConfirmationDialog), {
+  loading: () => <Skeleton className="h-14 w-full rounded-full" />,
+  ssr: false
+})
 
 export default function EditPartyPage() {
   const { id } = useParams() as { id: string }
@@ -41,6 +47,16 @@ export default function EditPartyPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
+      <div className="flex flex-col items-center gap-4 py-4">
+        <EditableAvatar
+          name={watch('name')}
+          color={watch('color' as any)}
+          imageUrl={watch('avatar_url' as any)}
+          onUpload={async (url) => { setValue('avatar_url' as any, url) }}
+          onDelete={async () => { setValue('avatar_url' as any, null) }}
+          size="xl"
+        />
+      </div>
       <form onSubmit={onSubmit} className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">

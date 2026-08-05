@@ -14,8 +14,10 @@ export interface Profile {
   reminders_per_day: number;
   default_reminder_days: number;
   received_cheques_enabled: boolean;
+  avatar_url?: string | null;
   created_at: string;
   updated_at: string;
+  deleted_at?: string | null;
 }
 
 export interface Business {
@@ -30,6 +32,7 @@ export interface Business {
   icon?: string;
   created_at: string;
   updated_at: string;
+  deleted_at?: string | null;
 }
 
 export interface Party {
@@ -42,8 +45,10 @@ export interface Party {
   notes: string | null;
   color?: string;
   icon?: string;
+  avatar_url?: string | null;
   created_at: string;
   updated_at: string;
+  deleted_at?: string | null;
 }
 
 export interface Bank {
@@ -65,6 +70,7 @@ export interface Account {
   icon?: string;
   created_at: string;
   updated_at: string;
+  deleted_at?: string | null;
   bank?: Bank;
 }
 

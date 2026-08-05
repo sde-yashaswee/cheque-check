@@ -10,9 +10,14 @@ import { EntityAvatar } from "@/components/ui/entity-avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useProfile } from "@/hooks/use-profile"
 import { cn } from "@/lib/utils"
-import { DeleteConfirmationDialog } from "@/components/ui/delete-dialog"
+import dynamic from 'next/dynamic'
 import { DataState } from "@/components/ui/data-state"
 import { EmptyState } from "@/components/ui/empty-state"
+
+const DeleteConfirmationDialog = dynamic(() => import("@/components/ui/delete-dialog").then(mod => mod.DeleteConfirmationDialog), {
+  loading: () => <Skeleton className="h-8 w-8 rounded-full" />,
+  ssr: false
+})
 
 export default function BusinessesPage() {
   const { profile } = useProfile()

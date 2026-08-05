@@ -7,6 +7,7 @@ export const businessSchema = z.object({
   address: z.string().optional().or(z.literal('')),
   color: z.string().optional(),
   icon: z.string().optional(),
+  logo_url: z.string().nullable().optional(),
 })
 
 export const partySchema = z.object({
@@ -17,6 +18,7 @@ export const partySchema = z.object({
   notes: z.string().optional().or(z.literal('')),
   color: z.string().optional(),
   icon: z.string().optional(),
+  avatar_url: z.string().nullable().optional(),
 })
 
 export const accountSchema = z.object({

@@ -170,7 +170,11 @@ export default function OnboardingPage() {
             {step < 5 ? (
               <>
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Step {step} of 4</p>
-                <h1 className="text-display-md md:text-display-lg font-semibold tracking-tight text-ink dark:text-white">
+                <h1 className="text-display-md md:text-display-lg font-semibold tracking-tight text-ink dark:text-white flex items-center gap-3">
+                  {step === 1 && <HugeiconsIcon icon={Wallet} className="h-8 w-8 text-primary" />}
+                  {step === 2 && <HugeiconsIcon icon={Building2} className="h-8 w-8 text-primary" />}
+                  {step === 3 && <HugeiconsIcon icon={Settings2} className="h-8 w-8 text-primary" />}
+                  {step === 4 && <HugeiconsIcon icon={Bell} className="h-8 w-8 text-primary" />}
                   {step === 1 && "Welcome to ChequeCheck"}
                   {step === 2 && "Business Details"}
                   {step === 3 && "Personalize Experience"}

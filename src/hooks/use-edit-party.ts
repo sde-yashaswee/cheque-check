@@ -17,6 +17,15 @@ export function useEditParty(id: string, businessId: string | undefined) {
 
   const form = useForm({
     resolver: zodResolver(partySchema),
+    defaultValues: {
+      name: '',
+      contact: '',
+      email: '',
+      address: '',
+      notes: '',
+      color: '#007AFF',
+      avatar_url: null,
+    }
   })
 
   const { reset } = form
@@ -30,6 +39,7 @@ export function useEditParty(id: string, businessId: string | undefined) {
         address: party.address || '',
         notes: party.notes || '',
         color: party.color,
+        avatar_url: party.avatar_url || null,
       })
     }
   }, [party, reset])

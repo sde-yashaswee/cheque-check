@@ -46,7 +46,7 @@ export function EntityAvatar({ name, color, icon, className, size = 'md' }: Enti
           "font-bold uppercase",
           size === 'sm' ? 'text-[8px]' : size === 'md' ? 'text-[10px]' : 'text-sm'
         )}>
-          {name.charAt(0)}
+          {name?.charAt(0) || '?'}
         </span>
       )}
     </div>

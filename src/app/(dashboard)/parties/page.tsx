@@ -58,7 +58,7 @@ export default function PartiesPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4">
+      <div className="space-y-4">
         <DataState
           isLoading={isLoading}
           isError={!!error}
@@ -66,7 +66,7 @@ export default function PartiesPage() {
           allData={parties}
           onClearFilters={clearFilters}
           loadingComponent={
-            <div className="grid gap-4">
+            <div className="space-y-4">
               {[1, 2, 3, 4, 5].map((i) => (
                 <Skeleton key={i} className="h-24 w-full rounded-lg" />
               ))}
@@ -95,13 +95,13 @@ export default function PartiesPage() {
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-lg truncate">{party.name}</p>
-                  <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{party.contact}</p>
+                  <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider truncate">{party.contact}</p>
                 </div>
-                <div className="text-right pr-2">
+                <div className="text-right pr-2 shrink-0">
                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">Balance</p>
                   <p className="text-sm font-semibold text-primary">{currency}{getBalance(party.id).toLocaleString()}</p>
                 </div>
-                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 group-hover:translate-x-1 transition-transform" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 shrink-0 text-muted-foreground opacity-40 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
           ))}

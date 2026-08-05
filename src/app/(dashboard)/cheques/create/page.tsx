@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useSearchParams } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Camera01Icon as Camera, Cancel01Icon as X, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft } from '@hugeicons/core-free-icons';
+import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Camera01Icon as Camera, Cancel01Icon as X, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, Invoice01Icon as ReceiptText } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 import { Combobox } from '@/components/ui/combobox'
@@ -264,7 +264,10 @@ export default function CreateChequePage() {
             </div>
 
             <div className="rounded-lg bg-primary/5 p-6 space-y-4 border border-primary/10">
-              <h3 className="font-semibold text-primary uppercase tracking-wider text-[10px]">Summary</h3>
+              <div className="flex items-center gap-2">
+                <HugeiconsIcon icon={ReceiptText} className="h-3 w-3 text-primary opacity-80" />
+                <h3 className="font-semibold text-primary uppercase tracking-wider text-[10px]">Summary</h3>
+              </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground font-semibold">Amount</span>
                 <span className="text-xl font-semibold text-primary">₹{Number(watch('amount') || 0).toLocaleString()}</span>

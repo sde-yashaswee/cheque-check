@@ -8,6 +8,7 @@ export class BusinessService {
     const { data, error } = await supabase
       .from('businesses')
       .select('*')
+      .is('deleted_at', null)
       .order('created_at', { ascending: false })
     
     if (error) throw error
@@ -25,7 +26,7 @@ export class BusinessService {
     return data as Business
   }
 
-  static async create(business: Omit<Business, 'id' | 'user_id' | 'created_at' | 'updated_at'>) {
+  static async create(business: Omit<Business, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('User not authenticated')
 
@@ -39,7 +40,7 @@ export class BusinessService {
     return data as Business
   }
 
-  static async update(id: string, business: Partial<Omit<Business, 'id' | 'user_id' | 'created_at' | 'updated_at'>>) {
+  static async update(id: string, business: Partial<Omit<Business, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>>) {
     const { data, error } = await supabase
       .from('businesses')
       .update(business)
@@ -54,7 +55,7 @@ export class BusinessService {
   static async delete(id: string) {
     const { error } = await supabase
       .from('businesses')
-      .delete()
+      .update({ deleted_at: new Date().toISOString() })
       .eq('id', id)
     
     if (error) throw error

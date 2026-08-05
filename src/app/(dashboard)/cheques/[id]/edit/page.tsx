@@ -14,8 +14,13 @@ import { cn } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 import { Combobox } from '@/components/ui/combobox'
 import { Skeleton } from '@/components/ui/skeleton'
-import { DeleteConfirmationDialog } from '@/components/ui/delete-dialog'
+import dynamic from 'next/dynamic'
 import { Party, AccountWithRelations } from '@/types'
+
+const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-dialog').then(mod => mod.DeleteConfirmationDialog), {
+  loading: () => <Skeleton className="h-14 w-full rounded-full" />,
+  ssr: false
+})
 
 export default function EditChequePage() {
   const { id } = useParams() as { id: string }

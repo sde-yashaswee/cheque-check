@@ -1,7 +1,7 @@
 'use client'
 
 import { HugeiconsIcon } from '@hugeicons/react';
-import { PlusSignIcon as Plus, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, File02Icon as FileText } from '@hugeicons/core-free-icons';;
+import { PlusSignIcon as Plus, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, File02Icon as FileText, FlashIcon as Zap, Calendar03Icon as Calendar, Chart01Icon as Stats } from '@hugeicons/core-free-icons';
 import { Button } from "@/components/ui/button";
 import { useBusiness } from "@/hooks/use-business";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,11 +11,16 @@ import Link from "next/link";
 import { ChequeStatus, ChequeWithRelations } from "@/types";
 import { useProfile } from "@/hooks/use-profile";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { useChequeStats } from "@/hooks/use-cheque-stats";
 import { DataState } from "@/components/ui/data-state";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Building03Icon, Calendar01Icon, PieChartIcon } from "@hugeicons/core-free-icons";
+import dynamic from 'next/dynamic'
+
+const ChequeStatsChart = dynamic(() => import("@/components/cheque-stats-chart").then(mod => mod.ChequeStatsChart), {
+  loading: () => <Skeleton className="h-full w-full rounded-lg" />,
+  ssr: false
+})
 
 export default function HomePage() {
   const { activeBusiness } = useBusiness()
@@ -102,7 +107,10 @@ export default function HomePage() {
 
           {/* Quick Actions */}
           <div className="space-y-4">
-            <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1">Quick Actions</h2>
+            <div className="flex items-center gap-2 px-1">
+              <HugeiconsIcon icon={Zap} className="h-3 w-3 text-muted-foreground opacity-80" />
+              <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Quick Actions</h2>
+            </div>
             <div className="flex gap-4">
               <Link href="/cheques/create?type=Outward" className="flex-1">
                 <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 transition-transform active:scale-95 border border-primary/5">
@@ -125,7 +133,10 @@ export default function HomePage() {
 
           {/* Today's Cheques */}
           <div className="space-y-4">
-            <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1">Today&apos;s Cheques</h2>
+            <div className="flex items-center gap-2 px-1">
+              <HugeiconsIcon icon={Calendar} className="h-3 w-3 text-muted-foreground opacity-80" />
+              <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Today&apos;s Cheques</h2>
+            </div>
             {todayCheques.length === 0 ? (
               <EmptyState
                 icon={Calendar01Icon}
@@ -162,54 +173,14 @@ export default function HomePage() {
 
           {/* Statistics Pie Chart */}
           <div className="space-y-4 pt-4">
-            <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1">Statistics</h2>
-            <div className="rounded-lg border bg-card p-6 h-[300px] relative">
-              {chartData.length > 0 ? (
-                <div className="relative h-full w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={chartData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={70}
-                        outerRadius={90}
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        contentStyle={{ borderRadius: '11px', border: 'none' }}
-                        itemStyle={{ fontWeight: '600' }}
-                      />
-                      <Legend 
-                        verticalAlign="bottom" 
-                        height={36} 
-                        iconType="circle"
-                        formatter={(value) => <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{value}</span>}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  {/* TOTAL TEXT IN THE CENTER */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -mt-4 flex flex-col items-center justify-center pointer-events-none">
-                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Total</p>
-                    <p className="text-2xl font-semibold leading-none">{cheques?.length || 0}</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex h-full items-center justify-center">
-                   <EmptyState
-                     icon={PieChartIcon}
-                     title="No data yet"
-                     description="Add cheques to see your statistics."
-                     className="border-none p-0"
-                   />
-                </div>
-              )}
+            <div className="flex items-center gap-2 px-1">
+              <HugeiconsIcon icon={Stats} className="h-3 w-3 text-muted-foreground opacity-80" />
+              <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Statistics</h2>
             </div>
+            <div className="rounded-lg border bg-card p-6 h-[300px] relative">
+              <ChequeStatsChart chartData={chartData} totalCheques={cheques?.length || 0} />
+            </div>
+
           </div>
         </>
       </DataState>

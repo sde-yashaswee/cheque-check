@@ -9,6 +9,7 @@ export class AccountService {
       .from('accounts')
       .select('*, bank:banks(name)')
       .eq('business_id', businessId)
+      .is('deleted_at', null)
       .order('account_name', { ascending: true })
     
     if (error) throw error
@@ -26,7 +27,7 @@ export class AccountService {
     return data as Account
   }
 
-  static async create(account: Omit<Account, 'id' | 'created_at' | 'updated_at' | 'bank'>) {
+  static async create(account: Omit<Account, 'id' | 'created_at' | 'updated_at' | 'bank' | 'deleted_at'>) {
     const { data, error } = await supabase
       .from('accounts')
       .insert([account])
@@ -37,7 +38,7 @@ export class AccountService {
     return data as Account
   }
 
-  static async update(id: string, account: Partial<Omit<Account, 'id' | 'business_id' | 'created_at' | 'updated_at' | 'bank'>>) {
+  static async update(id: string, account: Partial<Omit<Account, 'id' | 'business_id' | 'created_at' | 'updated_at' | 'bank' | 'deleted_at'>>) {
     const { data, error } = await supabase
       .from('accounts')
       .update(account)
@@ -52,7 +53,7 @@ export class AccountService {
   static async delete(id: string) {
     const { error } = await supabase
       .from('accounts')
-      .delete()
+      .update({ deleted_at: new Date().toISOString() })
       .eq('id', id)
     
     if (error) throw error

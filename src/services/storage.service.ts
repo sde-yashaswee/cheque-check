@@ -19,5 +19,23 @@ export const StorageService = {
       .getPublicUrl(filePath)
 
     return publicUrl
+  },
+
+  async uploadAvatar(file: File) {
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`
+    const filePath = `avatars/${fileName}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file)
+
+    if (uploadError) throw uploadError
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath)
+
+    return publicUrl
   }
 }

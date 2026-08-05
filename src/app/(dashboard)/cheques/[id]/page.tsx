@@ -142,7 +142,10 @@ export default function ChequeDetailPage() {
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1">Update Status</h3>
+        <div className="flex items-center gap-2 px-1">
+          <HugeiconsIcon icon={CheckCircle} className="h-3 w-3 text-muted-foreground opacity-80" />
+          <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Update Status</h3>
+        </div>
         <div className="grid grid-cols-3 gap-3">
           {statusActions.map((action) => (
             <Button

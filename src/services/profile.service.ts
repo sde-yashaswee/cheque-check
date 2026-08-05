@@ -11,24 +11,44 @@ export const ProfileService = {
       .from('profiles')
       .select('*')
       .eq('user_id', user.id)
+      .is('deleted_at', null)
       .maybeSingle()
 
     if (error) throw error
     
     if (!data) {
-      // If profile doesn't exist for some reason, create it
-      const { data: newProfile, error: createError } = await supabase
+      const { data: existing } = await supabase
         .from('profiles')
-        .insert([{ 
-          user_id: user.id, 
-          email: user.email,
-          name: user.user_metadata?.name || ''
-        }])
-        .select()
-        .single()
-      
-      if (createError) throw createError
-      return newProfile as Profile
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (existing && existing.deleted_at) {
+        // Reactivate soft-deleted profile
+        const { data: reactivated, error: reactError } = await supabase
+          .from('profiles')
+          .update({ deleted_at: null })
+          .eq('user_id', user.id)
+          .select()
+          .single()
+        if (reactError) throw reactError
+        return reactivated as Profile
+      }
+
+      if (!existing) {
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert([{ 
+            user_id: user.id, 
+            email: user.email,
+            name: user.user_metadata?.name || ''
+          }])
+          .select()
+          .single()
+        
+        if (createError) throw createError
+        return newProfile as Profile
+      }
     }
 
     return data as Profile
@@ -57,16 +77,11 @@ export const ProfileService = {
 
     const { error } = await supabase
       .from('profiles')
-      .delete()
+      .update({ deleted_at: new Date().toISOString() })
       .eq('user_id', user.id)
 
     if (error) throw error
 
-    // Also delete user from auth if possible? 
-    // Usually only admin can delete users from auth. 
-    // But since profiles has ON DELETE CASCADE on user_id in some systems, wait.
-    // In our migration, profiles.user_id has ON DELETE CASCADE.
-    // But we want to delete the user.
     await supabase.auth.signOut()
   }
 }

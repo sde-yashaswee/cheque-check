@@ -7,7 +7,7 @@ import { useBusiness } from '@/hooks/use-business'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { HashtagIcon as Hash, PencilEdit01Icon as Pencil } from '@hugeicons/core-free-icons';
+import { HashtagIcon as Hash, PencilEdit01Icon as Pencil, File02Icon as FileText } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
@@ -77,7 +77,10 @@ export default function AccountDetailPage() {
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1">Cheque History</h3>
+        <div className="flex items-center gap-2 px-1">
+          <HugeiconsIcon icon={FileText} className="h-3 w-3 text-muted-foreground opacity-80" />
+          <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Cheque History</h3>
+        </div>
         {accountCheques.length === 0 ? (
           <div className="rounded-lg border border-dashed p-10 text-center bg-canvas-parchment/30">
             <p className="text-sm text-muted-foreground font-semibold">No cheques found for this account.</p>

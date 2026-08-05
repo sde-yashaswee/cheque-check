@@ -2,7 +2,7 @@
 
 import { useBusiness } from "@/hooks/use-business"
 import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowDown01Icon as ChevronDown, PlusSignIcon as Plus, Tick02Icon as Check } from '@hugeicons/core-free-icons';
+import { ArrowDown01Icon as ChevronDown, PlusSignIcon as Plus, Tick02Icon as Check, Building03Icon as Building } from '@hugeicons/core-free-icons';
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { useState } from "react"
@@ -28,7 +28,8 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
       />
       <DialogContent className="w-[340px] p-0 rounded-2xl overflow-hidden border border-primary/5 shadow-product" showCloseButton={false}>
         <Command className="bg-popover">
-          <div className="px-5 py-4 border-b border-primary/5 bg-muted/30">
+          <div className="px-5 py-4 border-b border-primary/5 bg-muted/30 flex items-center gap-2">
+            <HugeiconsIcon icon={Building} className="h-3 w-3 text-muted-foreground opacity-80" />
             <h2 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-80">Switch Business</h2>
           </div>
           <CommandInput placeholder="Search business..." className="h-14 border-none" />
@@ -43,7 +44,7 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
                     setOpen(false)
                   }}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200",
+                    "flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 mb-1 last:mb-0",
                     activeBusiness?.id === business.id ? "bg-primary/10" : "hover:bg-muted"
                   )}
                 >
@@ -51,7 +52,7 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
                     "flex h-10 w-10 items-center justify-center rounded-lg font-bold text-sm shadow-sm",
                     activeBusiness?.id === business.id ? "bg-primary text-white" : "bg-muted text-muted-foreground"
                   )}>
-                    {business.name.charAt(0).toUpperCase()}
+                    {business.name?.charAt(0).toUpperCase() || 'B'}
                   </div>
                   <div className="flex flex-col flex-1 truncate">
                     <span className={cn(

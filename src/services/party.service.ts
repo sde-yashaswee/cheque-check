@@ -9,6 +9,7 @@ export class PartyService {
       .from('parties')
       .select('*')
       .eq('business_id', businessId)
+      .is('deleted_at', null)
       .order('name', { ascending: true })
     
     if (error) throw error
@@ -26,7 +27,7 @@ export class PartyService {
     return data as Party
   }
 
-  static async create(party: Omit<Party, 'id' | 'created_at' | 'updated_at'>) {
+  static async create(party: Omit<Party, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>) {
     const { data, error } = await supabase
       .from('parties')
       .insert([party])
@@ -37,7 +38,7 @@ export class PartyService {
     return data as Party
   }
 
-  static async update(id: string, party: Partial<Omit<Party, 'id' | 'business_id' | 'created_at' | 'updated_at'>>) {
+  static async update(id: string, party: Partial<Omit<Party, 'id' | 'business_id' | 'created_at' | 'updated_at' | 'deleted_at'>>) {
     const { data, error } = await supabase
       .from('parties')
       .update(party)
@@ -52,7 +53,7 @@ export class PartyService {
   static async delete(id: string) {
     const { error } = await supabase
       .from('parties')
-      .delete()
+      .update({ deleted_at: new Date().toISOString() })
       .eq('id', id)
     
     if (error) throw error
