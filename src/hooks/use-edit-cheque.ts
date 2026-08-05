@@ -7,6 +7,8 @@ import { ChequeService } from '@/services/cheque.service'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 
+type ChequeFormData = z.infer<typeof chequeSchema>
+
 export function useEditCheque(id: string) {
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -16,8 +18,19 @@ export function useEditCheque(id: string) {
     queryFn: () => ChequeService.getById(id),
   })
 
-  const form = useForm<z.infer<typeof chequeSchema>>({
-    resolver: zodResolver(chequeSchema),
+  const form = useForm<ChequeFormData>({
+    resolver: zodResolver(chequeSchema) as any,
+    defaultValues: {
+      cheque_number: '',
+      amount: 0,
+      cheque_date: new Date().toISOString().split('T')[0],
+      deposit_date: '',
+      party_id: '',
+      account_id: '',
+      type: 'Outward',
+      notes: '',
+      image_url: null,
+    }
   })
 
   const { reset } = form
@@ -39,7 +52,7 @@ export function useEditCheque(id: string) {
   }, [cheque, reset])
 
   const updateMutation = useMutation({
-    mutationFn: (data: z.infer<typeof chequeSchema>) => ChequeService.update(id, data),
+    mutationFn: (data: ChequeFormData) => ChequeService.update(id, data),
     onSuccess: () => {
       if (cheque?.business_id) {
         queryClient.invalidateQueries({ queryKey: ['cheques', cheque.business_id] })
@@ -59,6 +72,10 @@ export function useEditCheque(id: string) {
     }
   })
 
+  const onSubmit = form.handleSubmit((data) => {
+    updateMutation.mutate(data)
+  })
+
   return {
     form,
     cheque,
@@ -66,7 +83,7 @@ export function useEditCheque(id: string) {
     error,
     isSaving: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
-    onSubmit: form.handleSubmit((data) => updateMutation.mutate(data)),
+    onSubmit,
     onDelete: () => deleteMutation.mutate(),
   }
 }

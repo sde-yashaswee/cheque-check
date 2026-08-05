@@ -37,10 +37,15 @@ export default function ChequeDetailPage() {
 
   if (!cheque) return <div className="text-center py-20 text-muted-foreground">Cheque not found</div>
 
-  const statusActions: { status: ChequeStatus, icon: React.ElementType, label: string, color: string }[] = [
-    { status: 'Pending', icon: Hourglass, label: 'Pending', color: 'orange' },
-    { status: 'Cleared', icon: CheckCircle, label: 'Clear', color: 'green' },
-    { status: 'Bounced', icon: XCircle, label: 'Bounce', color: 'red' },
+  const statusActions = [
+    { 
+      status: (cheque.type === 'Outward' ? 'Issued' : 'Received') as ChequeStatus, 
+      icon: Hourglass, 
+      label: cheque.type === 'Outward' ? 'Issued' : 'Received', 
+      color: 'orange' 
+    },
+    { status: 'Cleared' as ChequeStatus, icon: CheckCircle, label: 'Clear', color: 'green' },
+    { status: 'Bounced' as ChequeStatus, icon: XCircle, label: 'Bounce', color: 'red' },
   ]
 
   return (
@@ -103,14 +108,14 @@ export default function ChequeDetailPage() {
             <div className="space-y-1">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Cheque Number</p>
               <div className="flex items-center gap-2">
-                <HugeiconsIcon icon={Hash} className="h-3 w-3 text-primary/40" />
+                <HugeiconsIcon icon={Hash as any} className="h-3 w-3 text-primary/40" />
                 <p className="font-mono font-semibold tracking-wider">{cheque.cheque_number}</p>
               </div>
             </div>
             <div className="space-y-1">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Cheque Date</p>
               <div className="flex items-center gap-2">
-                <HugeiconsIcon icon={Calendar} className="h-3 w-3 text-primary/40" />
+                <HugeiconsIcon icon={Calendar as any} className="h-3 w-3 text-primary/40" />
                 <p className="font-semibold">{new Date(cheque.cheque_date).toLocaleDateString()}</p>
               </div>
             </div>
@@ -119,7 +124,7 @@ export default function ChequeDetailPage() {
           {cheque.notes && (
             <div className="space-y-2 pt-4 border-t border-primary/5">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                <HugeiconsIcon icon={Note} className="h-3 w-3" /> Notes
+                <HugeiconsIcon icon={Note as any} className="h-3 w-3" /> Notes
               </p>
               <p className="text-sm font-semibold italic text-muted-foreground">{cheque.notes}</p>
             </div>
@@ -152,7 +157,7 @@ export default function ChequeDetailPage() {
               onClick={() => updateStatus(action.status)}
               disabled={isUpdating}
             >
-              <HugeiconsIcon icon={action.icon} className="h-5 w-5" />
+              <HugeiconsIcon icon={action.icon as any} className="h-5 w-5" />
               <span className="text-[10px] uppercase font-bold tracking-wider">{action.label}</span>
             </Button>
           ))}
@@ -162,7 +167,7 @@ export default function ChequeDetailPage() {
       <div className="pt-4 flex flex-col gap-3">
         <Link href={`/cheques/${id}/edit`} className="w-full">
           <Button className="w-full rounded-full h-14 text-lg" variant="secondary">
-            <HugeiconsIcon icon={Pencil} className="mr-2 h-5 w-5" /> Edit Cheque Details
+            <HugeiconsIcon icon={Pencil as any} className="mr-2 h-5 w-5" /> Edit Cheque Details
           </Button>
         </Link>
       </div>
