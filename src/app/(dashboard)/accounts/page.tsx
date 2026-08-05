@@ -41,11 +41,11 @@ export default function AccountsPage() {
         </div>
 
         <Popover>
-          <PopoverTrigger asChild>
+          <PopoverTrigger render={
             <Button variant={bankFilter !== 'All' ? 'default' : 'outline'} size="icon" className="rounded-full h-11 w-11 shrink-0">
               <Filter className="h-4 w-4" />
             </Button>
-          </PopoverTrigger>
+          } />
           <PopoverContent className="w-56 p-2 rounded-lg" align="end">
             <div className="flex flex-col gap-1">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">Filter Bank</p>

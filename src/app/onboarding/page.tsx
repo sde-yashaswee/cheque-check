@@ -58,6 +58,7 @@ export default function OnboardingPage() {
         email: businessEmail || null,
         phone: businessPhone || null,
         address: businessAddress || null,
+        logo_url: null,
       })
       setStep(2)
     } catch (error: any) {

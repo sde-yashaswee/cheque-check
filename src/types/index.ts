@@ -68,6 +68,10 @@ export interface Account {
   bank?: Bank;
 }
 
+export interface AccountWithRelations extends Account {
+  bank?: Bank;
+}
+
 export interface Cheque {
   id: string;
   business_id: string;

@@ -35,7 +35,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
   })
 
   const filteredCheques = query.length > 0 
-    ? cheques?.filter((c: any) => 
+    ? (cheques || []).filter((c: any) => 
         c.cheque_number.includes(query) || 
         c.party?.name.toLowerCase().includes(query.toLowerCase()) ||
         c.amount.toString().includes(query)
@@ -43,14 +43,14 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
     : []
 
   const filteredParties = query.length > 0
-    ? parties?.filter((p: any) => 
+    ? (parties || []).filter((p: any) => 
         p.name.toLowerCase().includes(query.toLowerCase()) ||
         p.contact.includes(query)
       ).slice(0, 5)
     : []
 
   const filteredAccounts = query.length > 0
-    ? accounts?.filter((a: any) => 
+    ? (accounts || []).filter((a: any) => 
         (a.bank?.name || '').toLowerCase().includes(query.toLowerCase()) ||
         a.account_name.toLowerCase().includes(query.toLowerCase()) ||
         a.account_number.includes(query)

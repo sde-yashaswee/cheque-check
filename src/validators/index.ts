@@ -37,4 +37,5 @@ export const chequeSchema = z.object({
   account_id: z.string().min(1, 'Account is required'),
   type: z.enum(['Outward', 'Inward']),
   notes: z.string().optional().or(z.literal('')),
+  image_url: z.string().nullable().optional(),
 })
