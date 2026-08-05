@@ -2,6 +2,7 @@ import * as React from "react"
 import { LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: LucideIcon
@@ -52,9 +53,10 @@ export function EmptyState({
               {action.label}
             </Button>
           ) : action.href ? (
-            <Button asChild className="rounded-full px-8">
-              <a href={action.href}>{action.label}</a>
-            </Button>
+            <Button
+              className="rounded-full px-8"
+              render={<Link href={action.href}>{action.label}</Link>}
+            />
           ) : (
             <Button className="rounded-full px-8">{action.label}</Button>
           )}

@@ -60,8 +60,8 @@ export function DeleteConfirmationDialog({
           </DialogHeader>
 
           <div className="space-y-4 py-6">
-            <div className="space-y-3">
-              <Label htmlFor="confirm_name" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            <div className="space-y-3 text-center">
+              <Label htmlFor="confirm_name" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block">
                 Type <span className="text-foreground font-mono font-black px-1.5 py-0.5 bg-muted rounded">{confirmName}</span> to confirm
               </Label>
               <Input
@@ -69,7 +69,7 @@ export function DeleteConfirmationDialog({
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder={confirmName}
-                className="h-14 bg-canvas-parchment border-none rounded-2xl font-mono font-bold text-lg"
+                className="h-14 bg-canvas-parchment border-none rounded-2xl font-mono font-bold text-lg text-center"
                 autoComplete="off"
               />
             </div>
