@@ -10,24 +10,8 @@ import { ProfileService } from '@/services/profile.service'
 import { useBusiness } from '@/hooks/use-business'
 import { useProfile } from '@/hooks/use-profile'
 import { useQueryClient } from '@tanstack/react-query'
-import { 
-  Wallet, 
-  Building2, 
-  Settings2, 
-  CheckCircle2, 
-  Bell, 
-  ArrowRight, 
-  ArrowLeft,
-  Mail,
-  Phone,
-  MapPin,
-  Check,
-  Globe,
-  Calendar,
-  Clock,
-  Languages,
-  DollarSign
-} from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Wallet01Icon as Wallet, Building03Icon as Building2, Settings02Icon as Settings2, CheckmarkCircle01Icon as CheckCircle2, Notification01Icon as Bell, ArrowRight01Icon as ArrowRight, ArrowLeft01Icon as ArrowLeft, Mail01Icon as Mail, CallIcon as Phone, Location01Icon as MapPin, Tick02Icon as Check, GlobalIcon as Globe, Calendar01Icon as Calendar, Clock01Icon as Clock, TranslateIcon as Languages, DollarCircleIcon as DollarSign } from '@hugeicons/core-free-icons';
 import { Combobox } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -177,7 +161,7 @@ export default function OnboardingPage() {
                   onClick={prevStep} 
                   className="rounded-full h-12 w-12 hover:bg-canvas-parchment"
                 >
-                  <ArrowLeft className="h-6 w-6" />
+                  <HugeiconsIcon icon={ArrowLeft} className="h-6 w-6" />
                 </Button>
               </motion.div>
             )}
@@ -229,7 +213,7 @@ export default function OnboardingPage() {
                   <div className="space-y-3">
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Business Name</Label>
                     <div className="relative group">
-                      <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                      <HugeiconsIcon icon={Building2} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                       <Input 
                         placeholder="e.g. Apple Inc." 
                         value={formData.businessName}
@@ -263,7 +247,7 @@ export default function OnboardingPage() {
                   onClick={nextStep} 
                   disabled={!formData.businessName}
                 >
-                  Get Started <ArrowRight className="ml-2 h-5 w-5" />
+                  Get Started <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
                 </Button>
               </motion.div>
             )}
@@ -281,7 +265,7 @@ export default function OnboardingPage() {
                   <div className="space-y-2">
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Business Email</Label>
                     <div className="relative group">
-                      <Mail className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <HugeiconsIcon icon={Mail} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input 
                         type="email"
                         placeholder="contact@company.com" 
@@ -295,7 +279,7 @@ export default function OnboardingPage() {
                   <div className="space-y-2">
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Business Phone</Label>
                     <div className="relative group">
-                      <Phone className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <HugeiconsIcon icon={Phone} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input 
                         placeholder="+1 (555) 000-0000" 
                         value={formData.businessPhone}
@@ -308,7 +292,7 @@ export default function OnboardingPage() {
                   <div className="space-y-2">
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Headquarters</Label>
                     <div className="relative group">
-                      <MapPin className="absolute left-5 top-5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <HugeiconsIcon icon={MapPin} className="absolute left-5 top-5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input 
                         placeholder="City, Country" 
                         value={formData.businessAddress}
@@ -323,7 +307,7 @@ export default function OnboardingPage() {
                   className="w-full rounded-pill h-14 text-lg font-medium shadow-xl shadow-primary/20 active:scale-[0.98] transition-transform" 
                   onClick={nextStep}
                 >
-                  Continue <ArrowRight className="ml-2 h-5 w-5" />
+                  Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
                 </Button>
               </motion.div>
             )}
@@ -393,7 +377,7 @@ export default function OnboardingPage() {
                   className="w-full rounded-pill h-14 text-lg font-medium shadow-xl shadow-primary/20 active:scale-[0.98] transition-transform" 
                   onClick={nextStep}
                 >
-                  Looks Good <ArrowRight className="ml-2 h-5 w-5" />
+                  Looks Good <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
                 </Button>
               </motion.div>
             )}
@@ -451,7 +435,7 @@ export default function OnboardingPage() {
                   onClick={handleFinish}
                   disabled={loading}
                 >
-                  {loading ? 'Completing Setup...' : 'Finish Setup'} <Check className="ml-2 h-5 w-5" />
+                  {loading ? 'Completing Setup...' : 'Finish Setup'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
                 </Button>
               </motion.div>
             )}
@@ -470,7 +454,7 @@ export default function OnboardingPage() {
                     transition={{ type: "spring", damping: 12, stiffness: 200, delay: 0.2 }}
                     className="flex h-32 w-32 items-center justify-center rounded-full bg-green-500 text-white shadow-2xl shadow-green-500/20"
                   >
-                    <CheckCircle2 className="h-16 w-16" />
+                    <HugeiconsIcon icon={CheckCircle2} className="h-16 w-16" />
                   </motion.div>
                   <motion.div 
                     animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.1, 0.3] }}
@@ -490,7 +474,7 @@ export default function OnboardingPage() {
                   onClick={() => router.push('/')} 
                   className="w-full max-w-sm rounded-pill h-14 text-xl font-semibold shadow-2xl shadow-primary/40 hover:scale-105 active:scale-95 transition-all"
                 >
-                  Enter Dashboard <ArrowRight className="ml-2 h-6 w-6" />
+                  Enter Dashboard <HugeiconsIcon icon={ArrowRight} className="ml-2 h-6 w-6" />
                 </Button>
               </motion.div>
             )}

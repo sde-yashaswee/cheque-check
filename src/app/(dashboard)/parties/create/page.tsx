@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
-import { ArrowLeft, ArrowRight, Check, User, Phone, MapPin } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, UserIcon as User, CallIcon as Phone, Location01Icon as MapPin } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 
 export default function CreatePartyPage() {
@@ -30,7 +31,7 @@ export default function CreatePartyPage() {
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => step > 1 ? prevStep() : router.back()} className="rounded-full">
-          <ArrowLeft className="h-5 w-5" />
+          <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5" />
         </Button>
         <div>
           <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Step {step} of 3</p>
@@ -57,7 +58,7 @@ export default function CreatePartyPage() {
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Party Name</Label>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+                  <HugeiconsIcon icon={User} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
                   <Input 
                     id="name" 
                     {...register('name')} 
@@ -88,7 +89,7 @@ export default function CreatePartyPage() {
             </div>
             
             <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('name')}>
-              Continue <ArrowRight className="ml-2 h-5 w-5" />
+              Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -98,7 +99,7 @@ export default function CreatePartyPage() {
             <div className="space-y-2">
               <Label htmlFor="contact" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Contact Number</Label>
               <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+                <HugeiconsIcon icon={Phone} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
                 <Input 
                   id="contact" 
                   {...register('contact')} 
@@ -115,7 +116,7 @@ export default function CreatePartyPage() {
             </div>
 
             <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('contact')}>
-              Continue <ArrowRight className="ml-2 h-5 w-5" />
+              Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -125,7 +126,7 @@ export default function CreatePartyPage() {
             <div className="space-y-2">
               <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Address</Label>
               <div className="relative">
-                <MapPin className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50" />
+                <HugeiconsIcon icon={MapPin} className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50" />
                 <Input id="address" {...register('address')} placeholder="Location details" className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm" />
               </div>
             </div>
@@ -147,7 +148,7 @@ export default function CreatePartyPage() {
             </div>
 
             <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Create Party'} <Check className="ml-2 h-5 w-5" />
+              {isSaving ? 'Saving...' : 'Create Party'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}

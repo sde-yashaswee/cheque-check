@@ -1,6 +1,7 @@
 'use client'
 
-import { Plus, ArrowUpRight, ArrowDownLeft, FileText } from "lucide-react";
+import { HugeiconsIcon } from '@hugeicons/react';
+import { PlusSignIcon as Plus, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, File02Icon as FileText } from '@hugeicons/core-free-icons';;
 import { Button } from "@/components/ui/button";
 import { useBusiness } from "@/hooks/use-business";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -83,7 +84,7 @@ export default function HomePage() {
               <p className="mt-2 text-4xl font-semibold">{currency}{outstanding.toLocaleString()}</p>
             </div>
             <div className="absolute -right-10 -bottom-10 opacity-10 rotate-12">
-              <FileText size={200} />
+              <HugeiconsIcon icon={FileText} size={200} />
             </div>
           </div>
 
@@ -94,7 +95,7 @@ export default function HomePage() {
               <Link href="/cheques/create?type=Outward" className="flex-1">
                 <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 transition-transform active:scale-95 border border-primary/5">
                   <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/10 text-primary">
-                    <ArrowUpRight className="h-6 w-6" />
+                    <HugeiconsIcon icon={ArrowUpRight} className="h-6 w-6" />
                   </div>
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">Issue Cheque</span>
                 </div>
@@ -102,7 +103,7 @@ export default function HomePage() {
               <Link href="/cheques/create?type=Inward" className="flex-1">
                 <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 transition-transform active:scale-95 border border-primary/5">
                   <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-green-500/10 text-green-600">
-                    <ArrowDownLeft className="h-6 w-6" />
+                    <HugeiconsIcon icon={ArrowDownLeft} className="h-6 w-6" />
                   </div>
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-green-600">Receive Cheque</span>
                 </div>
@@ -195,7 +196,7 @@ export default function HomePage() {
 
       <Link href="/cheques/create">
         <Button className="fixed bottom-24 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900" size="icon">
-          <Plus className="h-8 w-8" />
+          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
         </Button>
       </Link>
     </div>

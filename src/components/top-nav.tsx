@@ -3,7 +3,8 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { useProfile } from '@/hooks/use-profile'
 import { useBusiness } from '@/hooks/use-business'
-import { ChevronLeft, User, ChevronDown, Search } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowLeft01Icon as ChevronLeft, UserIcon as User, ArrowDown01Icon as ChevronDown, Search01Icon as Search } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import { BusinessSwitcher } from "@/components/business-switcher"
 import { GlobalSearch } from "@/components/global-search"
@@ -45,7 +46,7 @@ export function TopNav() {
               onClick={() => router.back()}
               className="rounded-full -ml-2 h-9 w-9"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <HugeiconsIcon icon={ChevronLeft} className="h-5 w-5" />
             </Button>
           )}
           <h1 className="text-lg font-semibold tracking-tight">
@@ -60,12 +61,12 @@ export function TopNav() {
             onClick={() => setSearchOpen(true)} 
             className="rounded-full h-9 w-9"
           >
-            <Search className="h-5 w-5 text-muted-foreground" />
+            <HugeiconsIcon icon={Search} className="h-5 w-5 text-muted-foreground" />
           </Button>
 
           <Link href="/settings">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-all active:scale-95">
-              <User className="h-4 w-4" />
+              <HugeiconsIcon icon={User} className="h-4 w-4" />
             </div>
           </Link>
         </div>
@@ -77,7 +78,7 @@ export function TopNav() {
             <button className="flex h-8 w-full items-center bg-primary/5 px-4 text-[10px] font-semibold text-primary uppercase tracking-wider backdrop-blur-sm transition-colors hover:bg-primary/10 active:bg-primary/20 cursor-pointer border-b border-primary/5">
               <span className="opacity-60 mr-1.5">Business:</span> 
               {activeBusiness.name}
-              <ChevronDown className="ml-1.5 h-3 w-3 opacity-60" />
+              <HugeiconsIcon icon={ChevronDown} className="ml-1.5 h-3 w-3 opacity-60" />
             </button>
           }
         />

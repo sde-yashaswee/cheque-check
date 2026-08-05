@@ -1,7 +1,8 @@
 'use client'
 
 import { useParties } from '@/hooks/use-parties'
-import { Plus, Search, User, ChevronRight, ArrowUpAz, ArrowDownAz } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { PlusSignIcon as Plus, Search01Icon as Search, UserIcon as User, ArrowRight01Icon as ChevronRight, TextSquareIcon as ArrowUpAz, SortingZA01Icon as ArrowDownAz } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
@@ -39,7 +40,7 @@ export default function PartiesPage() {
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input 
             className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
             placeholder="Search parties..." 
@@ -53,7 +54,7 @@ export default function PartiesPage() {
           className="rounded-full h-11 w-11 shrink-0 bg-white"
           onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
         >
-          {sortOrder === 'asc' ? <ArrowUpAz className="h-5 w-5" /> : <ArrowDownAz className="h-5 w-5" />}
+          {sortOrder === 'asc' ? <HugeiconsIcon icon={ArrowUpAz} className="h-5 w-5" /> : <HugeiconsIcon icon={ArrowDownAz} className="h-5 w-5" />}
         </Button>
       </div>
 
@@ -100,7 +101,7 @@ export default function PartiesPage() {
                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">Balance</p>
                   <p className="text-sm font-semibold text-primary">{currency}{getBalance(party.id).toLocaleString()}</p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground opacity-40 group-hover:translate-x-1 transition-transform" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
           ))}
@@ -109,7 +110,7 @@ export default function PartiesPage() {
 
       <Link href="/parties/create">
         <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900" size="icon">
-          <Plus className="h-8 w-8" />
+          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
         </Button>
       </Link>
     </div>

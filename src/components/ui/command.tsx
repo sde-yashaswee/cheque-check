@@ -11,7 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { SearchIcon, CheckIcon } from "lucide-react"
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Search02Icon as SearchIcon, Tick01Icon as CheckIcon } from '@hugeicons/core-free-icons';
 
 function Command({
   className,
@@ -79,7 +80,7 @@ function CommandInput({
           )}
           {...props}
         />
-        <SearchIcon className="absolute left-3.5 size-4 shrink-0 opacity-50" />
+        <HugeiconsIcon icon={SearchIcon} className="absolute left-3.5 size-4 shrink-0 opacity-50" />
       </div>
     </div>
   )
@@ -159,7 +160,7 @@ function CommandItem({
       {...props}
     >
       {children}
-      <CheckIcon className="ml-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100" />
+      <HugeiconsIcon icon={CheckIcon} className="ml-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100" />
     </CommandPrimitive.Item>
   )
 }

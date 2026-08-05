@@ -1,11 +1,11 @@
 import * as React from "react"
-import { LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { HugeiconsIcon } from '@hugeicons/react'
 
 interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
-  icon?: LucideIcon
+  icon?: any
   title: string
   description?: string
   action?: {
@@ -37,7 +37,7 @@ export function EmptyState({
         {illustration ? (
           illustration
         ) : Icon ? (
-          <Icon className="h-10 w-10 text-primary/40" />
+          <HugeiconsIcon icon={Icon} className="h-10 w-10 text-primary/40" />
         ) : null}
       </div>
       <h3 className="text-xl font-semibold tracking-tight">{title}</h3>

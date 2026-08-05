@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label'
 import { AuthService } from '@/services/auth.service'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Wallet, Eye, EyeOff } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Wallet01Icon as Wallet, ViewIcon as Eye, ViewOffIcon as EyeOff } from '@hugeicons/core-free-icons';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -49,7 +50,7 @@ export default function SignupPage() {
       <div className="w-full max-w-sm space-y-8">
         <div className="flex flex-col items-center text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-primary text-white">
-            <Wallet className="h-8 w-8" />
+            <HugeiconsIcon icon={Wallet} className="h-8 w-8" />
           </div>
           <h1 className="mt-6 text-display-md font-semibold tracking-tight">ChequeCheck</h1>
           <p className="text-body text-muted-foreground">Start managing your cheques effortlessly.</p>
@@ -97,7 +98,7 @@ export default function SignupPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? <HugeiconsIcon icon={EyeOff} className="h-5 w-5" /> : <HugeiconsIcon icon={Eye} className="h-5 w-5" />}
                 </button>
               </div>
             </div>

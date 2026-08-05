@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, Users, Building2, ChevronRight } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { File02Icon as FileText, UserGroupIcon as Users, Building03Icon as Building2, ArrowRight01Icon as ChevronRight } from '@hugeicons/core-free-icons';
 import { useBusiness } from '@/hooks/use-business'
 import { ChequeService } from '@/services/cheque.service'
 import { PartyService } from '@/services/party.service'
@@ -85,13 +86,13 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10 text-primary">
-                  <FileText className="h-5 w-5" />
+                  <HugeiconsIcon icon={FileText} className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold">₹{c.amount.toLocaleString()}</p>
                   <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider">{c.party?.name} • #{c.cheque_number}</p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground opacity-40" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40" />
               </CommandItem>
             ))}
           </CommandGroup>
@@ -106,13 +107,13 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-green-500/10 text-green-600">
-                  <Users className="h-5 w-5" />
+                  <HugeiconsIcon icon={Users} className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold">{p.name}</p>
                   <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider">{p.contact}</p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground opacity-40" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40" />
               </CommandItem>
             ))}
           </CommandGroup>
@@ -127,13 +128,13 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-muted text-muted-foreground">
-                  <Building2 className="h-5 w-5" />
+                  <HugeiconsIcon icon={Building2} className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold">{a.bank?.name || 'Bank'}</p>
                   <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider">{a.account_name} • {a.account_number}</p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground opacity-40" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40" />
               </CommandItem>
             ))}
           </CommandGroup>

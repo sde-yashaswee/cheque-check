@@ -1,7 +1,8 @@
 'use client'
 
 import { useBusinesses } from "@/hooks/use-businesses-page"
-import { Building2, Plus, ArrowRight, FileText, Trash2, Search, ArrowUpAz, ArrowDownAz } from "lucide-react"
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Building03Icon as Building2, PlusSignIcon as Plus, ArrowRight01Icon as ArrowRight, File02Icon as FileText, Delete02Icon as Trash2, Search01Icon as Search, TextSquareIcon as ArrowUpAz, SortingZA01Icon as ArrowDownAz } from '@hugeicons/core-free-icons';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
@@ -39,7 +40,7 @@ export default function BusinessesPage() {
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input 
             className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
             placeholder="Search businesses..." 
@@ -53,7 +54,7 @@ export default function BusinessesPage() {
           className="rounded-full h-11 w-11 shrink-0 bg-white"
           onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
         >
-          {sortOrder === 'asc' ? <ArrowUpAz className="h-5 w-5" /> : <ArrowDownAz className="h-5 w-5" />}
+          {sortOrder === 'asc' ? <HugeiconsIcon icon={ArrowUpAz} className="h-5 w-5" /> : <HugeiconsIcon icon={ArrowDownAz} className="h-5 w-5" />}
         </Button>
       </div>
 
@@ -121,19 +122,19 @@ export default function BusinessesPage() {
                           size="icon" 
                           className="rounded-full h-8 w-8 text-muted-foreground hover:text-destructive transition-colors"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <HugeiconsIcon icon={Trash2} className="h-4 w-4" />
                         </Button>
                       }
                     />
                    </div>
-                   <ArrowRight className="h-5 w-5 text-muted-foreground opacity-20 transition-opacity group-hover:opacity-100" />
+                   <HugeiconsIcon icon={ArrowRight} className="h-5 w-5 text-muted-foreground opacity-20 transition-opacity group-hover:opacity-100" />
                 </div>
               </div>
 
               <div className="mt-2 flex items-center justify-between border-t border-dashed pt-4">
                 <div className="flex items-center gap-2">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <FileText className="h-3 w-3" />
+                    <HugeiconsIcon icon={FileText} className="h-3 w-3" />
                   </div>
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Upcoming</span>
                 </div>
@@ -148,7 +149,7 @@ export default function BusinessesPage() {
 
       <Link href="/businesses/create">
         <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900" size="icon">
-          <Plus className="h-8 w-8" />
+          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
         </Button>
       </Link>
     </div>

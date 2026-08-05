@@ -3,20 +3,8 @@
 import { useBusiness } from "@/hooks/use-business"
 import { useProfile } from "@/hooks/use-profile"
 import { Button } from "@/components/ui/button"
-import { 
-  ChevronRight, 
-  LogOut, 
-  User, 
-  Bell, 
-  Globe, 
-  CreditCard, 
-  FileSpreadsheet, 
-  Building2, 
-  LayoutGrid, 
-  Zap,
-  Languages,
-  Trash2
-} from "lucide-react"
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowRight01Icon as ChevronRight, Logout01Icon as LogOut, UserIcon as User, Notification01Icon as Bell, GlobalIcon as Globe, CreditCardIcon as CreditCard, File01Icon as FileSpreadsheet, Building03Icon as Building2, LayoutGridIcon as LayoutGrid, FlashIcon as Zap, TranslateIcon as Languages, Delete02Icon as Trash2 } from '@hugeicons/core-free-icons';
 import { useRouter } from "next/navigation"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-dialog"
 import { useQuery } from "@tanstack/react-query"
@@ -179,7 +167,7 @@ export default function SettingsPage() {
       {/* Profile Section */}
       <div className="flex items-center gap-4 rounded-lg bg-canvas-parchment p-5 dark:bg-surface-tile-1">
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white">
-          <User className="h-7 w-7" />
+          <HugeiconsIcon icon={User} className="h-7 w-7" />
         </div>
         <div className="flex-1">
           <p className="font-semibold text-lg leading-tight">{profile?.name || 'User'}</p>
@@ -211,7 +199,7 @@ export default function SettingsPage() {
                     ) : (
                       <div className="flex items-center gap-2">
                         {item.value && <span className="text-xs font-semibold text-muted-foreground">{item.value}</span>}
-                        <ChevronRight className="h-4 w-4 text-muted-foreground opacity-30" />
+                        <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-30" />
                       </div>
                     )}
                   </div>
@@ -239,11 +227,11 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-destructive/10 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-destructive/10 text-destructive">
-                    <Trash2 className="h-4 w-4" />
+                    <HugeiconsIcon icon={Trash2} className="h-4 w-4" />
                   </div>
                   <span className="text-sm font-semibold text-destructive">Delete My Account</span>
                 </div>
-                <ChevronRight className="h-4 w-4 text-destructive opacity-30" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-destructive opacity-30" />
               </div>
             }
           />
@@ -255,7 +243,7 @@ export default function SettingsPage() {
         className="w-full rounded-full h-14 text-lg font-semibold" 
         onClick={handleLogout}
       >
-        <LogOut className="mr-2 h-5 w-5" /> Sign Out
+        <HugeiconsIcon icon={LogOut} className="mr-2 h-5 w-5" /> Sign Out
       </Button>
 
       <div className="text-center pb-8">

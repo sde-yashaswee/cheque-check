@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Check, ChevronsUpDown, Landmark } from "lucide-react"
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Tick02Icon as Check, ArrowUpDownIcon as ChevronsUpDown, BankIcon as Landmark } from '@hugeicons/core-free-icons';
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import {
@@ -53,13 +54,13 @@ export function BankSelector({
                   size="sm" 
                 />
               ) : (
-                <Landmark className="h-5 w-5 text-muted-foreground" />
+                <HugeiconsIcon icon={Landmark} className="h-5 w-5 text-muted-foreground" />
               )}
               <span className="truncate">
                 {selectedBank ? selectedBank.name : "Select a bank"}
               </span>
             </div>
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <HugeiconsIcon icon={ChevronsUpDown} className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </div>
         }
       />
@@ -85,8 +86,7 @@ export function BankSelector({
                     <EntityAvatar name={bank.name} size="sm" />
                     <span className="font-bold">{bank.name}</span>
                   </div>
-                  <Check
-                    className={cn(
+                  <HugeiconsIcon icon={Check}                     className={cn(
                       "h-4 w-4 text-primary",
                       value === bank.id ? "opacity-100" : "opacity-0"
                     )}

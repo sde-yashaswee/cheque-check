@@ -1,6 +1,7 @@
 'use client'
 
-import * as LucideIcons from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import * as HugeIcons from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 
 interface EntityAvatarProps {
@@ -27,7 +28,7 @@ export function EntityAvatar({ name, color, icon, className, size = 'md' }: Enti
     lg: 'h-6 w-6',
   }
 
-  const IconComponent = icon ? (LucideIcons as any)[icon] : null
+  const IconComponent = icon ? (HugeIcons as any)[icon] : null
 
   return (
     <div 
@@ -39,7 +40,7 @@ export function EntityAvatar({ name, color, icon, className, size = 'md' }: Enti
       style={{ backgroundColor: defaultColor }}
     >
       {IconComponent ? (
-        <IconComponent className={iconSizeClasses[size]} />
+        <HugeiconsIcon icon={IconComponent} className={iconSizeClasses[size]} />
       ) : (
         <span className={cn(
           "font-bold uppercase",

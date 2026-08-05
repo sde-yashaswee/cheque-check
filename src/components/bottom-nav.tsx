@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, FileText, Users, Landmark } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Home01Icon as Home, File02Icon as FileText, UserGroupIcon as Users, BankIcon as Landmark } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -28,7 +29,7 @@ export function BottomNav() {
               isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <item.icon className={cn("h-5 w-5", isActive && "stroke-[2.5px]")} />
+            <HugeiconsIcon icon={item.icon} className={cn("h-5 w-5", isActive && "stroke-[2.5px]")} />
             <span className={cn("text-[10px] font-semibold tracking-tight", isActive ? "opacity-100" : "opacity-70")}>{item.name}</span>
           </Link>
         )

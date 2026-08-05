@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useSearchParams } from 'next/navigation'
-import { ArrowLeft, ArrowRight, Check, Camera, X, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Camera01Icon as Camera, Cancel01Icon as X, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 import { Combobox } from '@/components/ui/combobox'
@@ -66,7 +67,7 @@ export default function CreateChequePage() {
       <div className="flex items-center gap-4">
         {step > 1 && (
           <Button variant="ghost" size="icon" onClick={prevStep} className="rounded-full">
-            <ArrowLeft className="h-5 w-5" />
+            <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5" />
           </Button>
         )}
         <div>
@@ -107,7 +108,7 @@ export default function CreateChequePage() {
                     "h-12 w-12 rounded-sm flex items-center justify-center transition-colors",
                     watch('type') === 'Outward' ? "bg-primary text-white" : "bg-primary/10 text-primary"
                   )}>
-                    <ArrowUpRight className="h-6 w-6" />
+                    <HugeiconsIcon icon={ArrowUpRight} className="h-6 w-6" />
                   </div>
                   <span className={cn(
                     "font-semibold text-xs uppercase tracking-wider",
@@ -129,7 +130,7 @@ export default function CreateChequePage() {
                     "h-12 w-12 rounded-sm flex items-center justify-center transition-colors",
                     watch('type') === 'Inward' ? "bg-green-500 text-white" : "bg-green-500/10 text-green-600"
                   )}>
-                    <ArrowDownLeft className="h-6 w-6" />
+                    <HugeiconsIcon icon={ArrowDownLeft} className="h-6 w-6" />
                   </div>
                   <span className={cn(
                     "font-semibold text-xs uppercase tracking-wider",
@@ -166,7 +167,7 @@ export default function CreateChequePage() {
             </div>
             
             <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('amount')}>
-              Continue <ArrowRight className="ml-2 h-5 w-5" />
+              Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -200,7 +201,7 @@ export default function CreateChequePage() {
             </div>
 
             <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('party_id') || !watch('account_id')}>
-              Continue <ArrowRight className="ml-2 h-5 w-5" />
+              Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -218,7 +219,7 @@ export default function CreateChequePage() {
                       onClick={() => setValue('image_url', null)}
                       className="absolute top-3 right-3 p-2 bg-black/60 text-white rounded-full hover:bg-black transition-colors"
                     >
-                      <X className="h-4 w-4" />
+                      <HugeiconsIcon icon={X} className="h-4 w-4" />
                     </button>
                   </div>
                 ) : (
@@ -227,7 +228,7 @@ export default function CreateChequePage() {
                       {isUploading ? (
                         <div className="h-6 w-6 border-2 border-primary border-t-transparent animate-spin rounded-full" />
                       ) : (
-                        <Camera className="h-7 w-7" />
+                        <HugeiconsIcon icon={Camera} className="h-7 w-7" />
                       )}
                     </div>
                     <div className="text-center">
@@ -289,7 +290,7 @@ export default function CreateChequePage() {
             </div>
 
             <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save Cheque'} <Check className="ml-2 h-5 w-5" />
+              {isSaving ? 'Saving...' : 'Save Cheque'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}

@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter, useParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
-import { Check, User, CreditCard, Hash, Trash2 } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Tick02Icon as Check, UserIcon as User, CreditCardIcon as CreditCard, HashtagIcon as Hash, Delete02Icon as Trash2 } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DeleteConfirmationDialog } from '@/components/ui/delete-dialog'
@@ -55,7 +56,7 @@ export default function EditAccountPage() {
           <div className="space-y-2">
             <Label htmlFor="account_name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Account Holder Name</Label>
             <div className="relative">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+              <HugeiconsIcon icon={User} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
               <Input 
                 id="account_name" 
                 {...register('account_name')} 
@@ -69,7 +70,7 @@ export default function EditAccountPage() {
           <div className="space-y-2">
             <Label htmlFor="account_number" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Account Number</Label>
             <div className="relative">
-              <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+              <HugeiconsIcon icon={CreditCard} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
               <Input 
                 id="account_number" 
                 {...register('account_number')} 
@@ -83,7 +84,7 @@ export default function EditAccountPage() {
           <div className="space-y-2">
             <Label htmlFor="ifsc_code" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">IFSC Code</Label>
             <div className="relative">
-              <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+              <HugeiconsIcon icon={Hash} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
               <Input id="ifsc_code" {...register('ifsc_code')} placeholder="BANK0123456" className="h-14 pl-12 bg-canvas-parchment border-none uppercase rounded-sm" />
             </div>
           </div>
@@ -109,7 +110,7 @@ export default function EditAccountPage() {
 
         <div className="pt-4 flex flex-col gap-3">
           <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-            {isSaving ? 'Saving...' : 'Update Account'} <Check className="ml-2 h-5 w-5" />
+            {isSaving ? 'Saving...' : 'Update Account'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
           </Button>
 
           <DeleteConfirmationDialog 
@@ -119,7 +120,7 @@ export default function EditAccountPage() {
             onDelete={async () => { onDelete() }}
             trigger={
               <Button type="button" variant="ghost" className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">
-                <Trash2 className="mr-2 h-5 w-5" /> Delete Account
+                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" /> Delete Account
               </Button>
             }
           />

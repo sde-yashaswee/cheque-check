@@ -6,7 +6,8 @@ import { useParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
-import { Hash, Pencil } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { HashtagIcon as Hash, PencilEdit01Icon as Pencil } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
@@ -55,7 +56,7 @@ export default function AccountDetailPage() {
           </div>
           <Link href={`/accounts/${id}/edit`}>
             <Button variant="ghost" size="icon" className="rounded-full bg-canvas-parchment/50">
-              <Pencil className="h-4 w-4" />
+              <HugeiconsIcon icon={Pencil} className="h-4 w-4" />
             </Button>
           </Link>
         </div>
@@ -64,7 +65,7 @@ export default function AccountDetailPage() {
           <div className="space-y-1">
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Account Number</p>
             <div className="flex items-center gap-2">
-              <Hash className="h-3 w-3 text-primary" />
+              <HugeiconsIcon icon={Hash} className="h-3 w-3 text-primary" />
               <p className="font-mono font-semibold">{account.account_number}</p>
             </div>
           </div>

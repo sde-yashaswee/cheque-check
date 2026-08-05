@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Check, ChevronsUpDown, PlusCircle } from "lucide-react"
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Tick02Icon as Check, ArrowUpDownIcon as ChevronsUpDown, PlusSignCircleIcon as PlusCircle } from '@hugeicons/core-free-icons';
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import {
@@ -64,7 +65,7 @@ export function Combobox({
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
-        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        <HugeiconsIcon icon={ChevronsUpDown} className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </PopoverTrigger>
       <PopoverContent className="w-full p-0 rounded-lg overflow-hidden border border-primary/5" align="start">
         <Command className="rounded-none">
@@ -88,8 +89,7 @@ export function Combobox({
                     <EntityAvatar name={option.label} color={option.color} icon={option.icon} size="sm" />
                     <span className="font-semibold">{option.label}</span>
                   </div>
-                  <Check
-                    className={cn(
+                  <HugeiconsIcon icon={Check}                     className={cn(
                       "h-4 w-4 text-primary",
                       value === option.value ? "opacity-100" : "opacity-0"
                     )}
@@ -104,7 +104,7 @@ export function Combobox({
               <div className="p-1">
                 <Link href={createUrl}>
                   <div className="flex items-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors cursor-pointer">
-                    <PlusCircle className="h-4 w-4" />
+                    <HugeiconsIcon icon={PlusCircle} className="h-4 w-4" />
                     {createLabel}
                   </div>
                 </Link>

@@ -2,7 +2,8 @@
 
 import { useProfile } from "@/hooks/use-profile"
 import { Switch } from "@/components/ui/switch"
-import { Phone, CheckCircle2, ShieldCheck, Zap } from "lucide-react"
+import { HugeiconsIcon } from '@hugeicons/react';
+import { CallIcon as Phone, CheckmarkCircle01Icon as CheckCircle2, SecurityCheckIcon as ShieldCheck, FlashIcon as Zap } from '@hugeicons/core-free-icons';
 import { cn } from "@/lib/utils"
 
 export default function FeaturesPage() {
@@ -62,7 +63,7 @@ export default function FeaturesPage() {
           >
             <div className="flex items-start justify-between">
               <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/10 text-primary">
-                <feature.icon className="h-6 w-6" />
+                <HugeiconsIcon icon={feature.icon} className="h-6 w-6" />
               </div>
               {feature.badge && (
                 <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-semibold text-primary uppercase">

@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ArrowRight, Check, Building2, Phone, Mail, MapPin } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Building03Icon as Building2, CallIcon as Phone, Mail01Icon as Mail, Location01Icon as MapPin } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 
 export default function CreateBusinessPage() {
@@ -28,7 +29,7 @@ export default function CreateBusinessPage() {
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => step > 1 ? prevStep() : router.back()} className="rounded-full">
-          <ArrowLeft className="h-5 w-5" />
+          <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5" />
         </Button>
         <div>
           <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Step {step} of 3</p>
@@ -55,7 +56,7 @@ export default function CreateBusinessPage() {
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Business Name</Label>
                 <div className="relative">
-                  <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+                  <HugeiconsIcon icon={Building2} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
                   <Input 
                     id="name" 
                     {...register('name')} 
@@ -86,7 +87,7 @@ export default function CreateBusinessPage() {
             </div>
             
             <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('name')}>
-              Continue <ArrowRight className="ml-2 h-5 w-5" />
+              Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -96,7 +97,7 @@ export default function CreateBusinessPage() {
             <div className="space-y-2">
               <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Business Email</Label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+                <HugeiconsIcon icon={Mail} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
                 <Input 
                   id="email" 
                   {...register('email')} 
@@ -110,7 +111,7 @@ export default function CreateBusinessPage() {
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Business Phone</Label>
               <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+                <HugeiconsIcon icon={Phone} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
                 <Input 
                   id="phone" 
                   {...register('phone')} 
@@ -121,7 +122,7 @@ export default function CreateBusinessPage() {
             </div>
 
             <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('email')}>
-              Continue <ArrowRight className="ml-2 h-5 w-5" />
+              Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -131,7 +132,7 @@ export default function CreateBusinessPage() {
             <div className="space-y-2">
               <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Business Address</Label>
               <div className="relative">
-                <MapPin className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50" />
+                <HugeiconsIcon icon={MapPin} className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50" />
                 <Input id="address" {...register('address')} placeholder="Headquarters location" className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm" />
               </div>
             </div>
@@ -150,7 +151,7 @@ export default function CreateBusinessPage() {
             </div>
 
             <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-              {isSaving ? 'Creating Business...' : 'Create Business'} <Check className="ml-2 h-5 w-5" />
+              {isSaving ? 'Creating Business...' : 'Create Business'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}

@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
-import { ArrowLeft, ArrowRight, Check, CreditCard, User, Hash } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, CreditCardIcon as CreditCard, UserIcon as User, HashtagIcon as Hash } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 import { BankSelector } from '@/components/bank-selector'
 
@@ -31,7 +32,7 @@ export default function CreateAccountPage() {
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => step > 1 ? prevStep() : router.back()} className="rounded-full">
-          <ArrowLeft className="h-5 w-5" />
+          <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5" />
         </Button>
         <div>
           <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Step {step} of 3</p>
@@ -84,7 +85,7 @@ export default function CreateAccountPage() {
             </div>
             
             <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('bank_id')}>
-              Continue <ArrowRight className="ml-2 h-5 w-5" />
+              Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -94,7 +95,7 @@ export default function CreateAccountPage() {
             <div className="space-y-2">
               <Label htmlFor="account_name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Account Holder Name</Label>
               <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+                <HugeiconsIcon icon={User} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
                 <Input 
                   id="account_name" 
                   {...register('account_name')} 
@@ -108,7 +109,7 @@ export default function CreateAccountPage() {
             <div className="space-y-2">
               <Label htmlFor="account_number" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Account Number</Label>
               <div className="relative">
-                <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+                <HugeiconsIcon icon={CreditCard} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
                 <Input 
                   id="account_number" 
                   {...register('account_number')} 
@@ -120,7 +121,7 @@ export default function CreateAccountPage() {
             </div>
 
             <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('account_name') || !watch('account_number')}>
-              Continue <ArrowRight className="ml-2 h-5 w-5" />
+              Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -130,13 +131,13 @@ export default function CreateAccountPage() {
             <div className="space-y-2">
               <Label htmlFor="ifsc_code" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">IFSC Code</Label>
               <div className="relative">
-                <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+                <HugeiconsIcon icon={Hash} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
                 <Input id="ifsc_code" {...register('ifsc_code')} placeholder="BANK0123456" className="h-14 pl-12 bg-canvas-parchment border-none uppercase rounded-sm" />
               </div>
             </div>
 
             <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-              {isSaving ? 'Adding Account...' : 'Add Account'} <Check className="ml-2 h-5 w-5" />
+              {isSaving ? 'Adding Account...' : 'Add Account'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}

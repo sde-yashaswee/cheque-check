@@ -1,6 +1,7 @@
 'use client'
 
-import { Plus, ChevronRight, Search, ArrowUpAz, ArrowDownAz, Landmark, Filter } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { PlusSignIcon as Plus, ArrowRight01Icon as ChevronRight, Search01Icon as Search, TextSquareIcon as ArrowUpAz, SortingZA01Icon as ArrowDownAz, BankIcon as Landmark, FilterIcon as Filter } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
@@ -40,7 +41,7 @@ export default function AccountsPage() {
     <div className="mx-auto max-w-2xl space-y-8 pb-24">
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input 
             className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
             placeholder="Search accounts..." 
@@ -52,7 +53,7 @@ export default function AccountsPage() {
         <Popover>
           <PopoverTrigger render={
             <Button variant={bankFilter !== 'All' ? 'default' : 'outline'} size="icon" className="rounded-full h-11 w-11 shrink-0">
-              <Filter className="h-4 w-4" />
+              <HugeiconsIcon icon={Filter} className="h-4 w-4" />
             </Button>
           } />
           <PopoverContent className="w-56 p-2 rounded-lg" align="end">
@@ -89,7 +90,7 @@ export default function AccountsPage() {
           className="rounded-full h-11 w-11 shrink-0"
           onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
         >
-          {sortOrder === 'asc' ? <ArrowUpAz className="h-5 w-5" /> : <ArrowDownAz className="h-5 w-5" />}
+          {sortOrder === 'asc' ? <HugeiconsIcon icon={ArrowUpAz} className="h-5 w-5" /> : <HugeiconsIcon icon={ArrowDownAz} className="h-5 w-5" />}
         </Button>
       </div>
 
@@ -132,7 +133,7 @@ export default function AccountsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <p className="text-lg font-semibold truncate">{account.bank?.name}</p>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground opacity-40 group-hover:translate-x-1 transition-transform" />
+                      <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 group-hover:translate-x-1 transition-transform" />
                     </div>
                     <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mt-0.5">{account.account_name}</p>
                     
@@ -154,7 +155,7 @@ export default function AccountsPage() {
 
       <Link href="/accounts/create">
         <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900" size="icon">
-          <Plus className="h-8 w-8" />
+          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
         </Button>
       </Link>
     </div>

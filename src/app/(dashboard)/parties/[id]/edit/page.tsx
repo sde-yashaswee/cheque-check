@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter, useParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
-import { Check, User, Phone, MapPin, Trash2 } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Tick02Icon as Check, UserIcon as User, CallIcon as Phone, Location01Icon as MapPin, Delete02Icon as Trash2 } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DeleteConfirmationDialog } from '@/components/ui/delete-dialog'
@@ -45,7 +46,7 @@ export default function EditPartyPage() {
           <div className="space-y-2">
             <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Party Name</Label>
             <div className="relative">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+              <HugeiconsIcon icon={User} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
               <Input 
                 id="name" 
                 {...register('name')} 
@@ -59,7 +60,7 @@ export default function EditPartyPage() {
           <div className="space-y-2">
             <Label htmlFor="contact" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Contact Number</Label>
             <div className="relative">
-              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+              <HugeiconsIcon icon={Phone} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
               <Input 
                 id="contact" 
                 {...register('contact')} 
@@ -78,7 +79,7 @@ export default function EditPartyPage() {
           <div className="space-y-2">
             <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Address</Label>
             <div className="relative">
-              <MapPin className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50" />
+              <HugeiconsIcon icon={MapPin} className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50" />
               <Input id="address" {...register('address')} placeholder="Location details" className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm" />
             </div>
           </div>
@@ -104,7 +105,7 @@ export default function EditPartyPage() {
 
         <div className="pt-4 flex flex-col gap-3">
           <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-            {isSaving ? 'Saving...' : 'Update Party'} <Check className="ml-2 h-5 w-5" />
+            {isSaving ? 'Saving...' : 'Update Party'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
           </Button>
 
           <DeleteConfirmationDialog 
@@ -114,7 +115,7 @@ export default function EditPartyPage() {
             onDelete={async () => { onDelete() }}
             trigger={
               <Button type="button" variant="ghost" className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">
-                <Trash2 className="mr-2 h-5 w-5" /> Delete Party
+                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" /> Delete Party
               </Button>
             }
           />

@@ -1,7 +1,8 @@
 'use client'
 
 import { useBusiness } from "@/hooks/use-business"
-import { ChevronDown, Plus, Check } from "lucide-react"
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowDown01Icon as ChevronDown, PlusSignIcon as Plus, Tick02Icon as Check } from '@hugeicons/core-free-icons';
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { useState } from "react"
@@ -20,7 +21,7 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={trigger || (
           <button className="flex items-center gap-2 rounded-pill bg-canvas-parchment px-4 py-2 text-sm font-semibold transition-transform active:scale-95 dark:bg-surface-tile-1">
-            <ChevronDown className="h-4 w-4" />
+            <HugeiconsIcon icon={ChevronDown} className="h-4 w-4" />
             <span>{activeBusiness?.name || 'Select Business'}</span>
           </button>
         )}
@@ -65,7 +66,7 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
                   </div>
                   {activeBusiness?.id === business.id && (
                     <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white">
-                      <Check className="h-3.5 w-3.5 stroke-[3]" />
+                      <HugeiconsIcon icon={Check} className="h-3.5 w-3.5 stroke-[3]" />
                     </div>
                   )}
                 </CommandItem>
@@ -77,7 +78,7 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
             <Link href="/businesses/create" onClick={() => setOpen(false)} className="block">
               <CommandItem className="flex items-center gap-3 px-4 py-4 cursor-pointer text-primary hover:bg-primary/5 rounded-xl">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <Plus className="h-6 w-6" />
+                  <HugeiconsIcon icon={Plus} className="h-6 w-6" />
                 </div>
                 <span className="font-bold text-sm uppercase tracking-widest">Add New Business</span>
               </CommandItem>

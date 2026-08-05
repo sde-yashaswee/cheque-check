@@ -1,5 +1,6 @@
 import * as React from "react"
-import { Search, ShieldAlert, AlertCircle } from "lucide-react"
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Search01Icon as Search, Alert02Icon as ShieldAlert, Alert01Icon as AlertCircle } from '@hugeicons/core-free-icons';
 import { EmptyState } from "./empty-state"
 import { useRouter } from "next/navigation"
 

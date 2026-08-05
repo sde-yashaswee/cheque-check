@@ -3,7 +3,8 @@
 import { useSwipeable } from 'react-swipeable'
 import { ChequeStatus, ChequeWithRelations } from '@/types'
 import { cn } from '@/lib/utils'
-import { Check, X, Trash2, Image as ImageIcon } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Tick02Icon as Check, Cancel01Icon as X, Delete02Icon as Trash2, Image01Icon as ImageIcon } from '@hugeicons/core-free-icons';
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useProfile } from '@/hooks/use-profile'
@@ -86,7 +87,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
           "flex items-center gap-2 transition-opacity",
           swiping === 'clear' ? "opacity-100" : "opacity-0"
         )}>
-          <Check className="h-6 w-6 text-green-500" />
+          <HugeiconsIcon icon={Check} className="h-6 w-6 text-green-500" />
           <span className="font-bold text-green-500">CLEAR</span>
         </div>
         <div className={cn(
@@ -94,7 +95,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
           swiping === 'bounce' ? "opacity-100" : "opacity-0"
         )}>
           <span className="font-bold text-destructive">BOUNCE</span>
-          <X className="h-6 w-6 text-destructive" />
+          <HugeiconsIcon icon={X} className="h-6 w-6 text-destructive" />
         </div>
       </div>
 
@@ -120,7 +121,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
                   <Dialog>
                     <DialogTrigger render={
                       <button className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center text-primary transition-transform active:scale-90">
-                        <ImageIcon className="h-3 w-3" />
+                        <HugeiconsIcon icon={ImageIcon} className="h-3 w-3" />
                       </button>
                     } />
                     <DialogContent className="max-w-lg p-0 overflow-hidden bg-transparent border-none shadow-none">
@@ -157,7 +158,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
               onDelete={async () => { deleteMutation.mutate() }}
               trigger={
                 <button className="text-muted-foreground hover:text-destructive transition-colors">
-                  <Trash2 className="h-3 w-3" />
+                  <HugeiconsIcon icon={Trash2} className="h-3 w-3" />
                 </button>
               }
             />

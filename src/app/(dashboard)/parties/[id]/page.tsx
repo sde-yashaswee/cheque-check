@@ -7,7 +7,8 @@ import { useBusiness } from '@/hooks/use-business'
 import { useProfile } from '@/hooks/use-profile'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
-import { Phone, Mail, Pencil } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react';
+import { CallIcon as Phone, Mail01Icon as Mail, PencilEdit01Icon as Pencil } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
@@ -59,7 +60,7 @@ export default function PartyDetailPage() {
           </div>
           <Link href={`/parties/${id}/edit`}>
             <Button variant="ghost" size="icon" className="rounded-full bg-canvas-parchment/50">
-              <Pencil className="h-4 w-4" />
+              <HugeiconsIcon icon={Pencil} className="h-4 w-4" />
             </Button>
           </Link>
         </div>
@@ -67,13 +68,13 @@ export default function PartyDetailPage() {
         <div className="flex gap-3 relative z-10">
           <a href={`tel:${party.contact}`} className="flex-1">
             <Button className="w-full rounded-sm h-12" variant="outline">
-              <Phone className="mr-2 h-4 w-4" /> Contact
+              <HugeiconsIcon icon={Phone} className="mr-2 h-4 w-4" /> Contact
             </Button>
           </a>
           {party.email && (
             <a href={`mailto:${party.email}`} className="flex-1">
               <Button className="w-full rounded-sm h-12" variant="outline">
-                <Mail className="mr-2 h-4 w-4" /> Email
+                <HugeiconsIcon icon={Mail} className="mr-2 h-4 w-4" /> Email
               </Button>
             </a>
           )}
