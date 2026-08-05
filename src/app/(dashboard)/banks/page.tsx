@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useBusiness } from '@/hooks/use-business'
 
+import { Skeleton } from '@/components/ui/skeleton'
+
 export default function BanksPage() {
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
@@ -19,13 +21,13 @@ export default function BanksPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
-      <div className="flex items-center justify-between">
-        <h1 className="text-display-lg">Banks</h1>
-      </div>
-
       <div className="space-y-4">
         {isLoading ? (
-          <p>Loading banks...</p>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-32 w-full rounded-lg" />
+            ))}
+          </div>
         ) : banks?.length === 0 ? (
           <div className="py-20 text-center">
             <Building2 className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />

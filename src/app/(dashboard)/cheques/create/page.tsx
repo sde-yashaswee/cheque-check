@@ -79,7 +79,6 @@ export default function CreateChequePage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
         )}
-        <h1 className="text-display-lg">New Cheque</h1>
       </div>
 
       {/* Progress Bar */}

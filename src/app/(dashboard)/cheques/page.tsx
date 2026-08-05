@@ -11,6 +11,9 @@ import { useState } from 'react'
 import { ChequeStatus } from '@/types'
 import { useBusiness } from '@/hooks/use-business'
 
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Skeleton } from '@/components/ui/skeleton'
+
 export default function ChequesPage() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<ChequeStatus | 'All'>('All')
@@ -42,8 +45,6 @@ export default function ChequesPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-24">
-      <h1 className="text-display-lg">Cheques</h1>
-
       <div className="flex gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -54,31 +55,39 @@ export default function ChequesPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Button variant="outline" className="rounded-full h-11 w-11 p-0" size="icon">
-          <Filter className="h-4 w-4" />
-        </Button>
-      </div>
-
-      <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-        {['All', 'Issued', 'Received', 'Cleared', 'Bounced'].map((s) => (
-          <button
-            key={s}
-            onClick={() => setFilter(s as any)}
-            className={cn(
-              "whitespace-nowrap rounded-pill px-4 py-1.5 text-xs font-semibold transition-colors",
-              filter === s 
-                ? "bg-primary text-white" 
-                : "bg-canvas-parchment text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {s}
-          </button>
-        ))}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant={filter !== 'All' ? 'default' : 'outline'} className="rounded-full h-11 w-11 p-0" size="icon">
+              <Filter className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-48 p-2" align="end">
+            <div className="flex flex-col gap-1">
+              {['All', 'Issued', 'Received', 'Cleared', 'Bounced'].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setFilter(s as any)}
+                  className={cn(
+                    "flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted",
+                    filter === s ? "text-primary" : "text-muted-foreground"
+                  )}
+                >
+                  {s}
+                  {filter === s && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div className="space-y-4">
         {isLoading ? (
-          <p>Loading cheques...</p>
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-32 w-full" />
+            ))}
+          </div>
         ) : filteredCheques?.length === 0 ? (
           <div className="py-20 text-center">
             <p className="text-muted-foreground text-body">No cheques found.</p>
@@ -93,6 +102,7 @@ export default function ChequesPage() {
           ))
         )}
       </div>
+
 
       <Link href="/cheques/create">
         <Button className="fixed bottom-20 right-6 h-14 w-14 rounded-full shadow-lg" size="icon">

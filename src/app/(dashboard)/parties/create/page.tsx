@@ -44,8 +44,6 @@ export default function CreatePartyPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
-      <h1 className="text-display-lg">Create Party</h1>
-      
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pb-12">
         <div className="space-y-2">
           <Label htmlFor="name">Party Name *</Label>

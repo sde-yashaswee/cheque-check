@@ -16,6 +16,8 @@ import Link from "next/link"
 import { Combobox } from "@/components/ui/combobox"
 import { format, differenceInDays } from "date-fns"
 
+import { Skeleton } from "@/components/ui/skeleton"
+
 export default function SettingsPage() {
   const { activeBusiness, businesses } = useBusiness()
   const { profile, updateProfile, isLoading: profileLoading } = useProfile()
@@ -27,6 +29,22 @@ export default function SettingsPage() {
     queryFn: () => ChequeService.getAll(activeBusiness!.id),
     enabled: !!activeBusiness?.id,
   })
+
+  if (profileLoading) {
+    return (
+      <div className="mx-auto max-w-2xl space-y-8 pb-20">
+        <Skeleton className="h-20 w-full" />
+        <div className="space-y-8">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="space-y-3">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-48 w-full" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   const handleExport = () => {
     if (!cheques) return
@@ -49,6 +67,18 @@ export default function SettingsPage() {
     { label: 'DD/MM/YYYY', value: 'dd/MM/yyyy' },
     { label: 'MM/DD/YYYY', value: 'MM/dd/yyyy' },
     { label: 'YYYY-MM-DD', value: 'yyyy-MM-dd' },
+  ]
+
+  const remindersPerDayOptions = [
+    { label: '1 time/day', value: '1' },
+    { label: '2 times/day', value: '2' },
+    { label: '3 times/day', value: '3' },
+  ]
+
+  const reminderFrequencyOptions = [
+    { label: '1 day before', value: '1' },
+    { label: '3 days before', value: '3' },
+    { label: '7 days before', value: '7' },
   ]
 
   const remainingDays = profile ? 30 - differenceInDays(new Date(), new Date(profile.created_at)) : 0
@@ -93,8 +123,31 @@ export default function SettingsPage() {
     {
       title: 'Reminders',
       items: [
-        { name: 'Voice Calls', toggle: true, icon: Bell, checked: profile?.received_cheques_enabled, onChange: (val: boolean) => updateProfile({ received_cheques_enabled: val }) },
-        { name: 'Reminder Frequency', value: `${profile?.reminders_per_day || 1} time/day`, icon: Bell },
+        { name: 'Received Cheques Mode', toggle: true, icon: Bell, checked: profile?.received_cheques_enabled, onChange: (val: boolean) => updateProfile({ received_cheques_enabled: val }) },
+        { 
+          name: 'Reminders Per Day', 
+          icon: Bell,
+          component: (
+            <Combobox 
+              options={remindersPerDayOptions} 
+              value={profile?.reminders_per_day?.toString()} 
+              onValueChange={(val) => updateProfile({ reminders_per_day: parseInt(val) })}
+              className="h-9 w-[140px]"
+            />
+          )
+        },
+        { 
+          name: 'Reminder Frequency', 
+          icon: Bell,
+          component: (
+            <Combobox 
+              options={reminderFrequencyOptions} 
+              value={profile?.default_reminder_days?.toString()} 
+              onValueChange={(val) => updateProfile({ default_reminder_days: parseInt(val) })}
+              className="h-9 w-[150px]"
+            />
+          )
+        },
       ]
     },
     {
@@ -107,10 +160,9 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
-      <h1 className="text-display-lg">Settings</h1>
-
       {/* Profile Section */}
       <div className="flex items-center gap-4 rounded-lg bg-canvas-parchment p-4 dark:bg-surface-tile-1">
+
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
           <User className="h-6 w-6" />
         </div>

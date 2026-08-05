@@ -14,6 +14,7 @@ import { GlobalSearch } from "@/components/global-search";
 
 import { useProfile } from "@/hooks/use-profile";
 import { Landmark, Building2, Users } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function HomePage() {
   const { activeBusiness } = useBusiness()
@@ -62,21 +63,31 @@ export default function HomePage() {
 
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
       
-      <div>
-        <p className="text-sm text-muted-foreground font-medium">Hello, {profile?.name || 'User'}</p>
-        <h1 className="text-display-lg">Dashboard</h1>
-      </div>
-
-      {!activeBusiness ? (
+      {!activeBusiness && !isLoading ? (
         <div className="py-20 text-center">
           <p className="text-muted-foreground">Create a business to get started.</p>
           <Link href="/businesses/create" className="mt-4 block">
             <Button className="rounded-pill">Create Business</Button>
           </Link>
         </div>
+      ) : isLoading ? (
+        <>
+          <Skeleton className="h-40 w-full rounded-lg" />
+          <div className="grid grid-cols-2 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} className="h-24 w-full" />
+            ))}
+          </div>
+          <div className="space-y-4">
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+        </>
       ) : (
         <>
           {/* Outstanding Card */}
+
           <div className="rounded-lg bg-primary p-6 text-primary-foreground shadow-product">
             <p className="text-sm font-medium opacity-80">Outstanding</p>
             <p className="mt-1 text-display-lg">{currency}{outstanding.toLocaleString()}</p>

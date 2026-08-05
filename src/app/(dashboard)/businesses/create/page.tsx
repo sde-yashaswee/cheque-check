@@ -10,9 +10,13 @@ import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useBusiness } from '@/hooks/use-business'
+
 export default function CreateBusinessPage() {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const queryClient = useQueryClient()
+  const { setActiveBusiness } = useBusiness()
   
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(businessSchema),
@@ -24,23 +28,21 @@ export default function CreateBusinessPage() {
     }
   })
 
-  const onSubmit = async (data: any) => {
-    setLoading(true)
-    try {
-      await BusinessService.create(data)
+  const mutation = useMutation({
+    mutationFn: (data: any) => BusinessService.create(data),
+    onSuccess: (newBusiness) => {
+      queryClient.invalidateQueries({ queryKey: ['businesses'] })
+      setActiveBusiness(newBusiness)
       router.push('/')
-    } catch (error) {
-      console.error(error)
-      alert('Failed to create business')
-    } finally {
-      setLoading(false)
     }
+  })
+
+  const onSubmit = (data: any) => {
+    mutation.mutate(data)
   }
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
-      <h1 className="text-display-lg">Create Business</h1>
-      
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="name">Business Name</Label>
@@ -64,8 +66,8 @@ export default function CreateBusinessPage() {
           <Input id="address" {...register('address')} placeholder="Business location" />
         </div>
 
-        <Button type="submit" className="w-full rounded-pill h-12 text-lg" disabled={loading}>
-          {loading ? 'Creating...' : 'Create Business'}
+        <Button type="submit" className="w-full rounded-pill h-12 text-lg" disabled={mutation.isPending}>
+          {mutation.isPending ? 'Creating...' : 'Create Business'}
         </Button>
       </form>
     </div>

@@ -43,8 +43,6 @@ export default function CreateBankPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
-      <h1 className="text-display-lg">Add Bank</h1>
-      
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="bank_name">Bank Name *</Label>

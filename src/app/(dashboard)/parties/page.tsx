@@ -8,11 +8,16 @@ import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useBusiness } from '@/hooks/use-business'
+import { useProfile } from '@/hooks/use-profile'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function PartiesPage() {
   const [search, setSearch] = useState('')
   const { activeBusiness } = useBusiness()
+  const { profile } = useProfile()
   const businessId = activeBusiness?.id
+
+  const currency = profile?.currency || '₹'
 
   const { data: parties, isLoading } = useQuery({
     queryKey: ['parties', businessId],
@@ -27,8 +32,6 @@ export default function PartiesPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
-      <h1 className="text-display-lg">Parties</h1>
-
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input 
@@ -41,8 +44,13 @@ export default function PartiesPage() {
 
       <div className="space-y-3">
         {isLoading ? (
-          <p>Loading parties...</p>
+          <div className="space-y-3">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="h-20 w-full rounded-lg" />
+            ))}
+          </div>
         ) : filteredParties?.length === 0 ? (
+
           <div className="py-20 text-center">
             <p className="text-muted-foreground text-body">No parties found.</p>
             <Link href="/parties/create">
@@ -62,7 +70,7 @@ export default function PartiesPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-xs font-semibold text-muted-foreground uppercase">Outstanding</p>
-                  <p className="text-sm font-bold">₹0</p>
+                  <p className="text-sm font-bold">{currency}0</p>
                 </div>
               </div>
             </Link>
