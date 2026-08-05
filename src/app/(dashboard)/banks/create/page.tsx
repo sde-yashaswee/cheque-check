@@ -34,7 +34,7 @@ export default function CreateBankPage() {
     mutationFn: (data: any) => BankService.create({ ...data, business_id: activeBusiness!.id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['banks', activeBusiness?.id] })
-      router.push('/banks')
+      router.back()
     }
   })
 
@@ -51,11 +51,9 @@ export default function CreateBankPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="flex items-center gap-4">
-        {step > 1 && (
-          <Button variant="ghost" size="icon" onClick={prevStep} className="rounded-full">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        )}
+        <Button variant="ghost" size="icon" onClick={() => step > 1 ? prevStep() : router.back()} className="rounded-full">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
         <div>
           <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Step {step} of 3</p>
           <h2 className="text-display-sm font-bold">Add Bank</h2>
@@ -79,14 +77,14 @@ export default function CreateBankPage() {
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="bank_name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Bank Name</Label>
+                <Label htmlFor="bank_name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Bank Name <span className="text-destructive">*</span></Label>
                 <div className="relative">
                   <Landmark className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input 
                     id="bank_name" 
                     {...register('bank_name')} 
                     placeholder="e.g. ICICI Bank" 
-                    className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-medium"
+                    className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-medium rounded-2xl shadow-sm"
                   />
                 </div>
                 {errors.bank_name && <p className="text-xs text-destructive">{errors.bank_name.message as string}</p>}
@@ -111,7 +109,7 @@ export default function CreateBankPage() {
               </div>
             </div>
             
-            <Button type="button" className="w-full rounded-pill h-14 text-lg" onClick={nextStep} disabled={!watch('bank_name')}>
+            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('bank_name')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -120,34 +118,34 @@ export default function CreateBankPage() {
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="account_name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Account Holder Name</Label>
+              <Label htmlFor="account_name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Account Holder Name <span className="text-destructive">*</span></Label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input 
                   id="account_name" 
                   {...register('account_name')} 
                   placeholder="e.g. John Doe" 
-                  className="h-14 pl-12 bg-canvas-parchment border-none"
+                  className="h-14 pl-12 bg-canvas-parchment border-none rounded-2xl shadow-sm"
                 />
               </div>
               {errors.account_name && <p className="text-xs text-destructive">{errors.account_name.message as string}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="account_number" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Account Number</Label>
+              <Label htmlFor="account_number" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Account Number <span className="text-destructive">*</span></Label>
               <div className="relative">
                 <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input 
                   id="account_number" 
                   {...register('account_number')} 
                   placeholder="Enter full number" 
-                  className="h-14 pl-12 bg-canvas-parchment border-none"
+                  className="h-14 pl-12 bg-canvas-parchment border-none rounded-2xl shadow-sm"
                 />
               </div>
               {errors.account_number && <p className="text-xs text-destructive">{errors.account_number.message as string}</p>}
             </div>
 
-            <Button type="button" className="w-full rounded-pill h-14 text-lg" onClick={nextStep} disabled={!watch('account_name') || !watch('account_number')}>
+            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('account_name') || !watch('account_number')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -156,17 +154,17 @@ export default function CreateBankPage() {
         {step === 3 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="ifsc_code" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">IFSC Code (Optional)</Label>
+              <Label htmlFor="ifsc_code" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">IFSC Code</Label>
               <div className="relative">
                 <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="ifsc_code" {...register('ifsc_code')} placeholder="BANK0123456" className="h-14 pl-12 bg-canvas-parchment border-none uppercase" />
+                <Input id="ifsc_code" {...register('ifsc_code')} placeholder="BANK0123456" className="h-14 pl-12 bg-canvas-parchment border-none uppercase rounded-2xl shadow-sm" />
               </div>
             </div>
 
-            <div className="rounded-3xl bg-primary/5 p-6 space-y-4 border border-primary/10">
+            <div className="rounded-3xl bg-primary/5 p-6 space-y-4 border border-primary/10 shadow-sm">
               <h3 className="font-bold text-primary uppercase tracking-widest text-[10px]">Bank Details</h3>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: watch('color' as any) || '#5856D6' }}>
+                <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm" style={{ backgroundColor: watch('color' as any) || '#5856D6' }}>
                   {watch('bank_name')?.charAt(0) || 'B'}
                 </div>
                 <div>

@@ -112,33 +112,33 @@ export default function CreateChequePage() {
         {step === 1 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="amount">Amount</Label>
+              <Label htmlFor="amount">Amount <span className="text-destructive">*</span></Label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold">₹</span>
                 <Input 
                   id="amount" 
                   type="number" 
                   {...register('amount')} 
-                  className="h-16 pl-10 text-3xl font-bold border-none bg-canvas-parchment rounded-lg" 
+                  className="h-16 pl-10 text-3xl font-bold border-none bg-canvas-parchment rounded-lg shadow-sm" 
                 />
               </div>
               {errors.amount && <p className="text-xs text-destructive">{errors.amount.message as string}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cheque_number">Cheque Number</Label>
-              <Input id="cheque_number" {...register('cheque_number')} placeholder="6-digit number" className="h-12" />
+              <Label htmlFor="cheque_number">Cheque Number <span className="text-destructive">*</span></Label>
+              <Input id="cheque_number" {...register('cheque_number')} placeholder="6-digit number" className="h-12 rounded-xl" />
               {errors.cheque_number && <p className="text-xs text-destructive">{errors.cheque_number.message as string}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cheque_date">Cheque Date</Label>
-              <Input id="cheque_date" type="date" {...register('cheque_date')} className="h-12" />
+              <Label htmlFor="cheque_date">Cheque Date <span className="text-destructive">*</span></Label>
+              <Input id="cheque_date" type="date" {...register('cheque_date')} className="h-12 rounded-xl" />
               {errors.cheque_date && <p className="text-xs text-destructive">{errors.cheque_date.message as string}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label>Type</Label>
+              <Label>Type <span className="text-destructive">*</span></Label>
               <div className="flex gap-2">
                 {['Outward', 'Inward'].map((t) => (
                   <button
@@ -147,7 +147,7 @@ export default function CreateChequePage() {
                     onClick={() => setValue('type', t as any)}
                     className={cn(
                       "flex-1 rounded-pill h-11 text-sm font-semibold transition-colors",
-                      watch('type') === t ? "bg-primary text-white" : "bg-canvas-parchment text-muted-foreground"
+                      watch('type') === t ? "bg-primary text-white shadow-md" : "bg-canvas-parchment text-muted-foreground"
                     )}
                   >
                     {t === 'Outward' ? 'Issued' : 'Received'}
@@ -156,7 +156,7 @@ export default function CreateChequePage() {
               </div>
             </div>
             
-            <Button type="button" className="w-full rounded-pill h-14 text-lg" onClick={nextStep} disabled={!watch('amount')}>
+            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('amount')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -165,28 +165,32 @@ export default function CreateChequePage() {
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label>Select Party</Label>
+              <Label>Select Party <span className="text-destructive">*</span></Label>
               <Combobox 
                 options={partyOptions} 
                 value={watch('party_id')} 
                 onValueChange={(val) => setValue('party_id', val)} 
                 placeholder="Choose a party"
+                createUrl="/parties/create"
+                createLabel="Add new party"
               />
               {errors.party_id && <p className="text-xs text-destructive">{errors.party_id.message as string}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label>Select Bank</Label>
+              <Label>Select Bank <span className="text-destructive">*</span></Label>
               <Combobox 
                 options={bankOptions} 
                 value={watch('bank_id')} 
                 onValueChange={(val) => setValue('bank_id', val)} 
                 placeholder="Choose a bank"
+                createUrl="/banks/create"
+                createLabel="Add new bank"
               />
               {errors.bank_id && <p className="text-xs text-destructive">{errors.bank_id.message as string}</p>}
             </div>
 
-            <Button type="button" className="w-full rounded-pill h-14 text-lg" onClick={nextStep} disabled={!watch('party_id') || !watch('bank_id')}>
+            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('party_id') || !watch('bank_id')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -195,27 +199,27 @@ export default function CreateChequePage() {
         {step === 3 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="notes">Notes (Optional)</Label>
-              <Input id="notes" {...register('notes')} placeholder="Add any notes here" className="h-12" />
+              <Label htmlFor="notes">Notes</Label>
+              <Input id="notes" {...register('notes')} placeholder="Add any notes here" className="h-12 rounded-xl" />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="deposit_date">Expected Deposit Date (Optional)</Label>
-              <Input id="deposit_date" type="date" {...register('deposit_date')} className="h-12" />
+              <Label htmlFor="deposit_date">Expected Deposit Date</Label>
+              <Input id="deposit_date" type="date" {...register('deposit_date')} className="h-12 rounded-xl" />
             </div>
 
-            <div className="rounded-3xl bg-primary/5 p-6 space-y-4 border border-primary/10">
+            <div className="rounded-3xl bg-primary/5 p-6 space-y-4 border border-primary/10 shadow-sm">
               <h3 className="font-bold text-primary uppercase tracking-widest text-[10px]">Summary</h3>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">Amount</span>
+                <span className="text-muted-foreground font-medium">Amount</span>
                 <span className="text-xl font-black">₹{Number(watch('amount') || 0).toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">Number</span>
-                <span className="font-bold font-mono bg-white px-2 py-0.5 rounded shadow-sm">#{watch('cheque_number')}</span>
+                <span className="text-muted-foreground font-medium">Number</span>
+                <span className="font-bold font-mono bg-white px-2 py-0.5 rounded shadow-sm text-primary">#{watch('cheque_number')}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">Party</span>
+                <span className="text-muted-foreground font-medium">Party</span>
                 <div className="flex items-center gap-2">
                   <span className="font-bold">{selectedParty?.name || '-'}</span>
                   {selectedParty && (

@@ -35,7 +35,7 @@ export default function CreateBusinessPage() {
     onSuccess: (newBusiness) => {
       queryClient.invalidateQueries({ queryKey: ['businesses'] })
       setActiveBusiness(newBusiness)
-      router.push('/')
+      router.push('/businesses')
     }
   })
 
@@ -51,11 +51,9 @@ export default function CreateBusinessPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="flex items-center gap-4">
-        {step > 1 && (
-          <Button variant="ghost" size="icon" onClick={prevStep} className="rounded-full">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        )}
+        <Button variant="ghost" size="icon" onClick={() => step > 1 ? prevStep() : router.back()} className="rounded-full">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
         <div>
           <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Step {step} of 3</p>
           <h2 className="text-display-sm font-bold">New Business</h2>
@@ -79,14 +77,14 @@ export default function CreateBusinessPage() {
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Business Name</Label>
+                <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Business Name <span className="text-destructive">*</span></Label>
                 <div className="relative">
                   <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input 
                     id="name" 
                     {...register('name')} 
                     placeholder="e.g. Acme Corp" 
-                    className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-medium"
+                    className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-medium rounded-2xl shadow-sm"
                   />
                 </div>
                 {errors.name && <p className="text-xs text-destructive">{errors.name.message as string}</p>}
@@ -111,7 +109,7 @@ export default function CreateBusinessPage() {
               </div>
             </div>
             
-            <Button type="button" className="w-full rounded-pill h-14 text-lg" onClick={nextStep} disabled={!watch('name')}>
+            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('name')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -120,14 +118,14 @@ export default function CreateBusinessPage() {
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Business Email</Label>
+              <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Business Email <span className="text-destructive">*</span></Label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input 
                   id="email" 
                   {...register('email')} 
                   placeholder="contact@business.com" 
-                  className="h-14 pl-12 bg-canvas-parchment border-none"
+                  className="h-14 pl-12 bg-canvas-parchment border-none rounded-2xl shadow-sm"
                 />
               </div>
               {errors.email && <p className="text-xs text-destructive">{errors.email.message as string}</p>}
@@ -141,12 +139,12 @@ export default function CreateBusinessPage() {
                   id="phone" 
                   {...register('phone')} 
                   placeholder="+91 ..." 
-                  className="h-14 pl-12 bg-canvas-parchment border-none"
+                  className="h-14 pl-12 bg-canvas-parchment border-none rounded-2xl shadow-sm"
                 />
               </div>
             </div>
 
-            <Button type="button" className="w-full rounded-pill h-14 text-lg" onClick={nextStep} disabled={!watch('email')}>
+            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('email')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -158,14 +156,14 @@ export default function CreateBusinessPage() {
               <Label htmlFor="address" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Business Address</Label>
               <div className="relative">
                 <MapPin className="absolute left-4 top-4 h-5 w-5 text-muted-foreground" />
-                <Input id="address" {...register('address')} placeholder="Headquarters location" className="h-14 pl-12 bg-canvas-parchment border-none" />
+                <Input id="address" {...register('address')} placeholder="Headquarters location" className="h-14 pl-12 bg-canvas-parchment border-none rounded-2xl shadow-sm" />
               </div>
             </div>
 
-            <div className="rounded-3xl bg-primary/5 p-6 space-y-4 border border-primary/10">
+            <div className="rounded-3xl bg-primary/5 p-6 space-y-4 border border-primary/10 shadow-sm">
               <h3 className="font-bold text-primary uppercase tracking-widest text-[10px]">Business Summary</h3>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: watch('color' as any) || '#007AFF' }}>
+                <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm" style={{ backgroundColor: watch('color' as any) || '#007AFF' }}>
                   {watch('name')?.charAt(0) || 'B'}
                 </div>
                 <div>

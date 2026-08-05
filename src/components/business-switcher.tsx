@@ -19,28 +19,28 @@ export function BusinessSwitcher() {
           </button>
         }
       />
-      <DialogContent className="sm:max-w-[425px] rounded-t-[32px] sm:rounded-lg">
-        <DialogHeader>
-          <DialogTitle>Switch Business</DialogTitle>
+      <DialogContent className="sm:max-w-[425px] rounded-3xl overflow-hidden shadow-2xl border-none">
+        <DialogHeader className="px-6 pt-6">
+          <DialogTitle className="text-xl font-black uppercase tracking-tight">Switch Business</DialogTitle>
         </DialogHeader>
-        <div className="space-y-2 py-4">
+        <div className="space-y-2 p-6">
           {businesses.map((b) => (
             <button
               key={b.id}
               onClick={() => setActiveBusiness(b)}
               className={cn(
-                "w-full rounded-lg px-4 py-3 text-left text-body font-medium transition-colors",
+                "w-full rounded-2xl px-4 py-4 text-left text-body font-bold transition-all active:scale-[0.97]",
                 activeBusiness?.id === b.id 
-                  ? "bg-primary text-white" 
-                  : "bg-canvas-parchment hover:bg-muted"
+                  ? "bg-primary text-white shadow-md shadow-primary/20" 
+                  : "bg-canvas-parchment hover:bg-muted text-muted-foreground"
               )}
             >
               {b.name}
             </button>
           ))}
-          <Link href="/businesses/create" className="block">
-            <button className="flex w-full items-center gap-2 rounded-lg border border-dashed border-primary/40 px-4 py-3 text-primary hover:bg-primary/5">
-              <Plus className="h-4 w-4" />
+          <Link href="/businesses/create" className="block pt-2">
+            <button className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/20 px-4 py-4 text-primary font-bold hover:bg-primary/5 transition-colors">
+              <Plus className="h-5 w-5" />
               <span>Add New Business</span>
             </button>
           </Link>

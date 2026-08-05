@@ -20,17 +20,12 @@ export default function BanksPage() {
   })
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+    <div className="mx-auto max-w-2xl space-y-8 pb-24">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Management</p>
           <h2 className="text-display-sm font-bold">Bank Accounts</h2>
         </div>
-        <Link href="/banks/create">
-          <Button size="icon" className="rounded-full shadow-lg">
-            <Plus className="h-5 w-5" />
-          </Button>
-        </Link>
       </div>
 
       <div className="grid gap-4">
@@ -77,6 +72,12 @@ export default function BanksPage() {
           ))
         )}
       </div>
+
+      <Link href="/banks/create">
+        <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full shadow-2xl z-40 border-4 border-white dark:border-zinc-900" size="icon">
+          <Plus className="h-8 w-8" />
+        </Button>
+      </Link>
     </div>
   )
 }

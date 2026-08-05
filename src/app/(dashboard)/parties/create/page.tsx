@@ -35,7 +35,7 @@ export default function CreatePartyPage() {
     mutationFn: (data: any) => PartyService.create({ ...data, business_id: activeBusiness!.id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['parties', activeBusiness?.id] })
-      router.push('/parties')
+      router.back()
     }
   })
 
@@ -52,11 +52,9 @@ export default function CreatePartyPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="flex items-center gap-4">
-        {step > 1 && (
-          <Button variant="ghost" size="icon" onClick={prevStep} className="rounded-full">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        )}
+        <Button variant="ghost" size="icon" onClick={() => step > 1 ? prevStep() : router.back()} className="rounded-full">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
         <div>
           <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Step {step} of 3</p>
           <h2 className="text-display-sm font-bold">New Party</h2>
@@ -80,14 +78,14 @@ export default function CreatePartyPage() {
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Party Name</Label>
+                <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Party Name <span className="text-destructive">*</span></Label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input 
                     id="name" 
                     {...register('name')} 
                     placeholder="Enter full name" 
-                    className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-medium"
+                    className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-medium rounded-2xl shadow-sm"
                   />
                 </div>
                 {errors.name && <p className="text-xs text-destructive">{errors.name.message as string}</p>}
@@ -112,7 +110,7 @@ export default function CreatePartyPage() {
               </div>
             </div>
             
-            <Button type="button" className="w-full rounded-pill h-14 text-lg" onClick={nextStep} disabled={!watch('name')}>
+            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('name')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -121,25 +119,25 @@ export default function CreatePartyPage() {
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="contact" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Contact Number</Label>
+              <Label htmlFor="contact" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Contact Number <span className="text-destructive">*</span></Label>
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input 
                   id="contact" 
                   {...register('contact')} 
                   placeholder="Phone number" 
-                  className="h-14 pl-12 bg-canvas-parchment border-none"
+                  className="h-14 pl-12 bg-canvas-parchment border-none rounded-2xl shadow-sm"
                 />
               </div>
               {errors.contact && <p className="text-xs text-destructive">{errors.contact.message as string}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email (Optional)</Label>
-              <Input id="email" {...register('email')} placeholder="email@address.com" className="h-14 bg-canvas-parchment border-none" />
+              <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email</Label>
+              <Input id="email" {...register('email')} placeholder="email@address.com" className="h-14 bg-canvas-parchment border-none rounded-2xl shadow-sm" />
             </div>
 
-            <Button type="button" className="w-full rounded-pill h-14 text-lg" onClick={nextStep} disabled={!watch('contact')}>
+            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('contact')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -151,16 +149,16 @@ export default function CreatePartyPage() {
               <Label htmlFor="address" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Address</Label>
               <div className="relative">
                 <MapPin className="absolute left-4 top-4 h-5 w-5 text-muted-foreground" />
-                <Input id="address" {...register('address')} placeholder="Location details" className="h-14 pl-12 bg-canvas-parchment border-none" />
+                <Input id="address" {...register('address')} placeholder="Location details" className="h-14 pl-12 bg-canvas-parchment border-none rounded-2xl shadow-sm" />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="notes" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Notes</Label>
-              <Input id="notes" {...register('notes')} placeholder="Any additional notes" className="h-14 bg-canvas-parchment border-none" />
+              <Input id="notes" {...register('notes')} placeholder="Any additional notes" className="h-14 bg-canvas-parchment border-none rounded-2xl shadow-sm" />
             </div>
 
-            <div className="rounded-3xl bg-primary/5 p-6 space-y-4 border border-primary/10">
+            <div className="rounded-3xl bg-primary/5 p-6 space-y-4 border border-primary/10 shadow-sm">
               <h3 className="font-bold text-primary uppercase tracking-widest text-[10px]">Review Information</h3>
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full" style={{ backgroundColor: watch('color' as any) || '#34C759' }} />

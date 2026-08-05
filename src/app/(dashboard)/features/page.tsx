@@ -2,24 +2,11 @@
 
 import { useProfile } from "@/hooks/use-profile"
 import { Switch } from "@/components/ui/switch"
-import { Bell, Phone, CheckCircle2, ShieldCheck, Zap } from "lucide-react"
+import { Phone, CheckCircle2, ShieldCheck, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Combobox } from "@/components/ui/combobox"
 
 export default function FeaturesPage() {
   const { profile, updateProfile, isLoading } = useProfile()
-
-  const remindersPerDayOptions = [
-    { label: '1 time/day', value: '1' },
-    { label: '2 times/day', value: '2' },
-    { label: '3 times/day', value: '3' },
-  ]
-
-  const reminderFrequencyOptions = [
-    { label: '1 day before', value: '1' },
-    { label: '3 days before', value: '3' },
-    { label: '7 days before', value: '7' },
-  ]
 
   const features = [
     {
@@ -103,42 +90,6 @@ export default function FeaturesPage() {
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="space-y-4">
-        <h3 className="px-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Reminder Preferences</h3>
-        <div className="divide-y rounded-3xl border bg-card overflow-hidden">
-          <div className="flex items-center justify-between p-6">
-            <div className="flex items-center gap-3">
-              <Bell className="h-5 w-5 text-muted-foreground" />
-              <div className="space-y-0.5">
-                <p className="font-bold">Reminders Per Day</p>
-                <p className="text-xs text-muted-foreground">How many alerts you receive daily</p>
-              </div>
-            </div>
-            <Combobox 
-              options={remindersPerDayOptions} 
-              value={profile?.reminders_per_day?.toString()} 
-              onValueChange={(val) => updateProfile({ reminders_per_day: parseInt(val) })}
-              className="h-10 w-[140px] rounded-2xl"
-            />
-          </div>
-          <div className="flex items-center justify-between p-6">
-            <div className="flex items-center gap-3">
-              <Zap className="h-5 w-5 text-muted-foreground" />
-              <div className="space-y-0.5">
-                <p className="font-bold">Reminder Frequency</p>
-                <p className="text-xs text-muted-foreground">Advance notice before cheque date</p>
-              </div>
-            </div>
-            <Combobox 
-              options={reminderFrequencyOptions} 
-              value={profile?.default_reminder_days?.toString()} 
-              onValueChange={(val) => updateProfile({ default_reminder_days: parseInt(val) })}
-              className="h-10 w-[150px] rounded-2xl"
-            />
-          </div>
-        </div>
       </div>
     </div>
   )

@@ -56,19 +56,19 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 sm:max-w-[600px] gap-0 border-none shadow-2xl">
+      <DialogContent className="p-0 sm:max-w-[600px] gap-0 border-none shadow-2xl rounded-3xl overflow-hidden [&>button]:hidden">
         <DialogTitle className="sr-only">Global Search</DialogTitle>
-        <div className="flex items-center border-b px-4 py-3">
-          <SearchIcon className="h-5 w-5 text-muted-foreground" />
+        <div className="flex items-center border-b px-4 py-4 bg-white dark:bg-zinc-900">
+          <SearchIcon className="h-5 w-5 text-primary" />
           <Input
             autoFocus
-            className="border-none bg-transparent text-lg focus-visible:ring-0"
-            placeholder="Search cheques, parties, or banks..."
+            className="border-none bg-transparent text-lg focus-visible:ring-0 font-bold placeholder:text-muted-foreground/50"
+            placeholder="Search everything..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="rounded-full">
-            <X className="h-5 w-5" />
+          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="rounded-full hover:bg-canvas-parchment">
+            <X className="h-5 w-5 text-muted-foreground" />
           </Button>
         </div>
 

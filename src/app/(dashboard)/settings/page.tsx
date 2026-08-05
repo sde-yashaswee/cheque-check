@@ -5,7 +5,20 @@ import { useProfile } from "@/hooks/use-profile"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { ChevronRight, LogOut, User, Bell, Globe, CreditCard, Download, FileSpreadsheet, Building2, Landmark } from "lucide-react"
+import { 
+  ChevronRight, 
+  LogOut, 
+  User, 
+  Bell, 
+  Globe, 
+  CreditCard, 
+  Download, 
+  FileSpreadsheet, 
+  Building2, 
+  Landmark, 
+  LayoutGrid, 
+  Zap 
+} from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { ReportService } from "@/services/report.service"
@@ -15,7 +28,6 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { Combobox } from "@/components/ui/combobox"
 import { format, differenceInDays } from "date-fns"
-
 import { Skeleton } from "@/components/ui/skeleton"
 
 export default function SettingsPage() {
@@ -47,7 +59,10 @@ export default function SettingsPage() {
   }
 
   const handleExport = () => {
-    if (!cheques) return
+    if (!cheques || cheques.length === 0) {
+      alert("No cheques found to export.")
+      return
+    }
     ReportService.exportToCSV(cheques, `${activeBusiness?.name || 'Business'}_Cheques.csv`)
   }
 
@@ -118,6 +133,36 @@ export default function SettingsPage() {
       items: [
         { name: 'My Businesses', icon: Building2, href: '/businesses' },
         { name: 'Bank Accounts', icon: Landmark, href: '/banks' },
+        { name: 'Features', icon: LayoutGrid, href: '/features' },
+      ]
+    },
+    {
+      title: 'Reminders',
+      items: [
+        { 
+          name: 'Reminders Per Day', 
+          icon: Bell,
+          component: (
+            <Combobox 
+              options={remindersPerDayOptions} 
+              value={profile?.reminders_per_day?.toString()} 
+              onValueChange={(val) => updateProfile({ reminders_per_day: parseInt(val) })}
+              className="h-9 w-[140px]"
+            />
+          )
+        },
+        { 
+          name: 'Reminder Frequency', 
+          icon: Zap,
+          component: (
+            <Combobox 
+              options={reminderFrequencyOptions} 
+              value={profile?.default_reminder_days?.toString()} 
+              onValueChange={(val) => updateProfile({ default_reminder_days: parseInt(val) })}
+              className="h-9 w-[150px]"
+            />
+          )
+        },
       ]
     },
     {
@@ -132,7 +177,6 @@ export default function SettingsPage() {
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       {/* Profile Section */}
       <div className="flex items-center gap-4 rounded-lg bg-canvas-parchment p-4 dark:bg-surface-tile-1">
-
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
           <User className="h-6 w-6" />
         </div>
@@ -191,7 +235,7 @@ export default function SettingsPage() {
       </Button>
 
       <div className="text-center">
-        <p className="text-xs text-muted-foreground">Cheque Reminder v1.0.0</p>
+        <p className="text-xs text-muted-foreground">CheckCheck v1.0.0</p>
         <p className="text-[10px] text-muted-foreground mt-1">
           {format(new Date(), "PPpp")}
         </p>

@@ -4,8 +4,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChequeService } from '@/services/cheque.service'
 import { ChequeCard } from '@/components/cheque-card'
 import { Plus, Search, Filter } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useState } from 'react'
 import { ChequeStatus } from '@/types'
@@ -57,10 +58,11 @@ export default function ChequesPage() {
           />
         </div>
         <Popover>
-          <PopoverTrigger asChild>
-            <Button variant={filter !== 'All' ? 'default' : 'outline'} className="rounded-full h-11 w-11 p-0" size="icon">
-              <Filter className="h-4 w-4" />
-            </Button>
+          <PopoverTrigger className={cn(
+            buttonVariants({ variant: filter !== 'All' ? 'default' : 'outline', size: 'icon' }),
+            "rounded-full h-11 w-11 p-0 shrink-0"
+          )}>
+            <Filter className="h-4 w-4" />
           </PopoverTrigger>
           <PopoverContent className="w-56 p-2 rounded-3xl" align="end">
             <div className="flex flex-col gap-1">
