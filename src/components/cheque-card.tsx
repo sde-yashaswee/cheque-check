@@ -3,7 +3,7 @@
 import { useSwipeable } from 'react-swipeable'
 import { ChequeStatus, ChequeWithRelations } from '@/types'
 import { cn } from '@/lib/utils'
-import { Check, X, Trash2 } from 'lucide-react'
+import { Check, X, Trash2, Image as ImageIcon } from 'lucide-react'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useProfile } from '@/hooks/use-profile'
@@ -14,6 +14,7 @@ import { DeleteConfirmationDialog } from '@/components/ui/delete-dialog'
 import { ChequeService } from '@/services/cheque.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useBusiness } from '@/hooks/use-business'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 
 interface ChequeCardProps {
   cheque: ChequeWithRelations
@@ -113,7 +114,21 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
               className="mt-1"
             />
             <div>
-              <p className="text-xl font-bold">{currency}{cheque.amount.toLocaleString()}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-xl font-bold">{currency}{cheque.amount.toLocaleString()}</p>
+                {cheque.image_url && (
+                  <Dialog>
+                    <DialogTrigger render={
+                      <button className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center text-primary transition-transform active:scale-90">
+                        <ImageIcon className="h-3 w-3" />
+                      </button>
+                    } />
+                    <DialogContent className="max-w-lg p-0 overflow-hidden bg-transparent border-none shadow-none">
+                      <img src={cheque.image_url} alt="Cheque Scan" className="w-full h-auto rounded-3xl" />
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </div>
               <p className="text-body-strong">{cheque.party?.name}</p>
             </div>
           </div>
@@ -122,9 +137,9 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
               {format(new Date(cheque.cheque_date), dateFormat)}
             </p>
             <div className="mt-1 flex items-center justify-end gap-1.5">
-              <span className="text-[10px] text-muted-foreground">{cheque.account?.bank_name}</span>
+              <span className="text-[10px] text-muted-foreground">{(cheque.account as any)?.bank?.name}</span>
               <EntityAvatar 
-                name={cheque.account?.bank_name || '?'} 
+                name={(cheque.account as any)?.bank?.name || '?'} 
                 color={cheque.account?.color} 
                 icon={cheque.account?.icon}
                 size="sm"

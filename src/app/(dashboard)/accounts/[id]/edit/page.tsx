@@ -11,10 +11,11 @@ import { Label } from '@/components/ui/label'
 import { useRouter, useParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
-import { Check, Landmark, User, CreditCard, Hash, Trash2 } from 'lucide-react'
+import { Check, User, CreditCard, Hash, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DeleteConfirmationDialog } from '@/components/ui/delete-dialog'
+import { BankSelector } from '@/components/bank-selector'
 
 export default function EditAccountPage() {
   const { id } = useParams() as { id: string }
@@ -35,7 +36,6 @@ export default function EditAccountPage() {
     if (account) {
       reset({
         bank_id: account.bank_id || '',
-        bank_name: account.bank_name,
         account_name: account.account_name,
         account_number: account.account_number,
         ifsc_code: account.ifsc_code || '',
@@ -82,17 +82,12 @@ export default function EditAccountPage() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="bank_name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Bank Name <span className="text-destructive">*</span></Label>
-            <div className="relative">
-              <Landmark className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input 
-                id="bank_name" 
-                {...register('bank_name')} 
-                placeholder="e.g. ICICI Bank" 
-                className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-medium rounded-2xl shadow-sm"
-              />
-            </div>
-            {errors.bank_name && <p className="text-xs text-destructive">{errors.bank_name.message as string}</p>}
+            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Bank <span className="text-destructive">*</span></Label>
+            <BankSelector 
+              value={watch('bank_id')}
+              onValueChange={(val) => setValue('bank_id', val)}
+            />
+            {errors.bank_id && <p className="text-xs text-destructive">{errors.bank_id.message as string}</p>}
           </div>
 
           <div className="space-y-2">
@@ -158,10 +153,10 @@ export default function EditAccountPage() {
           <DeleteConfirmationDialog 
             title="Delete Account?"
             description="This will permanently delete this account and all associated cheque history. This action cannot be undone."
-            confirmName={account?.bank_name || ''}
+            confirmName={account?.bank?.name || 'Account'}
             onDelete={async () => { deleteMutation.mutate() }}
             trigger={
-              <Button type="button" variant="ghost" className="w-full rounded-pill h-14 text-muted-foreground hover:text-destructive">
+              <Button type="button" variant="ghost" className="w-full rounded-pill h-14 text-muted-foreground hover:text-destructive transition-colors">
                 <Trash2 className="mr-2 h-5 w-5" /> Delete Account
               </Button>
             }

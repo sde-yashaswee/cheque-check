@@ -20,7 +20,7 @@ export default function CreateBusinessPage() {
   const queryClient = useQueryClient()
   const { setActiveBusiness } = useBusiness()
   
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm({
     resolver: zodResolver(businessSchema),
     defaultValues: {
       name: '',
@@ -39,7 +39,16 @@ export default function CreateBusinessPage() {
     }
   })
 
-  const nextStep = () => setStep(s => Math.min(s + 1, 3))
+  const nextStep = async () => {
+    let isValid = false
+    if (step === 1) {
+      isValid = await trigger(['name'])
+    } else if (step === 2) {
+      isValid = await trigger(['email'])
+    }
+    
+    if (isValid) setStep(s => Math.min(s + 1, 3))
+  }
   const prevStep = () => setStep(s => Math.max(s - 1, 1))
 
   const onSubmit = (data: any) => {

@@ -20,8 +20,7 @@ export const partySchema = z.object({
 })
 
 export const accountSchema = z.object({
-  bank_id: z.string().optional().or(z.literal('')),
-  bank_name: z.string().min(1, 'Bank name is required'),
+  bank_id: z.string().min(1, 'Bank is required'),
   account_name: z.string().min(1, 'Account holder name is required'),
   account_number: z.string().min(1, 'Account number is required'),
   ifsc_code: z.string().optional().or(z.literal('')),

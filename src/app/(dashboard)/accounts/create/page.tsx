@@ -5,16 +5,15 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { accountSchema } from '@/validators'
 import { AccountService } from '@/services/account.service'
-import { BankService } from '@/services/bank.service'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, ArrowRight, Check, Landmark, CreditCard, User, Hash } from 'lucide-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { ArrowLeft, ArrowRight, Check, CreditCard, User, Hash } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { BankSelector } from '@/components/bank-selector'
 
 export default function CreateAccountPage() {
   const [step, setStep] = useState(1)
@@ -22,21 +21,15 @@ export default function CreateAccountPage() {
   const { activeBusiness } = useBusiness()
   const queryClient = useQueryClient()
   
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm({
     resolver: zodResolver(accountSchema),
     defaultValues: {
       bank_id: '',
-      bank_name: '',
       account_name: '',
       account_number: '',
       ifsc_code: '',
       color: '#007AFF'
     }
-  })
-
-  const { data: banks } = useQuery({
-    queryKey: ['master-banks'],
-    queryFn: () => BankService.getAll(),
   })
 
   const mutation = useMutation({
@@ -47,7 +40,16 @@ export default function CreateAccountPage() {
     }
   })
 
-  const nextStep = () => setStep(s => Math.min(s + 1, 3))
+  const nextStep = async () => {
+    let isValid = false
+    if (step === 1) {
+      isValid = await trigger(['bank_id'])
+    } else if (step === 2) {
+      isValid = await trigger(['account_name', 'account_number'])
+    }
+    
+    if (isValid) setStep(s => Math.min(s + 1, 3))
+  }
   const prevStep = () => setStep(s => Math.max(s - 1, 1))
 
   const onSubmit = (data: any) => {
@@ -87,38 +89,11 @@ export default function CreateAccountPage() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Select Bank <span className="text-destructive">*</span></Label>
-                <Select onValueChange={(val) => {
-                  if (val === 'other') {
-                    setValue('bank_id', '');
-                    setValue('bank_name', '');
-                  } else {
-                    const bank = banks?.find(b => b.id === val);
-                    setValue('bank_id', val);
-                    if (bank) setValue('bank_name', bank.name);
-                  }
-                }}>
-                  <SelectTrigger className="h-14 bg-canvas-parchment border-none text-lg font-medium rounded-2xl shadow-sm px-4">
-                    <SelectValue placeholder="Choose a bank" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {banks?.map((bank) => (
-                      <SelectItem key={bank.id} value={bank.id}>{bank.name}</SelectItem>
-                    ))}
-                    <SelectItem value="other">Other Bank</SelectItem>
-                  </SelectContent>
-                </Select>
-                {(watch('bank_id') === '' || watch('bank_id') === 'other') && (
-                  <div className="relative mt-2">
-                    <Landmark className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input 
-                      id="bank_name" 
-                      {...register('bank_name')} 
-                      placeholder="Enter bank name" 
-                      className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-medium rounded-2xl shadow-sm"
-                    />
-                  </div>
-                )}
-                {errors.bank_name && <p className="text-xs text-destructive">{errors.bank_name.message as string}</p>}
+                <BankSelector 
+                  value={watch('bank_id')}
+                  onValueChange={(val) => setValue('bank_id', val)}
+                />
+                {errors.bank_id && <p className="text-xs text-destructive">{errors.bank_id.message as string}</p>}
               </div>
 
               <div className="space-y-2">
@@ -140,7 +115,7 @@ export default function CreateAccountPage() {
               </div>
             </div>
             
-            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('bank_name')}>
+            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('bank_id')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -189,19 +164,6 @@ export default function CreateAccountPage() {
               <div className="relative">
                 <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input id="ifsc_code" {...register('ifsc_code')} placeholder="BANK0123456" className="h-14 pl-12 bg-canvas-parchment border-none uppercase rounded-2xl shadow-sm" />
-              </div>
-            </div>
-
-            <div className="rounded-3xl bg-primary/5 p-6 space-y-4 border border-primary/10 shadow-sm">
-              <h3 className="font-bold text-primary uppercase tracking-widest text-[10px]">Account Preview</h3>
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm" style={{ backgroundColor: watch('color' as any) || '#5856D6' }}>
-                  {watch('bank_name')?.charAt(0) || 'A'}
-                </div>
-                <div>
-                  <p className="font-bold">{watch('bank_name')}</p>
-                  <p className="text-xs text-muted-foreground">{watch('account_name')} - {watch('account_number')}</p>
-                </div>
               </div>
             </div>
 

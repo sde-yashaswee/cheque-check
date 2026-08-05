@@ -58,7 +58,6 @@ export interface Account {
   id: string;
   business_id: string;
   bank_id: string | null;
-  bank_name: string;
   account_name: string;
   account_number: string;
   ifsc_code: string | null;
@@ -82,6 +81,7 @@ export interface Cheque {
   status: ChequeStatus;
   type: ChequeType;
   notes: string | null;
+  image_url: string | null;
   voice_call_sent: boolean;
   last_call_at: string | null;
   created_at: string;
@@ -90,5 +90,5 @@ export interface Cheque {
 
 export interface ChequeWithRelations extends Cheque {
   party?: { name: string; color?: string; icon?: string };
-  account?: { bank_name: string; account_name: string; color?: string; icon?: string };
+  account?: { account_name: string; color?: string; icon?: string; bank?: { name: string } };
 }

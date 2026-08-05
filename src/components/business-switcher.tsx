@@ -18,14 +18,13 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        {trigger || (
+      <PopoverTrigger render={trigger || (
           <button className="flex items-center gap-2 rounded-pill bg-canvas-parchment px-4 py-2 text-sm font-semibold transition-transform active:scale-95 dark:bg-surface-tile-1">
             <ChevronDown className="h-4 w-4" />
             <span>{activeBusiness?.name || 'Select Business'}</span>
           </button>
         )}
-      </PopoverTrigger>
+      />
       <PopoverContent className="w-[280px] p-0 rounded-3xl overflow-hidden border shadow-2xl" align="start">
         <Command className="bg-popover">
           <div className="px-4 py-3 border-b">

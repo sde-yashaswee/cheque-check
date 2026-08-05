@@ -7,7 +7,7 @@ export class ChequeService {
   static async getAll(businessId: string) {
     const { data, error } = await supabase
       .from('cheques')
-      .select('*, party:parties(name), account:accounts(bank_name, account_name)')
+      .select('*, party:parties(name, color, icon), account:accounts(account_name, color, icon, bank:banks(name))')
       .eq('business_id', businessId)
       .order('cheque_date', { ascending: true })
     
@@ -18,7 +18,7 @@ export class ChequeService {
   static async getById(id: string) {
     const { data, error } = await supabase
       .from('cheques')
-      .select('*, party:parties(name), account:accounts(bank_name, account_name)')
+      .select('*, party:parties(name, color, icon), account:accounts(account_name, color, icon, bank:banks(name))')
       .eq('id', id)
       .single()
     

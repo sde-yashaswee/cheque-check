@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { PartyService } from '@/services/party.service'
-import { Plus, Search, User, ChevronRight } from 'lucide-react'
+import { Plus, Search, User, ChevronRight, ArrowUpAz, ArrowDownAz } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
@@ -14,6 +14,7 @@ import { EntityAvatar } from '@/components/ui/entity-avatar'
 
 export default function PartiesPage() {
   const [search, setSearch] = useState('')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const { activeBusiness } = useBusiness()
   const { profile } = useProfile()
   const businessId = activeBusiness?.id
@@ -29,23 +30,36 @@ export default function PartiesPage() {
   const filteredParties = parties?.filter(p => 
     p.name.toLowerCase().includes(search.toLowerCase()) ||
     p.contact.includes(search)
-  )
+  ).sort((a, b) => {
+    if (sortOrder === 'asc') return a.name.localeCompare(b.name)
+    return b.name.localeCompare(a.name)
+  })
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input 
-          className="rounded-pill pl-10 h-11 bg-canvas-parchment border-none shadow-sm" 
-          placeholder="Search parties..." 
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <div className="flex gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input 
+            className="rounded-pill pl-10 h-11 bg-canvas-parchment border-none shadow-sm" 
+            placeholder="Search parties..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="rounded-full h-11 w-11 shrink-0 bg-white shadow-sm border-none"
+          onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+        >
+          {sortOrder === 'asc' ? <ArrowUpAz className="h-5 w-5" /> : <ArrowDownAz className="h-5 w-5" />}
+        </Button>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {isLoading ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
               <Skeleton key={i} className="h-20 w-full rounded-3xl" />
             ))}

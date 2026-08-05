@@ -20,7 +20,7 @@ export default function CreatePartyPage() {
   const { activeBusiness } = useBusiness()
   const queryClient = useQueryClient()
   
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm({
     resolver: zodResolver(partySchema),
     defaultValues: {
       name: '',
@@ -39,7 +39,16 @@ export default function CreatePartyPage() {
     }
   })
 
-  const nextStep = () => setStep(s => Math.min(s + 1, 3))
+  const nextStep = async () => {
+    let isValid = false
+    if (step === 1) {
+      isValid = await trigger(['name'])
+    } else if (step === 2) {
+      isValid = await trigger(['contact'])
+    }
+    
+    if (isValid) setStep(s => Math.min(s + 1, 3))
+  }
   const prevStep = () => setStep(s => Math.max(s - 1, 1))
 
   const onSubmit = (data: any) => {

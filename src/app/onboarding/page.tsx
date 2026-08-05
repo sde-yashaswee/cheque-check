@@ -5,17 +5,19 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { BusinessService } from '@/services/business.service'
 import { ProfileService } from '@/services/profile.service'
 import { useBusiness } from '@/hooks/use-business'
-import { Wallet, Building2, Settings2, CheckCircle2 } from 'lucide-react'
+import { useProfile } from '@/hooks/use-profile'
+import { Wallet, Building2, Settings2, CheckCircle2, Bell, ArrowRight, ArrowLeft } from 'lucide-react'
+import { Combobox } from '@/components/ui/combobox'
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const { businesses, isLoading: businessesLoading } = useBusiness()
+  const { businesses, isLoading: businessesLoading, activeBusiness } = useBusiness()
+  const { profile, updateProfile } = useProfile()
 
   // Step 1: Business Info
   const [businessName, setBusinessName] = useState('')
@@ -23,24 +25,32 @@ export default function OnboardingPage() {
   const [businessPhone, setBusinessPhone] = useState('')
   const [businessAddress, setBusinessAddress] = useState('')
 
-  // Step 2: Preferences
+  // Step 2: General Preferences
   const [currency, setCurrency] = useState('₹')
   const [dateFormat, setDateFormat] = useState('DD/MM/YYYY')
   const [timeFormat, setTimeFormat] = useState('12h')
   const [timeZone, setTimeZone] = useState('Asia/Kolkata')
   const [language, setLanguage] = useState('en')
 
+  // Step 3: Reminder Preferences
+  const [remindersPerDay, setRemindersPerDay] = useState('1')
+  const [defaultReminderDays, setDefaultReminderDays] = useState('3')
+
   useEffect(() => {
-    if (!businessesLoading && businesses.length > 0 && step === 1) {
-      // If user already has a business, skip to preferences or dashboard
-      // But for onboarding flow, we might want them to complete it.
-      // However, if they have a business, they are not really "new".
-      // Let's just allow them to finish if they somehow landed here.
+    if (profile) {
+      setCurrency(profile.currency || '₹')
+      setDateFormat(profile.date_format || 'DD/MM/YYYY')
+      setTimeFormat(profile.time_format || '12h')
+      setTimeZone(profile.time_zone || 'Asia/Kolkata')
+      setLanguage(profile.language || 'en')
+      setRemindersPerDay(profile.reminders_per_day?.toString() || '1')
+      setDefaultReminderDays(profile.default_reminder_days?.toString() || '3')
     }
-  }, [businesses, businessesLoading, step])
+  }, [profile])
 
   const handleStep1 = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!businessName) return
     setLoading(true)
     try {
       await BusinessService.create({
@@ -59,16 +69,23 @@ export default function OnboardingPage() {
 
   const handleStep2 = async (e: React.FormEvent) => {
     e.preventDefault()
+    setStep(3)
+  }
+
+  const handleStep3 = async (e: React.FormEvent) => {
+    e.preventDefault()
     setLoading(true)
     try {
-      await ProfileService.update({
+      await updateProfile({
         currency,
         date_format: dateFormat,
         time_format: timeFormat,
         time_zone: timeZone,
         language,
+        reminders_per_day: parseInt(remindersPerDay),
+        default_reminder_days: parseInt(defaultReminderDays)
       })
-      setStep(3)
+      setStep(4)
     } catch (error: any) {
       alert(error.message)
     } finally {
@@ -79,6 +96,48 @@ export default function OnboardingPage() {
   const finishOnboarding = () => {
     router.push('/')
   }
+
+  const currencyOptions = [
+    { label: '₹ (INR)', value: '₹' },
+    { label: '$ (USD)', value: '$' },
+    { label: '€ (EUR)', value: '€' },
+    { label: '£ (GBP)', value: '£' },
+  ]
+
+  const dateFormatOptions = [
+    { label: 'DD/MM/YYYY', value: 'DD/MM/YYYY' },
+    { label: 'MM/DD/YYYY', value: 'MM/DD/YYYY' },
+    { label: 'YYYY-MM-DD', value: 'YYYY-MM-DD' },
+  ]
+
+  const timeFormatOptions = [
+    { label: '12-hour (AM/PM)', value: '12h' },
+    { label: '24-hour', value: '24h' },
+  ]
+
+  const languageOptions = [
+    { label: 'English', value: 'en' },
+    { label: 'Hindi', value: 'hi' },
+  ]
+
+  const timeZoneOptions = [
+    { label: 'IST (UTC+5:30)', value: 'Asia/Kolkata' },
+    { label: 'UTC', value: 'UTC' },
+    { label: 'EST (UTC-5)', value: 'America/New_York' },
+    { label: 'GMT (UTC+0)', value: 'Europe/London' },
+  ]
+
+  const remindersPerDayOptions = [
+    { label: '1 time/day', value: '1' },
+    { label: '2 times/day', value: '2' },
+    { label: '3 times/day', value: '3' },
+  ]
+
+  const reminderFrequencyOptions = [
+    { label: '1 day before', value: '1' },
+    { label: '3 days before', value: '3' },
+    { label: '7 days before', value: '7' },
+  ]
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-canvas-parchment px-6 dark:bg-black">
@@ -91,9 +150,9 @@ export default function OnboardingPage() {
           <p className="text-body text-muted-foreground mt-2">Let&apos;s get you set up in a few seconds.</p>
           
           <div className="flex items-center gap-2 mt-6">
-            <div className={`h-2 w-12 rounded-full transition-colors ${step >= 1 ? 'bg-primary' : 'bg-muted'}`} />
-            <div className={`h-2 w-12 rounded-full transition-colors ${step >= 2 ? 'bg-primary' : 'bg-muted'}`} />
-            <div className={`h-2 w-12 rounded-full transition-colors ${step >= 3 ? 'bg-primary' : 'bg-muted'}`} />
+            {[1, 2, 3, 4].map((s) => (
+              <div key={s} className={`h-2 w-10 rounded-full transition-all duration-500 ${step >= s ? 'bg-primary' : 'bg-muted'}`} />
+            ))}
           </div>
         </div>
 
@@ -136,94 +195,119 @@ export default function OnboardingPage() {
                   className="h-12 bg-canvas-parchment border-none rounded-xl"
                 />
               </div>
-              <Button type="submit" className="w-full rounded-pill h-12 text-lg shadow-product" disabled={loading}>
-                {loading ? 'Saving...' : 'Next Step'}
+              <Button type="submit" className="w-full rounded-pill h-12 text-lg shadow-product" disabled={loading || !businessName}>
+                {loading ? 'Saving...' : 'Next Step'} <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </form>
           )}
 
           {step === 2 && (
-            <form onSubmit={handleStep2} className="space-y-4">
+            <form onSubmit={handleStep2} className="space-y-6">
               <div className="flex items-center gap-2 mb-4 text-primary font-bold">
                 <Settings2 className="h-5 w-5" />
-                <span>Your Preferences</span>
+                <span>General Preferences</span>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Currency</Label>
-                  <Select value={currency} onValueChange={setCurrency}>
-                    <SelectTrigger className="h-12 bg-canvas-parchment border-none rounded-xl">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="₹">INR (₹)</SelectItem>
-                      <SelectItem value="$">USD ($)</SelectItem>
-                      <SelectItem value="€">EUR (€)</SelectItem>
-                      <SelectItem value="£">GBP (£)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Combobox 
+                    options={currencyOptions} 
+                    value={currency} 
+                    onValueChange={setCurrency}
+                  />
                 </div>
+
                 <div className="space-y-2">
                   <Label>Date Format</Label>
-                  <Select value={dateFormat} onValueChange={setDateFormat}>
-                    <SelectTrigger className="h-12 bg-canvas-parchment border-none rounded-xl">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
-                      <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
-                      <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Combobox 
+                    options={dateFormatOptions} 
+                    value={dateFormat} 
+                    onValueChange={setDateFormat}
+                  />
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Time Format</Label>
+                    <Combobox 
+                      options={timeFormatOptions} 
+                      value={timeFormat} 
+                      onValueChange={setTimeFormat}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Language</Label>
+                    <Combobox 
+                      options={languageOptions} 
+                      value={language} 
+                      onValueChange={setLanguage}
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <Label>Time Format</Label>
-                  <Select value={timeFormat} onValueChange={setTimeFormat}>
-                    <SelectTrigger className="h-12 bg-canvas-parchment border-none rounded-xl">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="12h">12-hour (AM/PM)</SelectItem>
-                      <SelectItem value="24h">24-hour</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Language</Label>
-                  <Select value={language} onValueChange={setLanguage}>
-                    <SelectTrigger className="h-12 bg-canvas-parchment border-none rounded-xl">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="hi">Hindi</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label>Time Zone</Label>
+                  <Combobox 
+                    options={timeZoneOptions} 
+                    value={timeZone} 
+                    onValueChange={setTimeZone}
+                  />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label>Time Zone</Label>
-                <Select value={timeZone} onValueChange={setTimeZone}>
-                  <SelectTrigger className="h-12 bg-canvas-parchment border-none rounded-xl">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Asia/Kolkata">IST (UTC+5:30)</SelectItem>
-                    <SelectItem value="UTC">UTC</SelectItem>
-                    <SelectItem value="America/New_York">EST (UTC-5)</SelectItem>
-                    <SelectItem value="Europe/London">GMT (UTC+0)</SelectItem>
-                  </SelectContent>
-                </Select>
+
+              <div className="flex gap-3">
+                <Button type="button" variant="outline" className="flex-1 rounded-pill h-12" onClick={() => setStep(1)}>
+                   Back
+                </Button>
+                <Button type="submit" className="flex-[2] rounded-pill h-12 text-lg shadow-product">
+                  Next Step <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
               </div>
-              <Button type="submit" className="w-full rounded-pill h-12 text-lg shadow-product" disabled={loading}>
-                {loading ? 'Saving...' : 'Finish Setup'}
-              </Button>
             </form>
           )}
 
           {step === 3 && (
+            <form onSubmit={handleStep3} className="space-y-6">
+              <div className="flex items-center gap-2 mb-4 text-primary font-bold">
+                <Bell className="h-5 w-5" />
+                <span>Reminder Preferences</span>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Reminders Per Day</Label>
+                  <Combobox 
+                    options={remindersPerDayOptions} 
+                    value={remindersPerDay} 
+                    onValueChange={setRemindersPerDay}
+                  />
+                  <p className="text-[10px] text-muted-foreground">How many times should we notify you about a cheque on its due date?</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Default Reminder Frequency</Label>
+                  <Combobox 
+                    options={reminderFrequencyOptions} 
+                    value={defaultReminderDays} 
+                    onValueChange={setDefaultReminderDays}
+                  />
+                  <p className="text-[10px] text-muted-foreground">Start notifying you this many days before the due date.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button type="button" variant="outline" className="flex-1 rounded-pill h-12" onClick={() => setStep(2)}>
+                   Back
+                </Button>
+                <Button type="submit" className="flex-[2] rounded-pill h-12 text-lg shadow-product" disabled={loading}>
+                  {loading ? 'Saving...' : 'Finish Setup'} <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {step === 4 && (
             <div className="flex flex-col items-center text-center space-y-6">
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/20">
                 <CheckCircle2 className="h-10 w-10" />

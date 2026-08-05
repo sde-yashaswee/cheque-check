@@ -20,6 +20,7 @@ const routeTitles: Record<string, string> = {
   '/accounts': 'Accounts',
   '/accounts/create': 'Add Account',
   '/settings': 'Settings',
+  '/businesses': 'Businesses',
   '/businesses/create': 'New Business',
   '/features': 'Features',
 }
@@ -32,7 +33,7 @@ export function TopNav() {
   const [searchOpen, setSearchOpen] = useState(false)
 
   const title = routeTitles[pathname] || 'Dashboard'
-  const isMainTab = ['/', '/cheques', '/parties', '/accounts', '/settings'].includes(pathname)
+  const isMainTab = ['/', '/cheques', '/parties', '/accounts', '/settings', '/businesses'].includes(pathname)
 
   return (
     <div className="sticky top-0 z-40 w-full flex flex-col">
@@ -74,11 +75,11 @@ export function TopNav() {
       {activeBusiness && (
         <BusinessSwitcher 
           trigger={
-            <button className="flex h-7 items-center border-b bg-primary/5 px-4 text-[10px] font-bold text-primary uppercase tracking-wider backdrop-blur-sm transition-colors hover:bg-primary/10 active:bg-primary/20">
+            <div className="flex h-7 w-full items-center border-b bg-primary/5 px-4 text-[10px] font-bold text-primary uppercase tracking-wider backdrop-blur-sm transition-colors hover:bg-primary/10 active:bg-primary/20 cursor-pointer">
               <span className="opacity-60 mr-1.5">Business:</span> 
               {activeBusiness.name}
               <ChevronDown className="ml-1.5 h-3 w-3 opacity-60" />
-            </button>
+            </div>
           }
         />
       )}

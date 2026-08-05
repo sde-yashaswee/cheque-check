@@ -159,7 +159,6 @@ export default function SettingsPage() {
       title: 'Management',
       items: [
         { name: 'My Businesses', icon: Building2, href: '/businesses' },
-        { name: 'Accounts', icon: Landmark, href: '/accounts' },
         { name: 'Features', icon: LayoutGrid, href: '/features' },
       ]
     },

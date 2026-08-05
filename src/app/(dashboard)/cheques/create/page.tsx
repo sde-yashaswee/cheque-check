@@ -12,14 +12,16 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Camera, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 import { Combobox } from '@/components/ui/combobox'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
+import { StorageService } from '@/services/storage.service'
 
 export default function CreateChequePage() {
   const [step, setStep] = useState(1)
+  const [isUploading, setIsUploading] = useState(false)
   const router = useRouter()
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
@@ -37,7 +39,7 @@ export default function CreateChequePage() {
     enabled: !!businessId,
   })
 
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
+  const { register, handleSubmit, setValue, watch, trigger, formState: { errors } } = useForm({
     resolver: zodResolver(chequeSchema),
     defaultValues: {
       amount: 0,
@@ -47,6 +49,7 @@ export default function CreateChequePage() {
       account_id: '',
       type: 'Outward',
       notes: '',
+      image_url: null as string | null,
       deposit_date: '',
     }
   })
@@ -63,8 +66,32 @@ export default function CreateChequePage() {
     mutation.mutate(data)
   }
 
-  const nextStep = () => setStep(s => Math.min(s + 1, 3))
+  const nextStep = async () => {
+    let isValid = false
+    if (step === 1) {
+      isValid = await trigger(['amount', 'cheque_number', 'cheque_date'])
+    } else if (step === 2) {
+      isValid = await trigger(['party_id', 'account_id'])
+    }
+    
+    if (isValid) setStep(s => Math.min(s + 1, 3))
+  }
   const prevStep = () => setStep(s => Math.max(s - 1, 1))
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    
+    setIsUploading(true)
+    try {
+      const url = await StorageService.uploadChequeImage(file)
+      setValue('image_url', url)
+    } catch (error: any) {
+      alert("Upload failed: " + error.message)
+    } finally {
+      setIsUploading(false)
+    }
+  }
 
   const partyOptions = parties?.map(p => ({ 
     label: p.name, 
@@ -198,6 +225,48 @@ export default function CreateChequePage() {
 
         {step === 3 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Cheque Photo</Label>
+              <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-3xl p-4 bg-canvas-parchment/30 min-h-[140px] transition-colors hover:bg-canvas-parchment/50">
+                {watch('image_url' as any) ? (
+                  <div className="relative w-full aspect-video rounded-2xl overflow-hidden border shadow-sm">
+                    <img src={watch('image_url' as any)} alt="Cheque" className="w-full h-full object-cover" />
+                    <button 
+                      type="button"
+                      onClick={() => setValue('image_url', null)}
+                      className="absolute top-3 right-3 p-2 bg-black/60 text-white rounded-full hover:bg-black transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center gap-3 cursor-pointer py-6 w-full">
+                    <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+                      {isUploading ? (
+                        <div className="h-6 w-6 border-2 border-primary border-t-transparent animate-spin rounded-full" />
+                      ) : (
+                        <Camera className="h-7 w-7" />
+                      )}
+                    </div>
+                    <div className="text-center">
+                      <span className="text-sm font-bold text-primary block">
+                        {isUploading ? 'Uploading Cheque...' : 'Scan / Upload Cheque'}
+                      </span>
+                      <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tighter">Take a photo of the physical cheque</p>
+                    </div>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      capture="environment" 
+                      className="hidden" 
+                      onChange={handleImageUpload}
+                      disabled={isUploading}
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="notes">Notes</Label>
               <Input id="notes" {...register('notes')} placeholder="Add any notes here" className="h-12 rounded-xl" />
