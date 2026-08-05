@@ -10,12 +10,15 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useProfile } from "@/hooks/use-profile"
 import { cn } from "@/lib/utils"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-dialog"
+import { DataState } from "@/components/ui/data-state"
+import { EmptyState } from "@/components/ui/empty-state"
 
 export default function BusinessesPage() {
   const { profile } = useProfile()
   const currency = profile?.currency || '₹'
 
   const {
+    businesses,
     filteredBusinesses,
     isLoading,
     activeBusiness,
@@ -27,6 +30,10 @@ export default function BusinessesPage() {
     getUpcomingTotal,
     deleteBusiness,
   } = useBusinesses()
+
+  const clearFilters = () => {
+    setSearch('')
+  }
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
@@ -51,20 +58,31 @@ export default function BusinessesPage() {
       </div>
 
       <div className="space-y-4">
-        {isLoading ? (
-          [1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-32 w-full rounded-lg" />
-          ))
-        ) : filteredBusinesses?.length === 0 ? (
-          <div className="py-20 text-center bg-canvas-parchment/30 rounded-lg border border-dashed">
-            <Building2 className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />
-            <p className="mt-4 text-muted-foreground text-body">No businesses found.</p>
-            <Link href="/businesses/create" className="mt-4 inline-block">
-              <Button variant="outline" className="rounded-full">Create your first business</Button>
-            </Link>
-          </div>
-        ) : (
-          filteredBusinesses?.map((business) => (
+        <DataState
+          isLoading={isLoading}
+          data={filteredBusinesses}
+          allData={businesses}
+          onClearFilters={clearFilters}
+          loadingComponent={
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-32 w-full rounded-lg" />
+              ))}
+            </div>
+          }
+          emptyState={
+            <EmptyState
+              icon={Building2}
+              title="No businesses found"
+              description="Create a business profile to start managing your accounts, parties, and cheques."
+              action={{
+                label: "Create your first business",
+                href: "/businesses/create"
+              }}
+            />
+          }
+        >
+          {filteredBusinesses?.map((business) => (
             <div 
               key={business.id}
               onClick={() => setActiveBusiness(business)}
@@ -124,8 +142,8 @@ export default function BusinessesPage() {
                 </p>
               </div>
             </div>
-          ))
-        )}
+          ))}
+        </DataState>
       </div>
 
       <Link href="/businesses/create">

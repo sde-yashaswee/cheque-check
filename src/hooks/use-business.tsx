@@ -10,12 +10,13 @@ interface BusinessContextType {
   setActiveBusiness: (business: Business) => void
   businesses: Business[]
   isLoading: boolean
+  isFetching: boolean
 }
 
 const BusinessContext = createContext<BusinessContextType | undefined>(undefined)
 
 export function BusinessProvider({ children }: { children: React.ReactNode }) {
-  const { data: businesses, isLoading } = useQuery({
+  const { data: businesses, isLoading, isFetching } = useQuery({
     queryKey: ['businesses'],
     queryFn: () => BusinessService.getAll(),
   })
@@ -37,7 +38,8 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
       activeBusiness, 
       setActiveBusiness, 
       businesses: businesses || [], 
-      isLoading 
+      isLoading,
+      isFetching
     }}>
       {children}
     </BusinessContext.Provider>

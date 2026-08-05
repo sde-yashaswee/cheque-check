@@ -10,15 +10,19 @@ import { EntityAvatar } from '@/components/ui/entity-avatar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { useAccounts } from '@/hooks/use-accounts'
+import { DataState } from '@/components/ui/data-state'
+import { EmptyState } from '@/components/ui/empty-state'
 
 export default function AccountsPage() {
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
 
   const {
+    accounts,
     filteredAccounts,
     uniqueBanks,
     isLoading,
+    error,
     search,
     setSearch,
     sortOrder,
@@ -26,6 +30,11 @@ export default function AccountsPage() {
     bankFilter,
     setBankFilter,
   } = useAccounts(businessId)
+
+  const clearFilters = () => {
+    setSearch('')
+    setBankFilter('All')
+  }
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-24">
@@ -85,20 +94,32 @@ export default function AccountsPage() {
       </div>
 
       <div className="grid gap-4">
-        {isLoading ? (
-          [1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-28 w-full rounded-lg" />
-          ))
-        ) : filteredAccounts?.length === 0 ? (
-          <div className="py-20 text-center bg-canvas-parchment/30 rounded-lg border border-dashed">
-            <Landmark className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />
-            <p className="mt-4 text-muted-foreground text-body">No accounts found.</p>
-            <Link href="/accounts/create" className="mt-4 inline-block">
-              <Button variant="outline" className="rounded-full">Add your first account</Button>
-            </Link>
-          </div>
-        ) : (
-          filteredAccounts?.map((account) => (
+        <DataState
+          isLoading={isLoading}
+          isError={!!error}
+          data={filteredAccounts}
+          allData={accounts}
+          onClearFilters={clearFilters}
+          loadingComponent={
+            <div className="grid gap-4">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-28 w-full rounded-lg" />
+              ))}
+            </div>
+          }
+          emptyState={
+            <EmptyState
+              icon={Landmark}
+              title="No accounts found"
+              description="You haven't added any bank accounts yet. Add your first account to start tracking cheques."
+              action={{
+                label: "Add your first account",
+                href: "/accounts/create"
+              }}
+            />
+          }
+        >
+          {filteredAccounts?.map((account) => (
             <Link key={account.id} href={`/accounts/${account.id}`}>
               <div className="group relative rounded-lg border bg-card p-6 transition-all active:scale-[0.98] border-primary/5">
                 <div className="flex items-start gap-4">
@@ -127,8 +148,8 @@ export default function AccountsPage() {
                 </div>
               </div>
             </Link>
-          ))
-        )}
+          ))}
+        </DataState>
       </div>
 
       <Link href="/accounts/create">

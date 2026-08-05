@@ -196,7 +196,7 @@ export default function SettingsPage() {
         {sections.map((section) => (
           <div key={section.title} className="space-y-3">
             <h3 className="px-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{section.title}</h3>
-            <div className="divide-y rounded-lg border bg-card overflow-hidden border-primary/5">
+            <div className="divide-y rounded-lg border bg-card overflow-hidden border-gray-100">
               {section.items.map((item: any) => {
                 const content = (
                   <div key={item.name} className={cn("flex items-center justify-between p-4 transition-colors", (item.action || item.href) && "cursor-pointer active:bg-muted/50 hover:bg-muted/30")} onClick={item.action}>

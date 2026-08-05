@@ -5,17 +5,20 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export function OnboardingCheck({ children }: { children: React.ReactNode }) {
-  const { businesses, isLoading } = useBusiness();
+  const { businesses, isLoading, isFetching } = useBusiness();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && businesses.length === 0 && pathname !== '/onboarding') {
+    // Wait until both loading (first fetch) and fetching (background invalidation/refetch) are done
+    const isReady = !isLoading && !isFetching;
+    
+    if (isReady && businesses.length === 0 && pathname !== '/onboarding') {
       router.push('/onboarding');
     }
-  }, [businesses, isLoading, pathname, router]);
+  }, [businesses, isLoading, isFetching, pathname, router]);
 
-  if (isLoading) return null;
+  if (isLoading || isFetching) return null;
 
   return <>{children}</>;
 }

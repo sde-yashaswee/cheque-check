@@ -9,6 +9,8 @@ import { useBusiness } from '@/hooks/use-business'
 import { useProfile } from '@/hooks/use-profile'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
+import { DataState } from '@/components/ui/data-state'
+import { EmptyState } from '@/components/ui/empty-state'
 
 export default function PartiesPage() {
   const { activeBusiness } = useBusiness()
@@ -18,14 +20,20 @@ export default function PartiesPage() {
   const currency = profile?.currency || '₹'
 
   const {
+    parties,
     filteredParties,
     isLoading,
+    error,
     search,
     setSearch,
     sortOrder,
     setSortOrder,
     getBalance,
   } = useParties(businessId)
+
+  const clearFilters = () => {
+    setSearch('')
+  }
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
@@ -49,24 +57,34 @@ export default function PartiesPage() {
         </Button>
       </div>
 
-      <div className="space-y-4">
-        {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Skeleton key={i} className="h-24 w-full rounded-lg" />
-            ))}
-          </div>
-        ) : filteredParties?.length === 0 ? (
-          <div className="py-20 text-center bg-canvas-parchment/30 rounded-lg border border-dashed">
-            <User className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />
-            <p className="mt-4 text-muted-foreground text-body">No parties found.</p>
-            <Link href="/parties/create">
-              <Button variant="link" className="text-primary font-semibold">Add your first party</Button>
-            </Link>
-          </div>
-        ) : (
-          filteredParties?.map((party) => (
-            <Link key={party.id} href={`/parties/${party.id}`}>
+      <div className="grid gap-4">
+        <DataState
+          isLoading={isLoading}
+          isError={!!error}
+          data={filteredParties}
+          allData={parties}
+          onClearFilters={clearFilters}
+          loadingComponent={
+            <div className="grid gap-4">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Skeleton key={i} className="h-24 w-full rounded-lg" />
+              ))}
+            </div>
+          }
+          emptyState={
+            <EmptyState
+              icon={User}
+              title="No parties found"
+              description="Keep track of people or businesses you deal with. Add your first party to get started."
+              action={{
+                label: "Add your first party",
+                href: "/parties/create"
+              }}
+            />
+          }
+        >
+          {filteredParties?.map((party) => (
+            <Link key={party.id} href={`/parties/${party.id}`} className="block">
               <div className="group flex items-center gap-4 rounded-lg border bg-card p-5 transition-all active:scale-[0.98] border-primary/5">
                 <EntityAvatar 
                   name={party.name} 
@@ -85,8 +103,8 @@ export default function PartiesPage() {
                 <ChevronRight className="h-4 w-4 text-muted-foreground opacity-40 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
-          ))
-        )}
+          ))}
+        </DataState>
       </div>
 
       <Link href="/parties/create">

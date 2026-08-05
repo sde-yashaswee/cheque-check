@@ -2,7 +2,7 @@
 
 import { useCheques } from '@/hooks/use-cheques'
 import { ChequeCard } from '@/components/cheque-card'
-import { Plus, Search, Filter } from 'lucide-react'
+import { Plus, Search, Filter, ReceiptText } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -11,20 +11,29 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Skeleton } from '@/components/ui/skeleton'
 import { StatusPill } from '@/components/ui/status-pill'
 import { cn } from '@/lib/utils'
+import { DataState } from '@/components/ui/data-state'
+import { EmptyState } from '@/components/ui/empty-state'
 
 export default function ChequesPage() {
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
 
   const {
+    cheques,
     filteredCheques,
     isLoading,
+    error,
     search,
     setSearch,
     filter,
     setFilter,
     updateStatus,
   } = useCheques(businessId)
+
+  const clearFilters = () => {
+    setSearch('')
+    setFilter('All')
+  }
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-24">
@@ -70,25 +79,39 @@ export default function ChequesPage() {
       </div>
 
       <div className="space-y-4">
-        {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-32 w-full rounded-lg" />
-            ))}
-          </div>
-        ) : filteredCheques?.length === 0 ? (
-          <div className="py-20 text-center">
-            <p className="text-muted-foreground text-body">No cheques found.</p>
-          </div>
-        ) : (
-          filteredCheques?.map((cheque: any) => (
+        <DataState
+          isLoading={isLoading}
+          isError={!!error}
+          data={filteredCheques}
+          allData={cheques}
+          onClearFilters={clearFilters}
+          loadingComponent={
+            <div className="space-y-4">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-32 w-full rounded-lg" />
+              ))}
+            </div>
+          }
+          emptyState={
+            <EmptyState
+              icon={ReceiptText}
+              title="No cheques recorded"
+              description="You haven't recorded any cheques yet. Add your first issued or received cheque."
+              action={{
+                label: "Record your first cheque",
+                href: "/cheques/create"
+              }}
+            />
+          }
+        >
+          {filteredCheques?.map((cheque: any) => (
             <ChequeCard 
               key={cheque.id} 
               cheque={cheque} 
               onStatusUpdate={updateStatus}
             />
-          ))
-        )}
+          ))}
+        </DataState>
       </div>
 
       <Link href="/cheques/create">

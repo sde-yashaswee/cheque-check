@@ -12,11 +12,27 @@ function Dialog({ ...props }: DialogPrimitive.Root.Props) {
 }
 
 function DialogTrigger({ render, ...props }: DialogPrimitive.Trigger.Props) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" render={render} {...props} />
+  const isNativeButton = React.isValidElement(render) && render.type === "button"
+  return (
+    <DialogPrimitive.Trigger
+      data-slot="dialog-trigger"
+      render={render}
+      nativeButton={isNativeButton}
+      {...props}
+    />
+  )
 }
 
 function DialogClose({ render, ...props }: DialogPrimitive.Close.Props) {
-  return <DialogPrimitive.Close data-slot="dialog-close" render={render} {...props} />
+  const isNativeButton = React.isValidElement(render) && render.type === "button"
+  return (
+    <DialogPrimitive.Close
+      data-slot="dialog-close"
+      render={render}
+      nativeButton={isNativeButton}
+      {...props}
+    />
+  )
 }
 
 function DialogPortal({ ...props }: DialogPrimitive.Portal.Props) {
@@ -31,7 +47,7 @@ function DialogOverlay({
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        "fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-md data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         className
       )}
       {...props}

@@ -9,84 +9,142 @@ import { BusinessService } from '@/services/business.service'
 import { ProfileService } from '@/services/profile.service'
 import { useBusiness } from '@/hooks/use-business'
 import { useProfile } from '@/hooks/use-profile'
-import { Wallet, Building2, Settings2, CheckCircle2, Bell, ArrowRight, ArrowLeft } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { 
+  Wallet, 
+  Building2, 
+  Settings2, 
+  CheckCircle2, 
+  Bell, 
+  ArrowRight, 
+  ArrowLeft,
+  Mail,
+  Phone,
+  MapPin,
+  Check,
+  Globe,
+  Calendar,
+  Clock,
+  Languages,
+  DollarSign
+} from 'lucide-react'
 import { Combobox } from '@/components/ui/combobox'
+import { cn } from '@/lib/utils'
+import { motion, AnimatePresence } from 'framer-motion'
+
+const COLORS = ['#0066cc', '#34C759', '#FF9500', '#FF3B30', '#AF52DE', '#5856D6', '#8E8E93']
+
+const CURRENCY_OPTIONS = [
+  { label: '₹ (INR)', value: '₹' },
+  { label: '$ (USD)', value: '$' },
+  { label: '€ (EUR)', value: '€' },
+  { label: '£ (GBP)', value: '£' },
+]
+
+const DATE_FORMAT_OPTIONS = [
+  { label: 'DD/MM/YYYY', value: 'DD/MM/YYYY' },
+  { label: 'MM/DD/YYYY', value: 'MM/DD/YYYY' },
+  { label: 'YYYY-MM-DD', value: 'YYYY-MM-DD' },
+]
+
+const TIME_FORMAT_OPTIONS = [
+  { label: '12-hour (AM/PM)', value: '12h' },
+  { label: '24-hour', value: '24h' },
+]
+
+const LANGUAGE_OPTIONS = [
+  { label: 'English', value: 'en' },
+  { label: 'Hindi', value: 'hi' },
+]
+
+const TIMEZONE_OPTIONS = [
+  { label: 'IST (UTC+5:30)', value: 'Asia/Kolkata' },
+  { label: 'UTC', value: 'UTC' },
+  { label: 'EST (UTC-5)', value: 'America/New_York' },
+  { label: 'GMT (UTC+0)', value: 'Europe/London' },
+]
+
+const REMINDERS_PER_DAY_OPTIONS = [
+  { label: '1 time/day', value: '1' },
+  { label: '2 times/day', value: '2' },
+  { label: '3 times/day', value: '3' },
+]
+
+const REMINDER_FREQUENCY_OPTIONS = [
+  { label: '1 day before', value: '1' },
+  { label: '3 days before', value: '3' },
+  { label: '7 days before', value: '7' },
+]
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const { businesses, isLoading: businessesLoading, activeBusiness } = useBusiness()
+  const queryClient = useQueryClient()
   const { profile, updateProfile } = useProfile()
+  const { setActiveBusiness } = useBusiness()
 
-  // Step 1: Business Info
-  const [businessName, setBusinessName] = useState('')
-  const [businessEmail, setBusinessEmail] = useState('')
-  const [businessPhone, setBusinessPhone] = useState('')
-  const [businessAddress, setBusinessAddress] = useState('')
-
-  // Step 2: General Preferences
-  const [currency, setCurrency] = useState('₹')
-  const [dateFormat, setDateFormat] = useState('DD/MM/YYYY')
-  const [timeFormat, setTimeFormat] = useState('12h')
-  const [timeZone, setTimeZone] = useState('Asia/Kolkata')
-  const [language, setLanguage] = useState('en')
-
-  // Step 3: Reminder Preferences
-  const [remindersPerDay, setRemindersPerDay] = useState('1')
-  const [defaultReminderDays, setDefaultReminderDays] = useState('3')
+  // Form State
+  const [formData, setFormData] = useState({
+    businessName: '',
+    businessEmail: '',
+    businessPhone: '',
+    businessAddress: '',
+    businessColor: '#0066cc',
+    currency: '₹',
+    dateFormat: 'DD/MM/YYYY',
+    timeFormat: '12h',
+    timeZone: 'Asia/Kolkata',
+    language: 'en',
+    remindersPerDay: '1',
+    defaultReminderDays: '3',
+  })
 
   useEffect(() => {
     if (profile) {
-      setCurrency(profile.currency || '₹')
-      setDateFormat(profile.date_format || 'DD/MM/YYYY')
-      setTimeFormat(profile.time_format || '12h')
-      setTimeZone(profile.time_zone || 'Asia/Kolkata')
-      setLanguage(profile.language || 'en')
-      setRemindersPerDay(profile.reminders_per_day?.toString() || '1')
-      setDefaultReminderDays(profile.default_reminder_days?.toString() || '3')
+      setFormData(prev => ({
+        ...prev,
+        currency: profile.currency || '₹',
+        dateFormat: profile.date_format || 'DD/MM/YYYY',
+        timeFormat: profile.time_format || '12h',
+        timeZone: profile.time_zone || 'Asia/Kolkata',
+        language: profile.language || 'en',
+        remindersPerDay: profile.reminders_per_day?.toString() || '1',
+        defaultReminderDays: profile.default_reminder_days?.toString() || '3',
+      }))
     }
   }, [profile])
 
-  const handleStep1 = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!businessName) return
+  const nextStep = () => setStep(s => Math.min(s + 1, 5))
+  const prevStep = () => setStep(s => Math.max(s - 1, 1))
+
+  const handleFinish = async () => {
     setLoading(true)
     try {
-      await BusinessService.create({
-        name: businessName,
-        email: businessEmail || null,
-        phone: businessPhone || null,
-        address: businessAddress || null,
+      // 1. Create Business
+      const business = await BusinessService.create({
+        name: formData.businessName,
+        email: formData.businessEmail || null,
+        phone: formData.businessPhone || null,
+        address: formData.businessAddress || null,
+        color: formData.businessColor,
         logo_url: null,
       })
-      setStep(2)
-    } catch (error: any) {
-      alert(error.message)
-    } finally {
-      setLoading(false)
-    }
-  }
+      await queryClient.invalidateQueries({ queryKey: ['businesses'] })
+      setActiveBusiness(business)
 
-  const handleStep2 = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setStep(3)
-  }
-
-  const handleStep3 = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    try {
+      // 2. Update Profile
       await updateProfile({
-        currency,
-        date_format: dateFormat,
-        time_format: timeFormat,
-        time_zone: timeZone,
-        language,
-        reminders_per_day: parseInt(remindersPerDay),
-        default_reminder_days: parseInt(defaultReminderDays)
+        currency: formData.currency,
+        date_format: formData.dateFormat,
+        time_format: formData.timeFormat,
+        time_zone: formData.timeZone,
+        language: formData.language,
+        reminders_per_day: parseInt(formData.remindersPerDay),
+        default_reminder_days: parseInt(formData.defaultReminderDays)
       })
-      setStep(4)
+
+      setStep(5)
     } catch (error: any) {
       alert(error.message)
     } finally {
@@ -94,237 +152,351 @@ export default function OnboardingPage() {
     }
   }
 
-  const finishOnboarding = () => {
-    router.push('/')
+  const containerVariants = {
+    initial: { opacity: 0, x: 20 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -20 }
   }
-
-  const currencyOptions = [
-    { label: '₹ (INR)', value: '₹' },
-    { label: '$ (USD)', value: '$' },
-    { label: '€ (EUR)', value: '€' },
-    { label: '£ (GBP)', value: '£' },
-  ]
-
-  const dateFormatOptions = [
-    { label: 'DD/MM/YYYY', value: 'DD/MM/YYYY' },
-    { label: 'MM/DD/YYYY', value: 'MM/DD/YYYY' },
-    { label: 'YYYY-MM-DD', value: 'YYYY-MM-DD' },
-  ]
-
-  const timeFormatOptions = [
-    { label: '12-hour (AM/PM)', value: '12h' },
-    { label: '24-hour', value: '24h' },
-  ]
-
-  const languageOptions = [
-    { label: 'English', value: 'en' },
-    { label: 'Hindi', value: 'hi' },
-  ]
-
-  const timeZoneOptions = [
-    { label: 'IST (UTC+5:30)', value: 'Asia/Kolkata' },
-    { label: 'UTC', value: 'UTC' },
-    { label: 'EST (UTC-5)', value: 'America/New_York' },
-    { label: 'GMT (UTC+0)', value: 'Europe/London' },
-  ]
-
-  const remindersPerDayOptions = [
-    { label: '1 time/day', value: '1' },
-    { label: '2 times/day', value: '2' },
-    { label: '3 times/day', value: '3' },
-  ]
-
-  const reminderFrequencyOptions = [
-    { label: '1 day before', value: '1' },
-    { label: '3 days before', value: '3' },
-    { label: '7 days before', value: '7' },
-  ]
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-canvas-parchment px-6 dark:bg-black">
-      <div className="w-full max-w-md space-y-8">
-        <div className="flex flex-col items-center text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-primary text-white mb-4">
-            <Wallet className="h-8 w-8" />
-          </div>
-          <h1 className="text-display-md font-semibold tracking-tight">Welcome to ChequeCheck</h1>
-          <p className="text-body text-muted-foreground mt-2">Let&apos;s get you set up in a few seconds.</p>
-          
-          <div className="flex items-center gap-2 mt-6">
-            {[1, 2, 3, 4].map((s) => (
-              <div key={s} className={`h-2 w-10 rounded-full transition-all duration-500 ${step >= s ? 'bg-primary' : 'bg-muted'}`} />
-            ))}
+    <div className="min-h-screen bg-background dark:bg-black selection:bg-primary/10 transition-colors duration-500">
+      <div className="mx-auto max-w-2xl px-6 py-12 md:py-24 space-y-12">
+        
+        {/* Header */}
+        <div className="flex items-center gap-6">
+          <AnimatePresence mode="wait">
+            {step > 1 && step < 5 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+              >
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={prevStep} 
+                  className="rounded-full h-12 w-12 hover:bg-canvas-parchment"
+                >
+                  <ArrowLeft className="h-6 w-6" />
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <div className="space-y-1">
+            {step < 5 ? (
+              <>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Step {step} of 4</p>
+                <h1 className="text-display-md md:text-display-lg font-semibold tracking-tight text-ink dark:text-white">
+                  {step === 1 && "Welcome to ChequeCheck"}
+                  {step === 2 && "Business Details"}
+                  {step === 3 && "Personalize Experience"}
+                  {step === 4 && "Notifications"}
+                </h1>
+              </>
+            ) : (
+              <h1 className="text-display-lg font-semibold tracking-tight text-ink dark:text-white text-center w-full">All Set!</h1>
+            )}
           </div>
         </div>
 
-        <div className="rounded-lg bg-white p-8 dark:bg-surface-tile-1 border border-primary/5">
-          {step === 1 && (
-            <form onSubmit={handleStep1} className="space-y-4">
-              <div className="flex items-center gap-2 mb-4 text-primary font-semibold">
-                <Building2 className="h-5 w-5" />
-                <span>Business Information</span>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="bizName">Business Name</Label>
-                <Input 
-                  id="bizName" 
-                  placeholder="My Awesome Business" 
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                  required
-                  className="h-12 bg-canvas-parchment border-none rounded-sm"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="bizEmail">Business Email (Optional)</Label>
-                <Input 
-                  id="bizEmail" 
-                  type="email"
-                  placeholder="contact@business.com" 
-                  value={businessEmail}
-                  onChange={(e) => setBusinessEmail(e.target.value)}
-                  className="h-12 bg-canvas-parchment border-none rounded-sm"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="bizPhone">Business Phone (Optional)</Label>
-                <Input 
-                  id="bizPhone" 
-                  placeholder="+91 98765 43210" 
-                  value={businessPhone}
-                  onChange={(e) => setBusinessPhone(e.target.value)}
-                  className="h-12 bg-canvas-parchment border-none rounded-sm"
-                />
-              </div>
-              <Button type="submit" className="w-full rounded-full h-12 text-lg" disabled={loading || !businessName}>
-                {loading ? 'Saving...' : 'Next Step'} <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </form>
-          )}
+        {/* Progress Bar */}
+        {step < 5 && (
+          <div className="flex gap-2">
+            {[1, 2, 3, 4].map((s) => (
+              <div 
+                key={s} 
+                className={cn(
+                  "h-1.5 flex-1 rounded-full transition-all duration-500",
+                  s <= step ? "bg-primary" : "bg-canvas-parchment dark:bg-surface-tile-1"
+                )} 
+              />
+            ))}
+          </div>
+        )}
 
-          {step === 2 && (
-            <form onSubmit={handleStep2} className="space-y-6">
-              <div className="flex items-center gap-2 mb-4 text-primary font-semibold">
-                <Settings2 className="h-5 w-5" />
-                <span>General Preferences</span>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Currency</Label>
-                  <Combobox 
-                    options={currencyOptions} 
-                    value={currency} 
-                    onValueChange={setCurrency}
-                  />
+        <div className="relative min-h-[400px]">
+          <AnimatePresence mode="wait">
+            {step === 1 && (
+              <motion.div 
+                key="step1"
+                variants={containerVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="space-y-8"
+              >
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Business Name</Label>
+                    <div className="relative group">
+                      <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                      <Input 
+                        placeholder="e.g. Apple Inc." 
+                        value={formData.businessName}
+                        onChange={(e) => setFormData({...formData, businessName: e.target.value})}
+                        className="h-14 pl-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none text-xl font-medium rounded-sm transition-all focus:ring-2 focus:ring-primary/20"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Brand Color</Label>
+                    <div className="flex flex-wrap gap-4 p-1">
+                      {COLORS.map((c) => (
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() => setFormData({...formData, businessColor: c})}
+                          className={cn(
+                            "h-12 w-12 rounded-full transition-all active:scale-[0.85] ring-offset-4 dark:ring-offset-black",
+                            formData.businessColor === c ? "ring-2 ring-primary scale-110 shadow-lg" : "hover:scale-105 opacity-80 hover:opacity-100"
+                          )}
+                          style={{ backgroundColor: c }}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </div>
+                
+                <Button 
+                  className="w-full rounded-pill h-14 text-lg font-medium shadow-xl shadow-primary/20 active:scale-[0.98] transition-transform" 
+                  onClick={nextStep} 
+                  disabled={!formData.businessName}
+                >
+                  Get Started <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </motion.div>
+            )}
 
-                <div className="space-y-2">
-                  <Label>Date Format</Label>
-                  <Combobox 
-                    options={dateFormatOptions} 
-                    value={dateFormat} 
-                    onValueChange={setDateFormat}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
+            {step === 2 && (
+              <motion.div 
+                key="step2"
+                variants={containerVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="space-y-6"
+              >
+                <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Time Format</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Business Email</Label>
+                    <div className="relative group">
+                      <Mail className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Input 
+                        type="email"
+                        placeholder="contact@company.com" 
+                        value={formData.businessEmail}
+                        onChange={(e) => setFormData({...formData, businessEmail: e.target.value})}
+                        className="h-14 pl-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none text-lg rounded-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Business Phone</Label>
+                    <div className="relative group">
+                      <Phone className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Input 
+                        placeholder="+1 (555) 000-0000" 
+                        value={formData.businessPhone}
+                        onChange={(e) => setFormData({...formData, businessPhone: e.target.value})}
+                        className="h-14 pl-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none text-lg rounded-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Headquarters</Label>
+                    <div className="relative group">
+                      <MapPin className="absolute left-5 top-5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Input 
+                        placeholder="City, Country" 
+                        value={formData.businessAddress}
+                        onChange={(e) => setFormData({...formData, businessAddress: e.target.value})}
+                        className="h-14 pl-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none text-lg rounded-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <Button 
+                  className="w-full rounded-pill h-14 text-lg font-medium shadow-xl shadow-primary/20 active:scale-[0.98] transition-transform" 
+                  onClick={nextStep}
+                >
+                  Continue <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </motion.div>
+            )}
+
+            {step === 3 && (
+              <motion.div 
+                key="step3"
+                variants={containerVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="space-y-6"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Currency</Label>
                     <Combobox 
-                      options={timeFormatOptions} 
-                      value={timeFormat} 
-                      onValueChange={setTimeFormat}
+                      options={CURRENCY_OPTIONS} 
+                      value={formData.currency} 
+                      onValueChange={(v) => setFormData({...formData, currency: v})}
+                      className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Language</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Language</Label>
                     <Combobox 
-                      options={languageOptions} 
-                      value={language} 
-                      onValueChange={setLanguage}
+                      options={LANGUAGE_OPTIONS} 
+                      value={formData.language} 
+                      onValueChange={(v) => setFormData({...formData, language: v})}
+                      className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Time Zone</Label>
+                  <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Date Format</Label>
                   <Combobox 
-                    options={timeZoneOptions} 
-                    value={timeZone} 
-                    onValueChange={setTimeZone}
+                    options={DATE_FORMAT_OPTIONS} 
+                    value={formData.dateFormat} 
+                    onValueChange={(v) => setFormData({...formData, dateFormat: v})}
+                    className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
                   />
                 </div>
-              </div>
 
-              <div className="flex gap-3">
-                <Button type="button" variant="outline" className="flex-1 rounded-full h-12" onClick={() => setStep(1)}>
-                   Back
-                </Button>
-                <Button type="submit" className="flex-[2] rounded-full h-12 text-lg">
-                  Next Step <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </div>
-            </form>
-          )}
-
-          {step === 3 && (
-            <form onSubmit={handleStep3} className="space-y-6">
-              <div className="flex items-center gap-2 mb-4 text-primary font-semibold">
-                <Bell className="h-5 w-5" />
-                <span>Reminder Preferences</span>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Reminders Per Day</Label>
-                  <Combobox 
-                    options={remindersPerDayOptions} 
-                    value={remindersPerDay} 
-                    onValueChange={setRemindersPerDay}
-                  />
-                  <p className="text-[10px] text-muted-foreground">How many times should we notify you about a cheque on its due date?</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Time Format</Label>
+                    <Combobox 
+                      options={TIME_FORMAT_OPTIONS} 
+                      value={formData.timeFormat} 
+                      onValueChange={(v) => setFormData({...formData, timeFormat: v})}
+                      className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Time Zone</Label>
+                    <Combobox 
+                      options={TIMEZONE_OPTIONS} 
+                      value={formData.timeZone} 
+                      onValueChange={(v) => setFormData({...formData, timeZone: v})}
+                      className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Default Reminder Frequency</Label>
-                  <Combobox 
-                    options={reminderFrequencyOptions} 
-                    value={defaultReminderDays} 
-                    onValueChange={setDefaultReminderDays}
-                  />
-                  <p className="text-[10px] text-muted-foreground">Start notifying you this many days before the due date.</p>
+                <Button 
+                  className="w-full rounded-pill h-14 text-lg font-medium shadow-xl shadow-primary/20 active:scale-[0.98] transition-transform" 
+                  onClick={nextStep}
+                >
+                  Looks Good <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </motion.div>
+            )}
+
+            {step === 4 && (
+              <motion.div 
+                key="step4"
+                variants={containerVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="space-y-8"
+              >
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Daily Frequency</Label>
+                    <Combobox 
+                      options={REMINDERS_PER_DAY_OPTIONS} 
+                      value={formData.remindersPerDay} 
+                      onValueChange={(v) => setFormData({...formData, remindersPerDay: v})}
+                      className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
+                    />
+                    <p className="text-[11px] text-muted-foreground px-1">How many alerts should we send on the due date?</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Advanced Warning</Label>
+                    <Combobox 
+                      options={REMINDER_FREQUENCY_OPTIONS} 
+                      value={formData.defaultReminderDays} 
+                      onValueChange={(v) => setFormData({...formData, defaultReminderDays: v})}
+                      className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
+                    />
+                    <p className="text-[11px] text-muted-foreground px-1">Days before the due date to start notifying you.</p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex gap-3">
-                <Button type="button" variant="outline" className="flex-1 rounded-full h-12" onClick={() => setStep(2)}>
-                   Back
-                </Button>
-                <Button type="submit" className="flex-[2] rounded-full h-12 text-lg" disabled={loading}>
-                  {loading ? 'Saving...' : 'Finish Setup'} <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </div>
-            </form>
-          )}
+                <div className="p-6 rounded-lg bg-primary/5 dark:bg-primary/10 border border-primary/10 space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="h-12 w-12 rounded-full flex items-center justify-center text-white text-xl font-bold"
+                      style={{ backgroundColor: formData.businessColor }}
+                    >
+                      {formData.businessName?.charAt(0) || 'B'}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-ink dark:text-white">{formData.businessName}</h3>
+                      <p className="text-sm text-muted-foreground">Ready to manage your cheques.</p>
+                    </div>
+                  </div>
+                </div>
 
-          {step === 4 && (
-            <div className="flex flex-col items-center text-center space-y-6">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/20">
-                <CheckCircle2 className="h-10 w-10" />
-              </div>
-              <div className="space-y-2">
-                <h2 className="text-2xl font-semibold">You&apos;re all set!</h2>
-                <p className="text-muted-foreground">Your business and preferences have been configured.</p>
-              </div>
-              <Button onClick={finishOnboarding} className="w-full rounded-full h-12 text-lg">
-                Go to Dashboard
-              </Button>
-            </div>
-          )}
+                <Button 
+                  className="w-full rounded-pill h-14 text-lg font-medium shadow-xl shadow-primary/20 active:scale-[0.98] transition-transform" 
+                  onClick={handleFinish}
+                  disabled={loading}
+                >
+                  {loading ? 'Completing Setup...' : 'Finish Setup'} <Check className="ml-2 h-5 w-5" />
+                </Button>
+              </motion.div>
+            )}
+
+            {step === 5 && (
+              <motion.div 
+                key="step5"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center text-center space-y-12 py-12"
+              >
+                <div className="relative">
+                  <motion.div 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", damping: 12, stiffness: 200, delay: 0.2 }}
+                    className="flex h-32 w-32 items-center justify-center rounded-full bg-green-500 text-white shadow-2xl shadow-green-500/20"
+                  >
+                    <CheckCircle2 className="h-16 w-16" />
+                  </motion.div>
+                  <motion.div 
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.1, 0.3] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute inset-0 bg-green-500 rounded-full -z-10"
+                  />
+                </div>
+
+                <div className="space-y-4">
+                  <h2 className="text-display-md font-semibold tracking-tight">You&apos;re Ready to Go</h2>
+                  <p className="text-lead text-muted-foreground max-w-sm mx-auto">
+                    Everything is configured. Welcome to the future of cheque management.
+                  </p>
+                </div>
+
+                <Button 
+                  onClick={() => router.push('/')} 
+                  className="w-full max-w-sm rounded-pill h-14 text-xl font-semibold shadow-2xl shadow-primary/40 hover:scale-105 active:scale-95 transition-all"
+                >
+                  Enter Dashboard <ArrowRight className="ml-2 h-6 w-6" />
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
   )
-
 }

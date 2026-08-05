@@ -7,7 +7,7 @@ export class AccountService {
   static async getAll(businessId: string) {
     const { data, error } = await supabase
       .from('accounts')
-      .select('*')
+      .select('*, bank:banks(name)')
       .eq('business_id', businessId)
       .order('account_name', { ascending: true })
     
@@ -18,7 +18,7 @@ export class AccountService {
   static async getById(id: string) {
     const { data, error } = await supabase
       .from('accounts')
-      .select('*')
+      .select('*, bank:banks(name)')
       .eq('id', id)
       .single()
     

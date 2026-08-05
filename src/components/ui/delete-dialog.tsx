@@ -81,7 +81,7 @@ export function DeleteConfirmationDialog({
             variant="destructive"
             onClick={handleConfirm}
             disabled={inputValue !== confirmName || loading}
-            className="w-full rounded-pill h-14 shadow-lg shadow-destructive/20 font-bold text-lg"
+            className="w-full rounded-pill h-14 font-bold text-lg"
           >
             {loading ? 'Deleting...' : 'Delete Permanently'}
           </Button>

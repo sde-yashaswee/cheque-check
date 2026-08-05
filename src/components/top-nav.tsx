@@ -5,7 +5,6 @@ import { useProfile } from '@/hooks/use-profile'
 import { useBusiness } from '@/hooks/use-business'
 import { ChevronLeft, User, ChevronDown, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { BusinessSwitcher } from "@/components/business-switcher"
 import { GlobalSearch } from "@/components/global-search"
 import { useState } from "react"
@@ -75,11 +74,11 @@ export function TopNav() {
       {activeBusiness && (
         <BusinessSwitcher 
           trigger={
-            <div className="flex h-8 w-full items-center bg-primary/5 px-4 text-[10px] font-semibold text-primary uppercase tracking-wider backdrop-blur-sm transition-colors hover:bg-primary/10 active:bg-primary/20 cursor-pointer border-b border-primary/5">
+            <button className="flex h-8 w-full items-center bg-primary/5 px-4 text-[10px] font-semibold text-primary uppercase tracking-wider backdrop-blur-sm transition-colors hover:bg-primary/10 active:bg-primary/20 cursor-pointer border-b border-primary/5">
               <span className="opacity-60 mr-1.5">Business:</span> 
               {activeBusiness.name}
               <ChevronDown className="ml-1.5 h-3 w-3 opacity-60" />
-            </div>
+            </button>
           }
         />
       )}

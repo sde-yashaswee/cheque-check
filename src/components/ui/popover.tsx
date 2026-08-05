@@ -10,7 +10,15 @@ function Popover({ ...props }: PopoverPrimitive.Root.Props) {
 }
 
 function PopoverTrigger({ render, ...props }: PopoverPrimitive.Trigger.Props) {
-  return <PopoverPrimitive.Trigger data-slot="popover-trigger" render={render} {...props} />
+  const isNativeButton = React.isValidElement(render) && render.type === "button"
+  return (
+    <PopoverPrimitive.Trigger
+      data-slot="popover-trigger"
+      render={render}
+      nativeButton={isNativeButton}
+      {...props}
+    />
+  )
 }
 
 function PopoverContent({
