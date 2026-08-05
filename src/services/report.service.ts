@@ -8,7 +8,7 @@ export class ReportService {
     const rows = cheques.map(c => [
       c.cheque_number,
       c.party?.name || '',
-      c.account?.bank_name || '',
+      (c.account as any)?.bank?.name || '',
       c.amount,
       c.cheque_date,
       c.type,

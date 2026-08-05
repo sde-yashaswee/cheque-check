@@ -51,7 +51,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
 
   const filteredAccounts = query.length > 0
     ? accounts?.filter((a: any) => 
-        a.bank_name.toLowerCase().includes(query.toLowerCase()) ||
+        (a.bank?.name || '').toLowerCase().includes(query.toLowerCase()) ||
         a.account_name.toLowerCase().includes(query.toLowerCase()) ||
         a.account_number.includes(query)
       ).slice(0, 5)
@@ -62,6 +62,8 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
     onOpenChange(false)
   }
 
+  const hasResults = filteredCheques.length > 0 || filteredParties.length > 0 || filteredAccounts.length > 0
+
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <CommandInput 
@@ -70,7 +72,9 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
         onValueChange={setQuery}
       />
       <CommandList className="max-h-[400px]">
-        <CommandEmpty>No results found for &quot;{query}&quot;.</CommandEmpty>
+        {query.length > 0 && !hasResults && (
+          <CommandEmpty>No results found for &quot;{query}&quot;.</CommandEmpty>
+        )}
         
         {filteredCheques && filteredCheques.length > 0 && (
           <CommandGroup heading="Cheques">
@@ -126,7 +130,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
                   <Building2 className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold">{a.bank_name}</p>
+                  <p className="text-sm font-bold">{a.bank?.name || 'Bank'}</p>
                   <p className="text-xs text-muted-foreground truncate">{a.account_name} • {a.account_number}</p>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground opacity-40" />

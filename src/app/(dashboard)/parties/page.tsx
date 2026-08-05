@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { PartyService } from '@/services/party.service'
+import { ChequeService } from '@/services/cheque.service'
 import { Plus, Search, User, ChevronRight, ArrowUpAz, ArrowDownAz } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,11 +22,24 @@ export default function PartiesPage() {
 
   const currency = profile?.currency || '₹'
 
-  const { data: parties, isLoading } = useQuery({
+  const { data: parties, isLoading: partiesLoading } = useQuery({
     queryKey: ['parties', businessId],
     queryFn: () => PartyService.getAll(businessId!),
     enabled: !!businessId,
   })
+
+  const { data: cheques } = useQuery({
+    queryKey: ['cheques', businessId],
+    queryFn: () => ChequeService.getAll(businessId!),
+    enabled: !!businessId,
+  })
+
+  const getBalance = (partyId: string) => {
+    if (!cheques) return 0
+    return cheques
+      .filter((c: any) => c.party_id === partyId && c.status !== 'Cleared' && c.status !== 'Bounced')
+      .reduce((sum: number, c: any) => sum + c.amount, 0)
+  }
 
   const filteredParties = parties?.filter(p => 
     p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -58,10 +72,10 @@ export default function PartiesPage() {
       </div>
 
       <div className="space-y-4">
-        {isLoading ? (
+        {partiesLoading ? (
           <div className="space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
-              <Skeleton key={i} className="h-20 w-full rounded-3xl" />
+              <Skeleton key={i} className="h-24 w-full rounded-3xl" />
             ))}
           </div>
         ) : filteredParties?.length === 0 ? (
@@ -75,7 +89,7 @@ export default function PartiesPage() {
         ) : (
           filteredParties?.map((party) => (
             <Link key={party.id} href={`/parties/${party.id}`}>
-              <div className="group flex items-center gap-4 rounded-3xl border bg-card p-4 transition-all active:scale-98 hover:shadow-md">
+              <div className="group flex items-center gap-4 rounded-3xl border bg-card p-5 transition-all active:scale-98 hover:shadow-md">
                 <EntityAvatar 
                   name={party.name} 
                   color={party.color} 
@@ -86,9 +100,9 @@ export default function PartiesPage() {
                   <p className="font-bold text-lg truncate">{party.name}</p>
                   <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{party.contact}</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Balance</p>
-                  <p className="text-sm font-black text-primary">{currency}0</p>
+                <div className="text-right pr-2">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-0.5">Balance</p>
+                  <p className="text-sm font-black text-primary">{currency}{getBalance(party.id).toLocaleString()}</p>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground opacity-40 group-hover:translate-x-1 transition-transform" />
               </div>

@@ -1,0 +1,7 @@
+Few Issues Still we need to fix.
+1. Today, Upcoming and overdue, cards will be above than the Pie Chart thing.
+2. The COlors in the PieChart you can set, the bounced is red, the cleared is green, and issued is yellow, and recived is blue. please fix, this, also the total cheques, are not properylt in the middle of the pie-cahrt, fix this they should be in the middle of hte pie chart.
+3. on this page : http://localhost:3000/cheques/create?type=Outward the Type Issued and Recieved, should be two square tiles, with Issued and Recieved, and they should be highlighted based on the url, they are at, meaning the initaal vlaue of the type should be tkane from the url itself, it's just create without any query params, then take issue as default. and for http://localhost:3000/cheques/create?type=Inward it should be Recibved cheque highlihted.
+4. On the Complete Application, we were using the bank_name from the accounts table, but now we use the name from the bank_id associated with the account, so, please in the entire application, change the way, how we fetch the bank name, to use this new way.
+5. On thr Global Search bar, as I hit the search for the first time, it starts with showing : No Results found for "" something like this, given that the user hasn't even touched the search first time.
+6. Still in the Parties Page : http://localhost:3000/parties create a party-card and show it here, with proepr spacing, etc.

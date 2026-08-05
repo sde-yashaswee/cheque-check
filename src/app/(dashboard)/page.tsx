@@ -10,7 +10,6 @@ import Link from "next/link";
 import { ChequeStatus, ChequeWithRelations } from "@/types";
 import { useProfile } from "@/hooks/use-profile";
 import { Skeleton } from "@/components/ui/skeleton";
-import { StatusPill } from "@/components/ui/status-pill";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
 export default function HomePage() {
@@ -51,10 +50,10 @@ export default function HomePage() {
   const currency = profile?.currency || '₹'
 
   const chartData = [
-    { name: 'Issued', value: issuedCount, color: '#007AFF' },
-    { name: 'Received', value: receivedCount, color: '#34C759' },
-    { name: 'Cleared', value: clearedCount, color: '#AF52DE' },
-    { name: 'Bounced', value: bouncedCount, color: '#FF3B30' },
+    { name: 'Issued', value: issuedCount, color: '#EAB308' },   // Yellow
+    { name: 'Received', value: receivedCount, color: '#2563EB' }, // Blue
+    { name: 'Cleared', value: clearedCount, color: '#22C55E' },  // Green
+    { name: 'Bounced', value: bouncedCount, color: '#EF4444' },  // Red
   ].filter(d => d.value > 0);
 
   return (
@@ -115,7 +114,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Today's Cheques (MOVED UP) */}
+          {/* Today's Cheques */}
           <div className="space-y-4">
             <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1">Today&apos;s Cheques</h2>
             {todayCheques.length === 0 ? (
@@ -135,62 +134,65 @@ export default function HomePage() {
             )}
           </div>
 
+          {/* Today/Upcoming/Overdue Cards - MOVED ABOVE PIE CHART */}
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: "Today", count: todayCheques.length, color: 'bg-primary/5' },
+              { label: "Upcoming", count: upcomingCount, color: 'bg-green-500/5' },
+              { label: "Overdue", count: overdueCount, color: 'bg-red-500/5' },
+            ].map((status) => (
+              <div key={status.label} className={`group relative rounded-2xl border ${status.color} p-4 transition-all active:scale-95 overflow-hidden`}>
+                <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{status.label}</p>
+                <p className="mt-2 text-2xl font-black">{status.count}</p>
+              </div>
+            ))}
+          </div>
+
           {/* Statistics Pie Chart */}
           <div className="space-y-4 pt-4">
             <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1">Statistics</h2>
             <div className="rounded-3xl border bg-card p-6 h-[300px] relative">
               {chartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={chartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                      itemStyle={{ fontWeight: 'bold' }}
-                    />
-                    <Legend 
-                      verticalAlign="bottom" 
-                      height={36} 
-                      iconType="circle"
-                      formatter={(value) => <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{value}</span>}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="relative h-full w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={chartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={70}
+                        outerRadius={90}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                        itemStyle={{ fontWeight: 'bold' }}
+                      />
+                      <Legend 
+                        verticalAlign="bottom" 
+                        height={36} 
+                        iconType="circle"
+                        formatter={(value) => <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{value}</span>}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  {/* TOTAL TEXT IN THE CENTER */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -mt-4 flex flex-col items-center justify-center pointer-events-none">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Total</p>
+                    <p className="text-2xl font-black leading-none">{cheques?.length || 0}</p>
+                  </div>
+                </div>
               ) : (
                 <div className="flex h-full items-center justify-center">
                    <p className="text-sm text-muted-foreground italic">No data to display</p>
                 </div>
               )}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none text-center">
-                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Total</p>
-                 <p className="text-xl font-black">{cheques?.length || 0}</p>
-              </div>
             </div>
-          </div>
-
-          {/* Status Format (Today/Upcoming/Overdue only as requested) */}
-          <div className="grid grid-cols-3 gap-3 pt-4">
-            {[
-              { label: "Today", count: todayCheques.length, status: 'Today' },
-              { label: "Upcoming", count: upcomingCount, status: 'Upcoming' },
-              { label: "Overdue", count: overdueCount, status: 'Overdue' },
-            ].map((status) => (
-              <div key={status.label} className="group relative rounded-2xl border bg-card p-4 transition-all active:scale-95 overflow-hidden">
-                <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{status.label}</p>
-                <p className="mt-2 text-2xl font-black">{status.count}</p>
-              </div>
-            ))}
           </div>
         </>
       )}

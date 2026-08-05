@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { chequeSchema } from '@/validators'
@@ -11,8 +11,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useRouter } from 'next/navigation'
-import { ArrowLeft, ArrowRight, Check, Camera, X } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { ArrowLeft, ArrowRight, Check, Camera, X, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 import { Combobox } from '@/components/ui/combobox'
@@ -23,6 +23,8 @@ export default function CreateChequePage() {
   const [step, setStep] = useState(1)
   const [isUploading, setIsUploading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const typeParam = searchParams.get('type')
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
   const queryClient = useQueryClient()
@@ -47,12 +49,19 @@ export default function CreateChequePage() {
       cheque_date: new Date().toISOString().split('T')[0],
       party_id: '',
       account_id: '',
-      type: 'Outward',
+      type: (typeParam === 'Inward' ? 'Inward' : 'Outward') as 'Outward' | 'Inward',
       notes: '',
       image_url: null as string | null,
       deposit_date: '',
     }
   })
+
+  // Update type if query param changes
+  useEffect(() => {
+    if (typeParam === 'Inward' || typeParam === 'Outward') {
+      setValue('type', typeParam as any)
+    }
+  }, [typeParam, setValue])
 
   const mutation = useMutation({
     mutationFn: (data: any) => ChequeService.create({ ...data, business_id: businessId }),
@@ -101,7 +110,7 @@ export default function CreateChequePage() {
   })) || []
 
   const accountOptions = accounts?.map(b => ({ 
-    label: `${b.bank_name} (${b.account_number.slice(-4)})`, 
+    label: `${(b as any).bank?.name || 'Bank'} (${b.account_number.slice(-4)})`, 
     value: b.id,
     color: (b as any).color,
     icon: (b as any).icon
@@ -139,6 +148,55 @@ export default function CreateChequePage() {
         {step === 1 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
+              <Label>Cheque Type <span className="text-destructive">*</span></Label>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => setValue('type', 'Outward')}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-3 rounded-3xl p-6 border-2 transition-all active:scale-95",
+                    watch('type') === 'Outward' 
+                      ? "bg-primary/5 border-primary shadow-sm" 
+                      : "bg-card border-transparent hover:border-primary/20"
+                  )}
+                >
+                  <div className={cn(
+                    "h-12 w-12 rounded-2xl flex items-center justify-center transition-colors",
+                    watch('type') === 'Outward' ? "bg-primary text-white" : "bg-primary/10 text-primary"
+                  )}>
+                    <ArrowUpRight className="h-6 w-6" />
+                  </div>
+                  <span className={cn(
+                    "font-bold text-sm uppercase tracking-widest",
+                    watch('type') === 'Outward' ? "text-primary" : "text-muted-foreground"
+                  )}>Issued</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setValue('type', 'Inward')}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-3 rounded-3xl p-6 border-2 transition-all active:scale-95",
+                    watch('type') === 'Inward' 
+                      ? "bg-green-500/5 border-green-500 shadow-sm" 
+                      : "bg-card border-transparent hover:border-green-500/20"
+                  )}
+                >
+                  <div className={cn(
+                    "h-12 w-12 rounded-2xl flex items-center justify-center transition-colors",
+                    watch('type') === 'Inward' ? "bg-green-500 text-white" : "bg-green-500/10 text-green-600"
+                  )}>
+                    <ArrowDownLeft className="h-6 w-6" />
+                  </div>
+                  <span className={cn(
+                    "font-bold text-sm uppercase tracking-widest",
+                    watch('type') === 'Inward' ? "text-green-600" : "text-muted-foreground"
+                  )}>Received</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="amount">Amount <span className="text-destructive">*</span></Label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold">₹</span>
@@ -162,25 +220,6 @@ export default function CreateChequePage() {
               <Label htmlFor="cheque_date">Cheque Date <span className="text-destructive">*</span></Label>
               <Input id="cheque_date" type="date" {...register('cheque_date')} className="h-12 rounded-xl" />
               {errors.cheque_date && <p className="text-xs text-destructive">{errors.cheque_date.message as string}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Type <span className="text-destructive">*</span></Label>
-              <div className="flex gap-2">
-                {['Outward', 'Inward'].map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => setValue('type', t as any)}
-                    className={cn(
-                      "flex-1 rounded-pill h-11 text-sm font-semibold transition-colors",
-                      watch('type') === t ? "bg-primary text-white shadow-md" : "bg-canvas-parchment text-muted-foreground"
-                    )}
-                  >
-                    {t === 'Outward' ? 'Issued' : 'Received'}
-                  </button>
-                ))}
-              </div>
             </div>
             
             <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('amount')}>

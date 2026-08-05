@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { AccountService } from '@/services/account.service'
-import { Plus, Building2, ChevronRight, Search, ArrowUpAz, ArrowDownAz, Landmark } from 'lucide-react'
+import { Plus, Building2, ChevronRight, Search, ArrowUpAz, ArrowDownAz, Landmark, Filter } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
@@ -10,10 +10,13 @@ import { useState } from 'react'
 import { useBusiness } from '@/hooks/use-business'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 
 export default function AccountsPage() {
   const [search, setSearch] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [bankFilter, setBankFilter] = useState<string | 'All'>('All')
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
 
@@ -23,20 +26,25 @@ export default function AccountsPage() {
     enabled: !!businessId,
   })
 
-  const filteredAccounts = accounts?.filter(a => 
-    a.account_name.toLowerCase().includes(search.toLowerCase()) ||
-    a.bank?.name.toLowerCase().includes(search.toLowerCase()) ||
-    a.account_number.includes(search)
-  ).sort((a, b) => {
+  const filteredAccounts = accounts?.filter(a => {
+    const matchesSearch = a.account_name.toLowerCase().includes(search.toLowerCase()) ||
+                         a.bank?.name.toLowerCase().includes(search.toLowerCase()) ||
+                         a.account_number.includes(search)
+    const matchesBank = bankFilter === 'All' || a.bank_id === bankFilter
+    return matchesSearch && matchesBank
+  }).sort((a, b) => {
     const nameA = a.account_name.toLowerCase()
     const nameB = b.account_name.toLowerCase()
     if (sortOrder === 'asc') return nameA.localeCompare(nameB)
-    return nameB.localeCompare(nameA)
+    return nameB.localeCompare(a.name)
   })
+
+  const uniqueBanks = Array.from(new Set(accounts?.map(a => JSON.stringify({ id: a.bank_id, name: a.bank?.name })).filter(Boolean)))
+    .map(b => JSON.parse(b as string))
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-24">
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input 
@@ -46,6 +54,41 @@ export default function AccountsPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant={bankFilter !== 'All' ? 'default' : 'outline'} size="icon" className="rounded-full h-11 w-11 shrink-0 bg-white shadow-sm border-none">
+              <Filter className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-56 p-2 rounded-3xl" align="end">
+            <div className="flex flex-col gap-1">
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-3 py-2">Filter Bank</p>
+              <button
+                onClick={() => setBankFilter('All')}
+                className={cn(
+                  "flex items-center justify-between rounded-2xl px-3 py-2.5 text-sm font-bold transition-all",
+                  bankFilter === 'All' ? "bg-primary text-white" : "hover:bg-muted"
+                )}
+              >
+                All Banks
+              </button>
+              {uniqueBanks.map((bank) => (
+                <button
+                  key={bank.id}
+                  onClick={() => setBankFilter(bank.id)}
+                  className={cn(
+                    "flex items-center justify-between rounded-2xl px-3 py-2.5 text-sm font-bold transition-all",
+                    bankFilter === bank.id ? "bg-primary text-white" : "hover:bg-muted"
+                  )}
+                >
+                  <span className="truncate">{bank.name}</span>
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+
         <Button 
           variant="outline" 
           size="icon" 
