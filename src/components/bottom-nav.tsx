@@ -5,16 +5,18 @@ import { usePathname } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Home01Icon as Home, File02Icon as FileText, UserGroupIcon as Users, BankIcon as Landmark } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl';
 
 const navItems = [
-  { name: 'Home', href: '/', icon: Home },
-  { name: 'Cheques', href: '/cheques', icon: FileText },
-  { name: 'Parties', href: '/parties', icon: Users },
-  { name: 'Accounts', href: '/accounts', icon: Landmark },
+  { name: 'dashboard', href: '/', icon: Home },
+  { name: 'cheques', href: '/cheques', icon: FileText },
+  { name: 'parties', href: '/parties', icon: Users },
+  { name: 'accounts', href: '/accounts', icon: Landmark },
 ]
 
 export function BottomNav() {
   const pathname = usePathname()
+  const t = useTranslations('Navigation')
 
   // Only show bottom nav on main top-level routes
   const isMainTab = ['/', '/cheques', '/parties', '/accounts', '/settings', '/businesses', '/features'].includes(pathname)
@@ -37,7 +39,7 @@ export function BottomNav() {
             )}
           >
             <HugeiconsIcon icon={item.icon} className={cn("h-5 w-5", isActive && "stroke-[2.5px]")} />
-            <span className={cn("text-[10px] font-semibold tracking-tight", isActive ? "opacity-100" : "opacity-70")}>{item.name}</span>
+            <span className={cn("text-[10px] font-semibold tracking-tight", isActive ? "opacity-100" : "opacity-70")}>{t(item.name)}</span>
           </Link>
         )
       })}

@@ -1,10 +1,12 @@
-'use client'
+"use client"
+
+"use client"
 
 import { useBusiness } from "@/hooks/use-business"
 import { useProfile } from "@/hooks/use-profile"
 import { Button } from "@/components/ui/button"
 import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowRight01Icon as ChevronRight, Logout01Icon as LogOut, UserIcon as User, Notification01Icon as Bell, GlobalIcon as Globe, CreditCardIcon as CreditCard, File01Icon as FileSpreadsheet, Building03Icon as Building2, LayoutGridIcon as LayoutGrid, FlashIcon as Zap, TranslateIcon as Languages, Delete02Icon as Trash2, Clock01Icon as Clock } from '@hugeicons/core-free-icons';
+import { ArrowRight01Icon as ChevronRight, Logout01Icon as LogOut, UserIcon as User, Notification01Icon as Bell, GlobalIcon as Globe, CreditCardIcon as CreditCard, File01Icon as FileSpreadsheet, Building03Icon as Building2, LayoutGridIcon as LayoutGrid, FlashIcon as Zap, TranslateIcon as Languages, Delete02Icon as Trash2, Clock01Icon as Clock, MegaphoneIcon as Megaphone, HelpCircleIcon as Help, InformationCircleIcon as Info, Shield01Icon as Shield, LicenseIcon as License, Money03Icon as Money } from '@hugeicons/core-free-icons';
 import { useRouter } from "next/navigation"
 import dynamic from 'next/dynamic'
 import { useQuery } from "@tanstack/react-query"
@@ -16,6 +18,7 @@ import { format, differenceInDays } from "date-fns"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSettings } from "@/hooks/use-settings"
 import { EditableAvatar } from "@/components/ui/editable-avatar"
+import { useTranslations } from 'next-intl';
 
 const DeleteConfirmationDialog = dynamic(() => import("@/components/ui/delete-dialog").then(mod => mod.DeleteConfirmationDialog), {
   loading: () => <Skeleton className="h-16 w-full rounded-lg" />,
@@ -23,6 +26,8 @@ const DeleteConfirmationDialog = dynamic(() => import("@/components/ui/delete-di
 })
 
 export default function SettingsPage() {
+  const t = useTranslations('Settings');
+  const router = useRouter()
   const { activeBusiness } = useBusiness()
   const { profile, updateProfile, isLoading: profileLoading } = useProfile()
   const { handleExport, handleLogout, handleDeleteProfile } = useSettings()
@@ -65,7 +70,7 @@ export default function SettingsPage() {
   const languageOptions = [
     { label: 'English', value: 'en' },
     { label: 'Hindi', value: 'hi' },
-    { label: 'Hinglish', value: 'hinglish' },
+    { label: 'Hinglish', value: 'hi-en' },
   ]
 
   const timezoneOptions = [
@@ -93,7 +98,7 @@ export default function SettingsPage() {
 
   const sections = [
     {
-      title: 'General',
+      title: t('general'),
       icon: LayoutGrid,
       items: [
         { 
@@ -139,7 +144,11 @@ export default function SettingsPage() {
             <Combobox 
               options={languageOptions} 
               value={profile?.language || "en"} 
-              onValueChange={(val) => updateProfile({ language: val })}
+              onValueChange={(val) => {
+                updateProfile({ language: val });
+                document.cookie = `NEXT_LOCALE=${val}; path=/; max-age=31536000`;
+                router.refresh();
+              }}
               className={selectorWidth}
             />
           )
@@ -147,7 +156,7 @@ export default function SettingsPage() {
       ]
     },
     {
-      title: 'Management',
+      title: t('management'),
       icon: Building2,
       items: [
         { name: 'My Businesses', icon: Building2, href: '/businesses' },
@@ -155,7 +164,7 @@ export default function SettingsPage() {
       ]
     },
     {
-      title: 'Reminders',
+      title: t('reminders'),
       icon: Bell,
       items: [
         { 
@@ -185,10 +194,28 @@ export default function SettingsPage() {
       ]
     },
     {
-      title: 'Data & Reports',
+      title: t('dataAndReports'),
       icon: FileSpreadsheet,
       items: [
         { name: 'Export Cheques (CSV)', icon: FileSpreadsheet, action: () => handleExport(cheques, activeBusiness?.name || '') },
+      ]
+    },
+    {
+      title: t('support'),
+      icon: Help,
+      items: [
+        { name: "What's New", icon: Megaphone, href: '/settings/whats-new' },
+        { name: 'Help & Support', icon: Help, href: '/settings/help-and-support' },
+        { name: 'About App', icon: Info, href: '/settings/about' },
+      ]
+    },
+    {
+      title: t('legal'),
+      icon: Shield,
+      items: [
+        { name: 'Privacy Policy', icon: Shield, href: '/settings/privacy-policy' },
+        { name: 'Terms & Conditions', icon: License, href: '/settings/terms-and-conditions' },
+        { name: 'Refund Policy', icon: Money, href: '/settings/refund-policy' },
       ]
     }
   ]
@@ -255,7 +282,7 @@ export default function SettingsPage() {
       <div className="space-y-3">
         <div className="flex items-center gap-2 px-2">
           <HugeiconsIcon icon={Trash2} className="h-3 w-3 text-destructive opacity-80" />
-          <h3 className="text-[10px] font-semibold text-destructive uppercase tracking-wider">Danger Zone</h3>
+          <h3 className="text-[10px] font-semibold text-destructive uppercase tracking-wider">{t('dangerZone')}</h3>
         </div>
         <div className="divide-y rounded-lg border border-destructive/20 bg-destructive/5 overflow-hidden">
           <DeleteConfirmationDialog 
@@ -283,7 +310,7 @@ export default function SettingsPage() {
         className="w-full rounded-full h-14 text-lg font-semibold" 
         onClick={handleLogout}
       >
-        <HugeiconsIcon icon={LogOut} className="mr-2 h-5 w-5" /> Sign Out
+        <HugeiconsIcon icon={LogOut} className="mr-2 h-5 w-5" /> {t('signOut')}
       </Button>
 
       <div className="text-center pb-8">

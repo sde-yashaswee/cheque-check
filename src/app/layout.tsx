@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/providers";
 import { Toaster } from "@/components/ui/toast";
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages, getLocale } from 'next-intl/server';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,24 +16,27 @@ export const metadata: Metadata = {
   description: "Never miss a cheque again.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en" className={`${inter.variable}`}>
+    <html lang={locale} className={`${inter.variable}`}>
       <body className="bg-primary font-sans text-foreground selection:bg-primary/10 antialiased flex items-center justify-center min-h-[100dvh] overflow-hidden">
-        
-        {/* Mock Phone Container: Centered on large screens, full screen on mobile */}
+
         <div className="relative w-full h-[100dvh] bg-background sm:h-[90dvh] sm:max-h-[932px] sm:max-w-[430px] sm:rounded-xl sm:border-[4px] sm:border-white sm:shadow-2xl overflow-hidden flex flex-col [transform:translateZ(0)]">
-          <Providers>
-            {/* Inner Scrollable Area: All content scrolls inside here */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden relative flex flex-col">
-              {children}
-            </div>
-            <Toaster />
-          </Providers>
+          <NextIntlClientProvider messages={messages}>
+            <Providers>
+              <div className="flex-1 overflow-y-auto overflow-x-hidden relative flex flex-col">
+                {children}
+              </div>
+              <Toaster />
+            </Providers>
+          </NextIntlClientProvider>
         </div>
 
         {/* Landscape Warning Overlay: Visible only on mobile landscape devices */}

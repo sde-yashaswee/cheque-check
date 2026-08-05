@@ -1,0 +1,12 @@
+{
+  "Settings": {
+    "general": "सामान्य",
+    "management": "प्रबंधन",
+    "reminders": "अनुस्मारक",
+    "dataAndReports": "डेटा और रिपोर्ट",
+    "support": "सहायता",
+    "legal": "कानूनी",
+    "dangerZone": "खतरे का क्षेत्र",
+    "signOut": "साइन आउट"
+  }
+}

@@ -14,8 +14,11 @@ import { StatusPill } from '@/components/ui/status-pill'
 import { cn } from '@/lib/utils'
 import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
+import { useTranslations } from 'next-intl'
 
 export default function ChequesPage() {
+  const t = useTranslations('Cheques')
+  const tCommon = useTranslations('Common')
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
 
@@ -36,6 +39,8 @@ export default function ChequesPage() {
     setFilter('All')
   }
 
+  const statusOptions = ['All', 'Issued', 'Received', 'Cleared', 'Bounced'] as const
+
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-24">
       <div className="flex gap-2">
@@ -43,7 +48,7 @@ export default function ChequesPage() {
           <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input 
             className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
-            placeholder="Search cheques..." 
+            placeholder={t('searchPlaceholder')} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -59,17 +64,17 @@ export default function ChequesPage() {
           />
           <PopoverContent className="w-56 p-2 rounded-lg" align="end">
             <div className="flex flex-col gap-1">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">Filter Status</p>
-              {['All', 'Issued', 'Received', 'Cleared', 'Bounced'].map((s) => (
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">{t('filterStatus')}</p>
+              {statusOptions.map((s) => (
                 <button
                   key={s}
-                  onClick={() => setFilter(s as any)}
+                  onClick={() => setFilter(s)}
                   className={cn(
                     "flex items-center justify-between rounded-sm px-3 py-2.5 text-sm font-semibold transition-all active:scale-95",
                     filter === s ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted"
                   )}
                 >
-                  {s}
+                  {tCommon(s.toLowerCase() as any)}
                   {filter === s ? (
                     <div className="h-2 w-2 rounded-full bg-white" />
                   ) : (
@@ -99,10 +104,10 @@ export default function ChequesPage() {
           emptyState={
             <EmptyState
               icon={ReceiptText}
-              title="No cheques recorded"
-              description="You haven't recorded any cheques yet. Add your first issued or received cheque."
+              title={t('noChequesTitle')}
+              description={t('noChequesDesc')}
               action={{
-                label: "Record your first cheque",
+                label: t('recordFirst'),
                 href: "/cheques/create"
               }}
             />

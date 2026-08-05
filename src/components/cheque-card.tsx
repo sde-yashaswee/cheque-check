@@ -13,6 +13,7 @@ import { StatusPill } from '@/components/ui/status-pill'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
 import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useTranslations } from 'next-intl'
 
 const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-dialog').then(mod => mod.DeleteConfirmationDialog), {
   loading: () => <Skeleton className="h-10 w-full rounded-lg" />,
@@ -32,6 +33,8 @@ interface ChequeCardProps {
 }
 
 export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
+  const t = useTranslations('Cheques')
+  const tCommon = useTranslations('Common')
   const [offset, setOffset] = useState(0)
   const [swiping, setSwiping] = useState<'clear' | 'bounce' | null>(null)
   const { profile } = useProfile()
@@ -99,13 +102,13 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
           swiping === 'clear' ? "opacity-100" : "opacity-0"
         )}>
           <HugeiconsIcon icon={Check} className="h-6 w-6 text-green-500" />
-          <span className="font-bold text-green-500">CLEAR</span>
+          <span className="font-bold text-green-500 uppercase">{t('clear')}</span>
         </div>
         <div className={cn(
           "flex items-center gap-2 transition-opacity",
           swiping === 'bounce' ? "opacity-100" : "opacity-0"
         )}>
-          <span className="font-bold text-destructive">BOUNCE</span>
+          <span className="font-bold text-destructive uppercase">{t('bounce')}</span>
           <HugeiconsIcon icon={X} className="h-6 w-6 text-destructive" />
         </div>
       </div>
@@ -138,7 +141,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
                       </button>
                     } />
                     <DialogContent className="max-w-lg p-0 overflow-hidden bg-transparent border-none shadow-none">
-                      <Image src={cheque.image_url} alt="Cheque Scan" width={800} height={400} className="w-full h-auto rounded-3xl" />
+                      <Image src={cheque.image_url} alt={t('scan')} width={800} height={400} className="w-full h-auto rounded-3xl" />
                     </DialogContent>
                   </Dialog>
                 )}
@@ -164,11 +167,11 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
         </div>
         <div className="mt-4 flex justify-between items-center border-t pt-4 relative z-10">
           <div className="flex items-center gap-2">
-            <p className="text-xs text-muted-foreground">Cheque #{cheque.cheque_number}</p>
+            <p className="text-xs text-muted-foreground">#{cheque.cheque_number}</p>
             <div className="pointer-events-auto">
               <DeleteConfirmationDialog 
-                title="Delete Cheque?"
-                description="This will permanently delete this cheque record."
+                title={t('deleteConfirmTitle')}
+                description={t('deleteConfirmDesc')}
                 confirmName={cheque.cheque_number}
                 onDelete={async () => { deleteMutation.mutate() }}
                 trigger={

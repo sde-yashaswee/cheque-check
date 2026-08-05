@@ -15,6 +15,7 @@ import { Wallet01Icon as Wallet, Building03Icon as Building2, Settings02Icon as 
 import { Combobox } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 
 const COLORS = ['#0066cc', '#34C759', '#FF9500', '#FF3B30', '#AF52DE', '#5856D6', '#8E8E93']
 
@@ -48,25 +49,28 @@ const TIMEZONE_OPTIONS = [
   { label: 'GMT (UTC+0)', value: 'Europe/London' },
 ]
 
-const REMINDERS_PER_DAY_OPTIONS = [
-  { label: '1 time/day', value: '1' },
-  { label: '2 times/day', value: '2' },
-  { label: '3 times/day', value: '3' },
-]
-
-const REMINDER_FREQUENCY_OPTIONS = [
-  { label: '1 day before', value: '1' },
-  { label: '3 days before', value: '3' },
-  { label: '7 days before', value: '7' },
-]
-
 export default function OnboardingPage() {
+  const t = useTranslations('Onboarding')
+  const tc = useTranslations('Common')
+  
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const queryClient = useQueryClient()
   const { profile, updateProfile } = useProfile()
   const { setActiveBusiness } = useBusiness()
+
+  const REMINDERS_PER_DAY_OPTIONS = [
+    { label: t('remindersPerDay', { count: 1 }), value: '1' },
+    { label: t('remindersPerDay', { count: 2 }), value: '2' },
+    { label: t('remindersPerDay', { count: 3 }), value: '3' },
+  ]
+
+  const REMINDER_FREQUENCY_OPTIONS = [
+    { label: t('reminderDays', { count: 1 }), value: '1' },
+    { label: t('reminderDays', { count: 3 }), value: '3' },
+    { label: t('reminderDays', { count: 7 }), value: '7' },
+  ]
 
   // Form State
   const [formData, setFormData] = useState({
@@ -169,20 +173,22 @@ export default function OnboardingPage() {
           <div className="space-y-1">
             {step < 5 ? (
               <>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Step {step} of 4</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                  {t('step', { step, total: 4 })}
+                </p>
                 <h1 className="text-display-md md:text-display-lg font-semibold tracking-tight text-ink dark:text-white flex items-center gap-3">
                   {step === 1 && <HugeiconsIcon icon={Wallet} className="h-8 w-8 text-primary" />}
                   {step === 2 && <HugeiconsIcon icon={Building2} className="h-8 w-8 text-primary" />}
                   {step === 3 && <HugeiconsIcon icon={Settings2} className="h-8 w-8 text-primary" />}
                   {step === 4 && <HugeiconsIcon icon={Bell} className="h-8 w-8 text-primary" />}
-                  {step === 1 && "Welcome to ChequeCheck"}
-                  {step === 2 && "Business Details"}
-                  {step === 3 && "Personalize Experience"}
-                  {step === 4 && "Notifications"}
+                  {step === 1 && t('welcome')}
+                  {step === 2 && t('businessDetails')}
+                  {step === 3 && t('personalizeExperience')}
+                  {step === 4 && t('notifications')}
                 </h1>
               </>
             ) : (
-              <h1 className="text-display-lg font-semibold tracking-tight text-ink dark:text-white text-center w-full">All Set!</h1>
+              <h1 className="text-display-lg font-semibold tracking-tight text-ink dark:text-white text-center w-full">{t('allSet')}</h1>
             )}
           </div>
         </div>
@@ -215,11 +221,11 @@ export default function OnboardingPage() {
               >
                 <div className="space-y-6">
                   <div className="space-y-3">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Business Name</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('businessName')}</Label>
                     <div className="relative group">
                       <HugeiconsIcon icon={Building2} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                       <Input 
-                        placeholder="e.g. Apple Inc." 
+                        placeholder={t('businessNamePlaceholder')} 
                         value={formData.businessName}
                         onChange={(e) => setFormData({...formData, businessName: e.target.value})}
                         className="h-14 pl-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none text-xl font-medium rounded-sm transition-all focus:ring-2 focus:ring-primary/20"
@@ -228,7 +234,7 @@ export default function OnboardingPage() {
                   </div>
 
                   <div className="space-y-4">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Brand Color</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('brandColor')}</Label>
                     <div className="flex flex-wrap gap-4 p-1">
                       {COLORS.map((c) => (
                         <button
@@ -251,7 +257,7 @@ export default function OnboardingPage() {
                   onClick={nextStep} 
                   disabled={!formData.businessName}
                 >
-                  Get Started <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
+                  {t('getStarted')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
                 </Button>
               </motion.div>
             )}
@@ -267,12 +273,12 @@ export default function OnboardingPage() {
               >
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Business Email</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('businessEmail')}</Label>
                     <div className="relative group">
                       <HugeiconsIcon icon={Mail} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input 
                         type="email"
-                        placeholder="contact@company.com" 
+                        placeholder={t('businessEmailPlaceholder')} 
                         value={formData.businessEmail}
                         onChange={(e) => setFormData({...formData, businessEmail: e.target.value})}
                         className="h-14 pl-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none text-lg rounded-sm"
@@ -281,11 +287,11 @@ export default function OnboardingPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Business Phone</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('businessPhone')}</Label>
                     <div className="relative group">
                       <HugeiconsIcon icon={Phone} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input 
-                        placeholder="+1 (555) 000-0000" 
+                        placeholder={t('businessPhonePlaceholder')} 
                         value={formData.businessPhone}
                         onChange={(e) => setFormData({...formData, businessPhone: e.target.value})}
                         className="h-14 pl-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none text-lg rounded-sm"
@@ -294,11 +300,11 @@ export default function OnboardingPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Headquarters</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('headquarters')}</Label>
                     <div className="relative group">
                       <HugeiconsIcon icon={MapPin} className="absolute left-5 top-5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input 
-                        placeholder="City, Country" 
+                        placeholder={t('headquartersPlaceholder')} 
                         value={formData.businessAddress}
                         onChange={(e) => setFormData({...formData, businessAddress: e.target.value})}
                         className="h-14 pl-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none text-lg rounded-sm"
@@ -311,7 +317,7 @@ export default function OnboardingPage() {
                   className="w-full rounded-pill h-14 text-lg font-medium shadow-xl shadow-primary/20 active:scale-[0.98] transition-transform" 
                   onClick={nextStep}
                 >
-                  Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
+                  {tc('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
                 </Button>
               </motion.div>
             )}
@@ -327,7 +333,7 @@ export default function OnboardingPage() {
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Currency</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('currency')}</Label>
                     <Combobox 
                       options={CURRENCY_OPTIONS} 
                       value={formData.currency} 
@@ -336,7 +342,7 @@ export default function OnboardingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Language</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('language')}</Label>
                     <Combobox 
                       options={LANGUAGE_OPTIONS} 
                       value={formData.language} 
@@ -347,7 +353,7 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Date Format</Label>
+                  <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('dateFormat')}</Label>
                   <Combobox 
                     options={DATE_FORMAT_OPTIONS} 
                     value={formData.dateFormat} 
@@ -358,7 +364,7 @@ export default function OnboardingPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Time Format</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('timeFormat')}</Label>
                     <Combobox 
                       options={TIME_FORMAT_OPTIONS} 
                       value={formData.timeFormat} 
@@ -367,7 +373,7 @@ export default function OnboardingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Time Zone</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('timeZone')}</Label>
                     <Combobox 
                       options={TIMEZONE_OPTIONS} 
                       value={formData.timeZone} 
@@ -381,7 +387,7 @@ export default function OnboardingPage() {
                   className="w-full rounded-pill h-14 text-lg font-medium shadow-xl shadow-primary/20 active:scale-[0.98] transition-transform" 
                   onClick={nextStep}
                 >
-                  Looks Good <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
+                  {t('looksGood')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
                 </Button>
               </motion.div>
             )}
@@ -397,25 +403,25 @@ export default function OnboardingPage() {
               >
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Daily Frequency</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('dailyFrequency')}</Label>
                     <Combobox 
                       options={REMINDERS_PER_DAY_OPTIONS} 
                       value={formData.remindersPerDay} 
                       onValueChange={(v) => setFormData({...formData, remindersPerDay: v})}
                       className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
                     />
-                    <p className="text-[11px] text-muted-foreground px-1">How many alerts should we send on the due date?</p>
+                    <p className="text-[11px] text-muted-foreground px-1">{t('dailyFrequencyHelp')}</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Advanced Warning</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('advancedWarning')}</Label>
                     <Combobox 
                       options={REMINDER_FREQUENCY_OPTIONS} 
                       value={formData.defaultReminderDays} 
                       onValueChange={(v) => setFormData({...formData, defaultReminderDays: v})}
                       className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
                     />
-                    <p className="text-[11px] text-muted-foreground px-1">Days before the due date to start notifying you.</p>
+                    <p className="text-[11px] text-muted-foreground px-1">{t('advancedWarningHelp')}</p>
                   </div>
                 </div>
 
@@ -429,7 +435,7 @@ export default function OnboardingPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-ink dark:text-white">{formData.businessName}</h3>
-                      <p className="text-sm text-muted-foreground">Ready to manage your cheques.</p>
+                      <p className="text-sm text-muted-foreground">{t('readyToManage')}</p>
                     </div>
                   </div>
                 </div>
@@ -439,7 +445,7 @@ export default function OnboardingPage() {
                   onClick={handleFinish}
                   disabled={loading}
                 >
-                  {loading ? 'Completing Setup...' : 'Finish Setup'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
+                  {loading ? t('completingSetup') : t('finishSetup')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
                 </Button>
               </motion.div>
             )}
@@ -468,9 +474,9 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <h2 className="text-display-md font-semibold tracking-tight">You&apos;re Ready to Go</h2>
+                  <h2 className="text-display-md font-semibold tracking-tight">{t('readyToGo')}</h2>
                   <p className="text-lead text-muted-foreground max-w-sm mx-auto">
-                    Everything is configured. Welcome to the future of cheque management.
+                    {t('successMessage')}
                   </p>
                 </div>
 
@@ -478,7 +484,7 @@ export default function OnboardingPage() {
                   onClick={() => router.push('/')} 
                   className="w-full max-w-sm rounded-pill h-14 text-xl font-semibold shadow-2xl shadow-primary/40 hover:scale-105 active:scale-95 transition-all"
                 >
-                  Enter Dashboard <HugeiconsIcon icon={ArrowRight} className="ml-2 h-6 w-6" />
+                  {t('enterDashboard')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-6 w-6" />
                 </Button>
               </motion.div>
             )}

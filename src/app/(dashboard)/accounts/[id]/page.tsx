@@ -16,8 +16,11 @@ import { StatusPill } from '@/components/ui/status-pill'
 import { cn } from '@/lib/utils'
 import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
+import { useTranslations } from 'next-intl'
 
 export default function AccountDetailPage() {
+  const t = useTranslations('Accounts')
+  const tc = useTranslations('Common')
   const { id } = useParams() as { id: string }
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
@@ -52,7 +55,7 @@ export default function AccountDetailPage() {
     )
   }
 
-  if (!account) return <div className="text-center py-20 text-muted-foreground">Account not found</div>
+  if (!account) return <div className="text-center py-20 text-muted-foreground">{t('notFound')}</div>
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
@@ -80,14 +83,14 @@ export default function AccountDetailPage() {
 
         <div className="grid grid-cols-2 gap-4 relative z-10">
           <div className="space-y-1">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Account Number</p>
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{t('accountNumber')}</p>
             <div className="flex items-center gap-2">
               <HugeiconsIcon icon={Hash} className="h-3 w-3 text-primary" />
               <p className="font-mono font-semibold">{account.account_number}</p>
             </div>
           </div>
           <div className="space-y-1">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">IFSC Code</p>
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{t('ifscCode')}</p>
             <p className="font-mono font-semibold uppercase">{account.ifsc_code || 'N/A'}</p>
           </div>
         </div>
@@ -96,7 +99,7 @@ export default function AccountDetailPage() {
       <div className="space-y-4">
         <div className="flex items-center gap-2 px-1">
           <HugeiconsIcon icon={FileText} className="h-3 w-3 text-muted-foreground opacity-80" />
-          <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Cheque History</h3>
+          <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tc('chequeHistory')}</h3>
         </div>
 
         <div className="flex gap-2">
@@ -104,7 +107,7 @@ export default function AccountDetailPage() {
             <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input 
               className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
-              placeholder="Search account cheques..." 
+              placeholder={t('searchChequesPlaceholder')} 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -120,7 +123,7 @@ export default function AccountDetailPage() {
             />
             <PopoverContent className="w-56 p-2 rounded-lg" align="end">
               <div className="flex flex-col gap-1">
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">Filter Status</p>
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">{tc('filterStatus')}</p>
                 {['All', 'Issued', 'Received', 'Cleared', 'Bounced'].map((s) => (
                   <button
                     key={s}
@@ -130,7 +133,7 @@ export default function AccountDetailPage() {
                       filter === s ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted"
                     )}
                   >
-                    {s}
+                    {tc(s.toLowerCase() as any)}
                     {filter === s ? (
                       <div className="h-2 w-2 rounded-full bg-white" />
                     ) : (
@@ -158,10 +161,10 @@ export default function AccountDetailPage() {
           emptyState={
             <EmptyState
               icon={ReceiptText}
-              title="No cheques found"
-              description="No cheques have been recorded for this account yet."
+              title={tc('noData')}
+              description={t('noChequesDesc')}
               action={{
-                label: "Record new cheque",
+                label: tc('recordNewCheque'),
                 href: "/cheques/create"
               }}
             />

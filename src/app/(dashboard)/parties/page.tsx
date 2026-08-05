@@ -12,8 +12,11 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
 import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
+import { useTranslations } from 'next-intl';
 
 export default function PartiesPage() {
+  const t = useTranslations('Parties');
+  const tCommon = useTranslations('Common');
   const { activeBusiness } = useBusiness()
   const { profile } = useProfile()
   const businessId = activeBusiness?.id
@@ -43,7 +46,7 @@ export default function PartiesPage() {
           <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input 
             className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
-            placeholder="Search parties..." 
+            placeholder={t('searchPlaceholder')} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -75,10 +78,10 @@ export default function PartiesPage() {
           emptyState={
             <EmptyState
               icon={User}
-              title="No parties found"
-              description="Keep track of people or businesses you deal with. Add your first party to get started."
+              title={t('noPartiesTitle')}
+              description={t('noPartiesDesc')}
               action={{
-                label: "Add your first party",
+                label: t('addFirstParty'),
                 href: "/parties/create"
               }}
             />
@@ -99,7 +102,7 @@ export default function PartiesPage() {
                   <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider truncate">{party.contact}</p>
                 </div>
                 <div className="text-right pr-2 shrink-0">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">Balance</p>
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">{tCommon('balance')}</p>
                   <p className="text-sm font-semibold text-primary">{currency}{getBalance(party.id).toLocaleString()}</p>
                 </div>
                 <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 shrink-0 text-muted-foreground opacity-40 group-hover:translate-x-1 transition-transform" />

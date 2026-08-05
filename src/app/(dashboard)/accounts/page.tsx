@@ -13,8 +13,11 @@ import { cn } from '@/lib/utils'
 import { useAccounts } from '@/hooks/use-accounts'
 import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
+import { useTranslations } from 'next-intl'
 
 export default function AccountsPage() {
+  const t = useTranslations('Accounts')
+  const tc = useTranslations('Common')
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
 
@@ -44,7 +47,7 @@ export default function AccountsPage() {
           <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input 
             className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
-            placeholder="Search accounts..." 
+            placeholder={t('searchPlaceholder')} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -61,7 +64,7 @@ export default function AccountsPage() {
           />
           <PopoverContent className="w-56 p-2 rounded-lg" align="end">
             <div className="flex flex-col gap-1">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">Filter Bank</p>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">{t('filterBank')}</p>
               <button
                 onClick={() => setBankFilter('All')}
                 className={cn(
@@ -69,7 +72,7 @@ export default function AccountsPage() {
                   bankFilter === 'All' ? "bg-primary text-white" : "hover:bg-muted"
                 )}
               >
-                All Banks
+                {tc('allBanks')}
               </button>
               {uniqueBanks.map((bank) => (
                 <button
@@ -114,10 +117,10 @@ export default function AccountsPage() {
           emptyState={
             <EmptyState
               icon={Landmark}
-              title="No accounts found"
-              description="You haven't added any bank accounts yet. Add your first account to start tracking cheques."
+              title={t('noAccountsTitle')}
+              description={t('noAccountsDesc')}
               action={{
-                label: "Add your first account",
+                label: t('addFirstAccount'),
                 href: "/accounts/create"
               }}
             />
@@ -146,7 +149,7 @@ export default function AccountsPage() {
                         {account.account_number.replace(/\d(?=\d{4})/g, "•")}
                       </p>
                       <span className="rounded-full bg-primary/5 px-2 py-0.5 text-[9px] font-semibold text-primary uppercase tracking-wider">
-                        {account.ifsc_code || 'No IFSC'}
+                        {account.ifsc_code || tc('noIfsc')}
                       </span>
                     </div>
                   </div>

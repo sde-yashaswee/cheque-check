@@ -16,6 +16,7 @@ import { DataState } from "@/components/ui/data-state";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Building03Icon, Calendar01Icon, PieChartIcon } from "@hugeicons/core-free-icons";
 import dynamic from 'next/dynamic'
+import { useTranslations } from 'next-intl';
 
 const ChequeStatsChart = dynamic(() => import("@/components/cheque-stats-chart").then(mod => mod.ChequeStatsChart), {
   loading: () => <Skeleton className="h-full w-full rounded-lg" />,
@@ -23,6 +24,8 @@ const ChequeStatsChart = dynamic(() => import("@/components/cheque-stats-chart")
 })
 
 export default function HomePage() {
+  const tDashboard = useTranslations('Dashboard')
+  const tCommon = useTranslations('Common')
   const { activeBusiness } = useBusiness()
   const { profile } = useProfile()
   const queryClient = useQueryClient()
@@ -55,10 +58,10 @@ export default function HomePage() {
   const currency = profile?.currency || '₹'
 
   const chartData = [
-    { name: 'Issued', value: issuedCount, color: '#0066cc' },   // Action Blue
-    { name: 'Received', value: receivedCount, color: '#2997ff' }, // Sky Blue
-    { name: 'Cleared', value: clearedCount, color: '#34C759' },  // iOS Green
-    { name: 'Bounced', value: bouncedCount, color: '#FF3B30' },  // iOS Red
+    { name: tDashboard('issued'), value: issuedCount, color: '#0066cc' },   // Action Blue
+    { name: tDashboard('received'), value: receivedCount, color: '#2997ff' }, // Sky Blue
+    { name: tDashboard('cleared'), value: clearedCount, color: '#34C759' },  // iOS Green
+    { name: tDashboard('bounced'), value: bouncedCount, color: '#FF3B30' },  // iOS Red
   ].filter(d => d.value > 0);
 
   return (
@@ -84,10 +87,10 @@ export default function HomePage() {
         emptyState={
           <EmptyState
             icon={Building03Icon}
-            title="Welcome to Cheque Check"
-            description="You need to create or select a business to start tracking cheques."
+            title={tDashboard('welcomeTitle')}
+            description={tDashboard('welcomeDescription')}
             action={{
-              label: "Create Business",
+              label: tDashboard('createBusiness'),
               href: "/businesses/create"
             }}
           />
@@ -97,7 +100,7 @@ export default function HomePage() {
           {/* Outstanding Card */}
           <div className="rounded-lg bg-primary p-8 text-primary-foreground relative overflow-hidden">
             <div className="relative z-10">
-              <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">Total Outstanding</p>
+              <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">{tDashboard('totalOutstanding')}</p>
               <p className="mt-2 text-4xl font-semibold">{currency}{outstanding.toLocaleString()}</p>
             </div>
             <div className="absolute -right-10 -bottom-10 opacity-10 rotate-12">
@@ -109,7 +112,7 @@ export default function HomePage() {
           <div className="space-y-4">
             <div className="flex items-center gap-2 px-1">
               <HugeiconsIcon icon={Zap} className="h-3 w-3 text-muted-foreground opacity-80" />
-              <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Quick Actions</h2>
+              <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tDashboard('quickActions')}</h2>
             </div>
             <div className="flex gap-4">
               <Link href="/cheques/create?type=Outward" className="flex-1">
@@ -117,7 +120,7 @@ export default function HomePage() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/10 text-primary">
                     <HugeiconsIcon icon={ArrowUpRight} className="h-6 w-6" />
                   </div>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">Issue Cheque</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{tDashboard('issueCheque')}</span>
                 </div>
               </Link>
               <Link href="/cheques/create?type=Inward" className="flex-1">
@@ -125,7 +128,7 @@ export default function HomePage() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-green-500/10 text-green-600">
                     <HugeiconsIcon icon={ArrowDownLeft} className="h-6 w-6" />
                   </div>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-green-600">Receive Cheque</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-green-600">{tDashboard('receiveCheque')}</span>
                 </div>
               </Link>
             </div>
@@ -135,13 +138,13 @@ export default function HomePage() {
           <div className="space-y-4">
             <div className="flex items-center gap-2 px-1">
               <HugeiconsIcon icon={Calendar} className="h-3 w-3 text-muted-foreground opacity-80" />
-              <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Today&apos;s Cheques</h2>
+              <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tDashboard('todaysCheques')}</h2>
             </div>
             {todayCheques.length === 0 ? (
               <EmptyState
                 icon={Calendar01Icon}
-                title="No cheques due today"
-                description="Enjoy your day! You have no upcoming cheques for today."
+                title={tDashboard('noChequesTodayTitle')}
+                description={tDashboard('noChequesTodayDescription')}
                 className="py-10 bg-canvas-parchment/30"
               />
             ) : (
@@ -160,9 +163,9 @@ export default function HomePage() {
           {/* Today/Upcoming/Overdue Cards */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: "Today", count: todayCheques.length, color: 'bg-primary/5' },
-              { label: "Upcoming", count: upcomingCount, color: 'bg-green-500/5' },
-              { label: "Overdue", count: overdueCount, color: 'bg-red-500/5' },
+              { label: tDashboard('today'), count: todayCheques.length, color: 'bg-primary/5' },
+              { label: tDashboard('upcoming'), count: upcomingCount, color: 'bg-green-500/5' },
+              { label: tDashboard('overdue'), count: overdueCount, color: 'bg-red-500/5' },
             ].map((status) => (
               <div key={status.label} className={`group relative rounded-lg border ${status.color} p-4 transition-all active:scale-95 overflow-hidden`}>
                 <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">{status.label}</p>
@@ -175,7 +178,7 @@ export default function HomePage() {
           <div className="space-y-4 pt-4">
             <div className="flex items-center gap-2 px-1">
               <HugeiconsIcon icon={Stats} className="h-3 w-3 text-muted-foreground opacity-80" />
-              <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Statistics</h2>
+              <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tDashboard('statistics')}</h2>
             </div>
             <div className="rounded-lg border bg-card p-6 h-[300px] relative">
               <ChequeStatsChart chartData={chartData} totalCheques={cheques?.length || 0} />

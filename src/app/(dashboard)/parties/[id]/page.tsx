@@ -17,8 +17,11 @@ import { StatusPill } from '@/components/ui/status-pill'
 import { cn } from '@/lib/utils'
 import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
+import { useTranslations } from 'next-intl'
 
 export default function PartyDetailPage() {
+  const t = useTranslations('Parties')
+  const tCommon = useTranslations('Common')
   const { id } = useParams() as { id: string }
   const { activeBusiness } = useBusiness()
   const { profile } = useProfile()
@@ -56,7 +59,7 @@ export default function PartyDetailPage() {
     )
   }
 
-  if (!party) return <div className="text-center py-20 text-muted-foreground">Party not found</div>
+  if (!party) return <div className="text-center py-20 text-muted-foreground">{t('notFound')}</div>
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
@@ -85,13 +88,13 @@ export default function PartyDetailPage() {
         <div className="flex gap-3 relative z-10">
           <a href={`tel:${party.contact}`} className="flex-1">
             <Button className="w-full rounded-sm h-12" variant="outline">
-              <HugeiconsIcon icon={Phone} className="mr-2 h-4 w-4" /> Contact
+              <HugeiconsIcon icon={Phone} className="mr-2 h-4 w-4" /> {tCommon('contact')}
             </Button>
           </a>
           {party.email && (
             <a href={`mailto:${party.email}`} className="flex-1">
               <Button className="w-full rounded-sm h-12" variant="outline">
-                <HugeiconsIcon icon={Mail} className="mr-2 h-4 w-4" /> Email
+                <HugeiconsIcon icon={Mail} className="mr-2 h-4 w-4" /> {tCommon('email')}
               </Button>
             </a>
           )}
@@ -99,18 +102,18 @@ export default function PartyDetailPage() {
 
         <div className="grid grid-cols-2 gap-4 relative z-10">
           <div className="rounded-sm bg-primary/5 p-4 border border-primary/10">
-            <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">Outstanding</p>
+            <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">{tCommon('outstanding')}</p>
             <p className="mt-2 text-2xl font-semibold">{currency}{outstanding.toLocaleString()}</p>
           </div>
           <div className="rounded-sm bg-canvas-parchment p-4 border border-border/50">
-            <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">Total Cheques</p>
+            <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">{tCommon('totalCheques')}</p>
             <p className="mt-2 text-2xl font-semibold">{partyCheques.length}</p>
           </div>
         </div>
         
         {party.address && (
           <div className="pt-2 relative z-10">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">Address</p>
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">{tCommon('address')}</p>
             <p className="text-sm font-semibold">{party.address}</p>
           </div>
         )}
@@ -119,7 +122,7 @@ export default function PartyDetailPage() {
       <div className="space-y-4">
         <div className="flex items-center gap-2 px-1">
           <HugeiconsIcon icon={FileText} className="h-3 w-3 text-muted-foreground opacity-80" />
-          <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Cheque History</h3>
+          <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tCommon('chequeHistory')}</h3>
         </div>
 
         <div className="flex gap-2">
@@ -127,7 +130,7 @@ export default function PartyDetailPage() {
             <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input 
               className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
-              placeholder="Search party cheques..." 
+              placeholder={t('searchChequesPlaceholder')} 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -143,7 +146,7 @@ export default function PartyDetailPage() {
             />
             <PopoverContent className="w-56 p-2 rounded-lg" align="end">
               <div className="flex flex-col gap-1">
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">Filter Status</p>
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">{tCommon('filterStatus')}</p>
                 {['All', 'Issued', 'Received', 'Cleared', 'Bounced'].map((s) => (
                   <button
                     key={s}
@@ -153,7 +156,7 @@ export default function PartyDetailPage() {
                       filter === s ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted"
                     )}
                   >
-                    {s}
+                    {tCommon(s.toLowerCase() as any)}
                     {filter === s ? (
                       <div className="h-2 w-2 rounded-full bg-white" />
                     ) : (
@@ -181,10 +184,10 @@ export default function PartyDetailPage() {
           emptyState={
             <EmptyState
               icon={ReceiptText}
-              title="No cheques found"
-              description="No cheques have been recorded for this party yet."
+              title={t('noChequesTitle')}
+              description={t('noChequesDesc')}
               action={{
-                label: "Record new cheque",
+                label: t('recordNewCheque'),
                 href: "/cheques/create"
               }}
             />

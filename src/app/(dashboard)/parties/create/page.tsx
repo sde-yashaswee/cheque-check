@@ -9,8 +9,11 @@ import { useBusiness } from '@/hooks/use-business'
 import { HugeiconsIcon } from '@hugeicons/react';
 import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, UserIcon as User, CallIcon as Phone, Location01Icon as MapPin } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 export default function CreatePartyPage() {
+  const t = useTranslations('Parties')
+  const tCommon = useTranslations('Common')
   const router = useRouter()
   const { activeBusiness } = useBusiness()
   
@@ -34,8 +37,8 @@ export default function CreatePartyPage() {
           <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5" />
         </Button>
         <div>
-          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Step {step} of 3</p>
-          <h2 className="text-display-sm font-semibold">New Party</h2>
+          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">{tCommon('step', { step, total: 3 })}</p>
+          <h2 className="text-display-sm font-semibold">{t('newParty')}</h2>
         </div>
       </div>
 
@@ -56,13 +59,13 @@ export default function CreatePartyPage() {
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Party Name</Label>
+                <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('partyName')}</Label>
                 <div className="relative">
                   <HugeiconsIcon icon={User} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
                   <Input 
                     id="name" 
                     {...register('name')} 
-                    placeholder="Enter full name" 
+                    placeholder={t('enterFullName')} 
                     className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-semibold rounded-sm"
                   />
                 </div>
@@ -70,7 +73,7 @@ export default function CreatePartyPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Theme Color</Label>
+                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tCommon('themeColor')}</Label>
                 <div className="flex flex-wrap gap-3 p-1">
                   {colors.map((c) => (
                     <button
@@ -89,7 +92,7 @@ export default function CreatePartyPage() {
             </div>
             
             <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('name')}>
-              Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
+              {tCommon('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -97,13 +100,13 @@ export default function CreatePartyPage() {
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="contact" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Contact Number</Label>
+              <Label htmlFor="contact" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('contactNumber')}</Label>
               <div className="relative">
                 <HugeiconsIcon icon={Phone} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
                 <Input 
                   id="contact" 
                   {...register('contact')} 
-                  placeholder="Phone number" 
+                  placeholder={t('phoneNumber')} 
                   className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
                 />
               </div>
@@ -111,12 +114,12 @@ export default function CreatePartyPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Email</Label>
+              <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tCommon('email')}</Label>
               <Input id="email" {...register('email')} placeholder="email@address.com" className="h-14 bg-canvas-parchment border-none rounded-sm" />
             </div>
 
             <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('contact')}>
-              Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
+              {tCommon('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -124,22 +127,22 @@ export default function CreatePartyPage() {
         {step === 3 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Address</Label>
+              <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tCommon('address')}</Label>
               <div className="relative">
                 <HugeiconsIcon icon={MapPin} className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50" />
-                <Input id="address" {...register('address')} placeholder="Location details" className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm" />
+                <Input id="address" {...register('address')} placeholder={t('locationDetails')} className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="notes" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Notes</Label>
-              <Input id="notes" {...register('notes')} placeholder="Any additional notes" className="h-14 bg-canvas-parchment border-none rounded-sm" />
+              <Label htmlFor="notes" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tCommon('notes')}</Label>
+              <Input id="notes" {...register('notes')} placeholder={t('anyAdditionalNotes')} className="h-14 bg-canvas-parchment border-none rounded-sm" />
             </div>
 
             <div className="rounded-lg bg-primary/5 p-6 space-y-4 border border-primary/10">
               <div className="flex items-center gap-2">
                 <HugeiconsIcon icon={User} className="h-3 w-3 text-primary opacity-80" />
-                <h3 className="font-semibold text-primary uppercase tracking-wider text-[10px]">Review Information</h3>
+                <h3 className="font-semibold text-primary uppercase tracking-wider text-[10px]">{t('reviewInformation')}</h3>
               </div>
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full" style={{ backgroundColor: watch('color' as any) || '#34C759' }} />
@@ -151,7 +154,7 @@ export default function CreatePartyPage() {
             </div>
 
             <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Create Party'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
+              {isSaving ? tCommon('saving') : t('createParty')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}

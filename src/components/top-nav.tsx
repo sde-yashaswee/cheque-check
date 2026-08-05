@@ -10,51 +10,11 @@ import { BusinessSwitcher } from "@/components/business-switcher"
 import { useState } from "react"
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
+import { useTranslations } from 'next-intl';
 
 const GlobalSearch = dynamic(() => import("@/components/global-search").then(mod => mod.GlobalSearch), {
   ssr: false
 })
-
-const getTitle = (pathname: string) => {
-  if (pathname === '/') return 'ChequeCheck'
-  if (pathname === '/settings') return 'Settings'
-  if (pathname === '/features') return 'Features'
-
-  const segments = pathname.split('/').filter(Boolean)
-  if (segments.length === 0) return 'ChequeCheck'
-
-  const resource = segments[0] // cheques, parties, accounts, businesses
-  const id = segments[1]
-  const action = segments[2]
-
-  const resourceMap: Record<string, string> = {
-    cheques: 'Cheque',
-    parties: 'Party',
-    accounts: 'Account',
-    businesses: 'Business'
-  }
-
-  const resourceName = resourceMap[resource] || resource.charAt(0).toUpperCase() + resource.slice(1)
-
-  if (segments.length === 1) {
-    return resource.charAt(0).toUpperCase() + resource.slice(1)
-  }
-
-  if (id === 'create') {
-    if (resource === 'accounts') return 'Add Account'
-    return `New ${resourceName}`
-  }
-
-  if (id && !action) {
-    return `View ${resourceName}`
-  }
-
-  if (id && action === 'edit') {
-    return `Edit ${resourceName}`
-  }
-
-  return 'Dashboard'
-}
 
 export function TopNav() {
   const pathname = usePathname()
@@ -62,6 +22,57 @@ export function TopNav() {
   const { activeBusiness } = useBusiness()
   const { profile } = useProfile()
   const [searchOpen, setSearchOpen] = useState(false)
+  const t = useTranslations()
+
+  const getTitle = (path: string) => {
+    if (path === '/') return 'ChequeCheck'
+    if (path === '/settings') return t('Navigation.settings')
+    if (path === '/features') return 'Features'
+
+    const segments = path.split('/').filter(Boolean)
+    if (segments.length === 0) return 'ChequeCheck'
+
+    const resource = segments[0] // cheques, parties, accounts, businesses
+    const id = segments[1]
+    const action = segments[2]
+
+    const featureMap: Record<string, string> = {
+      cheques: 'Cheques',
+      parties: 'Parties',
+      accounts: 'Accounts',
+      businesses: 'Businesses'
+    }
+
+    const featureKey = featureMap[resource]
+    if (!featureKey) return resource.charAt(0).toUpperCase() + resource.slice(1)
+
+    if (segments.length === 1) {
+      return t(`${featureKey}.title`)
+    }
+
+    if (id === 'create') {
+      if (resource === 'accounts') return t('Accounts.addAccount')
+      if (resource === 'cheques') return t('Cheques.newCheque')
+      if (resource === 'parties') return t('Parties.newParty')
+      if (resource === 'businesses') return t('Businesses.newBusiness')
+    }
+
+    if (id && !action) {
+      if (resource === 'accounts') return t('Accounts.viewAccount')
+      if (resource === 'cheques') return t('Cheques.viewCheque')
+      if (resource === 'parties') return t('Parties.viewParty')
+      if (resource === 'businesses') return t('Businesses.viewBusiness')
+    }
+
+    if (id && action === 'edit') {
+      if (resource === 'accounts') return t('Accounts.editAccount')
+      if (resource === 'cheques') return t('Cheques.editCheque')
+      if (resource === 'parties') return t('Parties.editParty')
+      if (resource === 'businesses') return t('Businesses.editBusiness')
+    }
+
+    return t('Navigation.dashboard')
+  }
 
   const title = getTitle(pathname)
   const isMainTab = ['/', '/cheques', '/parties', '/accounts', '/settings', '/businesses'].includes(pathname)
@@ -111,7 +122,7 @@ export function TopNav() {
         <BusinessSwitcher 
           trigger={
             <button className="flex h-8 w-full items-center bg-primary/5 px-4 text-[10px] font-semibold text-primary uppercase tracking-wider backdrop-blur-sm transition-colors hover:bg-primary/10 active:bg-primary/20 cursor-pointer border-b border-primary/5">
-              <span className="opacity-60 mr-1.5 font-bold">Business:</span> 
+              <span className="opacity-60 mr-1.5 font-bold">{t('Businesses.viewBusiness')}:</span> 
               <div className="flex items-center gap-1.5 overflow-hidden">
                 <div className="h-4 w-4 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center shrink-0">
                   {activeBusiness.logo_url ? (

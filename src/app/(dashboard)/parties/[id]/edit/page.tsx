@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import dynamic from 'next/dynamic'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
+import { useTranslations } from 'next-intl'
 
 const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-dialog').then(mod => mod.DeleteConfirmationDialog), {
   loading: () => <Skeleton className="h-14 w-full rounded-full" />,
@@ -19,6 +20,8 @@ const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-di
 })
 
 export default function EditPartyPage() {
+  const t = useTranslations('Parties')
+  const tCommon = useTranslations('Common')
   const { id } = useParams() as { id: string }
   const { activeBusiness } = useBusiness()
   
@@ -60,13 +63,13 @@ export default function EditPartyPage() {
       <form onSubmit={onSubmit} className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Party Name</Label>
+            <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('partyName')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={User} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
               <Input 
                 id="name" 
                 {...register('name')} 
-                placeholder="Enter full name" 
+                placeholder={t('enterFullName')} 
                 className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-semibold rounded-sm"
               />
             </div>
@@ -74,13 +77,13 @@ export default function EditPartyPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="contact" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Contact Number</Label>
+            <Label htmlFor="contact" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('contactNumber')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={Phone} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
               <Input 
                 id="contact" 
                 {...register('contact')} 
-                placeholder="Phone number" 
+                placeholder={t('phoneNumber')} 
                 className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
               />
             </div>
@@ -88,20 +91,20 @@ export default function EditPartyPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Email</Label>
+            <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tCommon('email')}</Label>
             <Input id="email" {...register('email')} placeholder="email@address.com" className="h-14 bg-canvas-parchment border-none rounded-sm" />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Address</Label>
+            <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tCommon('address')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={MapPin} className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50" />
-              <Input id="address" {...register('address')} placeholder="Location details" className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm" />
+              <Input id="address" {...register('address')} placeholder={t('locationDetails')} className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm" />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Theme Color</Label>
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tCommon('themeColor')}</Label>
             <div className="flex flex-wrap gap-3 p-1">
               {colors.map((c) => (
                 <button
@@ -121,17 +124,17 @@ export default function EditPartyPage() {
 
         <div className="pt-4 flex flex-col gap-3">
           <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-            {isSaving ? 'Saving...' : 'Update Party'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
+            {isSaving ? tCommon('saving') : t('updateParty')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
           </Button>
 
           <DeleteConfirmationDialog 
-            title="Delete Party?"
-            description="This will permanently delete this party and all associated records."
+            title={t('deleteConfirmTitle')}
+            description={t('deleteConfirmDesc')}
             confirmName={party?.name || ''}
             onDelete={async () => { onDelete() }}
             trigger={
               <Button type="button" variant="ghost" className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">
-                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" /> Delete Party
+                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" /> {t('deleteParty')}
               </Button>
             }
           />

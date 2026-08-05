@@ -16,6 +16,7 @@ import { Combobox } from '@/components/ui/combobox'
 import { Skeleton } from '@/components/ui/skeleton'
 import dynamic from 'next/dynamic'
 import { Party, AccountWithRelations } from '@/types'
+import { useTranslations } from 'next-intl'
 
 const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-dialog').then(mod => mod.DeleteConfirmationDialog), {
   loading: () => <Skeleton className="h-14 w-full rounded-full" />,
@@ -23,6 +24,8 @@ const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-di
 })
 
 export default function EditChequePage() {
+  const t = useTranslations('Cheques')
+  const tCommon = useTranslations('Common')
   const { id } = useParams() as { id: string }
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
@@ -81,7 +84,7 @@ export default function EditChequePage() {
       <form onSubmit={onSubmit} className="space-y-6">
         <div className="space-y-6">
           <div className="space-y-2">
-            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Cheque Type</Label>
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('type')}</Label>
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
@@ -102,7 +105,7 @@ export default function EditChequePage() {
                 <span className={cn(
                   "font-semibold text-xs uppercase tracking-wider",
                   watch('type') === 'Outward' ? "text-primary" : "text-muted-foreground"
-                )}>Issued</span>
+                )}>{t('issued')}</span>
               </button>
 
               <button
@@ -124,13 +127,13 @@ export default function EditChequePage() {
                 <span className={cn(
                   "font-semibold text-xs uppercase tracking-wider",
                   watch('type') === 'Inward' ? "text-green-600" : "text-muted-foreground"
-                )}>Received</span>
+                )}>{t('received')}</span>
               </button>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amount" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Amount</Label>
+            <Label htmlFor="amount" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('amount')}</Label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-semibold opacity-30">₹</span>
               <Input 
@@ -145,64 +148,64 @@ export default function EditChequePage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="cheque_number" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Cheque Number</Label>
-              <Input id="cheque_number" {...register('cheque_number')} placeholder="6-digit number" className="h-12 rounded-sm bg-canvas-parchment border-none" />
+              <Label htmlFor="cheque_number" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('chequeNumber')}</Label>
+              <Input id="cheque_number" {...register('cheque_number')} placeholder={t('chequeNumberPlaceholder')} className="h-12 rounded-sm bg-canvas-parchment border-none" />
               {errors.cheque_number && <p className="text-xs text-destructive ml-1">{errors.cheque_number.message as string}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cheque_date" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Cheque Date</Label>
+              <Label htmlFor="cheque_date" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('chequeDate')}</Label>
               <Input id="cheque_date" type="date" {...register('cheque_date')} className="h-12 rounded-sm bg-canvas-parchment border-none" />
               {errors.cheque_date && <p className="text-xs text-destructive ml-1">{errors.cheque_date.message as string}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Select Party</Label>
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('party')}</Label>
             <Combobox 
               options={partyOptions} 
               value={watch('party_id')} 
               onValueChange={(val) => setValue('party_id', val)} 
-              placeholder="Choose a party"
+              placeholder={t('partyPlaceholder')}
             />
             {errors.party_id && <p className="text-xs text-destructive ml-1">{errors.party_id.message as string}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Select Account</Label>
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('account')}</Label>
             <Combobox 
               options={accountOptions} 
               value={watch('account_id')} 
               onValueChange={(val) => setValue('account_id', val)} 
-              placeholder="Choose an account"
+              placeholder={t('accountPlaceholder')}
             />
             {errors.account_id && <p className="text-xs text-destructive ml-1">{errors.account_id.message as string}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Notes</Label>
-            <Input id="notes" {...register('notes')} placeholder="Add any notes here" className="h-12 rounded-sm bg-canvas-parchment border-none" />
+            <Label htmlFor="notes" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('notes')}</Label>
+            <Input id="notes" {...register('notes')} placeholder={t('notesPlaceholder')} className="h-12 rounded-sm bg-canvas-parchment border-none" />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="deposit_date" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Expected Deposit Date</Label>
+            <Label htmlFor="deposit_date" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('depositDate')}</Label>
             <Input id="deposit_date" type="date" {...register('deposit_date')} className="h-12 rounded-sm bg-canvas-parchment border-none" />
           </div>
         </div>
 
         <div className="pt-4 flex flex-col gap-3">
           <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-            {isSaving ? 'Saving...' : 'Update Cheque'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
+            {isSaving ? tCommon('saving') : t('updateAction')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
           </Button>
 
           <DeleteConfirmationDialog 
-            title="Delete Cheque?"
-            description="This will permanently delete this cheque record."
+            title={t('deleteConfirmTitle')}
+            description={t('deleteConfirmDesc')}
             confirmName={cheque?.cheque_number || 'Cheque'}
             onDelete={async () => { onDelete() }}
             trigger={
               <Button type="button" variant="ghost" className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">
-                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" /> Delete Cheque
+                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" /> {t('deleteAction')}
               </Button>
             }
           />

@@ -14,8 +14,11 @@ import { cn } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 import { Combobox } from '@/components/ui/combobox'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
+import { useTranslations } from 'next-intl'
 
 export default function CreateChequePage() {
+  const t = useTranslations('Cheques')
+  const tCommon = useTranslations('Common')
   const searchParams = useSearchParams()
   const typeParam = searchParams.get('type')
   const { activeBusiness } = useBusiness()
@@ -73,8 +76,8 @@ export default function CreateChequePage() {
           </Button>
         )}
         <div>
-          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Step {step} of 3</p>
-          <h2 className="text-display-sm font-semibold">New Cheque</h2>
+          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">{tCommon('step', { step, total: 3 })}</p>
+          <h2 className="text-display-sm font-semibold">{t('newCheque')}</h2>
         </div>
       </div>
 
@@ -94,7 +97,7 @@ export default function CreateChequePage() {
         {step === 1 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Cheque Type</Label>
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('type')}</Label>
               <div className="grid grid-cols-2 gap-4">
                 <button
                   type="button"
@@ -115,7 +118,7 @@ export default function CreateChequePage() {
                   <span className={cn(
                     "font-semibold text-xs uppercase tracking-wider",
                     watch('type') === 'Outward' ? "text-primary" : "text-muted-foreground"
-                  )}>Issued</span>
+                  )}>{t('issued')}</span>
                 </button>
 
                 <button
@@ -137,13 +140,13 @@ export default function CreateChequePage() {
                   <span className={cn(
                     "font-semibold text-xs uppercase tracking-wider",
                     watch('type') === 'Inward' ? "text-green-600" : "text-muted-foreground"
-                  )}>Received</span>
+                  )}>{t('received')}</span>
                 </button>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="amount" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Amount</Label>
+              <Label htmlFor="amount" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('amount')}</Label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-semibold opacity-30">₹</span>
                 <Input 
@@ -157,19 +160,19 @@ export default function CreateChequePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cheque_number" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Cheque Number</Label>
-              <Input id="cheque_number" {...register('cheque_number')} placeholder="6-digit number" className="h-12 rounded-sm" />
+              <Label htmlFor="cheque_number" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('chequeNumber')}</Label>
+              <Input id="cheque_number" {...register('cheque_number')} placeholder={t('chequeNumberPlaceholder')} className="h-12 rounded-sm" />
               {errors.cheque_number && <p className="text-xs text-destructive ml-1">{errors.cheque_number.message as string}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cheque_date" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Cheque Date</Label>
+              <Label htmlFor="cheque_date" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('chequeDate')}</Label>
               <Input id="cheque_date" type="date" {...register('cheque_date')} className="h-12 rounded-sm" />
               {errors.cheque_date && <p className="text-xs text-destructive ml-1">{errors.cheque_date.message as string}</p>}
             </div>
             
             <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('amount')}>
-              Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
+              {tCommon('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -177,33 +180,33 @@ export default function CreateChequePage() {
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Select Party</Label>
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('party')}</Label>
               <Combobox 
                 options={partyOptions} 
                 value={watch('party_id')} 
                 onValueChange={(val) => setValue('party_id', val)} 
-                placeholder="Choose a party"
+                placeholder={t('partyPlaceholder')}
                 createUrl="/parties/create"
-                createLabel="Add new party"
+                createLabel={t('addParty')}
               />
               {errors.party_id && <p className="text-xs text-destructive ml-1">{errors.party_id.message as string}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Select Account</Label>
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('account')}</Label>
               <Combobox 
                 options={accountOptions} 
                 value={watch('account_id')} 
                 onValueChange={(val) => setValue('account_id', val)} 
-                placeholder="Choose an account"
+                placeholder={t('accountPlaceholder')}
                 createUrl="/accounts/create"
-                createLabel="Add new account"
+                createLabel={t('addAccount')}
               />
               {errors.account_id && <p className="text-xs text-destructive ml-1">{errors.account_id.message as string}</p>}
             </div>
 
             <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('party_id') || !watch('account_id')}>
-              Continue <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
+              {tCommon('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -211,7 +214,7 @@ export default function CreateChequePage() {
         {step === 3 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Cheque Photo</Label>
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('photo')}</Label>
               <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-4 bg-canvas-parchment/30 min-h-[140px] transition-colors hover:bg-canvas-parchment/50 border-primary/10">
                 {watch('image_url' as any) ? (
                   <div className="relative w-full aspect-video rounded-sm overflow-hidden border">
@@ -235,9 +238,9 @@ export default function CreateChequePage() {
                     </div>
                     <div className="text-center">
                       <span className="text-sm font-semibold text-primary block">
-                        {isUploading ? 'Uploading Cheque...' : 'Scan / Upload Cheque'}
+                        {isUploading ? t('uploading') : t('scanUpload')}
                       </span>
-                      <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">Take a photo of the physical cheque</p>
+                      <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">{t('photoInstruction')}</p>
                     </div>
                     <input 
                       type="file" 
@@ -256,30 +259,30 @@ export default function CreateChequePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="notes" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Notes</Label>
-              <Input id="notes" {...register('notes')} placeholder="Add any notes here" className="h-12 rounded-sm" />
+              <Label htmlFor="notes" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('notes')}</Label>
+              <Input id="notes" {...register('notes')} placeholder={t('notesPlaceholder')} className="h-12 rounded-sm" />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="deposit_date" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Expected Deposit Date</Label>
+              <Label htmlFor="deposit_date" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('depositDate')}</Label>
               <Input id="deposit_date" type="date" {...register('deposit_date')} className="h-12 rounded-sm" />
             </div>
 
             <div className="rounded-lg bg-primary/5 p-6 space-y-4 border border-primary/10">
               <div className="flex items-center gap-2">
                 <HugeiconsIcon icon={ReceiptText} className="h-3 w-3 text-primary opacity-80" />
-                <h3 className="font-semibold text-primary uppercase tracking-wider text-[10px]">Summary</h3>
+                <h3 className="font-semibold text-primary uppercase tracking-wider text-[10px]">{t('summary')}</h3>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground font-semibold">Amount</span>
+                <span className="text-muted-foreground font-semibold">{t('amount')}</span>
                 <span className="text-xl font-semibold text-primary">₹{Number(watch('amount') || 0).toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground font-semibold">Number</span>
+                <span className="text-muted-foreground font-semibold">{t('number')}</span>
                 <span className="font-semibold font-mono bg-white px-2 py-0.5 rounded border border-primary/10 text-primary">#{watch('cheque_number')}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground font-semibold">Party</span>
+                <span className="text-muted-foreground font-semibold">{t('party')}</span>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">{selectedParty?.name || '-'}</span>
                   {selectedParty && (
@@ -296,7 +299,7 @@ export default function CreateChequePage() {
             </div>
 
             <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save Cheque'} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
+              {isSaving ? tCommon('saving') : t('saveAction')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
