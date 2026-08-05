@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { chequeSchema } from '@/validators'
 import { ChequeService } from '@/services/cheque.service'
 import { PartyService } from '@/services/party.service'
-import { BankService } from '@/services/bank.service'
+import { AccountService } from '@/services/account.service'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,9 +31,9 @@ export default function CreateChequePage() {
     enabled: !!businessId,
   })
 
-  const { data: banks } = useQuery({
-    queryKey: ['banks', businessId],
-    queryFn: () => BankService.getAll(businessId!),
+  const { data: accounts } = useQuery({
+    queryKey: ['accounts', businessId],
+    queryFn: () => AccountService.getAll(businessId!),
     enabled: !!businessId,
   })
 
@@ -44,7 +44,7 @@ export default function CreateChequePage() {
       cheque_number: '',
       cheque_date: new Date().toISOString().split('T')[0],
       party_id: '',
-      bank_id: '',
+      account_id: '',
       type: 'Outward',
       notes: '',
       deposit_date: '',
@@ -73,7 +73,7 @@ export default function CreateChequePage() {
     icon: (p as any).icon
   })) || []
 
-  const bankOptions = banks?.map(b => ({ 
+  const accountOptions = accounts?.map(b => ({ 
     label: `${b.bank_name} (${b.account_number.slice(-4)})`, 
     value: b.id,
     color: (b as any).color,
@@ -178,19 +178,19 @@ export default function CreateChequePage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Select Bank <span className="text-destructive">*</span></Label>
+              <Label>Select Account <span className="text-destructive">*</span></Label>
               <Combobox 
-                options={bankOptions} 
-                value={watch('bank_id')} 
-                onValueChange={(val) => setValue('bank_id', val)} 
-                placeholder="Choose a bank"
-                createUrl="/banks/create"
-                createLabel="Add new bank"
+                options={accountOptions} 
+                value={watch('account_id')} 
+                onValueChange={(val) => setValue('account_id', val)} 
+                placeholder="Choose an account"
+                createUrl="/accounts/create"
+                createLabel="Add new account"
               />
-              {errors.bank_id && <p className="text-xs text-destructive">{errors.bank_id.message as string}</p>}
+              {errors.account_id && <p className="text-xs text-destructive">{errors.account_id.message as string}</p>}
             </div>
 
-            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('party_id') || !watch('bank_id')}>
+            <Button type="button" className="w-full rounded-pill h-14 text-lg shadow-product" onClick={nextStep} disabled={!watch('party_id') || !watch('account_id')}>
               Continue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>

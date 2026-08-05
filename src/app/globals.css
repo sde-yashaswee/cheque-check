@@ -121,7 +121,6 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "ss03"; /* For Inter to look more like SF Pro */
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading tracking-tight;

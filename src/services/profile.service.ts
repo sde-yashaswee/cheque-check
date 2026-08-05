@@ -11,9 +11,26 @@ export const ProfileService = {
       .from('profiles')
       .select('*')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
 
     if (error) throw error
+    
+    if (!data) {
+      // If profile doesn't exist for some reason, create it
+      const { data: newProfile, error: createError } = await supabase
+        .from('profiles')
+        .insert([{ 
+          user_id: user.id, 
+          email: user.email,
+          name: user.user_metadata?.name || ''
+        }])
+        .select()
+        .single()
+      
+      if (createError) throw createError
+      return newProfile as Profile
+    }
+
     return data as Profile
   },
 
@@ -31,5 +48,25 @@ export const ProfileService = {
 
     if (error) throw error
     return data as Profile
+  },
+
+  async delete() {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
+    const { error } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('user_id', user.id)
+
+    if (error) throw error
+
+    // Also delete user from auth if possible? 
+    // Usually only admin can delete users from auth. 
+    // But since profiles has ON DELETE CASCADE on user_id in some systems, wait.
+    // In our migration, profiles.user_id has ON DELETE CASCADE.
+    // But we want to delete the user.
+    await supabase.auth.signOut()
   }
 }

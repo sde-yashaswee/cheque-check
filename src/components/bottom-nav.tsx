@@ -9,7 +9,7 @@ const navItems = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Cheques', href: '/cheques', icon: FileText },
   { name: 'Parties', href: '/parties', icon: Users },
-  { name: 'Banks', href: '/banks', icon: Landmark },
+  { name: 'Accounts', href: '/accounts', icon: Landmark },
 ]
 
 export function BottomNav() {

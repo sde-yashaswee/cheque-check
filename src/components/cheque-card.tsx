@@ -3,13 +3,17 @@
 import { useSwipeable } from 'react-swipeable'
 import { ChequeStatus, ChequeWithRelations } from '@/types'
 import { cn } from '@/lib/utils'
-import { Check, X } from 'lucide-react'
+import { Check, X, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useProfile } from '@/hooks/use-profile'
 import { format } from 'date-fns'
 import { StatusPill } from '@/components/ui/status-pill'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
+import { DeleteConfirmationDialog } from '@/components/ui/delete-dialog'
+import { ChequeService } from '@/services/cheque.service'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useBusiness } from '@/hooks/use-business'
 
 interface ChequeCardProps {
   cheque: ChequeWithRelations
@@ -20,6 +24,15 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
   const [offset, setOffset] = useState(0)
   const [swiping, setSwiping] = useState<'clear' | 'bounce' | null>(null)
   const { profile } = useProfile()
+  const { activeBusiness } = useBusiness()
+  const queryClient = useQueryClient()
+
+  const deleteMutation = useMutation({
+    mutationFn: () => ChequeService.delete(cheque.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cheques', activeBusiness?.id] })
+    }
+  })
 
   const currency = profile?.currency || '₹'
   const dateFormat = profile?.date_format || 'dd/MM/yyyy'
@@ -109,18 +122,31 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
               {format(new Date(cheque.cheque_date), dateFormat)}
             </p>
             <div className="mt-1 flex items-center justify-end gap-1.5">
-              <span className="text-[10px] text-muted-foreground">{cheque.bank?.bank_name}</span>
+              <span className="text-[10px] text-muted-foreground">{cheque.account?.bank_name}</span>
               <EntityAvatar 
-                name={cheque.bank?.bank_name || '?'} 
-                color={cheque.bank?.color} 
-                icon={cheque.bank?.icon}
+                name={cheque.account?.bank_name || '?'} 
+                color={cheque.account?.color} 
+                icon={cheque.account?.icon}
                 size="sm"
               />
             </div>
           </div>
         </div>
         <div className="mt-4 flex justify-between items-center border-t pt-4">
-          <p className="text-xs text-muted-foreground">Cheque #{cheque.cheque_number}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-xs text-muted-foreground">Cheque #{cheque.cheque_number}</p>
+            <DeleteConfirmationDialog 
+              title="Delete Cheque?"
+              description="This will permanently delete this cheque record."
+              confirmName={cheque.cheque_number}
+              onDelete={async () => { deleteMutation.mutate() }}
+              trigger={
+                <button className="text-muted-foreground hover:text-destructive transition-colors">
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              }
+            />
+          </div>
           <StatusPill status={statusLabel as any} />
         </div>
       </motion.div>

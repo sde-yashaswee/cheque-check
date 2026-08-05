@@ -11,9 +11,10 @@ import { Label } from '@/components/ui/label'
 import { useRouter, useParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Check, User, Phone, MapPin } from 'lucide-react'
+import { ArrowLeft, Check, User, Phone, MapPin, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
+import { DeleteConfirmationDialog } from '@/components/ui/delete-dialog'
 
 export default function EditPartyPage() {
   const { id } = useParams() as { id: string }
@@ -49,6 +50,14 @@ export default function EditPartyPage() {
       queryClient.invalidateQueries({ queryKey: ['parties', activeBusiness?.id] })
       queryClient.invalidateQueries({ queryKey: ['party', id] })
       router.back()
+    }
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: () => PartyService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['parties', activeBusiness?.id] })
+      router.push('/parties')
     }
   })
 
@@ -132,10 +141,22 @@ export default function EditPartyPage() {
           </div>
         </div>
 
-        <div className="pt-4">
+        <div className="pt-4 flex flex-col gap-3">
           <Button type="submit" className="w-full rounded-pill h-14 text-lg shadow-product" disabled={mutation.isPending}>
             {mutation.isPending ? 'Saving...' : 'Update Party'} <Check className="ml-2 h-5 w-5" />
           </Button>
+
+          <DeleteConfirmationDialog 
+            title="Delete Party?"
+            description="This will permanently delete this party and all associated cheque records. This action cannot be undone."
+            confirmName={party?.name || ''}
+            onDelete={async () => { deleteMutation.mutate() }}
+            trigger={
+              <Button type="button" variant="ghost" className="w-full rounded-pill h-14 text-muted-foreground hover:text-destructive">
+                <Trash2 className="mr-2 h-5 w-5" /> Delete Party
+              </Button>
+            }
+          />
         </div>
       </form>
     </div>

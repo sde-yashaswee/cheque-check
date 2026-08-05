@@ -103,6 +103,21 @@ export default function PartyDetailPage() {
         </Link>
       </div>
 
+      <div className="flex gap-3">
+        <a href={`tel:${party.contact}`} className="flex-1">
+          <Button className="w-full rounded-2xl h-12" variant="outline">
+            <Phone className="mr-2 h-4 w-4" /> Contact Person
+          </Button>
+        </a>
+        {party.email && (
+          <a href={`mailto:${party.email}`} className="flex-1">
+            <Button className="w-full rounded-2xl h-12" variant="outline">
+              <Mail className="mr-2 h-4 w-4" /> Email Party
+            </Button>
+          </a>
+        )}
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-3xl bg-primary p-6 text-primary-foreground relative overflow-hidden">
           <p className="text-[10px] font-bold opacity-70 uppercase tracking-widest relative z-10">Outstanding Balance</p>

@@ -4,11 +4,11 @@ export class ReportService {
   static exportToCSV(cheques: ChequeWithRelations[], filename: string = 'cheques_report.csv') {
     if (!cheques || cheques.length === 0) return;
 
-    const headers = ['Cheque Number', 'Party', 'Bank', 'Amount', 'Date', 'Type', 'Status', 'Notes'];
+    const headers = ['Cheque Number', 'Party', 'Account', 'Amount', 'Date', 'Type', 'Status', 'Notes'];
     const rows = cheques.map(c => [
       c.cheque_number,
       c.party?.name || '',
-      c.bank?.bank_name || '',
+      c.account?.bank_name || '',
       c.amount,
       c.cheque_date,
       c.type,

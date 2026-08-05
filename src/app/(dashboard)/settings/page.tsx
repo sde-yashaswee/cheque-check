@@ -18,11 +18,14 @@ import {
   Landmark, 
   LayoutGrid, 
   Zap,
-  Languages
+  Languages,
+  Trash2
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { ReportService } from "@/services/report.service"
+import { ProfileService } from "@/services/profile.service"
+import { DeleteConfirmationDialog } from "@/components/ui/delete-dialog"
 import { useQuery } from "@tanstack/react-query"
 import { ChequeService } from "@/services/cheque.service"
 import { cn } from "@/lib/utils"
@@ -69,6 +72,11 @@ export default function SettingsPage() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
+    router.push('/login')
+  }
+
+  const handleDeleteProfile = async () => {
+    await ProfileService.delete()
     router.push('/login')
   }
 
@@ -151,7 +159,7 @@ export default function SettingsPage() {
       title: 'Management',
       items: [
         { name: 'My Businesses', icon: Building2, href: '/businesses' },
-        { name: 'Bank Accounts', icon: Landmark, href: '/banks' },
+        { name: 'Accounts', icon: Landmark, href: '/accounts' },
         { name: 'Features', icon: LayoutGrid, href: '/features' },
       ]
     },
@@ -247,6 +255,29 @@ export default function SettingsPage() {
         ))}
       </div>
 
+      <div className="space-y-3">
+        <h3 className="px-2 text-[10px] font-medium text-destructive uppercase tracking-[0.2em]">Danger Zone</h3>
+        <div className="divide-y rounded-3xl border border-destructive/20 bg-destructive/5 overflow-hidden">
+          <DeleteConfirmationDialog 
+            title="Delete Entire Profile?"
+            description="This will permanently delete your account, all businesses, parties, accounts, and cheques. This action is irreversible."
+            confirmName={profile?.name || profile?.email || ''}
+            onDelete={handleDeleteProfile}
+            trigger={
+              <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-destructive/10 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
+                    <Trash2 className="h-4 w-4" />
+                  </div>
+                  <span className="text-sm font-bold text-destructive">Delete My Account</span>
+                </div>
+                <ChevronRight className="h-4 w-4 text-destructive opacity-30" />
+              </div>
+            }
+          />
+        </div>
+      </div>
+
       <Button 
         variant="destructive" 
         className="w-full rounded-pill h-14 text-lg font-medium" 
@@ -256,7 +287,7 @@ export default function SettingsPage() {
       </Button>
 
       <div className="text-center pb-8">
-        <p className="text-xs text-muted-foreground font-medium opacity-50 uppercase tracking-widest">CheckCheck v1.0.0</p>
+        <p className="text-xs text-muted-foreground font-medium opacity-50 uppercase tracking-widest">ChequeCheck v1.0.0</p>
         <p className="text-[10px] text-muted-foreground mt-2 opacity-30">
           {format(new Date(), "PPpp")}
         </p>

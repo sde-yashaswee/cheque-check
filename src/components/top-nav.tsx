@@ -17,8 +17,8 @@ const routeTitles: Record<string, string> = {
   '/cheques/create': 'New Cheque',
   '/parties': 'Parties',
   '/parties/create': 'New Party',
-  '/banks': 'Banks',
-  '/banks/create': 'Add Bank',
+  '/accounts': 'Accounts',
+  '/accounts/create': 'Add Account',
   '/settings': 'Settings',
   '/businesses/create': 'New Business',
   '/features': 'Features',
@@ -32,7 +32,7 @@ export function TopNav() {
   const [searchOpen, setSearchOpen] = useState(false)
 
   const title = routeTitles[pathname] || 'Dashboard'
-  const isMainTab = ['/', '/cheques', '/parties', '/banks', '/settings'].includes(pathname)
+  const isMainTab = ['/', '/cheques', '/parties', '/accounts', '/settings'].includes(pathname)
 
   return (
     <div className="sticky top-0 z-40 w-full flex flex-col">
@@ -49,7 +49,7 @@ export function TopNav() {
             </Button>
           )}
           <h1 className="text-lg font-bold tracking-tight">
-            {isMainTab && pathname === '/' ? 'CheckCheck' : title}
+            {isMainTab && pathname === '/' ? 'ChequeCheck' : title}
           </h1>
         </div>
 

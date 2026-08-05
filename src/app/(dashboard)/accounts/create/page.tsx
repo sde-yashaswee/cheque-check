@@ -3,37 +3,46 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { bankSchema } from '@/validators'
+import { accountSchema } from '@/validators'
+import { AccountService } from '@/services/account.service'
 import { BankService } from '@/services/bank.service'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, ArrowRight, Check, Landmark, CreditCard, User, Hash } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-export default function CreateBankPage() {
+export default function CreateAccountPage() {
   const [step, setStep] = useState(1)
   const router = useRouter()
   const { activeBusiness } = useBusiness()
   const queryClient = useQueryClient()
   
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
-    resolver: zodResolver(bankSchema),
+    resolver: zodResolver(accountSchema),
     defaultValues: {
+      bank_id: '',
       bank_name: '',
       account_name: '',
       account_number: '',
       ifsc_code: '',
+      color: '#007AFF'
     }
   })
 
+  const { data: banks } = useQuery({
+    queryKey: ['master-banks'],
+    queryFn: () => BankService.getAll(),
+  })
+
   const mutation = useMutation({
-    mutationFn: (data: any) => BankService.create({ ...data, business_id: activeBusiness!.id }),
+    mutationFn: (data: any) => AccountService.create({ ...data, business_id: activeBusiness!.id }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['banks', activeBusiness?.id] })
+      queryClient.invalidateQueries({ queryKey: ['accounts', activeBusiness?.id] })
       router.back()
     }
   })
@@ -56,7 +65,7 @@ export default function CreateBankPage() {
         </Button>
         <div>
           <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Step {step} of 3</p>
-          <h2 className="text-display-sm font-bold">Add Bank</h2>
+          <h2 className="text-display-sm font-bold">Add Account</h2>
         </div>
       </div>
 
@@ -77,16 +86,38 @@ export default function CreateBankPage() {
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="bank_name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Bank Name <span className="text-destructive">*</span></Label>
-                <div className="relative">
-                  <Landmark className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input 
-                    id="bank_name" 
-                    {...register('bank_name')} 
-                    placeholder="e.g. ICICI Bank" 
-                    className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-medium rounded-2xl shadow-sm"
-                  />
-                </div>
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Select Bank <span className="text-destructive">*</span></Label>
+                <Select onValueChange={(val) => {
+                  if (val === 'other') {
+                    setValue('bank_id', '');
+                    setValue('bank_name', '');
+                  } else {
+                    const bank = banks?.find(b => b.id === val);
+                    setValue('bank_id', val);
+                    if (bank) setValue('bank_name', bank.name);
+                  }
+                }}>
+                  <SelectTrigger className="h-14 bg-canvas-parchment border-none text-lg font-medium rounded-2xl shadow-sm px-4">
+                    <SelectValue placeholder="Choose a bank" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {banks?.map((bank) => (
+                      <SelectItem key={bank.id} value={bank.id}>{bank.name}</SelectItem>
+                    ))}
+                    <SelectItem value="other">Other Bank</SelectItem>
+                  </SelectContent>
+                </Select>
+                {(watch('bank_id') === '' || watch('bank_id') === 'other') && (
+                  <div className="relative mt-2">
+                    <Landmark className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input 
+                      id="bank_name" 
+                      {...register('bank_name')} 
+                      placeholder="Enter bank name" 
+                      className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-medium rounded-2xl shadow-sm"
+                    />
+                  </div>
+                )}
                 {errors.bank_name && <p className="text-xs text-destructive">{errors.bank_name.message as string}</p>}
               </div>
 
@@ -97,7 +128,7 @@ export default function CreateBankPage() {
                     <button
                       key={c}
                       type="button"
-                      onClick={() => (setValue as any)('color', c)}
+                      onClick={() => setValue('color', c)}
                       className={cn(
                         "h-10 w-10 rounded-full transition-all active:scale-90 ring-offset-2",
                         watch('color' as any) === c ? "ring-2 ring-primary scale-110 shadow-md" : "hover:scale-105"
@@ -162,20 +193,20 @@ export default function CreateBankPage() {
             </div>
 
             <div className="rounded-3xl bg-primary/5 p-6 space-y-4 border border-primary/10 shadow-sm">
-              <h3 className="font-bold text-primary uppercase tracking-widest text-[10px]">Bank Details</h3>
+              <h3 className="font-bold text-primary uppercase tracking-widest text-[10px]">Account Preview</h3>
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm" style={{ backgroundColor: watch('color' as any) || '#5856D6' }}>
-                  {watch('bank_name')?.charAt(0) || 'B'}
+                  {watch('bank_name')?.charAt(0) || 'A'}
                 </div>
                 <div>
                   <p className="font-bold">{watch('bank_name')}</p>
-                  <p className="text-xs text-muted-foreground">{watch('account_number')}</p>
+                  <p className="text-xs text-muted-foreground">{watch('account_name')} - {watch('account_number')}</p>
                 </div>
               </div>
             </div>
 
             <Button type="submit" className="w-full rounded-pill h-14 text-lg shadow-product" disabled={mutation.isPending}>
-              {mutation.isPending ? 'Adding Bank...' : 'Add Bank'} <Check className="ml-2 h-5 w-5" />
+              {mutation.isPending ? 'Adding Account...' : 'Add Account'} <Check className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}

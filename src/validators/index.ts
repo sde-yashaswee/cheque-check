@@ -19,7 +19,8 @@ export const partySchema = z.object({
   icon: z.string().optional(),
 })
 
-export const bankSchema = z.object({
+export const accountSchema = z.object({
+  bank_id: z.string().optional().or(z.literal('')),
   bank_name: z.string().min(1, 'Bank name is required'),
   account_name: z.string().min(1, 'Account holder name is required'),
   account_number: z.string().min(1, 'Account number is required'),
@@ -34,7 +35,7 @@ export const chequeSchema = z.object({
   cheque_date: z.string().min(1, 'Cheque date is required'),
   deposit_date: z.string().optional().or(z.literal('')),
   party_id: z.string().min(1, 'Party is required'),
-  bank_id: z.string().min(1, 'Bank is required'),
+  account_id: z.string().min(1, 'Account is required'),
   type: z.enum(['Outward', 'Inward']),
   notes: z.string().optional().or(z.literal('')),
 })

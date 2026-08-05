@@ -1,20 +1,30 @@
 'use client'
 
 import { useBusiness } from "@/hooks/use-business"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { ChequeService } from "@/services/cheque.service"
-import { Building2, Plus, ArrowRight, FileText } from "lucide-react"
+import { BusinessService } from "@/services/business.service"
+import { Building2, Plus, ArrowRight, FileText, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { EntityAvatar } from "@/components/ui/entity-avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useProfile } from "@/hooks/use-profile"
 import { cn } from "@/lib/utils"
+import { DeleteConfirmationDialog } from "@/components/ui/delete-dialog"
 
 export default function BusinessesPage() {
   const { businesses, isLoading: businessesLoading, activeBusiness, setActiveBusiness } = useBusiness()
   const { profile } = useProfile()
+  const queryClient = useQueryClient()
   const currency = profile?.currency || '₹'
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => BusinessService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['businesses'] })
+    }
+  })
 
   // Fetch cheques for all businesses to calculate upcoming totals
   const { data: allCheques, isLoading: chequesLoading } = useQuery({
@@ -97,6 +107,23 @@ export default function BusinessesPage() {
                    {activeBusiness?.id === business.id && (
                     <span className="rounded-full bg-primary px-2 py-0.5 text-[8px] font-bold text-white uppercase">Active</span>
                    )}
+                   <div onClick={(e) => e.stopPropagation()}>
+                    <DeleteConfirmationDialog 
+                      title="Delete Business?"
+                      description="This will permanently delete this business and all associated data. This action is irreversible."
+                      confirmName={business.name}
+                      onDelete={async () => { deleteMutation.mutate(business.id) }}
+                      trigger={
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="rounded-full h-8 w-8 text-muted-foreground hover:text-destructive transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      }
+                    />
+                   </div>
                    <ArrowRight className="h-5 w-5 text-muted-foreground opacity-20 transition-opacity group-hover:opacity-100" />
                 </div>
               </div>

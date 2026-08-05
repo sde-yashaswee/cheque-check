@@ -95,11 +95,11 @@ export default function HomePage() {
           <div className="space-y-4">
             <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1">Quick Actions</h2>
             <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
-              <Link href="/banks" className="flex flex-col items-center gap-2 min-w-[80px]">
+              <Link href="/accounts" className="flex flex-col items-center gap-2 min-w-[80px]">
                 <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-canvas-parchment text-primary shadow-sm transition-transform active:scale-90">
                   <Landmark className="h-6 w-6" />
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Banks</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Accounts</span>
               </Link>
               <Link href="/parties" className="flex flex-col items-center gap-2 min-w-[80px]">
                 <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-canvas-parchment text-primary shadow-sm transition-transform active:scale-90">

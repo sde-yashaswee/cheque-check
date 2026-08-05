@@ -7,11 +7,12 @@ import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Wallet } from 'lucide-react'
+import { Wallet, Eye, EyeOff } from 'lucide-react'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
@@ -55,7 +56,7 @@ export default function SignupPage() {
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-white shadow-product">
             <Wallet className="h-8 w-8" />
           </div>
-          <h1 className="mt-6 text-display-md font-black tracking-tight">CheckCheck</h1>
+          <h1 className="mt-6 text-display-md font-black tracking-tight">ChequeCheck</h1>
           <p className="text-body text-muted-foreground">Start managing your cheques effortlessly.</p>
         </div>
 
@@ -86,14 +87,24 @@ export default function SignupPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="h-12 bg-canvas-parchment border-none rounded-xl"
-              />
+              <div className="relative">
+                <Input 
+                  id="password" 
+                  type={showPassword ? "text" : "password"}
+                  placeholder="..." 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="h-12 bg-canvas-parchment border-none rounded-xl pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
             </div>
             <Button type="submit" className="w-full rounded-pill h-12 text-lg shadow-product" disabled={loading}>
               {loading ? 'Creating account...' : 'Create Account'}

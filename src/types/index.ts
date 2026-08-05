@@ -8,6 +8,9 @@ export interface Profile {
   email: string | null;
   currency: string;
   date_format: string;
+  time_format: string;
+  time_zone: string;
+  language: string;
   reminders_per_day: number;
   default_reminder_days: number;
   received_cheques_enabled: boolean;
@@ -45,7 +48,16 @@ export interface Party {
 
 export interface Bank {
   id: string;
+  name: string;
+  logo_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Account {
+  id: string;
   business_id: string;
+  bank_id: string | null;
   bank_name: string;
   account_name: string;
   account_number: string;
@@ -54,13 +66,14 @@ export interface Bank {
   icon?: string;
   created_at: string;
   updated_at: string;
+  bank?: Bank;
 }
 
 export interface Cheque {
   id: string;
   business_id: string;
   party_id: string;
-  bank_id: string;
+  account_id: string;
   cheque_number: string;
   amount: number;
   cheque_date: string;
@@ -77,5 +90,5 @@ export interface Cheque {
 
 export interface ChequeWithRelations extends Cheque {
   party?: { name: string; color?: string; icon?: string };
-  bank?: { bank_name: string; color?: string; icon?: string };
+  account?: { bank_name: string; account_name: string; color?: string; icon?: string };
 }

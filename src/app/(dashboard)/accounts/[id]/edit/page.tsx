@@ -3,51 +3,61 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { bankSchema } from '@/validators'
-import { BankService } from '@/services/bank.service'
+import { accountSchema } from '@/validators'
+import { AccountService } from '@/services/account.service'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter, useParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
-import { Check, Landmark, User, CreditCard, Hash } from 'lucide-react'
+import { Check, Landmark, User, CreditCard, Hash, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
+import { DeleteConfirmationDialog } from '@/components/ui/delete-dialog'
 
-export default function EditBankPage() {
+export default function EditAccountPage() {
   const { id } = useParams() as { id: string }
   const router = useRouter()
   const { activeBusiness } = useBusiness()
   const queryClient = useQueryClient()
   
-  const { data: bank, isLoading } = useQuery({
-    queryKey: ['bank', id],
-    queryFn: () => BankService.getById(id),
+  const { data: account, isLoading } = useQuery({
+    queryKey: ['account', id],
+    queryFn: () => AccountService.getById(id),
   })
 
   const { register, handleSubmit, watch, setValue, formState: { errors }, reset } = useForm({
-    resolver: zodResolver(bankSchema),
+    resolver: zodResolver(accountSchema),
   })
 
   useEffect(() => {
-    if (bank) {
+    if (account) {
       reset({
-        bank_name: bank.bank_name,
-        account_name: bank.account_name,
-        account_number: bank.account_number,
-        ifsc_code: bank.ifsc_code || '',
-        color: bank.color,
+        bank_id: account.bank_id || '',
+        bank_name: account.bank_name,
+        account_name: account.account_name,
+        account_number: account.account_number,
+        ifsc_code: account.ifsc_code || '',
+        color: account.color,
       })
     }
-  }, [bank, reset])
+  }, [account, reset])
 
   const mutation = useMutation({
-    mutationFn: (data: any) => BankService.update(id, data),
+    mutationFn: (data: any) => AccountService.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['banks', activeBusiness?.id] })
-      queryClient.invalidateQueries({ queryKey: ['bank', id] })
+      queryClient.invalidateQueries({ queryKey: ['accounts', activeBusiness?.id] })
+      queryClient.invalidateQueries({ queryKey: ['account', id] })
       router.back()
+    }
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: () => AccountService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts', activeBusiness?.id] })
+      router.push('/accounts')
     }
   })
 
@@ -140,10 +150,22 @@ export default function EditBankPage() {
           </div>
         </div>
 
-        <div className="pt-4">
+        <div className="pt-4 flex flex-col gap-3">
           <Button type="submit" className="w-full rounded-pill h-14 text-lg shadow-product" disabled={mutation.isPending}>
-            {mutation.isPending ? 'Saving...' : 'Update Bank'} <Check className="ml-2 h-5 w-5" />
+            {mutation.isPending ? 'Saving...' : 'Update Account'} <Check className="ml-2 h-5 w-5" />
           </Button>
+
+          <DeleteConfirmationDialog 
+            title="Delete Account?"
+            description="This will permanently delete this account and all associated cheque history. This action cannot be undone."
+            confirmName={account?.bank_name || ''}
+            onDelete={async () => { deleteMutation.mutate() }}
+            trigger={
+              <Button type="button" variant="ghost" className="w-full rounded-pill h-14 text-muted-foreground hover:text-destructive">
+                <Trash2 className="mr-2 h-5 w-5" /> Delete Account
+              </Button>
+            }
+          />
         </div>
       </form>
     </div>
