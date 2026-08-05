@@ -1,0 +1,146 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-canvas-parchment: var(--canvas-parchment);
+  --color-surface-tile-1: var(--surface-tile-1);
+  --color-ink: var(--ink);
+  --color-hairline: var(--hairline);
+
+  --radius-xs: 5px;
+  --radius-sm: 8px;
+  --radius-md: 11px;
+  --radius-lg: 18px;
+  --radius-pill: 9999px;
+  
+  --shadow-product: 3px 5px 30px rgba(0, 0, 0, 0.22);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #1d1d1f;
+  
+  --primary: #0066cc;
+  --primary-foreground: #ffffff;
+  
+  --canvas-parchment: #f5f5f7;
+  --surface-tile-1: #272729;
+  --ink: #1d1d1f;
+  --hairline: #e0e0e0;
+  
+  --card: #ffffff;
+  --card-foreground: #1d1d1f;
+  
+  --popover: #ffffff;
+  --popover-foreground: #1d1d1f;
+  
+  --secondary: #fafafc;
+  --secondary-foreground: #1d1d1f;
+  
+  --muted: #f5f5f7;
+  --muted-foreground: #7a7a7a;
+  
+  --accent: #f5f5f7;
+  --accent-foreground: #0066cc;
+  
+  --destructive: #ff3b30;
+  --destructive-foreground: #ffffff;
+  
+  --border: #e0e0e0;
+  --input: #e0e0e0;
+  --ring: #0071e3;
+
+  --radius: 18px;
+
+  --font-sans: "SF Pro Text", "Inter", system-ui, -apple-system, sans-serif;
+  --font-heading: "SF Pro Display", "Inter", system-ui, -apple-system, sans-serif;
+}
+
+.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+  
+  --primary: #0066cc;
+  --primary-foreground: #ffffff;
+  
+  --canvas-parchment: #1d1d1f;
+  --surface-tile-1: #272729;
+  --ink: #ffffff;
+  --hairline: #333333;
+  
+  --card: #1d1d1f;
+  --card-foreground: #ffffff;
+  
+  --popover: #1d1d1f;
+  --popover-foreground: #ffffff;
+  
+  --secondary: #272729;
+  --secondary-foreground: #ffffff;
+  
+  --muted: #272729;
+  --muted-foreground: #cccccc;
+  
+  --accent: #272729;
+  --accent-foreground: #2997ff;
+  
+  --border: #333333;
+  --input: #333333;
+  --ring: #0071e3;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss03"; /* For Inter to look more like SF Pro */
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
+  }
+}
+
+@layer utilities {
+  .text-hero-display {
+    font-size: 56px;
+    font-weight: 600;
+    line-height: 1.07;
+    letter-spacing: -0.28px;
+  }
+  .text-display-lg {
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: 0;
+  }
+  .text-lead {
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.14;
+    letter-spacing: 0.196px;
+  }
+  .text-body {
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
+  }
+  .text-body-strong {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.24;
+    letter-spacing: -0.374px;
+  }
+}

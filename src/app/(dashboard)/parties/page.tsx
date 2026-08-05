@@ -1,0 +1,81 @@
+'use client'
+
+import { useQuery } from '@tanstack/react-query'
+import { PartyService } from '@/services/party.service'
+import { Plus, Search, User } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import Link from 'next/link'
+import { useState } from 'react'
+
+export default function PartiesPage() {
+  const [search, setSearch] = useState('')
+  
+  // Note: We'd normally get the active business ID from a context/store
+  // For now, we'll assume a stub business ID if none exists
+  const businessId = 'stub-id' 
+
+  const { data: parties, isLoading } = useQuery({
+    queryKey: ['parties', businessId],
+    queryFn: () => PartyService.getAll(businessId),
+    enabled: !!businessId,
+  })
+
+  const filteredParties = parties?.filter(p => 
+    p.name.toLowerCase().includes(search.toLowerCase()) ||
+    p.contact.includes(search)
+  )
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+      <h1 className="text-display-lg">Parties</h1>
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input 
+          className="rounded-pill pl-10 h-11 bg-canvas-parchment border-none" 
+          placeholder="Search parties..." 
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-3">
+        {isLoading ? (
+          <p>Loading parties...</p>
+        ) : filteredParties?.length === 0 ? (
+          <div className="py-20 text-center">
+            <p className="text-muted-foreground text-body">No parties found.</p>
+            <Link href="/parties/create">
+              <Button variant="link" className="text-primary">Add your first party</Button>
+            </Link>
+          </div>
+        ) : (
+          filteredParties?.map((party) => (
+            <Link key={party.id} href={`/parties/${party.id}`}>
+              <div className="flex items-center gap-4 rounded-lg border bg-card p-4 transition-transform active:scale-98">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <User className="h-6 w-6" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-body">{party.name}</p>
+                  <p className="text-sm text-muted-foreground">{party.contact}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase">Outstanding</p>
+                  <p className="text-sm font-bold">₹0</p>
+                </div>
+              </div>
+            </Link>
+          ))
+        )}
+      </div>
+
+      <Link href="/parties/create">
+        <Button className="fixed bottom-20 right-6 h-14 w-14 rounded-full shadow-lg" size="icon">
+          <Plus className="h-6 w-6" />
+        </Button>
+      </Link>
+    </div>
+  )
+}
