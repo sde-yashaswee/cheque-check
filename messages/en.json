@@ -47,7 +47,10 @@
     "google": "Google",
     "facebook": "Facebook",
     "fullName": "Full Name",
-    "orContinueWith": "Or continue with"
+    "orContinueWith": "Or continue with",
+    "noPhone": "No phone",
+    "noEmail": "No email",
+    "cheques": "Cheques"
   },
   "Navigation": {
     "dashboard": "Dashboard",
@@ -184,6 +187,8 @@
     "deleteAction": "Delete Cheque",
     "updateAction": "Update Cheque",
     "saveAction": "Save Cheque",
+    "chequeCreated": "Cheque recorded successfully",
+    "duplicateChequeError": "A cheque with this number already exists for this account",
     "sortBy": "Sort By",
     "sortNewest": "Newest First",
     "sortOldest": "Oldest First",
@@ -261,8 +266,6 @@
     "deleteConfirmDesc": "This will permanently delete this business and all associated data.",
     "upcoming": "Upcoming",
     "notFound": "Business not found",
-    "noPhone": "No phone",
-    "noEmail": "No email",
     "businessCheques": "Business Cheques",
     "noChequesDesc": "No cheques found for this business.",
     "businessName": "Business Name",

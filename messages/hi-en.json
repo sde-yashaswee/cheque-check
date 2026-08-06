@@ -47,7 +47,10 @@
     "google": "Google",
     "facebook": "Facebook",
     "fullName": "Pura Naam",
-    "orContinueWith": "Ya phir isse continue karein"
+    "orContinueWith": "Ya phir isse continue karein",
+    "noPhone": "Phone number nahi hai",
+    "noEmail": "Email nahi hai",
+    "cheques": "Cheques"
   },
   "Navigation": {
     "dashboard": "Dashboard",
@@ -184,6 +187,8 @@
     "deleteAction": "Cheque Delete karein",
     "updateAction": "Cheque Update karein",
     "saveAction": "Cheque Save karein",
+    "chequeCreated": "Cheque successfully record ho gaya",
+    "duplicateChequeError": "Is account ke liye is number ka cheque pehle se exist karta hai",
     "sortBy": "Sort Karein",
     "sortNewest": "Sabse Naye Pehle",
     "sortOldest": "Sabse Purane Pehle",
@@ -261,8 +266,6 @@
     "deleteConfirmDesc": "Isse yeh business aur isse juda saara data hamesha ke liye delete ho jayega.",
     "upcoming": "Upcoming",
     "notFound": "Business nahi mila",
-    "noPhone": "Phone number nahi hai",
-    "noEmail": "Email nahi hai",
     "businessCheques": "Business ke Cheques",
     "noChequesDesc": "Is business ke liye koi cheque nahi mila.",
     "businessName": "Business ka Naam",

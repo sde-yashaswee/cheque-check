@@ -7,7 +7,7 @@ import { useBusiness } from '@/hooks/use-business'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { HashtagIcon as Hash, PencilEdit01Icon as Pencil, File02Icon as FileText, Search01Icon as Search, FilterIcon as Filter, Invoice01Icon as ReceiptText } from '@hugeicons/core-free-icons';
+import { HashtagIcon as Hash, PencilEdit01Icon as Pencil, File02Icon as FileText, Search01Icon as Search, FilterIcon as Filter, Invoice01Icon as ReceiptText, Note01Icon as Note } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
@@ -96,6 +96,16 @@ export default function AccountDetailPage() {
             <p className="font-mono font-semibold uppercase">{account.ifsc_code || 'N/A'}</p>
           </div>
         </div>
+
+        {account.notes && (
+          <div className="pt-4 border-t border-primary/5 relative z-10">
+            <div className="flex items-center gap-2 mb-1">
+              <HugeiconsIcon icon={Note} className="h-3 w-3 text-muted-foreground opacity-80"/>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tc('notes')}</p>
+            </div>
+            <p className="text-sm font-semibold italic text-muted-foreground">{account.notes}</p>
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">

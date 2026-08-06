@@ -60,7 +60,7 @@ export default function BusinessDetailPage() {
             />
             <div>
               <h2 className="text-2xl font-semibold">{business.name}</h2>
-              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{business.phone || t('noPhone')}</p>
+              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{business.phone || tc('noPhone')}</p>
             </div>
           </div>
           <Link href={`/businesses/${id}/edit`}>

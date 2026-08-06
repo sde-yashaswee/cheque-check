@@ -7,6 +7,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { StorageService } from '@/services/storage.service'
 import { z } from 'zod'
+import { toast } from '@/components/ui/toast'
+import { useTranslations } from 'next-intl'
 
 type ChequeFormValues = z.infer<typeof chequeSchema>
 
@@ -15,6 +17,8 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
   const [isUploading, setIsUploading] = useState(false)
   const router = useRouter()
   const queryClient = useQueryClient()
+  const t = useTranslations('Cheques')
+  const tc = useTranslations('Common')
 
   const form = useForm<ChequeFormValues>({
     resolver: zodResolver(chequeSchema),
@@ -66,8 +70,30 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
       // Return a context object with the snapshotted value
       return { previousCheques: prev }
     },
-    onError: (err, newCheque, context: any) => {
+    onSuccess: () => {
+      toast.add({
+        title: tc('success'),
+        description: t('chequeCreated'),
+        type: 'success'
+      })
+      router.push('/cheques')
+    },
+    onError: (err: any, newCheque, context: any) => {
       queryClient.setQueryData(['cheques', businessId], context?.previousCheques)
+      
+      if (err.code === '23505') {
+        toast.add({
+          title: tc('error'),
+          description: t('duplicateChequeError'),
+          type: 'error'
+        })
+      } else {
+        toast.add({
+          title: tc('error'),
+          description: err.message || tc('error'),
+          type: 'error'
+        })
+      }
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
@@ -89,7 +115,7 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
   const nextStep = async () => {
     let isValid = false
     if (step === 1) {
-      isValid = await trigger(['amount', 'cheque_number', 'cheque_date'])
+      isValid = await trigger(['amount', 'cheque_number', 'cheque_date', 'deposit_date'])
     } else if (step === 2) {
       isValid = await trigger(['party_id', 'account_id'])
     }
@@ -110,7 +136,6 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
     isSaving: mutation.isPending,
     onSubmit: form.handleSubmit((data) => {
       mutation.mutate(data)
-      router.push('/cheques')
     }),
   }
 }

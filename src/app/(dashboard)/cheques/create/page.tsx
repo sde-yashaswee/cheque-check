@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { useSearchParams } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react';
 import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Camera01Icon as Camera, Cancel01Icon as X, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, Invoice01Icon as ReceiptText, UserIcon as User, CreditCardIcon as CreditCard, BankIcon as Bank, Delete02Icon as Trash } from '@hugeicons/core-free-icons';
-import { cn, numberToIndianWords } from '@/lib/utils'
+import { cn, numberToIndianWords, getSimilarityScore } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 import { Combobox } from '@/components/ui/combobox'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
@@ -112,34 +112,57 @@ export default function CreateChequePage() {
           let matchedPartyId = ''
           let matchedAccountId = ''
 
-          // Attempt to match party
-          if (data.payee_name !== null && parties) {
-            const matchedParty = parties.find(p => 
-              p.name.toLowerCase().includes(data.payee_name.toLowerCase()) ||
-              data.payee_name.toLowerCase().includes(p.name.toLowerCase())
-            )
-            if (matchedParty) {
-              matchedPartyId = matchedParty.id
-              setValue('party_id', matchedParty.id)
+          const chequeType = watch('type')
+
+          // Enhanced fuzzy match for party using similarity score
+          // If Inward (received), the issuer (account_name) is the Party.
+          // If Outward (issued), the payee (payee_name) is the Party.
+          const partyNameToMatch = chequeType === 'Inward' ? data.account_name : data.payee_name
+
+          if (partyNameToMatch && parties) {
+            const matches = parties.map(p => ({
+              id: p.id,
+              name: p.name,
+              score: getSimilarityScore(p.name, partyNameToMatch)
+            })).sort((a, b) => b.score - a.score)
+
+            if (matches[0]?.score >= 0.7) {
+              matchedPartyId = matches[0].id
+              setValue('party_id', matchedPartyId)
             }
           }
 
-          // Attempt to match account
-          if (data.account_number !== null && accounts) {
-            const ocrAcc = data.account_number.replace(/\D/g, '')
-            const matchedAccount = accounts.find(a => {
+          // Enhanced fuzzy match for account using similarity score (on account name)
+          // Only match our accounts if it's an Outward cheque (our cheque)
+          if (chequeType === 'Outward' && accounts) {
+            const ocrAcc = data.account_number?.replace(/\D/g, '') || ''
+            
+            // Try number match first (exact or partial)
+            const exactNumMatch = accounts.find(a => {
               const localAcc = a.account_number.replace(/\D/g, '')
               return ocrAcc.length >= 4 && localAcc.length >= 4 && 
                      (localAcc.endsWith(ocrAcc) || ocrAcc.endsWith(localAcc))
             })
-            if (matchedAccount) {
-              matchedAccountId = matchedAccount.id
-              setValue('account_id', matchedAccount.id)
+
+            if (exactNumMatch) {
+              matchedAccountId = exactNumMatch.id
+              setValue('account_id', matchedAccountId)
+            } else if (data.account_name) {
+              // Try name match if number fails
+              const nameMatches = accounts.map(a => ({
+                id: a.id,
+                score: getSimilarityScore(a.account_name, data.account_name!)
+              })).sort((a, b) => b.score - a.score)
+
+              if (nameMatches[0]?.score >= 0.7) {
+                matchedAccountId = nameMatches[0].id
+                setValue('account_id', matchedAccountId)
+              }
             }
           }
 
           // If something is not matched, show the dialog
-          if ((data.payee_name && !matchedPartyId) || (data.account_number && !matchedAccountId)) {
+          if ((partyNameToMatch && !matchedPartyId) || (chequeType === 'Outward' && data.account_number && !matchedAccountId)) {
             // Try to pre-match bank
             let matchedBankId = ''
             if (data.bank_name && banks) {
@@ -152,7 +175,7 @@ export default function CreateChequePage() {
             }
 
             setUnmatchedEntities({
-              payee_name: !matchedPartyId ? data.payee_name : undefined,
+              payee_name: !matchedPartyId ? partyNameToMatch || undefined : undefined,
               account_name: data.account_name,
               account_number: !matchedAccountId ? data.account_number : undefined,
               ifsc_code: data.ifsc_code,
@@ -162,11 +185,12 @@ export default function CreateChequePage() {
             
             setCreateOptions({
               party: !matchedPartyId,
-              account: !matchedAccountId
+              account: chequeType === 'Outward' && !matchedAccountId
             })
           }
 
           setExtractionProgress(100)
+          if (toastId) toast.remove(toastId)
           toast.add({
             title: tCommon('success'),
             description: "Cheque details extracted successfully",
@@ -174,6 +198,7 @@ export default function CreateChequePage() {
           })
         } catch (error) {
           logger.error('OCR Error', error)
+          if (toastId) toast.remove(toastId)
           toast.add({
             title: tCommon('error'),
             description: "Failed to extract cheque details",
@@ -271,12 +296,7 @@ export default function CreateChequePage() {
   })) || []
 
   const selectedParty = parties?.find(p => p.id === watch('party_id'))
-
-  const formattedAmount = new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(watch('amount') || 0)
+  const selectedAccount = accounts?.find(a => a.id === watch('account_id'))
 
   const amountInWords = numberToIndianWords(watch('amount') || 0)
 
@@ -386,8 +406,7 @@ export default function CreateChequePage() {
                 />
               </div>
               <div className="flex flex-col gap-1 ml-1">
-                <p className="text-sm font-semibold text-primary">{formattedAmount}</p>
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest italic">{amountInWords}</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">{amountInWords}</p>
               </div>
               {errors.amount && <p className="text-xs text-destructive ml-1">{errors.amount.message as string}</p>}
             </div>
@@ -403,8 +422,14 @@ export default function CreateChequePage() {
               <Input id="cheque_date"type="date"{...register('cheque_date')} className="h-12 rounded-sm"/>
               {errors.cheque_date && <p className="text-xs text-destructive ml-1">{errors.cheque_date.message as string}</p>}
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="deposit_date"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('depositDate')}</Label>
+              <Input id="deposit_date"type="date"{...register('deposit_date')} className="h-14 bg-canvas-parchment border-none rounded-sm"/>
+              {errors.deposit_date && <p className="text-xs text-destructive ml-1">{errors.deposit_date.message as string}</p>}
+            </div>
             
-            <Button type="button"className="w-full rounded-full h-14 text-lg"onClick={nextStep} disabled={!watch('amount')}>
+            <Button type="button"className="w-full rounded-full h-14 text-lg"onClick={nextStep}>
               {tCommon('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
             </Button>
           </div>
@@ -499,12 +524,6 @@ export default function CreateChequePage() {
               <Input id="notes"{...register('notes')} placeholder={t('notesPlaceholder')} className="h-14 bg-canvas-parchment border-none rounded-sm"/>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="deposit_date"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('depositDate')}</Label>
-              <Input id="deposit_date"type="date"{...register('deposit_date')} className="h-14 bg-canvas-parchment border-none rounded-sm"/>
-              {errors.deposit_date && <p className="text-xs text-destructive ml-1">{errors.deposit_date.message as string}</p>}
-            </div>
-
             <div className="rounded-lg bg-primary/5 p-6 space-y-4 border border-primary/10">
               <div className="flex items-center gap-2">
                 <HugeiconsIcon icon={ReceiptText} className="h-3 w-3 text-primary opacity-80"/>
@@ -528,6 +547,21 @@ export default function CreateChequePage() {
                       color={(selectedParty as any).color} 
                       icon={(selectedParty as any).icon} 
                       imageUrl={(selectedParty as any).avatar_url}
+                      size="sm"
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground font-semibold">{t('account')}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">{selectedAccount ? `${(selectedAccount as any).bank?.name || 'Bank'} (${selectedAccount.account_number.slice(-4)})` : '-'}</span>
+                  {selectedAccount && (
+                    <EntityAvatar 
+                      name={(selectedAccount as any).bank?.name || 'Bank'} 
+                      color={(selectedAccount as any).color} 
+                      icon={(selectedAccount as any).icon} 
+                      imageUrl={(selectedAccount as any).bank?.logo_url}
                       size="sm"
                     />
                   )}

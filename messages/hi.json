@@ -21,6 +21,8 @@
     "sortNewest": "सबसे नए पहले",
     "sortOldest": "सबसे पुराने पहले",
     "sortAmountHigh": "राशि (अधिक से कम)",
+    "chequeCreated": "चेक सफलतापूर्वक रिकॉर्ड किया गया",
+    "duplicateChequeError": "इस खाते के लिए इस नंबर का चेक पहले से मौजूद है",
     "sortAmountLow": "राशि (कम से अधिक)"
   }
 }
