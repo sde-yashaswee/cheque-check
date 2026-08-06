@@ -17,6 +17,13 @@ import { useTranslations } from 'next-intl'
 import { useState, useEffect } from 'react'
 import { toast } from '@/components/ui/toast'
 import { logger } from '@/lib/logger'
+import { useBanks } from '@/hooks/use-banks'
+import { useQueryClient } from '@tanstack/react-query'
+import { PartyService } from '@/services/party.service'
+import { AccountService } from '@/services/account.service'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Checkbox } from '@/components/ui/checkbox'
+import { BankSelector } from '@/components/bank-selector'
 
 export default function CreateChequePage() {
   const t = useTranslations('Cheques')
@@ -28,6 +35,22 @@ export default function CreateChequePage() {
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
   const [isExtracting, setIsExtracting] = useState(false)
+  const queryClient = useQueryClient()
+  const { data: banks } = useBanks()
+
+  const [unmatchedEntities, setUnmatchedEntities] = useState<{
+    payee_name?: string;
+    account_number?: string;
+    bank_name?: string;
+    bank_id?: string;
+  } | null>(null)
+  
+  const [createOptions, setCreateOptions] = useState({
+    party: true,
+    account: true
+  })
+
+  const [isCreatingInline, setIsCreatingInline] = useState(false)
 
   const {
     form,
@@ -43,6 +66,7 @@ export default function CreateChequePage() {
   const { register, setValue, watch, formState: { errors } } = form
 
   const { parties } = useParties(businessId)
+  const { accounts } = useAccounts(businessId)
 
   useEffect(() => {
     if (actionParam === 'ocr' && imageUrlParam && !isExtracting) {
@@ -71,6 +95,9 @@ export default function CreateChequePage() {
           if (data.cheque_number !== null) setValue('cheque_number', data.cheque_number)
           if (data.cheque_date !== null) setValue('cheque_date', data.cheque_date)
           
+          let matchedPartyId = ''
+          let matchedAccountId = ''
+
           // Attempt to match party
           if (data.payee_name !== null && parties) {
             const matchedParty = parties.find(p => 
@@ -78,19 +105,48 @@ export default function CreateChequePage() {
               data.payee_name.toLowerCase().includes(p.name.toLowerCase())
             )
             if (matchedParty) {
+              matchedPartyId = matchedParty.id
               setValue('party_id', matchedParty.id)
-              toast.add({
-                title: tCommon('success'),
-                description: `Matched party: ${matchedParty.name}`,
-                type: 'success',
-              })
-            } else {
-              toast.add({
-                title: t('scan'),
-                description: `Extracted payee: ${data.payee_name}`,
-                type: 'info',
-              })
             }
+          }
+
+          // Attempt to match account
+          if (data.account_number !== null && accounts) {
+            const ocrAcc = data.account_number.replace(/\D/g, '')
+            const matchedAccount = accounts.find(a => {
+              const localAcc = a.account_number.replace(/\D/g, '')
+              return ocrAcc.length >= 4 && localAcc.length >= 4 && 
+                     (localAcc.endsWith(ocrAcc) || ocrAcc.endsWith(localAcc))
+            })
+            if (matchedAccount) {
+              matchedAccountId = matchedAccount.id
+              setValue('account_id', matchedAccount.id)
+            }
+          }
+
+          // If something is not matched, show the dialog
+          if ((data.payee_name && !matchedPartyId) || (data.account_number && !matchedAccountId)) {
+            // Try to pre-match bank
+            let matchedBankId = ''
+            if (data.bank_name && banks) {
+              const matchedBank = banks.find(b => 
+                data.bank_name.toLowerCase().includes(b.name.toLowerCase()) ||
+                b.name.toLowerCase().includes(data.bank_name.toLowerCase())
+              )
+              if (matchedBank) matchedBankId = matchedBank.id
+            }
+
+            setUnmatchedEntities({
+              payee_name: !matchedPartyId ? data.payee_name : undefined,
+              account_number: !matchedAccountId ? data.account_number : undefined,
+              bank_name: data.bank_name,
+              bank_id: matchedBankId
+            })
+            
+            setCreateOptions({
+              party: !matchedPartyId,
+              account: !matchedAccountId
+            })
           }
 
           toast.add({
@@ -113,9 +169,70 @@ export default function CreateChequePage() {
       extractData()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actionParam, imageUrlParam, parties, setValue, t, tCommon])
+  }, [actionParam, imageUrlParam, parties, accounts, banks, setValue, t, tCommon])
 
-  const { accounts } = useAccounts(businessId)
+  const handleInlineCreate = async () => {
+    if (!unmatchedEntities || !businessId) return
+    setIsCreatingInline(true)
+    try {
+      let partyId = watch('party_id')
+      let accountId = watch('account_id')
+
+      if (createOptions.party && unmatchedEntities.payee_name) {
+        const newParty = await PartyService.create({
+          business_id: businessId,
+          name: unmatchedEntities.payee_name,
+          contact: '0000000000',
+          color: '#34C759',
+          email: null,
+          address: null,
+          notes: null
+        })
+        partyId = newParty.id
+        setValue('party_id', partyId)
+        queryClient.invalidateQueries({ queryKey: ['parties', businessId] })
+      }
+
+      if (createOptions.account && unmatchedEntities.account_number) {
+        if (!unmatchedEntities.bank_id) {
+          toast.add({ 
+            title: tCommon('error'), 
+            description: 'Please select a bank for the new account', 
+            type: 'error' 
+          })
+          setIsCreatingInline(false)
+          return
+        }
+        const newAccount = await AccountService.create({
+          business_id: businessId,
+          bank_id: unmatchedEntities.bank_id,
+          account_name: unmatchedEntities.payee_name || 'Scanned Account',
+          account_number: unmatchedEntities.account_number,
+          color: '#007AFF',
+          ifsc_code: null
+        })
+        accountId = newAccount.id
+        setValue('account_id', accountId)
+        queryClient.invalidateQueries({ queryKey: ['accounts', businessId] })
+      }
+
+      setUnmatchedEntities(null)
+      toast.add({ 
+        title: tCommon('success'), 
+        description: 'Entities created and selected', 
+        type: 'success' 
+      })
+    } catch (error) {
+      logger.error('Inline creation error', error)
+      toast.add({ 
+        title: tCommon('error'), 
+        description: 'Failed to create entities', 
+        type: 'error' 
+      })
+    } finally {
+      setIsCreatingInline(false)
+    }
+  }
 
   const partyOptions = parties?.map(p => ({ 
     label: p.name, 
@@ -256,6 +373,7 @@ export default function CreateChequePage() {
                 placeholder={t('partyPlaceholder')}
                 createUrl="/parties/create"
                 createLabel={t('addParty')}
+                className="h-14 bg-canvas-parchment border-none rounded-sm"
               />
               {errors.party_id && <p className="text-xs text-destructive ml-1">{errors.party_id.message as string}</p>}
             </div>
@@ -269,6 +387,7 @@ export default function CreateChequePage() {
                 placeholder={t('accountPlaceholder')}
                 createUrl="/accounts/create"
                 createLabel={t('addAccount')}
+                className="h-14 bg-canvas-parchment border-none rounded-sm"
               />
               {errors.account_id && <p className="text-xs text-destructive ml-1">{errors.account_id.message as string}</p>}
             </div>
@@ -329,12 +448,12 @@ export default function CreateChequePage() {
 
             <div className="space-y-2">
               <Label htmlFor="notes"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('notes')}</Label>
-              <Input id="notes"{...register('notes')} placeholder={t('notesPlaceholder')} className="h-12 rounded-sm"/>
+              <Input id="notes"{...register('notes')} placeholder={t('notesPlaceholder')} className="h-14 bg-canvas-parchment border-none rounded-sm"/>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="deposit_date"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('depositDate')}</Label>
-              <Input id="deposit_date"type="date"{...register('deposit_date')} className="h-12 rounded-sm"/>
+              <Input id="deposit_date"type="date"{...register('deposit_date')} className="h-14 bg-canvas-parchment border-none rounded-sm"/>
             </div>
 
             <div className="rounded-lg bg-primary/5 p-6 space-y-4 border border-primary/10">
@@ -373,6 +492,75 @@ export default function CreateChequePage() {
           </div>
         )}
       </form>
+
+      <Dialog open={!!unmatchedEntities} onOpenChange={(open) => !open && setUnmatchedEntities(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>New Entities Found</DialogTitle>
+            <DialogDescription>
+              We found a party and/or account on the cheque that aren&apos;t in your business. Would you like to create them?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {unmatchedEntities?.payee_name && (
+              <div className="flex items-start gap-3 p-3 rounded-lg border bg-canvas-parchment/30">
+                <Checkbox 
+                  id="create-party" 
+                  checked={createOptions.party} 
+                  onCheckedChange={(checked) => setCreateOptions(prev => ({ ...prev, party: !!checked }))}
+                  className="mt-1"
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label htmlFor="create-party" className="text-sm font-semibold">
+                    Create Party: {unmatchedEntities.payee_name}
+                  </label>
+                  <p className="text-xs text-muted-foreground">This name was extracted as the payee.</p>
+                </div>
+              </div>
+            )}
+
+            {unmatchedEntities?.account_number && (
+              <div className="space-y-4 p-3 rounded-lg border bg-canvas-parchment/30">
+                <div className="flex items-start gap-3">
+                  <Checkbox 
+                    id="create-account" 
+                    checked={createOptions.account} 
+                    onCheckedChange={(checked) => setCreateOptions(prev => ({ ...prev, account: !!checked }))}
+                    className="mt-1"
+                  />
+                  <div className="grid gap-1.5 leading-none">
+                    <label htmlFor="create-account" className="text-sm font-semibold">
+                      Create Account: {unmatchedEntities.account_number}
+                    </label>
+                    <p className="text-xs text-muted-foreground">Bank account number from the scan.</p>
+                  </div>
+                </div>
+
+                {createOptions.account && (
+                  <div className="space-y-2 ml-7">
+                    <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Select Bank</Label>
+                    <BankSelector 
+                      value={unmatchedEntities.bank_id} 
+                      onValueChange={(val) => setUnmatchedEntities(prev => prev ? ({ ...prev, bank_id: val }) : null)}
+                      className="h-10 text-sm rounded-xl"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="flex-row gap-3">
+            <Button variant="ghost" className="flex-1 rounded-full" onClick={() => setUnmatchedEntities(null)}>
+              Skip
+            </Button>
+            <Button className="flex-1 rounded-full" onClick={handleInlineCreate} disabled={isCreatingInline || (!createOptions.party && !createOptions.account)}>
+              {isCreatingInline ? 'Creating...' : 'Create Selected'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

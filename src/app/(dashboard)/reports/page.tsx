@@ -6,7 +6,7 @@ import { useProfile } from "@/hooks/use-profile"
 import { ReportService } from "@/services/report.service"
 import { Button } from "@/components/ui/button"
 import { HugeiconsIcon } from '@hugeicons/react';
-import { File02Icon as FileText, FileDownloadIcon as Download, FilterIcon as Filter, Calendar01Icon as Calendar } from '@hugeicons/core-free-icons';
+import { File02Icon as FileText, FileDownloadIcon as Download, FilterIcon as Filter, Calendar01Icon as Calendar, Building03Icon } from '@hugeicons/core-free-icons';
 import { useChequeStats } from "@/hooks/use-cheque-stats"
 import { DataState } from "@/components/ui/data-state"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -51,16 +51,40 @@ export default function ReportsPage() {
           <h1 className="text-display-sm font-semibold tracking-tight">Reports</h1>
           <p className="text-body text-muted-foreground">Financial summary and exports</p>
         </div>
-        <Button onClick={handleExport} className="rounded-full gap-2">
+        <Button onClick={handleExport} className="rounded-full gap-2" disabled={!cheques || cheques.length === 0}>
           <HugeiconsIcon icon={Download} className="h-4 w-4"/> Export
         </Button>
       </div>
 
       <DataState
         isLoading={isLoading}
-        data={cheques || []}
-        allData={cheques || []}
-        loadingComponent={<Skeleton className="h-[300px] w-full rounded-lg"/>}
+        data={activeBusiness ? [activeBusiness] : []}
+        allData={activeBusiness ? [activeBusiness] : []}
+        loadingComponent={
+          <>
+            <Skeleton className="h-40 w-full rounded-lg"/>
+            <div className="grid grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-24 w-full rounded-lg"/>
+              ))}
+            </div>
+            <div className="space-y-4">
+              <Skeleton className="h-6 w-32"/>
+              <Skeleton className="h-32 w-full rounded-lg"/>
+            </div>
+          </>
+        }
+        emptyState={
+          <EmptyState
+            icon={Building03Icon}
+            title={t('welcomeTitle')}
+            description={t('welcomeDescription')}
+            action={{
+              label: t('createBusiness'),
+              href: "/businesses/create"
+            }}
+          />
+        }
       >
         <div className="space-y-8">
           {/* Summary Cards */}
@@ -82,7 +106,13 @@ export default function ReportsPage() {
               <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Distribution</h2>
             </div>
             <div className="rounded-lg border bg-card p-6 h-[300px] relative">
-              <ChequeStatsChart chartData={chartData} totalCheques={cheques?.length || 0} />
+              {cheques?.length === 0 ? (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-sm text-muted-foreground">No data for chart</p>
+                </div>
+              ) : (
+                <ChequeStatsChart chartData={chartData} totalCheques={cheques?.length || 0} />
+              )}
             </div>
           </div>
 
@@ -95,29 +125,38 @@ export default function ReportsPage() {
               </div>
             </div>
             
-            <div className="divide-y rounded-lg border bg-card overflow-hidden">
-              {(cheques || []).slice(0, 10).map((c) => (
-                <div key={c.id} className="flex items-center justify-between p-4">
-                  <div>
-                    <p className="font-semibold">{c.party?.name}</p>
-                    <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
-                      {format(new Date(c.cheque_date), 'MMM d, yyyy')} • #{c.cheque_number}
+            {cheques?.length === 0 ? (
+              <EmptyState
+                icon={FileText}
+                title="No cheques yet"
+                description="You don't have any cheques to report on."
+                className="py-10 bg-canvas-parchment/30"
+              />
+            ) : (
+              <div className="divide-y rounded-lg border bg-card overflow-hidden">
+                {(cheques || []).slice(0, 10).map((c) => (
+                  <div key={c.id} className="flex items-center justify-between p-4">
+                    <div>
+                      <p className="font-semibold">{c.party?.name}</p>
+                      <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
+                        {format(new Date(c.cheque_date), 'MMM d, yyyy')} • #{c.cheque_number}
+                      </p>
+                    </div>
+                    <div className="text-right space-y-1">
+                      <p className="font-bold">{currency}{c.amount.toLocaleString()}</p>
+                      <StatusPill status={c.status as any} className="scale-75 origin-right"/>
+                    </div>
+                  </div>
+                ))}
+                {(cheques?.length || 0) > 10 && (
+                  <div className="p-3 text-center bg-muted/20">
+                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      Showing 10 of {cheques?.length} cheques. Export to see all.
                     </p>
                   </div>
-                  <div className="text-right space-y-1">
-                    <p className="font-bold">{currency}{c.amount.toLocaleString()}</p>
-                    <StatusPill status={c.status as any} className="scale-75 origin-right"/>
-                  </div>
-                </div>
-              ))}
-              {(cheques?.length || 0) > 10 && (
-                <div className="p-3 text-center bg-muted/20">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    Showing 10 of {cheques?.length} cheques. Export to see all.
-                  </p>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </DataState>

@@ -38,7 +38,12 @@ export function BankSelector({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         render={
-          <div className={cn(buttonVariants({ variant: "outline"}), "w-full justify-between h-14 rounded-2xl bg-canvas-parchment border-none px-4 text-lg font-medium cursor-pointer", className)}>
+          <div className={cn(
+            buttonVariants({ variant: "outline"}), 
+            "w-full justify-between h-14 rounded-2xl bg-canvas-parchment border-none px-4 text-lg font-medium cursor-pointer", 
+            className?.includes('rounded-sm') && "rounded-sm",
+            className
+          )}>
             <div className="flex items-center gap-3 overflow-hidden">
               {selectedBank ? (
                 <EntityAvatar 

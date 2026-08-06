@@ -70,6 +70,7 @@ export default function CreateAccountPage() {
                 <BankSelector 
                   value={watch('bank_id')}
                   onValueChange={(val) => setValue('bank_id', val)}
+                  className="rounded-sm"
                 />
                 {errors.bank_id && <p className="text-xs text-destructive ml-1">{errors.bank_id.message as string}</p>}
               </div>

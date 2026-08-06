@@ -10,15 +10,14 @@ export function OnboardingCheck({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Wait until loading (first fetch) is done
-    const isReady = !isLoading;
+    const isReady = !isLoading && !isFetching;
     
     if (isReady && businesses.length === 0 && pathname !== '/onboarding') {
       router.push('/onboarding');
     }
-  }, [businesses, isLoading, pathname, router]);
+  }, [businesses, isLoading, isFetching, pathname, router]);
 
-  if (isLoading) return null;
+  if (isLoading || (isFetching && businesses.length === 0)) return null;
 
   return <>{children}</>;
 }

@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useProfile } from '@/hooks/use-profile'
 import { useBusiness } from '@/hooks/use-business'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowLeft01Icon as ChevronLeft, UserIcon as User, ArrowDown01Icon as ChevronDown, Search01Icon as Search } from '@hugeicons/core-free-icons';
+import { ArrowLeft01Icon as ChevronLeft, UserIcon as User, ArrowDown01Icon as ChevronDown, Search01Icon as Search, ViewIcon as View, Invoice01Icon as Invoice, Add01Icon as Plus, CreditCardIcon as Pay, UserGroupIcon as Party, UserAdd01Icon as NewParty, Settings02Icon as Settings, StarIcon as Star, Shield01Icon as Shield, LegalDocumentIcon as File, HelpCircleIcon as Help, RocketIcon as Rocket, PencilEdit01Icon as Edit } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import { BusinessSwitcher } from "@/components/business-switcher"
 import { useState } from "react"
@@ -24,92 +24,111 @@ export function TopNav() {
   const [searchOpen, setSearchOpen] = useState(false)
   const t = useTranslations()
 
-  const getTitle = (path: string) => {
-    if (path === '/') return 'ChequeCheck'
-    if (path === '/settings') return t('Navigation.settings')
-    if (path === '/features') return 'Features'
+  const getNavInfo = (path: string) => {
+    if (path === '/') return { title: 'ChequeCheck', icon: null }
+    if (path === '/settings') return { title: t('Navigation.settings'), icon: Settings }
+    if (path === '/features') return { title: 'Features', icon: Star }
 
     if (path.startsWith('/settings/')) {
       const sub = path.split('/')[2]
-      if (sub === 'privacy-policy') return t('Settings.privacyPolicy')
-      if (sub === 'terms-and-conditions') return t('Settings.termsAndConditions')
-      if (sub === 'refund-policy') return t('Settings.refundPolicy')
-      if (sub === 'about') return t('Settings.aboutApp')
-      if (sub === 'help-and-support') return t('Settings.helpAndSupport')
-      if (sub === 'whats-new') return t('Settings.whatsNew')
+      const subInfo: Record<string, { title: string; icon: any }> = {
+        'privacy-policy': { title: t('Settings.privacyPolicy'), icon: Shield },
+        'terms-and-conditions': { title: t('Settings.termsAndConditions'), icon: File },
+        'refund-policy': { title: t('Settings.refundPolicy'), icon: Pay },
+        'about': { title: t('Settings.aboutApp'), icon: Star },
+        'help-and-support': { title: t('Settings.helpAndSupport'), icon: Help },
+        'whats-new': { title: t('Settings.whatsNew'), icon: Rocket },
+      }
+      if (subInfo[sub]) return subInfo[sub]
     }
 
     const segments = path.split('/').filter(Boolean)
-    if (segments.length === 0) return 'ChequeCheck'
+    if (segments.length === 0) return { title: 'ChequeCheck', icon: null }
 
     const resource = segments[0] // cheques, parties, accounts, businesses
     const id = segments[1]
     const action = segments[2]
 
-    const featureMap: Record<string, string> = {
-      cheques: 'Cheques',
-      parties: 'Parties',
-      accounts: 'Accounts',
-      businesses: 'Businesses'
+    const featureMap: Record<string, { key: string; icon: any }> = {
+      cheques: { key: 'Cheques', icon: Invoice },
+      parties: { key: 'Parties', icon: Party },
+      accounts: { key: 'Accounts', icon: Pay },
+      businesses: { key: 'Businesses', icon: User }
     }
 
-    const featureKey = featureMap[resource]
-    if (!featureKey) return resource.charAt(0).toUpperCase() + resource.slice(1)
+    const feature = featureMap[resource]
+    if (!feature) return { title: resource.charAt(0).toUpperCase() + resource.slice(1), icon: null }
 
     if (segments.length === 1) {
-      return t(`${featureKey}.title`)
+      return { title: t(`${feature.key}.title`), icon: feature.icon }
     }
 
     if (id === 'create') {
-      if (resource === 'accounts') return t('Accounts.addAccount')
-      if (resource === 'cheques') return t('Cheques.newCheque')
-      if (resource === 'parties') return t('Parties.newParty')
-      if (resource === 'businesses') return t('Businesses.newBusiness')
+      const createIcons: Record<string, any> = {
+        accounts: Pay,
+        cheques: Plus,
+        parties: NewParty,
+        businesses: Plus
+      }
+      const createKeys: Record<string, string> = {
+        accounts: 'Accounts.addAccount',
+        cheques: 'Cheques.newCheque',
+        parties: 'Parties.newParty',
+        businesses: 'Businesses.newBusiness'
+      }
+      return { title: t(createKeys[resource]), icon: createIcons[resource] || Plus }
     }
 
     if (id && !action) {
-      if (resource === 'accounts') return t('Accounts.viewAccount')
-      if (resource === 'cheques') return t('Cheques.viewCheque')
-      if (resource === 'parties') return t('Parties.viewParty')
-      if (resource === 'businesses') return t('Businesses.viewBusiness')
+      const viewKeys: Record<string, string> = {
+        accounts: 'Accounts.viewAccount',
+        cheques: 'Cheques.viewCheque',
+        parties: 'Parties.viewParty',
+        businesses: 'Businesses.viewBusiness'
+      }
+      return { title: t(viewKeys[resource]), icon: View }
     }
 
     if (id && action === 'edit') {
-      if (resource === 'accounts') return t('Accounts.editAccount')
-      if (resource === 'cheques') return t('Cheques.editCheque')
-      if (resource === 'parties') return t('Parties.editParty')
-      if (resource === 'businesses') return t('Businesses.editBusiness')
+      const editKeys: Record<string, string> = {
+        accounts: 'Accounts.editAccount',
+        cheques: 'Cheques.editCheque',
+        parties: 'Parties.editParty',
+        businesses: 'Businesses.editBusiness'
+      }
+      return { title: t(editKeys[resource]), icon: Edit }
     }
 
-    return t('Navigation.dashboard')
+    return { title: t('Navigation.dashboard'), icon: null }
   }
 
-  const title = getTitle(pathname)
+  const { title, icon: TitleIcon } = getNavInfo(pathname)
   const isMainTab = ['/', '/cheques', '/parties', '/accounts', '/settings', '/businesses', '/features'].includes(pathname)
   
   const hideSettingsIcon = pathname.startsWith('/settings') || pathname.startsWith('/features')
-  const hideBusinessSwitcher = pathname.startsWith('/settings') || pathname.startsWith('/features')
+  const hideBusinessSwitcher = pathname.startsWith('/settings') || pathname.startsWith('/features') || pathname === '/businesses/create'
 
   return (
     <div className="sticky top-0 z-40 w-full flex flex-col">
       <header className="relative flex h-[52px] items-center justify-between bg-canvas-parchment/80 px-4 backdrop-blur-md dark:bg-black/80 border-b border-primary/5">
         <div id="progress-bar-nav-container" className="absolute bottom-0 left-0 right-0 h-[1.6px] z-50 pointer-events-none"/>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-hidden">
           {!isMainTab && (
             <Button
               variant="ghost"
               size="icon"
               onClick={() => router.back()}
-              className="rounded-full -ml-2 h-9 w-9"
+              className="rounded-full -ml-2 h-9 w-9 shrink-0"
             >
               <HugeiconsIcon icon={ChevronLeft} className="h-5 w-5"/>
             </Button>
           )}
-          <h1 className="text-lg font-semibold tracking-tight flex items-center gap-2">
+          <h1 className="text-lg font-semibold tracking-tight flex items-center gap-2 truncate">
             {isMainTab && pathname === '/' && (
-              <img src="/favicon-32x32.png" alt="ChequeCheck Logo" className="h-6 w-6 rounded-md" />
+              <img src="/favicon-32x32.png" alt="ChequeCheck Logo" className="h-6 w-6 rounded-md shrink-0" />
             )}
-            <span>{isMainTab && pathname === '/' ? 'ChequeCheck' : title}</span>
+            {TitleIcon && <HugeiconsIcon icon={TitleIcon} className="h-5 w-5 text-primary shrink-0"/>}
+            <span className="truncate">{isMainTab && pathname === '/' ? 'ChequeCheck' : title}</span>
           </h1>
         </div>
 

@@ -50,7 +50,12 @@ export function Combobox({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
-        className={cn(buttonVariants({ variant: "outline"}), "w-full justify-between h-12 rounded-sm border-primary/10", className)}
+        className={cn(
+          buttonVariants({ variant: className?.includes('bg-') ? "ghost" : "outline" }), 
+          "w-full justify-between h-12 rounded-sm",
+          !className?.includes('border-none') && "border-primary/10",
+          className
+        )}
       >
         <div className="flex items-center gap-2 overflow-hidden">
           {selectedOption && (
