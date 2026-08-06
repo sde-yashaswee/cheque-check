@@ -12,5 +12,13 @@
     "enableDailyCall": "दैनिक कॉल सक्षम करें",
     "phoneNumber": "फ़ोन नंबर",
     "phoneNumberPlaceholder": "+91 00000 00000"
+  },
+  "Cheques": {
+    "number": "नंबर",
+    "sortBy": "क्रमबद्ध करें",
+    "sortNewest": "सबसे नए पहले",
+    "sortOldest": "सबसे पुराने पहले",
+    "sortAmountHigh": "राशि (अधिक से कम)",
+    "sortAmountLow": "राशि (कम से अधिक)"
   }
 }

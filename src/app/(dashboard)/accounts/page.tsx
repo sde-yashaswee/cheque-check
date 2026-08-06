@@ -128,23 +128,23 @@ export default function AccountsPage() {
         >
           {filteredAccounts?.map((account) => (
             <Link key={account.id} href={`/accounts/${account.id}`}>
-              <div className="group relative rounded-lg border bg-card p-6 transition-all active:scale-[0.98] border-primary/5">
+              <div className="group relative rounded-xl border bg-card p-5 transition-all active:scale-[0.98] border-zinc-200 dark:border-zinc-800 shadow-sm">
                 <div className="flex items-start gap-4">
                   <EntityAvatar 
                     name={account.bank?.name || 'A'} 
                     color={account.color} 
                     icon={account.icon} 
                     imageUrl={account.bank?.logo_url}
-                    size="lg" 
+                    size="md" 
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <p className="text-lg font-semibold truncate">{account.bank?.name}</p>
-                      <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 group-hover:translate-x-1 transition-transform" />
+                      <p className="text-base font-bold truncate">{account.bank?.name}</p>
+                      <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground/40 group-hover:translate-x-0.5 transition-transform" />
                     </div>
                     <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mt-0.5">{account.account_name}</p>
                     
-                    <div className="mt-4 flex items-center justify-between border-t border-dashed pt-4">
+                    <div className="mt-4 flex items-center justify-between border-t border-dashed border-zinc-100 dark:border-zinc-800 pt-4">
                       <p className="text-xs font-mono text-muted-foreground tracking-tighter">
                         {account.account_number.replace(/\d(?=\d{4})/g, "•")}
                       </p>

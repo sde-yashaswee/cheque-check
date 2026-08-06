@@ -16,7 +16,7 @@
     "tryAgain": "Phir se koshish karein",
     "criticalError": "Critical Application Error",
     "criticalErrorDesc": "Application mein ek critical error aayi hai aur yeh aage nahi badh sakti.",
-    "rotateDevice": "Kripya apne device ko rotate karein",
+    "rotateDevice": "Phone rotate karein",
     "portraitModeOnly": "Yeh app portrait mode mein use karne ke liye design kiya gaya hai.",
     "success": "Safal raha",
     "continue": "Aage badhein",
@@ -140,6 +140,7 @@
     "viewCheque": "Cheque Dekhein",
     "issued": "Issued",
     "received": "Received",
+    "number": "Number",
     "chequeNumber": "Cheque Number",
     "chequeNumberPlaceholder": "6-digit number",
     "chequeDate": "Cheque ki Date",
@@ -180,7 +181,12 @@
     "deleteConfirmDesc": "Isse yeh cheque record hamesha ke liye delete ho jayega.",
     "deleteAction": "Cheque Delete karein",
     "updateAction": "Cheque Update karein",
-    "saveAction": "Cheque Save karein"
+    "saveAction": "Cheque Save karein",
+    "sortBy": "Sort Karein",
+    "sortNewest": "Sabse Naye Pehle",
+    "sortOldest": "Sabse Purane Pehle",
+    "sortAmountHigh": "Rakam (Zyada se Kam)",
+    "sortAmountLow": "Rakam (Kam se Zyada)"
   },
   "Parties": {
     "title": "Parties",

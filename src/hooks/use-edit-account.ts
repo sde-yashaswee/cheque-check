@@ -42,18 +42,40 @@ export function useEditAccount(id: string, businessId: string | undefined) {
 
   const updateMutation = useMutation({
     mutationFn: (data: any) => AccountService.update(id, data),
-    onSuccess: () => {
+    onMutate: async (newAccount) => {
+      await queryClient.cancelQueries({ queryKey: ['accounts', businessId] })
+      const previousAccounts = queryClient.getQueryData(['accounts', businessId])
+      queryClient.setQueryData(['accounts', businessId], (old: any) => {
+        if (!old) return old
+        return old.map((a: any) => a.id === id ? { ...a, ...newAccount } : a)
+      })
+      return { previousAccounts }
+    },
+    onError: (err, newAccount, context) => {
+      queryClient.setQueryData(['accounts', businessId], context?.previousAccounts)
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts', businessId] })
       queryClient.invalidateQueries({ queryKey: ['account', id] })
-      router.back()
     }
   })
 
   const deleteMutation = useMutation({
     mutationFn: () => AccountService.delete(id),
-    onSuccess: () => {
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['accounts', businessId] })
+      const previousAccounts = queryClient.getQueryData(['accounts', businessId])
+      queryClient.setQueryData(['accounts', businessId], (old: any) => {
+        if (!old) return old
+        return old.filter((a: any) => a.id !== id)
+      })
+      return { previousAccounts }
+    },
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(['accounts', businessId], context?.previousAccounts)
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts', businessId] })
-      router.push('/accounts')
     }
   })
 
@@ -64,7 +86,13 @@ export function useEditAccount(id: string, businessId: string | undefined) {
     error,
     isSaving: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
-    onSubmit: form.handleSubmit((data) => updateMutation.mutate(data)),
-    onDelete: () => deleteMutation.mutate(),
+    onSubmit: form.handleSubmit((data) => {
+      updateMutation.mutate(data)
+      router.back()
+    }),
+    onDelete: () => {
+      deleteMutation.mutate()
+      router.push('/accounts')
+    },
   }
 }

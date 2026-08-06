@@ -53,27 +53,62 @@ export function useEditCheque(id: string) {
 
   const updateMutation = useMutation({
     mutationFn: (data: ChequeFormData) => ChequeService.update(id, data),
-    onSuccess: () => {
+    onMutate: async (newCheque) => {
+      const businessId = cheque?.business_id
+      if (businessId) {
+        await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
+        const previousCheques = queryClient.getQueryData(['cheques', businessId])
+        queryClient.setQueryData(['cheques', businessId], (old: any) => {
+          if (!old) return old
+          return old.map((c: any) => c.id === id ? { ...c, ...newCheque } : c)
+        })
+        return { previousCheques }
+      }
+    },
+    onError: (err, newCheque, context) => {
+      const businessId = cheque?.business_id
+      if (businessId && context?.previousCheques) {
+        queryClient.setQueryData(['cheques', businessId], context.previousCheques)
+      }
+    },
+    onSettled: () => {
       if (cheque?.business_id) {
         queryClient.invalidateQueries({ queryKey: ['cheques', cheque.business_id] })
       }
       queryClient.invalidateQueries({ queryKey: ['cheque', id] })
-      router.back()
     }
   })
 
   const deleteMutation = useMutation({
     mutationFn: () => ChequeService.delete(id),
-    onSuccess: () => {
+    onMutate: async () => {
+      const businessId = cheque?.business_id
+      if (businessId) {
+        await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
+        const previousCheques = queryClient.getQueryData(['cheques', businessId])
+        queryClient.setQueryData(['cheques', businessId], (old: any) => {
+          if (!old) return old
+          return old.filter((c: any) => c.id !== id)
+        })
+        return { previousCheques }
+      }
+    },
+    onError: (err, variables, context) => {
+      const businessId = cheque?.business_id
+      if (businessId && context?.previousCheques) {
+        queryClient.setQueryData(['cheques', businessId], context.previousCheques)
+      }
+    },
+    onSettled: () => {
       if (cheque?.business_id) {
         queryClient.invalidateQueries({ queryKey: ['cheques', cheque.business_id] })
       }
-      router.push('/cheques')
     }
   })
 
   const onSubmit = form.handleSubmit((data) => {
     updateMutation.mutate(data)
+    router.back()
   })
 
   return {
@@ -84,6 +119,9 @@ export function useEditCheque(id: string) {
     isSaving: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
     onSubmit,
-    onDelete: () => deleteMutation.mutate(),
+    onDelete: () => {
+      deleteMutation.mutate()
+      router.push('/cheques')
+    },
   }
 }

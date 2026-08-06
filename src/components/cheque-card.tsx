@@ -43,7 +43,19 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
 
   const deleteMutation = useMutation({
     mutationFn: () => ChequeService.delete(cheque.id),
-    onSuccess: () => {
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['cheques', activeBusiness?.id] })
+      const previousCheques = queryClient.getQueryData(['cheques', activeBusiness?.id])
+      queryClient.setQueryData(['cheques', activeBusiness?.id], (old: any) => {
+        if (!old) return old
+        return old.filter((c: any) => c.id !== cheque.id)
+      })
+      return { previousCheques }
+    },
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(['cheques', activeBusiness?.id], context?.previousCheques)
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['cheques', activeBusiness?.id] })
     }
   })
@@ -117,7 +129,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
         {...handlers}
         style={{ x: offset }}
         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-        className="relative z-10 border bg-card p-5 shadow-sm active:scale-[0.99] transition-transform"
+        className="relative z-10 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-card p-5 shadow-sm active:scale-[0.99] transition-transform"
       >
         <Link href={`/cheques/${cheque.id}`} className="absolute inset-0 z-0" />
         <div className="flex justify-between items-start relative z-10 pointer-events-none">

@@ -1,20 +1,12 @@
 import { HugeiconsIcon } from "@hugeicons/react"
-import { ArrowLeft01Icon as ArrowLeft, Shield01Icon as Shield } from "@hugeicons/core-free-icons"
-import Link from "next/link"
+import { Shield01Icon as Shield } from "@hugeicons/core-free-icons"
 import { useTranslations } from "next-intl"
 
 export default function PrivacyPolicyPage() {
   const t = useTranslations("Settings")
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20 pt-4">
-      <div className="flex items-center gap-4 px-2">
-        <Link href="/settings" className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 hover:bg-muted/80 transition-colors">
-          <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5" />
-        </Link>
-        <h1 className="text-2xl font-bold">{t("privacyPolicy")}</h1>
-      </div>
-
+    <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="prose prose-sm dark:prose-invert max-w-none px-2">
         <div className="rounded-lg border bg-card p-6 space-y-4">
           <div className="flex items-center gap-3 text-primary mb-4">

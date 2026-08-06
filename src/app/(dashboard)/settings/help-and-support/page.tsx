@@ -1,5 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react"
-import { ArrowLeft01Icon as ArrowLeft, HelpCircleIcon as Help, Mail01Icon as Mail, MessageQuestionIcon as FAQ, Book02Icon as Docs } from "@hugeicons/core-free-icons"
+import { Mail01Icon as Mail, MessageQuestionIcon as FAQ, Book02Icon as Docs } from "@hugeicons/core-free-icons"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useTranslations } from "next-intl"
@@ -14,14 +14,7 @@ export default function HelpAndSupportPage() {
   ]
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20 pt-4">
-      <div className="flex items-center gap-4 px-2">
-        <Link href="/settings" className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 hover:bg-muted/80 transition-colors">
-          <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5" />
-        </Link>
-        <h1 className="text-2xl font-bold">{t("helpAndSupport")}</h1>
-      </div>
-
+    <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="space-y-8 px-2">
         <div className="grid grid-cols-2 gap-4">
           <Link href="mailto:support@chequecheck.com" className="flex flex-col items-center justify-center p-6 rounded-lg border bg-card hover:bg-muted/30 transition-all space-y-2 text-center">

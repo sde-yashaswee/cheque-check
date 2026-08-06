@@ -89,23 +89,23 @@ export default function PartiesPage() {
         >
           {filteredParties?.map((party) => (
             <Link key={party.id} href={`/parties/${party.id}`} className="block">
-              <div className="group flex items-center gap-4 rounded-lg border bg-card p-5 transition-all active:scale-[0.98] border-primary/5">
+              <div className="group flex items-center gap-4 rounded-xl border bg-card p-4 transition-all active:scale-[0.98] border-zinc-200 dark:border-zinc-800 shadow-sm">
                 <EntityAvatar 
                   name={party.name} 
                   color={party.color} 
                   icon={party.icon} 
                   imageUrl={party.avatar_url}
-                  size="lg" 
+                  size="md" 
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-lg truncate">{party.name}</p>
+                  <p className="font-bold text-base truncate">{party.name}</p>
                   <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider truncate">{party.contact}</p>
                 </div>
-                <div className="text-right pr-2 shrink-0">
+                <div className="text-right shrink-0">
                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">{tCommon('balance')}</p>
-                  <p className="text-sm font-semibold text-primary">{currency}{getBalance(party.id).toLocaleString()}</p>
+                  <p className="text-sm font-bold text-primary">{currency}{getBalance(party.id).toLocaleString()}</p>
                 </div>
-                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 shrink-0 text-muted-foreground opacity-40 group-hover:translate-x-1 transition-transform" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 shrink-0 text-muted-foreground/40 group-hover:translate-x-0.5 transition-transform" />
               </div>
             </Link>
           ))}

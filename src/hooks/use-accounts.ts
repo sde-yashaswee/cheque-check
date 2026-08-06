@@ -19,7 +19,7 @@ export function useAccounts(businessId: string | undefined) {
 
     return accounts.filter(a => {
       const matchesSearch = a.account_name.toLowerCase().includes(search.toLowerCase()) ||
-                           a.bank?.name.toLowerCase().includes(search.toLowerCase()) ||
+                           a.bank?.name?.toLowerCase().includes(search.toLowerCase()) ||
                            a.account_number.includes(search)
       const matchesBank = bankFilter === 'All' || a.bank_id === bankFilter
       return matchesSearch && matchesBank

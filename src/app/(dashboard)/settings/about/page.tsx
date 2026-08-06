@@ -1,5 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react"
-import { ArrowLeft01Icon as ArrowLeft, InformationCircleIcon as Info, UserIcon as User, Mail01Icon as Mail, StarsIcon as Version } from "@hugeicons/core-free-icons"
+import { InformationCircleIcon as Info, UserIcon as User, Mail01Icon as Mail, StarsIcon as Version } from "@hugeicons/core-free-icons"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 
@@ -7,14 +7,7 @@ export default function AboutPage() {
   const t = useTranslations("Settings")
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20 pt-4">
-      <div className="flex items-center gap-4 px-2">
-        <Link href="/settings" className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 hover:bg-muted/80 transition-colors">
-          <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5" />
-        </Link>
-        <h1 className="text-2xl font-bold">{t("aboutApp")}</h1>
-      </div>
-
+    <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="space-y-6 px-2">
         <div className="rounded-lg border bg-card overflow-hidden">
           <div className="p-6 text-center space-y-2 bg-muted/20">

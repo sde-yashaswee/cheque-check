@@ -221,7 +221,7 @@ export default function SettingsPage() {
   ]
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20 pt-4">
+    <div className="mx-auto max-w-2xl space-y-8 pb-20">
       {/* Profile Section */}
       <div className="flex items-center gap-4 rounded-lg bg-canvas-parchment p-5 dark:bg-surface-tile-1">
         <EditableAvatar

@@ -3,7 +3,7 @@
 import { useCheques } from '@/hooks/use-cheques'
 import { ChequeCard } from '@/components/cheque-card'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { PlusSignIcon as Plus, Search01Icon as Search, FilterIcon as Filter, Invoice01Icon as ReceiptText } from '@hugeicons/core-free-icons';
+import { PlusSignIcon as Plus, Search01Icon as Search, FilterIcon as Filter, Invoice01Icon as ReceiptText, SortingZA01Icon as Sort } from '@hugeicons/core-free-icons';
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -31,15 +31,28 @@ export default function ChequesPage() {
     setSearch,
     filter,
     setFilter,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
     updateStatus,
   } = useCheques(businessId)
 
   const clearFilters = () => {
     setSearch('')
     setFilter('All')
+    setSortBy('date')
+    setSortOrder('desc')
   }
 
   const statusOptions = ['All', 'Issued', 'Received', 'Cleared', 'Bounced'] as const
+
+  const sortOptions = [
+    { label: t('sortNewest', { fallback: 'Newest First' }), by: 'date', order: 'desc' },
+    { label: t('sortOldest', { fallback: 'Oldest First' }), by: 'date', order: 'asc' },
+    { label: t('sortAmountHigh', { fallback: 'Amount (High to Low)' }), by: 'amount', order: 'desc' },
+    { label: t('sortAmountLow', { fallback: 'Amount (Low to High)' }), by: 'amount', order: 'asc' },
+  ] as const
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-24">
@@ -82,6 +95,41 @@ export default function ChequesPage() {
                   )}
                 </button>
               ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger 
+            nativeButton
+            render={
+              <Button variant={(sortBy !== 'date' || sortOrder !== 'desc') ? 'default' : 'outline'} size="icon" className="rounded-full h-11 w-11 shrink-0">
+                <HugeiconsIcon icon={Sort} className="h-4 w-4" />
+              </Button>
+            } 
+          />
+          <PopoverContent className="w-56 p-2 rounded-lg" align="end">
+            <div className="flex flex-col gap-1">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">{t('sortBy', { fallback: 'Sort By' })}</p>
+              {sortOptions.map((opt, i) => {
+                const isActive = sortBy === opt.by && sortOrder === opt.order;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setSortBy(opt.by)
+                      setSortOrder(opt.order as 'asc' | 'desc')
+                    }}
+                    className={cn(
+                      "flex items-center justify-between rounded-sm px-3 py-2.5 text-sm font-semibold transition-all active:scale-95",
+                      isActive ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    {opt.label}
+                    {isActive && <div className="h-2 w-2 rounded-full bg-white" />}
+                  </button>
+                )
+              })}
             </div>
           </PopoverContent>
         </Popover>

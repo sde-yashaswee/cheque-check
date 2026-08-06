@@ -47,18 +47,40 @@ export function useEditBusiness(id: string) {
 
   const updateMutation = useMutation({
     mutationFn: (data: z.infer<typeof businessSchema>) => BusinessService.update(id, data),
-    onSuccess: () => {
+    onMutate: async (newBusiness) => {
+      await queryClient.cancelQueries({ queryKey: ['businesses'] })
+      const previousBusinesses = queryClient.getQueryData(['businesses'])
+      queryClient.setQueryData(['businesses'], (old: any) => {
+        if (!old) return old
+        return old.map((b: any) => b.id === id ? { ...b, ...newBusiness } : b)
+      })
+      return { previousBusinesses }
+    },
+    onError: (err, newBusiness, context) => {
+      queryClient.setQueryData(['businesses'], context?.previousBusinesses)
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['businesses'] })
       queryClient.invalidateQueries({ queryKey: ['business', id] })
-      router.back()
     }
   })
 
   const deleteMutation = useMutation({
     mutationFn: () => BusinessService.delete(id),
-    onSuccess: () => {
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['businesses'] })
+      const previousBusinesses = queryClient.getQueryData(['businesses'])
+      queryClient.setQueryData(['businesses'], (old: any) => {
+        if (!old) return old
+        return old.filter((b: any) => b.id !== id)
+      })
+      return { previousBusinesses }
+    },
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(['businesses'], context?.previousBusinesses)
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['businesses'] })
-      router.push('/businesses')
     }
   })
 
@@ -69,7 +91,13 @@ export function useEditBusiness(id: string) {
     error,
     isSaving: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
-    onSubmit: form.handleSubmit((data) => updateMutation.mutate(data)),
-    onDelete: () => deleteMutation.mutate(),
+    onSubmit: form.handleSubmit((data) => {
+      updateMutation.mutate(data)
+      router.back()
+    }),
+    onDelete: () => {
+      deleteMutation.mutate()
+      router.push('/businesses')
+    },
   }
 }

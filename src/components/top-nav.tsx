@@ -29,6 +29,16 @@ export function TopNav() {
     if (path === '/settings') return t('Navigation.settings')
     if (path === '/features') return 'Features'
 
+    if (path.startsWith('/settings/')) {
+      const sub = path.split('/')[2]
+      if (sub === 'privacy-policy') return t('Settings.privacyPolicy')
+      if (sub === 'terms-and-conditions') return t('Settings.termsAndConditions')
+      if (sub === 'refund-policy') return t('Settings.refundPolicy')
+      if (sub === 'about') return t('Settings.aboutApp')
+      if (sub === 'help-and-support') return t('Settings.helpAndSupport')
+      if (sub === 'whats-new') return t('Settings.whatsNew')
+    }
+
     const segments = path.split('/').filter(Boolean)
     if (segments.length === 0) return 'ChequeCheck'
 
@@ -75,11 +85,15 @@ export function TopNav() {
   }
 
   const title = getTitle(pathname)
-  const isMainTab = ['/', '/cheques', '/parties', '/accounts', '/settings', '/businesses'].includes(pathname)
+  const isMainTab = ['/', '/cheques', '/parties', '/accounts', '/settings', '/businesses', '/features'].includes(pathname)
+  
+  const hideSettingsIcon = pathname.startsWith('/settings') || pathname.startsWith('/features')
+  const hideBusinessSwitcher = pathname.startsWith('/settings') || pathname.startsWith('/features')
 
   return (
     <div className="sticky top-0 z-40 w-full flex flex-col">
-      <header className="flex h-[52px] items-center justify-between bg-canvas-parchment/80 px-4 backdrop-blur-md dark:bg-black/80 border-b border-primary/5">
+      <header className="relative flex h-[52px] items-center justify-between bg-canvas-parchment/80 px-4 backdrop-blur-md dark:bg-black/80 border-b border-primary/5">
+        <div id="progress-bar-container" className="absolute bottom-0 left-0 right-0 h-[1.6px] z-50 pointer-events-none" />
         <div className="flex items-center gap-2">
           {!isMainTab && (
             <Button
@@ -97,28 +111,32 @@ export function TopNav() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => setSearchOpen(true)} 
-            className="rounded-full h-9 w-9"
-          >
-            <HugeiconsIcon icon={Search} className="h-5 w-5 text-muted-foreground" />
-          </Button>
+          {!hideSettingsIcon && (
+            <>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setSearchOpen(true)} 
+                className="rounded-full h-9 w-9"
+              >
+                <HugeiconsIcon icon={Search} className="h-5 w-5 text-muted-foreground" />
+              </Button>
 
-          <Link href="/settings">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-all active:scale-95 overflow-hidden">
-              {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt={profile.name || 'User'} className="h-full w-full object-cover" />
-              ) : (
-                <HugeiconsIcon icon={User} className="h-4 w-4" />
-              )}
-            </div>
-          </Link>
+              <Link href="/settings">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-all active:scale-95 overflow-hidden">
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt={profile.name || 'User'} className="h-full w-full object-cover" />
+                  ) : (
+                    <HugeiconsIcon icon={User} className="h-4 w-4" />
+                  )}
+                </div>
+              </Link>
+            </>
+          )}
         </div>
       </header>
       
-      {activeBusiness && (
+      {!hideBusinessSwitcher && activeBusiness && (
         <BusinessSwitcher 
           trigger={
             <button className="flex h-8 w-full items-center bg-primary/5 px-4 text-[10px] font-semibold text-primary uppercase tracking-wider backdrop-blur-sm transition-colors hover:bg-primary/10 active:bg-primary/20 cursor-pointer border-b border-primary/5">

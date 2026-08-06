@@ -28,10 +28,28 @@ export function useCreateBusiness() {
 
   const mutation = useMutation({
     mutationFn: (data: any) => BusinessService.create(data),
-    onSuccess: (newBusiness) => {
+    onMutate: async (newBusiness) => {
+      await queryClient.cancelQueries({ queryKey: ['businesses'] })
+      const previousBusinesses = queryClient.getQueryData(['businesses'])
+      queryClient.setQueryData(['businesses'], (old: any) => {
+        const optimisticBusiness = {
+          ...newBusiness,
+          id: 'temp-' + Date.now(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }
+        return old ? [...old, optimisticBusiness] : [optimisticBusiness]
+      })
+      return { previousBusinesses }
+    },
+    onError: (err, newBusiness, context) => {
+      queryClient.setQueryData(['businesses'], context?.previousBusinesses)
+    },
+    onSettled: (newBusiness) => {
       queryClient.invalidateQueries({ queryKey: ['businesses'] })
-      setActiveBusiness(newBusiness)
-      router.push('/businesses')
+      if (newBusiness) {
+        setActiveBusiness(newBusiness)
+      }
     }
   })
 
@@ -55,6 +73,9 @@ export function useCreateBusiness() {
     nextStep,
     prevStep,
     isSaving: mutation.isPending,
-    onSubmit: form.handleSubmit((data) => mutation.mutate(data)),
+    onSubmit: form.handleSubmit((data) => {
+      mutation.mutate(data)
+      router.push('/businesses')
+    }),
   }
 }

@@ -46,18 +46,40 @@ export function useEditParty(id: string, businessId: string | undefined) {
 
   const updateMutation = useMutation({
     mutationFn: (data: any) => PartyService.update(id, data),
-    onSuccess: () => {
+    onMutate: async (newParty) => {
+      await queryClient.cancelQueries({ queryKey: ['parties', businessId] })
+      const previousParties = queryClient.getQueryData(['parties', businessId])
+      queryClient.setQueryData(['parties', businessId], (old: any) => {
+        if (!old) return old
+        return old.map((p: any) => p.id === id ? { ...p, ...newParty } : p)
+      })
+      return { previousParties }
+    },
+    onError: (err, newParty, context) => {
+      queryClient.setQueryData(['parties', businessId], context?.previousParties)
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['parties', businessId] })
       queryClient.invalidateQueries({ queryKey: ['party', id] })
-      router.back()
     }
   })
 
   const deleteMutation = useMutation({
     mutationFn: () => PartyService.delete(id),
-    onSuccess: () => {
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['parties', businessId] })
+      const previousParties = queryClient.getQueryData(['parties', businessId])
+      queryClient.setQueryData(['parties', businessId], (old: any) => {
+        if (!old) return old
+        return old.filter((p: any) => p.id !== id)
+      })
+      return { previousParties }
+    },
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(['parties', businessId], context?.previousParties)
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['parties', businessId] })
-      router.push('/parties')
     }
   })
 
@@ -68,7 +90,13 @@ export function useEditParty(id: string, businessId: string | undefined) {
     error,
     isSaving: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
-    onSubmit: form.handleSubmit((data) => updateMutation.mutate(data)),
-    onDelete: () => deleteMutation.mutate(),
+    onSubmit: form.handleSubmit((data) => {
+      updateMutation.mutate(data)
+      router.back()
+    }),
+    onDelete: () => {
+      deleteMutation.mutate()
+      router.push('/parties')
+    },
   }
 }

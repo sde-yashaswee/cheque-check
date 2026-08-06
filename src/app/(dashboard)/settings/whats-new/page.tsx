@@ -1,6 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react"
-import { ArrowLeft01Icon as ArrowLeft, MegaphoneIcon as WhatsNew, ZapIcon as Zap, StarIcon as Star, Shield01Icon as Shield } from "@hugeicons/core-free-icons"
-import Link from "next/link"
+import { MegaphoneIcon as WhatsNew, ZapIcon as Zap, StarIcon as Star, Shield01Icon as Shield } from "@hugeicons/core-free-icons"
 import { useTranslations } from "next-intl"
 
 export default function WhatsNewPage() {
@@ -20,14 +19,7 @@ export default function WhatsNewPage() {
   ]
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20 pt-4">
-      <div className="flex items-center gap-4 px-2">
-        <Link href="/settings" className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 hover:bg-muted/80 transition-colors">
-          <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5" />
-        </Link>
-        <h1 className="text-2xl font-bold">{t("whatsNew")}</h1>
-      </div>
-
+    <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="space-y-12 px-2">
         {updates.map((update) => (
           <div key={update.version} className="relative pl-8 space-y-6">

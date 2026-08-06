@@ -38,9 +38,36 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
 
   const mutation = useMutation({
     mutationFn: (data: any) => ChequeService.create({ ...data, business_id: businessId }),
-    onSuccess: () => {
+    onMutate: async (newCheque) => {
+      // Stop any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
+
+      // Snapshot the previous value
+      const previousCheques = queryClient.getQueryData(['cheques', businessId])
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(['cheques', businessId], (old: any) => {
+        const optimisticCheque = {
+          ...newCheque,
+          id: 'temp-' + Date.now(),
+          business_id: businessId,
+          status: newCheque.type === 'Inward' ? 'Received' : 'Issued',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          // We try to find party name for the list display
+          party: queryClient.getQueryData<any[]>(['parties', businessId])?.find(p => p.id === newCheque.party_id)
+        }
+        return old ? [optimisticCheque, ...old] : [optimisticCheque]
+      })
+
+      // Return a context object with the snapshotted value
+      return { previousCheques }
+    },
+    onError: (err, newCheque, context) => {
+      queryClient.setQueryData(['cheques', businessId], context?.previousCheques)
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
-      router.push('/cheques')
     }
   })
 
@@ -78,6 +105,9 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
     isUploading,
     handleImageUpload,
     isSaving: mutation.isPending,
-    onSubmit: form.handleSubmit((data) => mutation.mutate(data)),
+    onSubmit: form.handleSubmit((data) => {
+      mutation.mutate(data)
+      router.push('/cheques')
+    }),
   }
 }

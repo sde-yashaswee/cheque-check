@@ -16,7 +16,7 @@
     "tryAgain": "Try again",
     "criticalError": "Critical Application Error",
     "criticalErrorDesc": "The application encountered a critical error and could not continue.",
-    "rotateDevice": "Please Rotate Your Device",
+    "rotateDevice": "Rotate your phone",
     "portraitModeOnly": "This app is designed to be used in portrait mode.",
     "success": "Success",
     "continue": "Continue",
@@ -140,6 +140,7 @@
     "viewCheque": "View Cheque",
     "issued": "Issued",
     "received": "Received",
+    "number": "Number",
     "chequeNumber": "Cheque Number",
     "chequeNumberPlaceholder": "6-digit number",
     "chequeDate": "Cheque Date",
@@ -180,7 +181,12 @@
     "deleteConfirmDesc": "This will permanently delete this cheque record.",
     "deleteAction": "Delete Cheque",
     "updateAction": "Update Cheque",
-    "saveAction": "Save Cheque"
+    "saveAction": "Save Cheque",
+    "sortBy": "Sort By",
+    "sortNewest": "Newest First",
+    "sortOldest": "Oldest First",
+    "sortAmountHigh": "Amount (High to Low)",
+    "sortAmountLow": "Amount (Low to High)"
   },
   "Parties": {
     "title": "Parties",
