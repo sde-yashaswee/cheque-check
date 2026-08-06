@@ -8,6 +8,16 @@ import { useRouter } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react';
 import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Building03Icon as Building2, CallIcon as Phone, Mail01Icon as Mail, Location01Icon as MapPin } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
+import {
+  Stepper,
+  StepperIndicator,
+  StepperItem,
+  StepperNav,
+  StepperSeparator,
+  StepperTitle,
+  StepperTrigger,
+} from '@/components/reui/stepper'
+import { Badge } from '@/components/reui/badge'
 import { useTranslations } from 'next-intl'
 
 export default function CreateBusinessPage() {
@@ -30,27 +40,89 @@ export default function CreateBusinessPage() {
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost"size="icon"onClick={() => step > 1 ? prevStep() : router.back()} className="rounded-full">
-          <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5"/>
-        </Button>
-        <div>
-          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">{tc('step', { step, total: 3 })}</p>
-          <h2 className="text-display-sm font-semibold">{t('newBusiness')}</h2>
-        </div>
-      </div>
+      <Stepper
+        value={step}
+        className="w-full max-w-xl mx-auto space-y-8"
+        indicators={{
+          completed: <HugeiconsIcon icon={Check} className="size-3.5" />,
+        }}
+      >
+        <div className="flex items-start gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={prevStep}
+            disabled={step === 1}
+            className="rounded-full h-8 w-8 shrink-0 hover:bg-canvas-parchment"
+          >
+            <HugeiconsIcon icon={ArrowLeft} className="h-4 w-4"/>
+          </Button>
 
-      <div className="flex gap-2">
-        {[1, 2, 3].map((s) => (
-          <div 
-            key={s} 
-            className={cn(
-              "h-1.5 flex-1 rounded-full transition-colors",
-              s <= step ?"bg-primary":"bg-canvas-parchment"
-            )} 
-          />
-        ))}
-      </div>
+          <StepperNav className="gap-3 flex-1">
+            {[
+              { title: "Business Profile", icon: <HugeiconsIcon icon={Building2} className="size-4" /> },
+              { title: "Contact Info", icon: <HugeiconsIcon icon={Phone} className="size-4" /> },
+              { title: "Location", icon: <HugeiconsIcon icon={MapPin} className="size-4" /> }
+            ].map((s, index) => (
+              <StepperItem
+                key={index}
+                step={index + 1}
+                className="relative flex-1 items-center"
+              >
+                <StepperTrigger className="flex grow flex-col items-center justify-center gap-2.5">
+                  <StepperIndicator className="data-[state=inactive]:border-border data-[state=inactive]:text-muted-foreground data-[state=completed]:bg-success size-8 border-2 data-[state=completed]:text-white data-[state=inactive]:bg-background z-10">
+                    {s.icon}
+                  </StepperIndicator>
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="text-muted-foreground text-[10px] font-semibold uppercase text-center">
+                      Step {index + 1}
+                    </div>
+                    <StepperTitle className="group-data-[state=inactive]/step:text-muted-foreground text-center text-[10px] font-semibold">
+                      {s.title}
+                    </StepperTitle>
+                    <div className="mt-0.5">
+                      <Badge
+                        size="sm"
+                        variant="primary-light"
+                        className="hidden group-data-[state=active]/step:inline-flex text-[8px] h-4 px-1"
+                      >
+                        In Progress
+                      </Badge>
+                      <Badge
+                        variant="success-light"
+                        size="sm"
+                        className="hidden group-data-[state=completed]/step:inline-flex text-[8px] h-4 px-1"
+                      >
+                        Completed
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        size="sm"
+                        className="text-muted-foreground hidden group-data-[state=inactive]/step:inline-flex text-[8px] h-4 px-1"
+                      >
+                        Pending
+                      </Badge>
+                    </div>
+                  </div>
+                </StepperTrigger>
+                {3 > index + 1 && (
+                  <StepperSeparator className="group-data-[state=completed]/step:bg-success absolute inset-x-0 left-[50%] top-4 m-0 w-full z-0" />
+                )}
+              </StepperItem>
+            ))}
+          </StepperNav>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={nextStep}
+            disabled={step === 3 || (step === 1 && !watch('name'))}
+            className="rounded-full h-8 w-8 shrink-0 hover:bg-canvas-parchment"
+          >
+            <HugeiconsIcon icon={ArrowRight} className="h-4 w-4"/>
+          </Button>
+        </div>
+      </Stepper>
 
       <form onSubmit={onSubmit} className="space-y-8">
         {step === 1 && (

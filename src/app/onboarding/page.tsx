@@ -14,6 +14,16 @@ import { Wallet01Icon as Wallet, Building03Icon as Building2, Settings02Icon as 
 import { Combobox } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
+import {
+  Stepper,
+  StepperIndicator,
+  StepperItem,
+  StepperNav,
+  StepperSeparator,
+  StepperTitle,
+  StepperTrigger,
+} from '@/components/reui/stepper'
+import { Badge } from '@/components/reui/badge'
 import { useTranslations } from 'next-intl'
 
 const COLORS = ['#0066cc', '#34C759', '#FF9500', '#FF3B30', '#AF52DE', '#5856D6', '#8E8E93']
@@ -151,13 +161,14 @@ export default function OnboardingPage() {
       <div className="mx-auto max-w-2xl px-6 py-12 md:py-24 space-y-12">
         
         {/* Header */}
-        <div className="flex items-center gap-6">
+        <div className="relative flex items-center justify-center min-h-[64px]">
           <AnimatePresence mode="wait">
             {step > 1 && step < 5 && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
+                className="absolute left-0"
               >
                 <Button 
                   variant="ghost"
@@ -170,42 +181,112 @@ export default function OnboardingPage() {
               </motion.div>
             )}
           </AnimatePresence>
-          <div className="space-y-1">
+          <div className="text-center">
             {step < 5 ? (
-              <>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                  {t('step', { step, total: 4 })}
-                </p>
-                <h1 className="text-display-md md:text-display-lg font-semibold tracking-tight text-ink dark:text-white flex items-center gap-3">
-                  {step === 1 && <HugeiconsIcon icon={Wallet} className="h-8 w-8 text-primary"/>}
-                  {step === 2 && <HugeiconsIcon icon={Building2} className="h-8 w-8 text-primary"/>}
-                  {step === 3 && <HugeiconsIcon icon={Settings2} className="h-8 w-8 text-primary"/>}
-                  {step === 4 && <HugeiconsIcon icon={Bell} className="h-8 w-8 text-primary"/>}
+              <h1 className="text-display-md md:text-display-lg font-semibold tracking-tight text-ink dark:text-white flex items-center justify-center gap-3">
+                {step === 1 && <HugeiconsIcon icon={Wallet} className="h-8 w-8 text-primary"/>}
+                {step === 2 && <HugeiconsIcon icon={Building2} className="h-8 w-8 text-primary"/>}
+                {step === 3 && <HugeiconsIcon icon={Settings2} className="h-8 w-8 text-primary"/>}
+                {step === 4 && <HugeiconsIcon icon={Bell} className="h-8 w-8 text-primary"/>}
+                <span>
                   {step === 1 && t('welcome')}
                   {step === 2 && t('businessDetails')}
                   {step === 3 && t('personalizeExperience')}
                   {step === 4 && t('notifications')}
-                </h1>
-              </>
+                </span>
+              </h1>
             ) : (
-              <h1 className="text-display-lg font-semibold tracking-tight text-ink dark:text-white text-center w-full">{t('allSet')}</h1>
+              <h1 className="text-display-lg font-semibold tracking-tight text-ink dark:text-white">{t('allSet')}</h1>
             )}
           </div>
         </div>
 
         {/* Progress Bar */}
         {step < 5 && (
-          <div className="flex gap-2">
-            {[1, 2, 3, 4].map((s) => (
-              <div 
-                key={s} 
-                className={cn(
-                  "h-1.5 flex-1 rounded-full transition-all duration-500",
-                  s <= step ?"bg-primary":"bg-canvas-parchment dark:bg-surface-tile-1"
-                )} 
-              />
-            ))}
-          </div>
+          <Stepper
+            value={step}
+            className="w-full max-w-xl mx-auto space-y-8"
+            indicators={{
+              completed: <HugeiconsIcon icon={Check} className="size-3.5" />,
+            }}
+          >
+            <div className="flex items-start gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={prevStep}
+                disabled={step === 1}
+                className="rounded-full h-8 w-8 shrink-0 hover:bg-canvas-parchment"
+              >
+                <HugeiconsIcon icon={ArrowLeft} className="h-4 w-4"/>
+              </Button>
+              
+              <StepperNav className="gap-3 flex-1">
+                {[
+                  { title: tc('welcome'), icon: <HugeiconsIcon icon={Wallet} className="size-4" /> },
+                  { title: tc('businesses'), icon: <HugeiconsIcon icon={Building2} className="size-4" /> },
+                  { title: tc('activeNow'), icon: <HugeiconsIcon icon={Settings2} className="size-4" /> },
+                  { title: t('notifications'), icon: <HugeiconsIcon icon={Bell} className="size-4" /> }
+                ].map((s, index) => (
+                  <StepperItem
+                    key={index}
+                    step={index + 1}
+                    className="relative flex-1 items-center"
+                  >
+                    <StepperTrigger className="flex grow flex-col items-center justify-center gap-2.5">
+                      <StepperIndicator className="data-[state=inactive]:border-border data-[state=inactive]:text-muted-foreground data-[state=completed]:bg-success size-8 border-2 data-[state=completed]:text-white data-[state=inactive]:bg-background z-10">
+                        {s.icon}
+                      </StepperIndicator>
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="text-muted-foreground text-[10px] font-semibold uppercase text-center">
+                          Step {index + 1}
+                        </div>
+                        <StepperTitle className="group-data-[state=inactive]/step:text-muted-foreground text-center text-[10px] font-semibold hidden md:block">
+                          {s.title}
+                        </StepperTitle>
+                        <div className="hidden md:block mt-0.5">
+                          <Badge
+                            size="sm"
+                            variant="primary-light"
+                            className="hidden group-data-[state=active]/step:inline-flex text-[8px] h-4 px-1"
+                          >
+                            In Progress
+                          </Badge>
+                          <Badge
+                            variant="success-light"
+                            size="sm"
+                            className="hidden group-data-[state=completed]/step:inline-flex text-[8px] h-4 px-1"
+                          >
+                            Completed
+                          </Badge>
+                          <Badge
+                            variant="secondary"
+                            size="sm"
+                            className="text-muted-foreground hidden group-data-[state=inactive]/step:inline-flex text-[8px] h-4 px-1"
+                          >
+                            Pending
+                          </Badge>
+                        </div>
+                      </div>
+                    </StepperTrigger>
+                    {4 > index + 1 && (
+                      <StepperSeparator className="group-data-[state=completed]/step:bg-success absolute inset-x-0 left-[50%] top-4 m-0 w-full z-0" />
+                    )}
+                  </StepperItem>
+                ))}
+              </StepperNav>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={nextStep}
+                disabled={step === 4 || (step === 1 && !formData.businessName)}
+                className="rounded-full h-8 w-8 shrink-0 hover:bg-canvas-parchment"
+              >
+                <HugeiconsIcon icon={ArrowRight} className="h-4 w-4"/>
+              </Button>
+            </div>
+          </Stepper>
         )}
 
         <div className="relative min-h-[400px]">

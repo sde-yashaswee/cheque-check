@@ -9,10 +9,10 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
-  
+
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  
+
   --color-canvas-parchment: var(--canvas-parchment);
   --color-surface-tile-1: var(--surface-tile-1);
   --color-ink: var(--ink);
@@ -39,40 +39,56 @@
   --radius-md: 11px;
   --radius-lg: 18px;
   --radius-pill: 9999px;
-  
+
   --shadow-product: 3px 5px 30px rgba(0, 0, 0, 0.22);
+
+  --color-invert-foreground: var(--invert-foreground);
+
+  --color-invert: var(--invert);
+
+  --color-warning-foreground: var(--warning-foreground);
+
+  --color-warning: var(--warning);
+
+  --color-info-foreground: var(--info-foreground);
+
+  --color-info: var(--info);
+
+  --color-success-foreground: var(--success-foreground);
+
+  --color-success: var(--success);
 }
 
 :root {
   --background: #ffffff;
   --foreground: #1d1d1f;
-  
+
   --primary: #0066cc;
   --primary-foreground: #ffffff;
-  
+
   --canvas-parchment: #f5f5f7;
   --surface-tile-1: #272729;
   --ink: #1d1d1f;
   --hairline: #e0e0e0;
-  
+
   --card: #ffffff;
   --card-foreground: #1d1d1f;
-  
+
   --popover: #ffffff;
   --popover-foreground: #1d1d1f;
-  
+
   --secondary: #fafafc;
   --secondary-foreground: #1d1d1f;
-  
+
   --muted: #f5f5f7;
   --muted-foreground: #7a7a7a;
-  
+
   --accent: #f5f5f7;
   --accent-foreground: #0066cc;
-  
+
   --destructive: #ff3b30;
   --destructive-foreground: #ffffff;
-  
+
   --border: #e0e0e0;
   --input: #e0e0e0;
   --ring: #0071e3;
@@ -81,38 +97,55 @@
 
   --font-sans: "SF Pro Text", "Inter", system-ui, -apple-system, sans-serif;
   --font-heading: "SF Pro Display", "Inter", system-ui, -apple-system, sans-serif;
+  --success: var(--color-emerald-500);
+  --success-foreground: var(--color-emerald-900);
+  --info: var(--color-violet-500);
+  --info-foreground: var(--color-violet-900);
+  --warning: var(--color-yellow-500);
+  --warning-foreground: var(--color-yellow-900);
+  --invert: var(--color-zinc-900);
+  --invert-foreground: var(--color-zinc-50);
 }
 
 .dark {
   --background: #000000;
   --foreground: #ffffff;
-  
+
   --primary: #0066cc;
   --primary-foreground: #ffffff;
-  
+
   --canvas-parchment: #1d1d1f;
   --surface-tile-1: #272729;
   --ink: #ffffff;
   --hairline: #333333;
-  
+
   --card: #1d1d1f;
   --card-foreground: #ffffff;
-  
+
   --popover: #1d1d1f;
   --popover-foreground: #ffffff;
-  
+
   --secondary: #272729;
   --secondary-foreground: #ffffff;
-  
+
   --muted: #272729;
   --muted-foreground: #cccccc;
-  
+
   --accent: #272729;
   --accent-foreground: #2997ff;
-  
+
   --border: #333333;
   --input: #333333;
   --ring: #0071e3;
+  --destructive-foreground: var(--color-red-600);
+  --success: var(--color-emerald-500);
+  --success-foreground: var(--color-emerald-600);
+  --info: var(--color-violet-500);
+  --info-foreground: var(--color-violet-600);
+  --warning: var(--color-yellow-500);
+  --warning-foreground: var(--color-yellow-600);
+  --invert: var(--color-zinc-700);
+  --invert-foreground: var(--color-zinc-50);
 }
 
 @layer base {
