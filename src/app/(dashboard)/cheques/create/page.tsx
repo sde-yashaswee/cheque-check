@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useSearchParams } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Camera01Icon as Camera, Cancel01Icon as X, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, Invoice01Icon as ReceiptText } from '@hugeicons/core-free-icons';
+import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Camera01Icon as Camera, Cancel01Icon as X, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, Invoice01Icon as ReceiptText, UserIcon as User, CreditCardIcon as CreditCard, BankIcon as Bank, Delete02Icon as Trash } from '@hugeicons/core-free-icons';
 import { cn, numberToIndianWords } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 import { Combobox } from '@/components/ui/combobox'
@@ -143,10 +143,11 @@ export default function CreateChequePage() {
             // Try to pre-match bank
             let matchedBankId = ''
             if (data.bank_name && banks) {
-              const matchedBank = banks.find(b => 
-                data.bank_name.toLowerCase().includes(b.name.toLowerCase()) ||
-                b.name.toLowerCase().includes(data.bank_name.toLowerCase())
-              )
+              const normalizedOcr = data.bank_name.toLowerCase().replace(/\s/g, '').replace(/bank/g, '')
+              const matchedBank = banks.find(b => {
+                const normalizedBank = b.name.toLowerCase().replace(/\s/g, '').replace(/bank/g, '')
+                return normalizedOcr.includes(normalizedBank) || normalizedBank.includes(normalizedOcr)
+              })
               if (matchedBank) matchedBankId = matchedBank.id
             }
 
@@ -501,6 +502,7 @@ export default function CreateChequePage() {
             <div className="space-y-2">
               <Label htmlFor="deposit_date"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('depositDate')}</Label>
               <Input id="deposit_date"type="date"{...register('deposit_date')} className="h-14 bg-canvas-parchment border-none rounded-sm"/>
+              {errors.deposit_date && <p className="text-xs text-destructive ml-1">{errors.deposit_date.message as string}</p>}
             </div>
 
             <div className="rounded-lg bg-primary/5 p-6 space-y-4 border border-primary/10">
@@ -558,10 +560,13 @@ export default function CreateChequePage() {
                   onCheckedChange={(checked) => setCreateOptions(prev => ({ ...prev, party: !!checked }))}
                   className="mt-1"
                 />
-                <div className="grid gap-1.5 leading-none">
-                  <label htmlFor="create-party" className="text-sm font-semibold">
-                    Create Party: {unmatchedEntities.payee_name}
-                  </label>
+                <div className="flex-1 grid gap-1.5 leading-none">
+                  <div className="flex items-center gap-2">
+                    <HugeiconsIcon icon={User} className="h-3 w-3 text-primary" />
+                    <label htmlFor="create-party" className="text-sm font-semibold">
+                      Create Party: {unmatchedEntities.payee_name}
+                    </label>
+                  </div>
                   <p className="text-xs text-muted-foreground">This name was extracted as the payee.</p>
                 </div>
               </div>
@@ -576,17 +581,23 @@ export default function CreateChequePage() {
                     onCheckedChange={(checked) => setCreateOptions(prev => ({ ...prev, account: !!checked }))}
                     className="mt-1"
                   />
-                  <div className="grid gap-1.5 leading-none">
-                    <label htmlFor="create-account" className="text-sm font-semibold">
-                      Create Account: {unmatchedEntities.account_name || unmatchedEntities.account_number}
-                    </label>
+                  <div className="flex-1 grid gap-1.5 leading-none">
+                    <div className="flex items-center gap-2">
+                      <HugeiconsIcon icon={CreditCard} className="h-3 w-3 text-primary" />
+                      <label htmlFor="create-account" className="text-sm font-semibold">
+                        Create Account: {unmatchedEntities.account_name || unmatchedEntities.account_number}
+                      </label>
+                    </div>
                     <p className="text-xs text-muted-foreground">Extracted account details from the scan.</p>
                   </div>
                 </div>
 
                 {createOptions.account && (
                   <div className="space-y-2 ml-7">
-                    <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Select Bank</Label>
+                    <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                      <HugeiconsIcon icon={Bank} className="h-3 w-3" />
+                      Select Bank
+                    </Label>
                     <BankSelector 
                       value={unmatchedEntities.bank_id} 
                       onValueChange={(val) => setUnmatchedEntities(prev => prev ? ({ ...prev, bank_id: val }) : null)}
@@ -599,10 +610,16 @@ export default function CreateChequePage() {
           </div>
 
           <DialogFooter className="flex-row gap-3">
-            <Button variant="ghost" className="flex-1 rounded-full" onClick={() => setUnmatchedEntities(null)}>
+            <Button variant="ghost" className="flex-1 rounded-full gap-2" onClick={() => setUnmatchedEntities(null)}>
+              <HugeiconsIcon icon={Trash} className="h-4 w-4" />
               Skip
             </Button>
-            <Button className="flex-1 rounded-full" onClick={handleInlineCreate} disabled={isCreatingInline || (!createOptions.party && !createOptions.account)}>
+            <Button className="flex-1 rounded-full gap-2" onClick={handleInlineCreate} disabled={isCreatingInline || (!createOptions.party && !createOptions.account)}>
+              {isCreatingInline ? (
+                <div className="h-4 w-4 border-2 border-white border-t-transparent animate-spin rounded-full" />
+              ) : (
+                <HugeiconsIcon icon={Check} className="h-4 w-4" />
+              )}
               {isCreatingInline ? 'Creating...' : 'Create Selected'}
             </Button>
           </DialogFooter>

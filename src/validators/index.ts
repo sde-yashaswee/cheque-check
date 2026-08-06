@@ -35,7 +35,7 @@ export const chequeSchema = z.object({
   cheque_number: z.string().min(1, 'Cheque number is required'),
   amount: z.coerce.number().positive('Amount must be positive'),
   cheque_date: z.string().min(1, 'Cheque date is required'),
-  deposit_date: z.string().optional().or(z.literal('')),
+  deposit_date: z.string().min(1, 'Expected deposit date is required'),
   party_id: z.string().min(1, 'Party is required'),
   account_id: z.string().min(1, 'Account is required'),
   type: z.enum(['Outward', 'Inward']),

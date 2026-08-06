@@ -35,7 +35,7 @@ interface IOcrProvider {
 class OpenAiOcrProvider implements IOcrProvider {
   private readonly modelName: string;
 
-  constructor(modelName: string = 'gpt-4o') {
+  constructor(modelName: string = 'gpt-4o-mini') {
     this.modelName = modelName;
   }
 
