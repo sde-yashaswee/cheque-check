@@ -19,6 +19,14 @@ export function ProgressBar() {
   }, [])
 
   useEffect(() => {
+    // If top nav is present, prefer its container
+    const navContainer = document.getElementById('progress-bar-nav-container')
+    const parentSelector = navContainer ? '#progress-bar-nav-container' : '#progress-bar-container'
+    
+    nProgress.configure({ parent: parentSelector })
+  }, [pathname])
+
+  useEffect(() => {
     nProgress.done()
   }, [pathname, searchParams])
 

@@ -286,7 +286,7 @@ export default function CreateChequePage() {
               <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-4 bg-canvas-parchment/30 min-h-[140px] transition-colors hover:bg-canvas-parchment/50 border-primary/10">
                 {watch('image_url' as any) ? (
                   <div className="relative w-full aspect-video rounded-sm overflow-hidden border">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    { }
                     <img src={watch('image_url' as any)} alt="Cheque"className="w-full h-full object-cover"/>
                     <button 
                       type="button"

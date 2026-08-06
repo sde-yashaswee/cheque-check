@@ -93,7 +93,7 @@ export function TopNav() {
   return (
     <div className="sticky top-0 z-40 w-full flex flex-col">
       <header className="relative flex h-[52px] items-center justify-between bg-canvas-parchment/80 px-4 backdrop-blur-md dark:bg-black/80 border-b border-primary/5">
-        <div id="progress-bar-container"className="absolute bottom-0 left-0 right-0 h-[1.6px] z-50 pointer-events-none"/>
+        <div id="progress-bar-nav-container" className="absolute bottom-0 left-0 right-0 h-[1.6px] z-50 pointer-events-none"/>
         <div className="flex items-center gap-2">
           {!isMainTab && (
             <Button
@@ -105,8 +105,11 @@ export function TopNav() {
               <HugeiconsIcon icon={ChevronLeft} className="h-5 w-5"/>
             </Button>
           )}
-          <h1 className="text-lg font-semibold tracking-tight">
-            {isMainTab && pathname === '/' ? 'ChequeCheck' : title}
+          <h1 className="text-lg font-semibold tracking-tight flex items-center gap-2">
+            {isMainTab && pathname === '/' && (
+              <img src="/favicon-32x32.png" alt="ChequeCheck Logo" className="h-6 w-6 rounded-md" />
+            )}
+            <span>{isMainTab && pathname === '/' ? 'ChequeCheck' : title}</span>
           </h1>
         </div>
 
