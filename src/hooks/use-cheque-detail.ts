@@ -22,7 +22,7 @@ export function useChequeDetail(id: string) {
 
       if (cheque?.business_id) {
         await queryClient.cancelQueries({ queryKey: ['cheques', cheque.business_id] })
-        queryClient.setQueryData(['cheques', cheque.business_id], (old: any) => {
+        queryClient.setQueryData(['cheques', cheque.business_id], (old: any[]) => {
           if (!old) return old
           return old.map((c: any) => c.id === id ? { ...c, status } : c)
         })

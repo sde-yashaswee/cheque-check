@@ -36,6 +36,12 @@ export class AuthService {
     return await supabase.auth.signOut()
   }
 
+  static async resetPassword(email: string) {
+    return await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/settings/password`,
+    })
+  }
+
   static async getSession() {
     return await supabase.auth.getSession()
   }

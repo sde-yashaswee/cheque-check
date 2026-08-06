@@ -62,17 +62,22 @@ serve(async (req) => {
       .eq('voice_call_enabled', true)
       .not('phone', 'is', null)
 
+    interface BankData {
+      count: number;
+      total: number;
+    }
+
     const results = []
     for (const profile of profiles || []) {
       const userCheques = cheques.filter(c => c.business.user_id === profile.user_id)
-      const banks: Record<string, any> = {}
+      const banks: Record<string, BankData> = {}
       userCheques.forEach(c => {
         const name = c.account?.bank?.name || 'Unknown Bank'
         banks[name] = { count: (banks[name]?.count || 0) + 1, total: (banks[name]?.total || 0) + Number(c.amount) }
       })
 
       const bankSummaries = Object.entries(banks)
-        .map(([bank, data]: [string, any]) => 
+        .map(([bank, data]: [string, BankData]) => 
           `${data.count} cheque${data.count > 1 ? 's' : ''} hitting ${bank} for a total of ${data.total}`
         )
         .join(', and ')
@@ -109,7 +114,7 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ success: true, calls: results }))
-  } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 })
+  } catch (err: unknown) {
+    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }), { status: 500 })
   }
 })

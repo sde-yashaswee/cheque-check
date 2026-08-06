@@ -57,15 +57,15 @@ export function useEditCheque(id: string) {
       const businessId = cheque?.business_id
       if (businessId) {
         await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-        const previousCheques = queryClient.getQueryData(['cheques', businessId])
-        queryClient.setQueryData(['cheques', businessId], (old: any) => {
+        const prev = queryClient.getQueryData(['cheques', businessId])
+        queryClient.setQueryData(['cheques', businessId], (old: any[]) => {
           if (!old) return old
-          return old.map((c: any) => c.id === id ? { ...c, ...newCheque } : c)
+          return old.map((c) => c.id === id ? { ...c, ...newCheque } : c)
         })
-        return { previousCheques }
+        return { previousCheques: prev }
       }
     },
-    onError: (err, newCheque, context) => {
+    onError: (err, newCheque, context: any) => {
       const businessId = cheque?.business_id
       if (businessId && context?.previousCheques) {
         queryClient.setQueryData(['cheques', businessId], context.previousCheques)
@@ -85,15 +85,15 @@ export function useEditCheque(id: string) {
       const businessId = cheque?.business_id
       if (businessId) {
         await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-        const previousCheques = queryClient.getQueryData(['cheques', businessId])
-        queryClient.setQueryData(['cheques', businessId], (old: any) => {
+        const prev = queryClient.getQueryData(['cheques', businessId])
+        queryClient.setQueryData(['cheques', businessId], (old: any[]) => {
           if (!old) return old
-          return old.filter((c: any) => c.id !== id)
+          return old.filter((c) => c.id !== id)
         })
-        return { previousCheques }
+        return { previousCheques: prev }
       }
     },
-    onError: (err, variables, context) => {
+    onError: (err, variables, context: any) => {
       const businessId = cheque?.business_id
       if (businessId && context?.previousCheques) {
         queryClient.setQueryData(['cheques', businessId], context.previousCheques)

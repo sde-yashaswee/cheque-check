@@ -5,6 +5,7 @@ import { partySchema } from '@/validators'
 import { PartyService } from '@/services/party.service'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { Party } from '@/types'
 
 export function useEditParty(id: string, businessId: string | undefined) {
   const router = useRouter()
@@ -46,16 +47,16 @@ export function useEditParty(id: string, businessId: string | undefined) {
 
   const updateMutation = useMutation({
     mutationFn: (data: any) => PartyService.update(id, data),
-    onMutate: async (newParty) => {
+    onMutate: async (newParty: any) => {
       await queryClient.cancelQueries({ queryKey: ['parties', businessId] })
       const previousParties = queryClient.getQueryData(['parties', businessId])
-      queryClient.setQueryData(['parties', businessId], (old: any) => {
+      queryClient.setQueryData(['parties', businessId], (old: any[]) => {
         if (!old) return old
-        return old.map((p: any) => p.id === id ? { ...p, ...newParty } : p)
+        return old.map((p) => p.id === id ? { ...p, ...newParty } : p)
       })
       return { previousParties }
     },
-    onError: (err, newParty, context) => {
+    onError: (err, newParty, context: any) => {
       queryClient.setQueryData(['parties', businessId], context?.previousParties)
     },
     onSettled: () => {
@@ -69,13 +70,13 @@ export function useEditParty(id: string, businessId: string | undefined) {
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ['parties', businessId] })
       const previousParties = queryClient.getQueryData(['parties', businessId])
-      queryClient.setQueryData(['parties', businessId], (old: any) => {
+      queryClient.setQueryData(['parties', businessId], (old: any[]) => {
         if (!old) return old
-        return old.filter((p: any) => p.id !== id)
+        return old.filter((p) => p.id !== id)
       })
       return { previousParties }
     },
-    onError: (err, variables, context) => {
+    onError: (err, variables, context: any) => {
       queryClient.setQueryData(['parties', businessId], context?.previousParties)
     },
     onSettled: () => {

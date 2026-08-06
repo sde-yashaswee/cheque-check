@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { AccountService } from '@/services/account.service'
 import { useState, useMemo } from 'react'
-import { AccountWithRelations } from '@/types'
 
 export function useAccounts(businessId: string | undefined) {
   const [search, setSearch] = useState('')

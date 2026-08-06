@@ -21,7 +21,7 @@ export function useParties(businessId: string | undefined) {
 
   const getBalance = (partyId: string) => {
     if (!cheques) return 0
-    return cheques
+    return (cheques as any[])
       .filter((c: any) => c.party_id === partyId && c.status !== 'Cleared' && c.status !== 'Bounced')
       .reduce((sum: number, c: any) => sum + c.amount, 0)
   }

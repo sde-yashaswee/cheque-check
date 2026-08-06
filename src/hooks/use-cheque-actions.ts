@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChequeService } from '@/services/cheque.service'
-import { ChequeStatus } from '@/types'
+import { ChequeStatus, Cheque } from '@/types'
 import { useBusiness } from './use-business'
 
 export function useChequeActions() {
@@ -12,12 +12,13 @@ export function useChequeActions() {
       ChequeService.updateStatus(id, status),
     onMutate: async ({ id, status }) => {
       // Invalidate/Update list cache
+      let previousCheques: any[] = []
       if (activeBusiness?.id) {
         await queryClient.cancelQueries({ queryKey: ['cheques', activeBusiness.id] })
-        const previousCheques = queryClient.getQueryData(['cheques', activeBusiness.id])
-        queryClient.setQueryData(['cheques', activeBusiness.id], (old: any) => {
+        previousCheques = queryClient.getQueryData(['cheques', activeBusiness.id]) || []
+        queryClient.setQueryData(['cheques', activeBusiness.id], (old: any[]) => {
           if (!old) return old
-          return old.map((c: any) => c.id === id ? { ...c, status } : c)
+          return old.map((c) => c.id === id ? { ...c, status } : c)
         })
       }
 
@@ -29,7 +30,7 @@ export function useChequeActions() {
         return { ...old, status }
       })
 
-      return { previousCheques: queryClient.getQueryData(['cheques', activeBusiness?.id]), previousCheque }
+      return { previousCheques, previousCheque }
     },
     onSettled: (data, error, { id }) => {
       if (activeBusiness?.id) {
@@ -42,15 +43,16 @@ export function useChequeActions() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => ChequeService.delete(id),
     onMutate: async (id) => {
+      let previousCheques: any[] = []
       if (activeBusiness?.id) {
         await queryClient.cancelQueries({ queryKey: ['cheques', activeBusiness.id] })
-        const previousCheques = queryClient.getQueryData(['cheques', activeBusiness.id])
-        queryClient.setQueryData(['cheques', activeBusiness.id], (old: any) => {
+        previousCheques = queryClient.getQueryData(['cheques', activeBusiness.id]) || []
+        queryClient.setQueryData(['cheques', activeBusiness.id], (old: any[]) => {
           if (!old) return old
-          return old.filter((c: any) => c.id !== id)
+          return old.filter((c) => c.id !== id)
         })
       }
-      return { previousCheques: queryClient.getQueryData(['cheques', activeBusiness?.id]) }
+      return { previousCheques }
     },
     onSettled: () => {
       if (activeBusiness?.id) {

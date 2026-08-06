@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { File02Icon as FileText, UserGroupIcon as Users, Building03Icon as Building2, ArrowRight01Icon as ChevronRight } from '@hugeicons/core-free-icons';
+import { File02Icon as FileText, Building03Icon as Building2, ArrowRight01Icon as ChevronRight } from '@hugeicons/core-free-icons';
 import { useBusiness } from '@/hooks/use-business'
 import { useCheques } from '@/hooks/use-cheques'
 import { useParties } from '@/hooks/use-parties'
@@ -10,6 +10,7 @@ import { useAccounts } from '@/hooks/use-accounts'
 import { useRouter } from 'next/navigation'
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
+import { ChequeWithRelations, Party, AccountWithRelations } from '@/types'
 
 export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
   const [query, setQuery] = useState('')
@@ -22,7 +23,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
   const { accounts } = useAccounts(open ? businessId : undefined)
 
   const filteredCheques = query.length > 0 
-    ? (cheques || []).filter((c: any) => 
+    ? (cheques || []).filter((c: ChequeWithRelations) => 
         c.cheque_number.includes(query) || 
         c.party?.name.toLowerCase().includes(query.toLowerCase()) ||
         c.amount.toString().includes(query)
@@ -30,14 +31,14 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
     : []
 
   const filteredParties = query.length > 0
-    ? (parties || []).filter((p: any) => 
+    ? (parties || []).filter((p: Party) => 
         p.name.toLowerCase().includes(query.toLowerCase()) ||
-        p.contact.includes(query)
+        (p.contact || '').includes(query)
       ).slice(0, 5)
     : []
 
   const filteredAccounts = query.length > 0
-    ? (accounts || []).filter((a: any) => 
+    ? (accounts || []).filter((a: AccountWithRelations) => 
         (a.bank?.name || '').toLowerCase().includes(query.toLowerCase()) ||
         a.account_name.toLowerCase().includes(query.toLowerCase()) ||
         a.account_number.includes(query)
@@ -65,7 +66,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
         
         {filteredCheques && filteredCheques.length > 0 && (
           <CommandGroup heading="Cheques">
-            {filteredCheques.map((c: any) => (
+            {filteredCheques.map((c: ChequeWithRelations) => (
               <CommandItem 
                 key={c.id} 
                 onSelect={() => navigateTo(`/cheques`)}
@@ -86,7 +87,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
 
         {filteredParties && filteredParties.length > 0 && (
           <CommandGroup heading="Parties">
-            {filteredParties.map((p: any) => (
+            {filteredParties.map((p: Party) => (
               <CommandItem 
                 key={p.id} 
                 onSelect={() => navigateTo(`/parties/${p.id}`)}
@@ -112,7 +113,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
 
         {filteredAccounts && filteredAccounts.length > 0 && (
           <CommandGroup heading="Accounts">
-            {filteredAccounts.map((a: any) => (
+            {filteredAccounts.map((a: AccountWithRelations) => (
               <CommandItem 
                 key={a.id} 
                 onSelect={() => navigateTo(`/accounts/${a.id}`)}
@@ -140,3 +141,4 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
     </CommandDialog>
   )
 }
+

@@ -30,6 +30,7 @@ export default async function RootLayout({
     <html lang={locale} className={`${inter.variable}`}>
       <body className="bg-primary font-sans text-foreground selection:bg-primary/10 antialiased flex items-center justify-center min-h-[100dvh] overflow-hidden">
         <div className="relative w-full h-[100dvh] bg-background sm:h-[90dvh] sm:max-h-[932px] sm:max-w-[430px] sm:rounded-xl sm:border-[4px] sm:border-white sm: overflow-hidden flex flex-col [transform:translateZ(0)]">
+          <div id="progress-bar-container" className="absolute top-0 left-0 right-0 z-[100]" />
           <ProgressBar />
           <NextIntlClientProvider messages={messages}>
             <Providers>

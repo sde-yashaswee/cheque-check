@@ -27,10 +27,10 @@ export function useCreateParty(businessId: string | undefined) {
 
   const mutation = useMutation({
     mutationFn: (data: any) => PartyService.create({ ...data, business_id: businessId! }),
-    onMutate: async (newParty) => {
+    onMutate: async (newParty: any) => {
       await queryClient.cancelQueries({ queryKey: ['parties', businessId] })
       const previousParties = queryClient.getQueryData(['parties', businessId])
-      queryClient.setQueryData(['parties', businessId], (old: any) => {
+      queryClient.setQueryData(['parties', businessId], (old: any[]) => {
         const optimisticParty = {
           ...newParty,
           id: 'temp-' + Date.now(),
@@ -42,7 +42,7 @@ export function useCreateParty(businessId: string | undefined) {
       })
       return { previousParties }
     },
-    onError: (err, newParty, context) => {
+    onError: (err, newParty, context: any) => {
       queryClient.setQueryData(['parties', businessId], context?.previousParties)
     },
     onSettled: () => {

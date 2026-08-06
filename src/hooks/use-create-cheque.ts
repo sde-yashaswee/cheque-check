@@ -38,15 +38,15 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
 
   const mutation = useMutation({
     mutationFn: (data: any) => ChequeService.create({ ...data, business_id: businessId }),
-    onMutate: async (newCheque) => {
+    onMutate: async (newCheque: any) => {
       // Stop any outgoing refetches (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
 
       // Snapshot the previous value
-      const previousCheques = queryClient.getQueryData(['cheques', businessId])
+      const prev = queryClient.getQueryData(['cheques', businessId])
 
       // Optimistically update to the new value
-      queryClient.setQueryData(['cheques', businessId], (old: any) => {
+      queryClient.setQueryData(['cheques', businessId], (old: any[]) => {
         const optimisticCheque = {
           ...newCheque,
           id: 'temp-' + Date.now(),
@@ -61,9 +61,9 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
       })
 
       // Return a context object with the snapshotted value
-      return { previousCheques }
+      return { previousCheques: prev }
     },
-    onError: (err, newCheque, context) => {
+    onError: (err, newCheque, context: any) => {
       queryClient.setQueryData(['cheques', businessId], context?.previousCheques)
     },
     onSettled: () => {
@@ -76,8 +76,8 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
     try {
       const url = await StorageService.uploadChequeImage(file)
       setValue('image_url', url)
-    } catch (error: any) {
-      alert("Upload failed: "+ error.message)
+    } catch (error) {
+      alert("Upload failed: "+ (error instanceof Error ? error.message : String(error)))
     } finally {
       setIsUploading(false)
     }

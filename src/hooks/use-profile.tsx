@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useMemo } from 'react'
+import { createContext, useContext } from 'react'
 import { Profile } from '@/types'
 import { ProfileService } from '@/services/profile.service'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'

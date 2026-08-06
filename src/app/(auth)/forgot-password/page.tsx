@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { AuthService } from '@/services/auth.service'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Wallet01Icon as Wallet, ArrowLeft01Icon as ArrowLeft, Mail01Icon as Mail } from '@hugeicons/core-free-icons';
@@ -13,7 +12,6 @@ import { useTranslations } from 'next-intl'
 
 export default function ForgotPasswordPage() {
   const t = useTranslations('Auth')
-  const tc = useTranslations('Common')
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -28,8 +26,8 @@ export default function ForgotPasswordPage() {
       } else {
         setSent(true)
       }
-    } catch (error: any) {
-      alert(error.message)
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "An error occurred")
     } finally {
       setLoading(false)
     }
@@ -54,9 +52,9 @@ export default function ForgotPasswordPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10 text-green-600 mx-auto">
                 <HugeiconsIcon icon={Mail} className="h-6 w-6"/>
               </div>
-              <p className="text-sm">We've sent a password reset link to <strong>{email}</strong>.</p>
-              <Button asChild className="w-full rounded-full h-12">
-                <Link href="/login">Back to Login</Link>
+              <p className="text-sm">We&apos;ve sent a password reset link to <strong>{email}</strong>.</p>
+              <Button render={<Link href="/login" />} className="w-full rounded-full h-12">
+                Back to Login
               </Button>
             </div>
           ) : (

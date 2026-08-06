@@ -4,8 +4,10 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
+import { IconType } from "@/types"
+
 interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
-  icon?: any
+  icon?: IconType
   title: string
   description?: string
   action?: {

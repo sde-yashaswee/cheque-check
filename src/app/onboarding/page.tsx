@@ -1,17 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { BusinessService } from '@/services/business.service'
-import { ProfileService } from '@/services/profile.service'
 import { useBusiness } from '@/hooks/use-business'
 import { useProfile } from '@/hooks/use-profile'
 import { useQueryClient } from '@tanstack/react-query'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Wallet01Icon as Wallet, Building03Icon as Building2, Settings02Icon as Settings2, CheckmarkCircle01Icon as CheckCircle2, Notification01Icon as Bell, ArrowRight01Icon as ArrowRight, ArrowLeft01Icon as ArrowLeft, Mail01Icon as Mail, CallIcon as Phone, Location01Icon as MapPin, Tick02Icon as Check, GlobalIcon as Globe, Calendar01Icon as Calendar, Clock01Icon as Clock, TranslateIcon as Languages, DollarCircleIcon as DollarSign } from '@hugeicons/core-free-icons';
+import { Wallet01Icon as Wallet, Building03Icon as Building2, Settings02Icon as Settings2, CheckmarkCircle01Icon as CheckCircle2, Notification01Icon as Bell, ArrowRight01Icon as ArrowRight, ArrowLeft01Icon as ArrowLeft, Mail01Icon as Mail, CallIcon as Phone, Location01Icon as MapPin, Tick02Icon as Check } from '@hugeicons/core-free-icons';
 import { Combobox } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -88,20 +87,21 @@ export default function OnboardingPage() {
     defaultReminderDays: '3',
   })
 
-  useEffect(() => {
-    if (profile) {
-      setFormData(prev => ({
-        ...prev,
-        currency: profile.currency || '₹',
-        dateFormat: profile.date_format || 'dd/MM/yyyy',
-        timeFormat: profile.time_format || '12h',
-        timeZone: profile.time_zone || 'Asia/Kolkata',
-        language: profile.language || 'en',
-        remindersPerDay: profile.reminders_per_day?.toString() || '1',
-        defaultReminderDays: profile.default_reminder_days?.toString() || '3',
-      }))
-    }
-  }, [profile])
+  // Synchronize form data with profile when it loads
+  const [prevProfileId, setPrevProfileId] = useState<string | undefined>(profile?.id)
+  if (profile && profile.id !== prevProfileId) {
+    setPrevProfileId(profile.id)
+    setFormData(prev => ({
+      ...prev,
+      currency: profile.currency || '₹',
+      dateFormat: profile.date_format || 'dd/MM/yyyy',
+      timeFormat: profile.time_format || '12h',
+      timeZone: profile.time_zone || 'Asia/Kolkata',
+      language: profile.language || 'en',
+      remindersPerDay: profile.reminders_per_day?.toString() || '1',
+      defaultReminderDays: profile.default_reminder_days?.toString() || '3',
+    }))
+  }
 
   const nextStep = () => setStep(s => Math.min(s + 1, 5))
   const prevStep = () => setStep(s => Math.max(s - 1, 1))
@@ -133,8 +133,8 @@ export default function OnboardingPage() {
       })
 
       setStep(5)
-    } catch (error: any) {
-      alert(error.message)
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "An error occurred")
     } finally {
       setLoading(false)
     }

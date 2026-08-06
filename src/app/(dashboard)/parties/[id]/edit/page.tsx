@@ -53,7 +53,7 @@ export default function EditPartyPage() {
       <div className="flex flex-col items-center gap-4 py-4">
         <EditableAvatar
           name={watch('name')}
-          color={watch('color' as any)}
+          color={(watch as any)('color')}
           imageUrl={watch('avatar_url' as any)}
           onUpload={async (url) => { setValue('avatar_url' as any, url) }}
           onDelete={async () => { setValue('avatar_url' as any, null) }}
@@ -113,7 +113,7 @@ export default function EditPartyPage() {
                   onClick={() => setValue('color' as any, c)}
                   className={cn(
                     "h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2",
-                    watch('color' as any) === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
+                    (watch as any)('color') === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
                   )}
                   style={{ backgroundColor: c }}
                 />

@@ -26,10 +26,10 @@ export function useCreateAccount(businessId: string | undefined) {
 
   const mutation = useMutation({
     mutationFn: (data: any) => AccountService.create({ ...data, business_id: businessId! }),
-    onMutate: async (newAccount) => {
+    onMutate: async (newAccount: any) => {
       await queryClient.cancelQueries({ queryKey: ['accounts', businessId] })
       const previousAccounts = queryClient.getQueryData(['accounts', businessId])
-      queryClient.setQueryData(['accounts', businessId], (old: any) => {
+      queryClient.setQueryData(['accounts', businessId], (old: any[]) => {
         const optimisticAccount = {
           ...newAccount,
           id: 'temp-' + Date.now(),
@@ -41,7 +41,7 @@ export function useCreateAccount(businessId: string | undefined) {
       })
       return { previousAccounts }
     },
-    onError: (err, newAccount, context) => {
+    onError: (err, newAccount, context: any) => {
       queryClient.setQueryData(['accounts', businessId], context?.previousAccounts)
     },
     onSettled: () => {

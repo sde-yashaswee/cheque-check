@@ -82,7 +82,7 @@ export default function CreatePartyPage() {
                       onClick={() => setValue('color', c)}
                       className={cn(
                         "h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2",
-                        watch('color' as any) === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
+                        (watch as any)('color') === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
                       )}
                       style={{ backgroundColor: c }}
                     />
@@ -145,7 +145,7 @@ export default function CreatePartyPage() {
                 <h3 className="font-semibold text-primary uppercase tracking-wider text-[10px]">{t('reviewInformation')}</h3>
               </div>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full"style={{ backgroundColor: watch('color' as any) || '#34C759' }} />
+                <div className="h-10 w-10 rounded-full"style={{ backgroundColor: (watch as any)('color') || '#34C759' }} />
                 <div>
                   <p className="font-semibold">{watch('name')}</p>
                   <p className="text-xs text-muted-foreground">{watch('contact')}</p>

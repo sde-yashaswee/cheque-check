@@ -17,11 +17,27 @@ import { useSettings } from "@/hooks/use-settings"
 import { EditableAvatar } from "@/components/ui/editable-avatar"
 import { useTranslations } from 'next-intl';
 import { Switch } from "@/components/ui/switch"
+import { IconType, ChequeWithRelations } from "@/types"
 
 const DeleteConfirmationDialog = dynamic(() => import("@/components/ui/delete-dialog").then(mod => mod.DeleteConfirmationDialog), {
   loading: () => <Skeleton className="h-16 w-full rounded-lg"/>,
   ssr: false
 })
+
+interface SettingsItem {
+  name: string
+  icon: IconType
+  href?: string
+  action?: () => void
+  component?: React.ReactNode
+  value?: string
+}
+
+interface SettingsSection {
+  title: string
+  icon: IconType
+  items: SettingsItem[]
+}
 
 export default function SettingsPage() {
   const t = useTranslations('Settings');
@@ -88,7 +104,7 @@ export default function SettingsPage() {
 
   const selectorWidth = "h-9 w-[180px]"
 
-  const sections = [
+  const sections: SettingsSection[] = [
     {
       title: t('general'),
       icon: LayoutGrid,
@@ -200,7 +216,7 @@ export default function SettingsPage() {
       title: t('dataAndReports'),
       icon: FileSpreadsheet,
       items: [
-        { name: t('exportCheques'), icon: FileSpreadsheet, action: () => handleExport(cheques, activeBusiness?.name || '') },
+        { name: t('exportCheques'), icon: FileSpreadsheet, action: () => handleExport((cheques || []) as ChequeWithRelations[], activeBusiness?.name || '') },
       ]
     },
     {
@@ -241,14 +257,14 @@ export default function SettingsPage() {
       </div>
 
       <div className="space-y-8">
-        {sections.map((section: any) => (
+        {sections.map((section: SettingsSection) => (
           <div key={section.title} className="space-y-3">
             <div className="flex items-center gap-2 px-2">
               <HugeiconsIcon icon={section.icon} className="h-3 w-3 text-muted-foreground opacity-80"/>
               <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{section.title}</h3>
             </div>
             <div className="divide-y divide-border/50 rounded-lg border bg-card overflow-hidden">
-              {section.items.map((item: any) => {
+              {section.items.map((item: SettingsItem) => {
                 const content = (
                   <div key={item.name} className={cn("flex items-center justify-between p-4 transition-colors", (item.action || item.href) && "cursor-pointer active:bg-muted/50 hover:bg-muted/30")} onClick={item.action}>
                     <div className="flex items-center gap-3">

@@ -6,7 +6,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { Home01Icon as Home, File02Icon as FileText, UserGroupIcon as Users, BankIcon as Landmark } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const navItems = [
   { name: 'dashboard', href: '/', icon: Home },
@@ -21,9 +21,11 @@ export function BottomNav() {
   const [optimisticPath, setOptimisticPath] = useState<string | null>(null)
 
   // Reset optimistic path when actual pathname changes
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname)
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname)
     setOptimisticPath(null)
-  }, [pathname])
+  }
 
   // Only show bottom nav on main top-level routes
   const currentPath = optimisticPath || pathname

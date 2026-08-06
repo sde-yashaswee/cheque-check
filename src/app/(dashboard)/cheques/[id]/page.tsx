@@ -17,7 +17,6 @@ import { useTranslations } from 'next-intl'
 
 export default function ChequeDetailPage() {
   const t = useTranslations('Cheques')
-  const tCommon = useTranslations('Common')
   const { id } = useParams() as { id: string }
   const { profile } = useProfile()
   const currency = profile?.currency || '₹'

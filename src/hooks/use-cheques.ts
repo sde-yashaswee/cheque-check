@@ -26,12 +26,12 @@ export function useCheques(businessId: string | undefined) {
       ChequeService.updateStatus(id, status),
     onMutate: async ({ id, status }) => {
       await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-      const previousCheques = queryClient.getQueryData(['cheques', businessId])
-      queryClient.setQueryData(['cheques', businessId], (old: any) => {
+      const prev = queryClient.getQueryData(['cheques', businessId])
+      queryClient.setQueryData(['cheques', businessId], (old: any[]) => {
         if (!old) return old
         return old.map((c: any) => c.id === id ? { ...c, status } : c)
       })
-      return { previousCheques }
+      return { previousCheques: prev }
     },
     onError: (err, variables, context) => {
       queryClient.setQueryData(['cheques', businessId], context?.previousCheques)
@@ -45,12 +45,12 @@ export function useCheques(businessId: string | undefined) {
     mutationFn: (id: string) => ChequeService.delete(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-      const previousCheques = queryClient.getQueryData(['cheques', businessId])
-      queryClient.setQueryData(['cheques', businessId], (old: any) => {
+      const prev = queryClient.getQueryData(['cheques', businessId])
+      queryClient.setQueryData(['cheques', businessId], (old: any[]) => {
         if (!old) return old
         return old.filter((c: any) => c.id !== id)
       })
-      return { previousCheques }
+      return { previousCheques: prev }
     },
     onError: (err, variables, context) => {
       queryClient.setQueryData(['cheques', businessId], context?.previousCheques)
@@ -71,7 +71,7 @@ export function useCheques(businessId: string | undefined) {
   }, [cheques, profile?.received_cheques_enabled])
 
   const filteredCheques = useMemo(() => {
-    let result = [...processedCheques].filter((c) => {
+    const result = [...processedCheques].filter((c) => {
       const matchesSearch = c.cheque_number.includes(search) || 
                            c.party?.name?.toLowerCase().includes(search.toLowerCase()) ||
                            c.amount.toString().includes(search)

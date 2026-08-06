@@ -54,8 +54,8 @@ export default function EditBusinessPage() {
           color={watch('color' as any)}
           icon={watch('icon' as any)}
           imageUrl={watch('logo_url' as any)}
-          onUpload={async (url) => { setValue('logo_url' as any, url) }}
-          onDelete={async () => { setValue('logo_url' as any, null) }}
+          onUpload={async (url) => { (setValue as any)('logo_url', url) }}
+          onDelete={async () => { (setValue as any)('logo_url', null) }}
           size="xl"
         />
       </div>

@@ -50,13 +50,13 @@ export function useEditBusiness(id: string) {
     onMutate: async (newBusiness) => {
       await queryClient.cancelQueries({ queryKey: ['businesses'] })
       const previousBusinesses = queryClient.getQueryData(['businesses'])
-      queryClient.setQueryData(['businesses'], (old: any) => {
+      queryClient.setQueryData(['businesses'], (old: any[]) => {
         if (!old) return old
-        return old.map((b: any) => b.id === id ? { ...b, ...newBusiness } : b)
+        return old.map((b) => b.id === id ? { ...b, ...newBusiness } : b)
       })
       return { previousBusinesses }
     },
-    onError: (err, newBusiness, context) => {
+    onError: (err, newBusiness, context: any) => {
       queryClient.setQueryData(['businesses'], context?.previousBusinesses)
     },
     onSettled: () => {
@@ -70,13 +70,13 @@ export function useEditBusiness(id: string) {
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ['businesses'] })
       const previousBusinesses = queryClient.getQueryData(['businesses'])
-      queryClient.setQueryData(['businesses'], (old: any) => {
+      queryClient.setQueryData(['businesses'], (old: any[]) => {
         if (!old) return old
-        return old.filter((b: any) => b.id !== id)
+        return old.filter((b) => b.id !== id)
       })
       return { previousBusinesses }
     },
-    onError: (err, variables, context) => {
+    onError: (err, variables, context: any) => {
       queryClient.setQueryData(['businesses'], context?.previousBusinesses)
     },
     onSettled: () => {

@@ -156,6 +156,7 @@
     "notesPlaceholder": "Add any notes here",
     "depositDate": "Expected Deposit Date",
     "scan": "Cheque Scan",
+    "loading": "Extracting details...",
     "photo": "Cheque Photo",
     "uploading": "Uploading Cheque...",
     "scanUpload": "Scan / Upload Cheque",

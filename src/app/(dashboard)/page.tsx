@@ -5,19 +5,17 @@ import { PlusSignIcon as Plus, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft
 import { Button } from "@/components/ui/button";
 import { useBusiness } from "@/hooks/use-business";
 import { useCheques } from "@/hooks/use-cheques";
-import { useChequeActions } from "@/hooks/use-cheque-actions";
 import { ChequeCard } from "@/components/cheque-card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import { StorageService } from "@/services/storage.service";
-import { ChequeStatus, ChequeWithRelations } from "@/types";
 import { useProfile } from "@/hooks/use-profile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChequeStats } from "@/hooks/use-cheque-stats";
 import { DataState } from "@/components/ui/data-state";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Building03Icon, Calendar01Icon, PieChartIcon } from "@hugeicons/core-free-icons";
+import { Building03Icon, Calendar01Icon } from "@hugeicons/core-free-icons";
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl';
 

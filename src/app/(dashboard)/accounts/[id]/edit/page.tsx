@@ -4,7 +4,7 @@ import { useEditAccount } from '@/hooks/use-edit-account'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useRouter, useParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Tick02Icon as Check, UserIcon as User, CreditCardIcon as CreditCard, HashtagIcon as Hash, Delete02Icon as Trash2 } from '@hugeicons/core-free-icons';
@@ -108,10 +108,10 @@ export default function EditAccountPage() {
                 <button
                   key={c}
                   type="button"
-                  onClick={() => setValue('color' as any, c)}
+                  onClick={() => (setValue as any)('color', c)}
                   className={cn(
                     "h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2",
-                    watch('color' as any) === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
+                    (watch as any)('color') === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
                   )}
                   style={{ backgroundColor: c }}
                 />

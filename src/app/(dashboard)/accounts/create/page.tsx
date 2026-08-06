@@ -84,7 +84,7 @@ export default function CreateAccountPage() {
                       onClick={() => setValue('color', c)}
                       className={cn(
                         "h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2",
-                        watch('color' as any) === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
+                        (watch as any)('color') === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
                       )}
                       style={{ backgroundColor: c }}
                     />

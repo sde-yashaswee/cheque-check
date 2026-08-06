@@ -16,6 +16,8 @@ import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
 import { useTranslations } from 'next-intl'
 
+import { ChequeWithRelations } from '@/types'
+
 export default function ChequesPage() {
   const t = useTranslations('Cheques')
   const tCommon = useTranslations('Common')
@@ -161,7 +163,7 @@ export default function ChequesPage() {
             />
           }
         >
-          {filteredCheques?.map((cheque: any) => (
+          {filteredCheques?.map((cheque: ChequeWithRelations) => (
             <ChequeCard 
               key={cheque.id} 
               cheque={cheque} 

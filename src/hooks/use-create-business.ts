@@ -28,10 +28,10 @@ export function useCreateBusiness() {
 
   const mutation = useMutation({
     mutationFn: (data: any) => BusinessService.create(data),
-    onMutate: async (newBusiness) => {
+    onMutate: async (newBusiness: any) => {
       await queryClient.cancelQueries({ queryKey: ['businesses'] })
       const previousBusinesses = queryClient.getQueryData(['businesses'])
-      queryClient.setQueryData(['businesses'], (old: any) => {
+      queryClient.setQueryData(['businesses'], (old: any[]) => {
         const optimisticBusiness = {
           ...newBusiness,
           id: 'temp-' + Date.now(),
@@ -42,7 +42,7 @@ export function useCreateBusiness() {
       })
       return { previousBusinesses }
     },
-    onError: (err, newBusiness, context) => {
+    onError: (err, newBusiness, context: any) => {
       queryClient.setQueryData(['businesses'], context?.previousBusinesses)
     },
     onSettled: (newBusiness) => {

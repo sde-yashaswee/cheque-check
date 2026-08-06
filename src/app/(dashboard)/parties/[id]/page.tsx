@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils'
 import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
 import { useTranslations } from 'next-intl'
+import { ChequeWithRelations } from '@/types'
 
 export default function PartyDetailPage() {
   const t = useTranslations('Parties')
@@ -194,7 +195,7 @@ export default function PartyDetailPage() {
           }
         >
           <div className="space-y-4">
-            {filteredCheques?.map((cheque: any) => (
+            {filteredCheques?.map((cheque: ChequeWithRelations) => (
               <ChequeCard 
                 key={cheque.id} 
                 cheque={cheque} 

@@ -13,6 +13,13 @@ export async function POST(req: Request) {
       });
     }
 
+    if (!process.env.OPENAI_API_KEY) {
+      return new Response(JSON.stringify({ error: 'OpenAI API key is missing. Please set it in your environment variables.' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const { object } = await generateObject({
       model: openai('gpt-4o-mini'),
       schema: z.object({
@@ -33,7 +40,7 @@ export async function POST(req: Request) {
             },
             {
               type: 'image',
-              image: imageUrl,
+              image: new URL(imageUrl),
             },
           ],
         },
@@ -44,9 +51,10 @@ export async function POST(req: Request) {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('OCR Error:', error);
-    return new Response(JSON.stringify({ error: error.message || 'Failed to process image' }), {
+    const message = error instanceof Error ? error.message : 'Failed to process image';
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

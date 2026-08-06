@@ -80,7 +80,7 @@ export default function CreateBusinessPage() {
                       onClick={() => setValue('color', c)}
                       className={cn(
                         "h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2",
-                        watch('color' as any) === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
+                        (watch as any)('color') === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
                       )}
                       style={{ backgroundColor: c }}
                     />
@@ -146,7 +146,7 @@ export default function CreateBusinessPage() {
                 <h3 className="font-semibold text-primary uppercase tracking-wider text-[10px]">{t('businessSummary')}</h3>
               </div>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold"style={{ backgroundColor: watch('color' as any) || '#007AFF' }}>
+                <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold"style={{ backgroundColor: (watch as any)('color') || '#007AFF' }}>
                   {watch('name')?.charAt(0) || 'B'}
                 </div>
                 <div>

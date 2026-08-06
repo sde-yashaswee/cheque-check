@@ -1,5 +1,6 @@
 export type ChequeStatus = 'Issued' | 'Received' | 'Cleared' | 'Bounced';
 export type ChequeType = 'Outward' | 'Inward';
+export type IconType = any; // For now, to be safe with HugeIcons and Lucide
 
 export interface Profile {
   id: string;

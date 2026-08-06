@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { PartyService } from '@/services/party.service'
 import { ChequeService } from '@/services/cheque.service'
-import { ChequeStatus } from '@/types'
+import { ChequeStatus , Cheque } from '@/types'
 import { useMemo, useState } from 'react'
 
 export function usePartyDetail(id: string, businessId: string | undefined) {
@@ -30,11 +30,11 @@ export function usePartyDetail(id: string, businessId: string | undefined) {
 
   const partyCheques = useMemo(() => {
     if (!cheques) return []
-    return cheques.filter((c: any) => c.party_id === id)
+    return cheques.filter((c: Cheque) => c.party_id === id)
   }, [cheques, id])
 
   const filteredCheques = useMemo(() => {
-    return partyCheques.filter((c: any) => {
+    return partyCheques.filter((c: Cheque) => {
       const matchesSearch = c.cheque_number.includes(search) || c.amount.toString().includes(search)
       const matchesFilter = filter === 'All' || c.status === filter
       return matchesSearch && matchesFilter
@@ -43,8 +43,8 @@ export function usePartyDetail(id: string, businessId: string | undefined) {
 
   const outstanding = useMemo(() => {
     return partyCheques
-      .filter((c: any) => c.status !== 'Cleared' && c.status !== 'Bounced')
-      .reduce((sum: number, c: any) => sum + c.amount, 0)
+      .filter((c: Cheque) => c.status !== 'Cleared' && c.status !== 'Bounced')
+      .reduce((sum: number, c: Cheque) => sum + c.amount, 0)
   }, [partyCheques])
 
   const updateChequeStatus = (id: string, status: ChequeStatus) => {

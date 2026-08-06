@@ -4,7 +4,6 @@ import { useProfile } from "@/hooks/use-profile"
 import { Switch } from "@/components/ui/switch"
 import { HugeiconsIcon } from '@hugeicons/react';
 import { CallIcon as Phone, CheckmarkCircle01Icon as CheckCircle2 } from '@hugeicons/core-free-icons';
-import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 
 export default function FeaturesPage() {

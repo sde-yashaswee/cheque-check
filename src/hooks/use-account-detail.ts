@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { AccountService } from '@/services/account.service'
 import { ChequeService } from '@/services/cheque.service'
-import { ChequeStatus } from '@/types'
+import { ChequeStatus, Cheque } from '@/types'
 import { useMemo, useState } from 'react'
 
 export function useAccountDetail(id: string, businessId: string | undefined) {
@@ -30,11 +30,11 @@ export function useAccountDetail(id: string, businessId: string | undefined) {
 
   const accountCheques = useMemo(() => {
     if (!cheques) return []
-    return cheques.filter((c: any) => c.account_id === id)
+    return cheques.filter((c: Cheque) => c.account_id === id)
   }, [cheques, id])
 
   const filteredCheques = useMemo(() => {
-    return accountCheques.filter((c: any) => {
+    return accountCheques.filter((c: Cheque) => {
       const matchesSearch = c.cheque_number.includes(search) || c.amount.toString().includes(search)
       const matchesFilter = filter === 'All' || c.status === filter
       return matchesSearch && matchesFilter

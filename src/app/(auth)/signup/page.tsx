@@ -32,8 +32,8 @@ export default function SignupPage() {
         alert(t('checkEmailConfirmation'))
         router.push('/login')
       }
-    } catch (error: any) {
-      alert(error.message)
+    } catch (error: unknown) {
+      alert(error instanceof Error ? error.message : String(error))
     } finally {
       setLoading(false)
     }
@@ -43,8 +43,8 @@ export default function SignupPage() {
     try {
       const { error } = await AuthService.loginWithOAuth(provider)
       if (error) alert(error.message)
-    } catch (error: any) {
-      alert(error.message)
+    } catch (error: unknown) {
+      alert(error instanceof Error ? error.message : String(error))
     }
   }
 

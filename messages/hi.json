@@ -14,6 +14,8 @@
     "phoneNumberPlaceholder": "+91 00000 00000"
   },
   "Cheques": {
+    "scan": "चेक स्कैन",
+    "loading": "विवरण निकाले जा रहे हैं...",
     "number": "नंबर",
     "sortBy": "क्रमबद्ध करें",
     "sortNewest": "सबसे नए पहले",

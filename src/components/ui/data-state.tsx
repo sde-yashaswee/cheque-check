@@ -1,5 +1,4 @@
 import * as React from "react"
-import { HugeiconsIcon } from '@hugeicons/react';
 import { Search01Icon as Search, Alert02Icon as ShieldAlert, Alert01Icon as AlertCircle } from '@hugeicons/core-free-icons';
 import { EmptyState } from "./empty-state"
 import { useRouter } from "next/navigation"
@@ -8,8 +7,8 @@ interface DataStateProps {
   isLoading?: boolean
   isError?: boolean
   isUnauthorized?: boolean
-  data?: any[]
-  allData?: any[]
+  data?: unknown[]
+  allData?: unknown[]
   loadingComponent?: React.ReactNode
   emptyState?: React.ReactNode
   errorState?: React.ReactNode

@@ -33,8 +33,8 @@ export function DeleteConfirmationDialog({
     try {
       await onDelete()
       setOpen(false)
-    } catch (error: any) {
-      alert(error.message)
+    } catch (error) {
+      alert(error instanceof Error ? error.message : String(error))
     } finally {
       setLoading(false)
     }
