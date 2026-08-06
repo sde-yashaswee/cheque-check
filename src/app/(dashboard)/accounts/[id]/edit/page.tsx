@@ -128,7 +128,7 @@ export default function EditAccountPage() {
           <DeleteConfirmationDialog 
             title={t('deleteConfirmTitle')}
             description={t('deleteConfirmDesc')}
-            confirmName={account?.bank?.name || 'Account'}
+            confirmName={account?.account_name || 'Account'}
             onDelete={async () => { onDelete() }}
             trigger={
               <Button type="button"variant="ghost"className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">

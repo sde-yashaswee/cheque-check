@@ -95,14 +95,14 @@ export default function ChequeDetailPage() {
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{t('account')}</p>
               <div className="flex items-center gap-3">
                 <EntityAvatar 
-                  name={cheque.account?.bank?.name || 'A'} 
+                  name={cheque.account?.account_name || 'A'} 
                   color={cheque.account?.color} 
                   icon={cheque.account?.icon} 
                   imageUrl={cheque.account?.bank?.logo_url}
                 />
                 <div>
-                  <p className="font-semibold">{cheque.account?.bank?.name}</p>
-                  <p className="text-[10px] text-muted-foreground uppercase font-semibold">{cheque.account?.account_name}</p>
+                  <p className="font-semibold">{cheque.account?.account_name}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase font-semibold">{cheque.account?.bank?.name}</p>
                 </div>
               </div>
             </div>

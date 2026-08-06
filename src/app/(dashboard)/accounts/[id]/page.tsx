@@ -65,15 +65,15 @@ export default function AccountDetailPage() {
         <div className="flex justify-between items-start relative z-10">
           <div className="flex items-center gap-4">
             <EntityAvatar 
-              name={account.bank?.name || 'A'} 
+              name={account.account_name || 'A'} 
               color={account.color} 
               icon={account.icon} 
               imageUrl={account.bank?.logo_url}
               size="lg"
             />
             <div>
-              <h2 className="text-2xl font-semibold">{account.bank?.name}</h2>
-              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{account.account_name}</p>
+              <h2 className="text-2xl font-semibold">{account.account_name}</h2>
+              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{account.bank?.name}</p>
             </div>
           </div>
           <Link href={`/accounts/${id}/edit`}>
