@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
-import * as Sentry from '@sentry/nextjs'
 import { ErrorView } from '@/components/ui/error-view'
+import { logger } from '@/lib/logger'
 
 export default function Error({
   error,
@@ -12,8 +12,7 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log the error to Sentry
-    Sentry.captureException(error)
+    logger.error('Global error caught by error boundary', error)
   }, [error])
 
   return (

@@ -1,9 +1,9 @@
 'use client'
 
-import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
 import { ErrorView } from '@/components/ui/error-view'
 import { NextIntlClientProvider, useTranslations } from 'next-intl'
+import { logger } from '@/lib/logger'
 
 function GlobalErrorContent({
   error,
@@ -31,7 +31,7 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
-    Sentry.captureException(error)
+    logger.fatal('Critical global error caught', error)
   }, [error])
 
   return (

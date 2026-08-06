@@ -1,6 +1,7 @@
 import { openai } from '@ai-sdk/openai';
 import { generateObject } from 'ai';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 /**
  * Schema for extracting cheque details.
@@ -81,13 +82,13 @@ class OcrController {
         return this.respondWithError('Image URL is required for processing.', 400);
       }
 
-      console.log(`[OcrController] Processing request for image: ${imageUrl}`);
+      logger.info(`[OcrController] Processing request for image: ${imageUrl}`, { imageUrl });
       
       const result = await this.ocrProvider.processImage(imageUrl);
 
       return this.respondWithSuccess(result);
     } catch (error: any) {
-      console.error('[OcrController Error]:', error);
+      logger.error('[OcrController Error]', error);
 
       const status = error.message?.includes('credentials') ? 500 : 400;
       const message = error instanceof Error ? error.message : 'An unexpected error occurred during image processing.';

@@ -18,6 +18,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Building03Icon, Calendar01Icon } from "@hugeicons/core-free-icons";
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl';
+import { logger } from "@/lib/logger";
 
 const ChequeStatsChart = dynamic(() => import("@/components/cheque-stats-chart").then(mod => mod.ChequeStatsChart), {
   loading: () => <Skeleton className="h-full w-full rounded-lg"/>,
@@ -45,7 +46,7 @@ export default function HomePage() {
       const imageUrl = await StorageService.uploadChequeImage(file)
       router.push(`/cheques/create?imageUrl=${encodeURIComponent(imageUrl)}&action=ocr&type=Inward`)
     } catch (error) {
-      console.error('Scan error:', error)
+      logger.error('Scan error', error)
       alert('Failed to upload cheque image')
     } finally {
       setIsUploading(false)

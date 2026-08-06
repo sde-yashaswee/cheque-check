@@ -15,6 +15,7 @@ import {
 } from './dialog'
 import { StorageService } from '@/services/storage.service'
 import { toast } from './toast'
+import { logger } from '@/lib/logger'
 
 interface EditableAvatarProps {
   name: string
@@ -48,13 +49,6 @@ export function EditableAvatar({
     xl: 'h-32 w-32',
   }
 
-  const editButtonSizeClasses = {
-    sm: 'h-4 w-4 p-0.5',
-    md: 'h-6 w-6 p-1',
-    lg: 'h-8 w-8 p-1.5',
-    xl: 'h-10 w-10 p-2',
-  }
-
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -70,7 +64,7 @@ export function EditableAvatar({
       })
       setIsOpen(false)
     } catch (error) {
-      console.error('Error uploading avatar:', error)
+      logger.error('Error uploading avatar', error)
       toast.add({
         title: 'Error',
         description: 'Failed to upload avatar',
@@ -93,7 +87,7 @@ export function EditableAvatar({
       })
       setIsOpen(false)
     } catch (error) {
-      console.error('Error deleting avatar:', error)
+      logger.error('Error deleting avatar', error)
       toast.add({
         title: 'Error',
         description: 'Failed to remove avatar',

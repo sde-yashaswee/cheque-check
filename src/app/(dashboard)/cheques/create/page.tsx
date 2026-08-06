@@ -16,6 +16,7 @@ import { EntityAvatar } from '@/components/ui/entity-avatar'
 import { useTranslations } from 'next-intl'
 import { useState, useEffect } from 'react'
 import { toast } from '@/components/ui/toast'
+import { logger } from '@/lib/logger'
 
 export default function CreateChequePage() {
   const t = useTranslations('Cheques')
@@ -98,7 +99,7 @@ export default function CreateChequePage() {
             type: 'success',
           })
         } catch (error) {
-          console.error('OCR Error:', error)
+          logger.error('OCR Error', error)
           toast.add({
             title: tCommon('error'),
             description: "Failed to extract cheque details",
