@@ -234,6 +234,7 @@
     "filterBank": "Bank Filter karein",
     "noAccountsTitle": "Koi accounts nahi mile",
     "noAccountsDesc": "Aapne abhi tak koi bank account add nahi kiya hai. Cheques track karne ke liye apna pehla account add karein.",
+    "noChequesDesc": "Is account ke liye abhi tak koi cheque record nahi kiya gaya hai.",
     "addFirstAccount": "Apna pehla account add karein",
     "notFound": "Account nahi mila",
     "searchChequesPlaceholder": "Account ke cheques search karein...",

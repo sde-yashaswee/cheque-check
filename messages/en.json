@@ -234,6 +234,7 @@
     "filterBank": "Filter Bank",
     "noAccountsTitle": "No accounts found",
     "noAccountsDesc": "You haven't added any bank accounts yet. Add your first account to start tracking cheques.",
+    "noChequesDesc": "No cheques have been recorded for this account yet.",
     "addFirstAccount": "Add your first account",
     "notFound": "Account not found",
     "searchChequesPlaceholder": "Search account cheques...",
