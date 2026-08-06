@@ -28,6 +28,7 @@ export const accountSchema = z.object({
   ifsc_code: z.string().optional().or(z.literal('')),
   color: z.string().optional(),
   icon: z.string().optional(),
+  notes: z.string().optional().or(z.literal('')),
 })
 
 export const chequeSchema = z.object({

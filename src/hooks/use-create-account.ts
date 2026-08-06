@@ -18,7 +18,8 @@ export function useCreateAccount(businessId: string | undefined) {
       account_name: '',
       account_number: '',
       ifsc_code: '',
-      color: '#007AFF'
+      color: '#007AFF',
+      notes: ''
     }
   })
 

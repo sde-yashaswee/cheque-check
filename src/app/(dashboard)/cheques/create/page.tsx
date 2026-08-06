@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { useSearchParams } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react';
 import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Camera01Icon as Camera, Cancel01Icon as X, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, Invoice01Icon as ReceiptText } from '@hugeicons/core-free-icons';
-import { cn } from '@/lib/utils'
+import { cn, numberToIndianWords } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 import { Combobox } from '@/components/ui/combobox'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
@@ -35,12 +35,15 @@ export default function CreateChequePage() {
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
   const [isExtracting, setIsExtracting] = useState(false)
+  const [extractionProgress, setExtractionProgress] = useState(0)
   const queryClient = useQueryClient()
   const { data: banks } = useBanks()
 
   const [unmatchedEntities, setUnmatchedEntities] = useState<{
     payee_name?: string;
+    account_name?: string;
     account_number?: string;
+    ifsc_code?: string;
     bank_name?: string;
     bank_id?: string;
   } | null>(null)
@@ -72,13 +75,24 @@ export default function CreateChequePage() {
     if (actionParam === 'ocr' && imageUrlParam && !isExtracting) {
       const extractData = async () => {
         setIsExtracting(true)
+        setExtractionProgress(10)
         setValue('image_url', imageUrlParam)
         
-        toast.add({
+        const toastId = toast.add({
           title: t('scan'),
           description: t('loading'),
           type: 'loading',
         })
+
+        const progressInterval = setInterval(() => {
+          setExtractionProgress(prev => {
+            if (prev >= 90) {
+              clearInterval(progressInterval)
+              return 90
+            }
+            return prev + 5
+          })
+        }, 300)
 
         try {
           const response = await fetch('/api/ocr/cheque', {
@@ -138,7 +152,9 @@ export default function CreateChequePage() {
 
             setUnmatchedEntities({
               payee_name: !matchedPartyId ? data.payee_name : undefined,
+              account_name: data.account_name,
               account_number: !matchedAccountId ? data.account_number : undefined,
+              ifsc_code: data.ifsc_code,
               bank_name: data.bank_name,
               bank_id: matchedBankId
             })
@@ -149,6 +165,7 @@ export default function CreateChequePage() {
             })
           }
 
+          setExtractionProgress(100)
           toast.add({
             title: tCommon('success'),
             description: "Cheque details extracted successfully",
@@ -162,6 +179,7 @@ export default function CreateChequePage() {
             type: 'error',
           })
         } finally {
+          clearInterval(progressInterval)
           setIsExtracting(false)
         }
       }
@@ -186,7 +204,7 @@ export default function CreateChequePage() {
           color: '#34C759',
           email: null,
           address: null,
-          notes: null
+          notes: 'Automatically Generated from Cheque Scan'
         })
         partyId = newParty.id
         setValue('party_id', partyId)
@@ -206,11 +224,12 @@ export default function CreateChequePage() {
         const newAccount = await AccountService.create({
           business_id: businessId,
           bank_id: unmatchedEntities.bank_id,
-          account_name: unmatchedEntities.payee_name || 'Scanned Account',
+          account_name: unmatchedEntities.account_name || unmatchedEntities.payee_name || 'Scanned Account',
           account_number: unmatchedEntities.account_number,
+          ifsc_code: unmatchedEntities.ifsc_code || null,
           color: '#007AFF',
-          ifsc_code: null
-        })
+          notes: 'Automatically Generated from Cheque Scan'
+        } as any)
         accountId = newAccount.id
         setValue('account_id', accountId)
         queryClient.invalidateQueries({ queryKey: ['accounts', businessId] })
@@ -252,6 +271,14 @@ export default function CreateChequePage() {
 
   const selectedParty = parties?.find(p => p.id === watch('party_id'))
 
+  const formattedAmount = new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(watch('amount') || 0)
+
+  const amountInWords = numberToIndianWords(watch('amount') || 0)
+
   return (
     <div className="max-w-2xl space-y-8 pb-20">
       <div className="flex items-center gap-4">
@@ -266,16 +293,32 @@ export default function CreateChequePage() {
         </div>
       </div>
 
-      <div className="flex gap-2">
-        {[1, 2, 3].map((s) => (
-          <div 
-            key={s} 
-            className={cn(
-              "h-1.5 flex-1 rounded-full transition-colors",
-              s <= step ? "bg-primary": "bg-canvas-parchment"
-            )} 
-          />
-        ))}
+      <div className="flex flex-col gap-4">
+        <div className="flex gap-2">
+          {[1, 2, 3].map((s) => (
+            <div 
+              key={s} 
+              className={cn(
+                "h-1.5 flex-1 rounded-full transition-colors",
+                s <= step ?"bg-primary":"bg-canvas-parchment"
+              )} 
+            />
+          ))}
+        </div>
+        
+        {isExtracting && (
+          <div className="space-y-2 animate-in fade-in duration-500">
+            <div className="flex justify-between text-[10px] font-bold text-primary uppercase tracking-widest">
+              <span>Extracting Cheque Details... {extractionProgress}%</span>
+            </div>
+            <div className="h-1 w-full bg-primary/10 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-primary transition-all duration-300" 
+                style={{ width: `${extractionProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <form onSubmit={onSubmit} className="space-y-8">
@@ -341,6 +384,10 @@ export default function CreateChequePage() {
                   className="h-16 pl-10 text-3xl font-semibold border-none bg-canvas-parchment rounded-sm"
                 />
               </div>
+              <div className="flex flex-col gap-1 ml-1">
+                <p className="text-sm font-semibold text-primary">{formattedAmount}</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest italic">{amountInWords}</p>
+              </div>
               {errors.amount && <p className="text-xs text-destructive ml-1">{errors.amount.message as string}</p>}
             </div>
 
@@ -385,7 +432,7 @@ export default function CreateChequePage() {
                 value={watch('account_id')} 
                 onValueChange={(val) => setValue('account_id', val)} 
                 placeholder={t('accountPlaceholder')}
-                createUrl="/accounts/create"
+                createUrl={`/accounts/create?name=${encodeURIComponent(unmatchedEntities?.account_name || '')}&number=${unmatchedEntities?.account_number || ''}&ifsc=${unmatchedEntities?.ifsc_code || ''}&auto=true`}
                 createLabel={t('addAccount')}
                 className="h-14 bg-canvas-parchment border-none rounded-sm"
               />
@@ -531,9 +578,9 @@ export default function CreateChequePage() {
                   />
                   <div className="grid gap-1.5 leading-none">
                     <label htmlFor="create-account" className="text-sm font-semibold">
-                      Create Account: {unmatchedEntities.account_number}
+                      Create Account: {unmatchedEntities.account_name || unmatchedEntities.account_number}
                     </label>
-                    <p className="text-xs text-muted-foreground">Bank account number from the scan.</p>
+                    <p className="text-xs text-muted-foreground">Extracted account details from the scan.</p>
                   </div>
                 </div>
 
@@ -564,4 +611,3 @@ export default function CreateChequePage() {
     </div>
   )
 }
-

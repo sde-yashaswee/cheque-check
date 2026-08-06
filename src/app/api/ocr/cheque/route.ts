@@ -9,10 +9,12 @@ import { logger } from '@/lib/logger';
  */
 const ChequeDetailsSchema = z.object({
   amount: z.number().nullable().describe('The cheque amount as a number (e.g., 1500.00).'),
-  cheque_number: z.string().nullable().describe('Strictly 6 contiguous digits found at the left bottom of the cheque. Ignore letters/symbols.'),
+  cheque_number: z.string().nullable().describe('Strictly 6 contiguous digits found at the bottom lower left between narrow straight lines. Do not confuse with account number.'),
   cheque_date: z.string().nullable().describe('Date from the top-right boxes (originally DDMMYYYY). Convert and return strictly in YYYY-MM-DD format.'),
-  payee_name: z.string().nullable().describe('The name of the person or business the cheque is issued to.'),
-  account_number: z.string().nullable().describe('The bank account number, typically an 11-digit numerical sequence.'),
+  payee_name: z.string().nullable().describe('The name of the payee (after "Pay" or "To").'),
+  account_number: z.string().nullable().describe('The bank account number. Found near a block reading "A/c no". Avoid interpreting labels as numbers.'),
+  account_name: z.string().nullable().describe('The name of the account holder, found below the signature line (bottom right). Can be multiple lines.'),
+  ifsc_code: z.string().nullable().describe('The IFSC code (4 alphabets + 7 digits), located at top middle left of the date.'),
   bank_name: z.string().nullable().describe('The name of the bank.'),
 });
 
@@ -52,10 +54,13 @@ class OpenAiOcrProvider implements IOcrProvider {
             {
               type: 'text',
               text: `Analyze this cheque image and extract all relevant details. Adhere strictly to these rules:
-      - Date: Located in the top right corner. The block letters/boxes contain the date in DDMMYYYY format (8 numerical digits). Extract it and format your output as YYYY-MM-DD.
-      - Cheque Number: Located at the bottom. Find the contiguous strictly 6-digit numerical sequence, typically positioned towards the right side of the bottom sequence. Do not include any letters or separate numbers. Extract only that contiguous 6-digit sequence.
-      - Account Number: Usually an 11-digit numerical sequence.
-      - If any field is not clearly visible or legible, return null for that field. Keep processing fast and concise.`,
+- Date: Located in the top right corner. The block letters/boxes contain the date in DDMMYYYY format. Extract and format as YYYY-MM-DD.
+- Cheque Number: Located at the bottom lower left. It is between two narrow straight lines (like |123456| or "123456"). Extract ONLY these 6 contiguous digits. Do NOT confuse this with the account number.
+- Account Number: Located near a block that reads "A/c no" or "Account Number". Do not interpret the black box text/labels as the account number. Usually a long numerical sequence.
+- Account Name: Found below the signature area (bottom right). It could be multiple lines or a single line. Extract this exactly as written. This is NOT the payee name.
+- Payee Name: The name written after "Pay" or "To".
+- IFSC Code: Located at the top middle of the cheque, to the left of the date. Format is 4 alphabetic characters followed by 7 numeric digits (e.g., HDFC0001234). If not visible/unclear, return null.
+- If any field is not clearly visible or legible, return null for that field. Keep processing fast and concise.`,
             },
             {
               type: 'image',

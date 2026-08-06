@@ -75,6 +75,7 @@ export interface Account {
   updated_at: string;
   deleted_at?: string | null;
   bank?: Bank;
+  notes?: string | null;
 }
 
 export interface AccountWithRelations extends Account {

@@ -4,14 +4,15 @@ import { useCreateAccount } from '@/hooks/use-create-account'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, CreditCardIcon as CreditCard, UserIcon as User, HashtagIcon as Hash } from '@hugeicons/core-free-icons';
+import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, CreditCardIcon as CreditCard, UserIcon as User, HashtagIcon as Hash, Invoice01Icon as ReceiptText } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
+import { useEffect } from 'react'
 
 const BankSelector = dynamic(() => import('@/components/bank-selector').then(mod => mod.BankSelector), {
   loading: () => <Skeleton className="h-14 w-full rounded-2xl"/>,
@@ -22,6 +23,7 @@ export default function CreateAccountPage() {
   const t = useTranslations('Accounts')
   const tc = useTranslations('Common')
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { activeBusiness } = useBusiness()
   
   const {
@@ -34,6 +36,18 @@ export default function CreateAccountPage() {
   } = useCreateAccount(activeBusiness?.id)
 
   const { register, watch, setValue, formState: { errors } } = form
+
+  useEffect(() => {
+    const name = searchParams.get('name')
+    const number = searchParams.get('number')
+    const ifsc = searchParams.get('ifsc')
+    const auto = searchParams.get('auto')
+
+    if (name) setValue('account_name', name)
+    if (number) setValue('account_number', number)
+    if (ifsc) setValue('ifsc_code', ifsc)
+    if (auto === 'true') setValue('notes', 'Automatically Generated from Cheque Scan')
+  }, [searchParams, setValue])
 
   const colors = ['#007AFF', '#5856D6', '#AF52DE', '#FF2D55', '#FF3B30', '#FF9500', '#34C759']
 
@@ -48,6 +62,15 @@ export default function CreateAccountPage() {
           <h2 className="text-display-sm font-semibold">{t('addAccount')}</h2>
         </div>
       </div>
+
+      {searchParams.get('auto') === 'true' && (
+        <div className="bg-primary/5 border border-primary/10 rounded-sm p-4 animate-in fade-in slide-in-from-top-2 duration-500">
+          <p className="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+            <HugeiconsIcon icon={ReceiptText} className="h-4 w-4"/>
+            Automatically Generated from Cheque Scan
+          </p>
+        </div>
+      )}
 
       <div className="flex gap-2">
         {[1, 2, 3].map((s) => (
