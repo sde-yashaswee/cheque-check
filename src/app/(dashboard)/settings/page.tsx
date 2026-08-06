@@ -14,7 +14,7 @@ import { ChequeService } from "@/services/cheque.service"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { Combobox } from "@/components/ui/combobox"
-import { format, differenceInDays } from "date-fns"
+import { format } from "date-fns"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSettings } from "@/hooks/use-settings"
 import { EditableAvatar } from "@/components/ui/editable-avatar"
@@ -234,10 +234,6 @@ export default function SettingsPage() {
         <div className="flex-1">
           <p className="font-semibold text-lg leading-tight">{profile?.name || t('user')}</p>
           <p className="text-xs text-muted-foreground font-semibold">{profile?.email}</p>
-        </div>
-        <div className="text-right">
-          <p className="text-sm font-semibold text-primary">{t('days', { count: remainingDays })}</p>
-          <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{t('trial')}</p>
         </div>
       </div>
 

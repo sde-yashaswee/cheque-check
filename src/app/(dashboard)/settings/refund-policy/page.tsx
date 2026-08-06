@@ -34,13 +34,6 @@ export default function RefundPolicyPage() {
               {t("refundExceptionsContent")}
             </p>
           </section>
-
-          <section className="space-y-2">
-            <h2 className="text-lg font-bold">4. {t("trialPeriods")}</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              {t("refundTrialPeriodsContent")}
-            </p>
-          </section>
         </div>
       </div>
     </div>

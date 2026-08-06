@@ -129,7 +129,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
         {...handlers}
         style={{ x: offset }}
         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-        className="relative z-10 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-card p-5 shadow-sm active:scale-[0.99] transition-transform"
+        className="relative z-10 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-card p-5 shadow-sm active:scale-[0.99] transition-transform"
       >
         <Link href={`/cheques/${cheque.id}`} className="absolute inset-0 z-0" />
         <div className="flex justify-between items-start relative z-10 pointer-events-none">
