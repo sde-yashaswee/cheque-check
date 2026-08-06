@@ -125,7 +125,7 @@ export function TopNav() {
           )}
           <h1 className="text-lg font-semibold tracking-tight flex items-center gap-2 truncate">
             {isMainTab && pathname === '/' && (
-              <img src="/favicon-32x32.png" alt="ChequeCheck Logo" className="h-6 w-6 rounded-md shrink-0" />
+              <img src="/android-chrome-512x512.png" alt="ChequeCheck Logo" className="h-6 w-6 rounded-md shrink-0" />
             )}
             {TitleIcon && <HugeiconsIcon icon={TitleIcon} className="h-5 w-5 text-primary shrink-0"/>}
             <span className="truncate">{isMainTab && pathname === '/' ? 'ChequeCheck' : title}</span>
@@ -145,7 +145,7 @@ export function TopNav() {
               </Button>
 
               <Link href="/settings">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-all active:scale-95 overflow-hidden">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-all active:scale-95 overflow-hidden ring-2 ring-white shadow-sm">
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt={profile.name || 'User'} className="h-full w-full object-cover"/>
                   ) : (

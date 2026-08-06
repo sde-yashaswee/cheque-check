@@ -1,19 +1,19 @@
 'use client'
 
 import { HugeiconsIcon } from '@hugeicons/react';
-import { PlusSignIcon as Plus, ArrowRight01Icon as ChevronRight, Search01Icon as Search, TextSquareIcon as ArrowUpAz, SortingZA01Icon as ArrowDownAz, BankIcon as Landmark, FilterIcon as Filter } from '@hugeicons/core-free-icons';
+import { PlusSignIcon as Plus, ArrowRight01Icon as ChevronRight, Search01Icon as Search, BankIcon as Landmark, Sorting05Icon as Filter, Tick02Icon as Check } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import { useBusiness } from '@/hooks/use-business'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { useAccounts } from '@/hooks/use-accounts'
 import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
 import { useTranslations } from 'next-intl'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 export default function AccountsPage() {
   const t = useTranslations('Accounts')
@@ -31,6 +31,8 @@ export default function AccountsPage() {
     setSearch,
     sortOrder,
     setSortOrder,
+    sortBy,
+    setSortBy,
     bankFilter,
     setBankFilter,
   } = useAccounts(businessId)
@@ -39,6 +41,16 @@ export default function AccountsPage() {
     setSearch('')
     setBankFilter('All')
   }
+
+  const sortOptions = [
+    { label: t('sortByAccountName'), value: 'account_name' },
+    { label: t('sortByBankName'), value: 'bank_name' },
+  ]
+
+  const orderOptions = [
+    { label: tc('ascending'), value: 'asc' },
+    { label: tc('descending'), value: 'desc' },
+  ]
 
   return (
     <div className="max-w-2xl space-y-8 pb-24">
@@ -53,51 +65,99 @@ export default function AccountsPage() {
           />
         </div>
 
-        <Popover>
-          <PopoverTrigger 
-            nativeButton
-            render={
-              <Button variant={bankFilter !== 'All' ? 'default' : 'outline'} size="icon"className="rounded-full h-11 w-11 shrink-0">
-                <HugeiconsIcon icon={Filter} className="h-4 w-4"/>
-              </Button>
-            } 
-          />
-          <PopoverContent className="w-56 p-2 rounded-lg"align="end">
-            <div className="flex flex-col gap-1">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">{t('filterBank')}</p>
-              <button
-                onClick={() => setBankFilter('All')}
-                className={cn(
-                  "flex items-center justify-between rounded-sm px-3 py-2.5 text-sm font-semibold transition-all",
-                  bankFilter === 'All' ?"bg-primary text-white":"hover:bg-muted"
-                )}
-              >
-                {tc('allBanks')}
-              </button>
-              {uniqueBanks.map((bank) => (
-                <button
-                  key={bank.id}
-                  onClick={() => setBankFilter(bank.id)}
-                  className={cn(
-                    "flex items-center justify-between rounded-sm px-3 py-2.5 text-sm font-semibold transition-all",
-                    bankFilter === bank.id ?"bg-primary text-white":"hover:bg-muted"
-                  )}
-                >
-                  <span className="truncate">{bank.name}</span>
-                </button>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
+        <Sheet>
+          <SheetTrigger render={
+            <Button 
+              variant={bankFilter !== 'All' ? 'default' : 'outline'} 
+              size="icon"
+              className="rounded-full h-11 w-11 shrink-0 bg-white"
+            >
+              <HugeiconsIcon icon={Filter} className="h-5 w-5"/>
+            </Button>
+          } />
+          <SheetContent className="max-h-[80dvh] overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle>{tc('sortAndFilter')}</SheetTitle>
+            </SheetHeader>
+            
+            <div className="space-y-6 py-4">
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tc('sortBy')}</h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {sortOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setSortBy(option.value as any)}
+                      className={cn(
+                        "flex items-center justify-between px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
+                        sortBy === option.value 
+                          ? "bg-primary/5 border-primary text-primary" 
+                          : "bg-muted/30 border-transparent text-foreground"
+                      )}
+                    >
+                      <span className="font-bold text-sm">{option.label}</span>
+                      {sortBy === option.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-        <Button 
-          variant="outline"
-          size="icon"
-          className="rounded-full h-11 w-11 shrink-0"
-          onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-        >
-          {sortOrder === 'asc' ? <HugeiconsIcon icon={ArrowUpAz} className="h-5 w-5"/> : <HugeiconsIcon icon={ArrowDownAz} className="h-5 w-5"/>}
-        </Button>
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tc('order')}</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {orderOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setSortOrder(option.value as any)}
+                      className={cn(
+                        "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
+                        sortOrder === option.value 
+                          ? "bg-primary/5 border-primary text-primary" 
+                          : "bg-muted/30 border-transparent text-foreground"
+                      )}
+                    >
+                      <span className="font-bold text-sm">{option.label}</span>
+                      {sortOrder === option.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t('filterBank')}</h3>
+                <div className="grid grid-cols-1 gap-2">
+                  <button
+                    onClick={() => setBankFilter('All')}
+                    className={cn(
+                      "flex items-center justify-between px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
+                      bankFilter === 'All' 
+                        ? "bg-primary/5 border-primary text-primary" 
+                        : "bg-muted/30 border-transparent text-foreground"
+                    )}
+                  >
+                    <span className="font-bold text-sm">{tc('allBanks')}</span>
+                    {bankFilter === 'All' && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
+                  </button>
+                  {uniqueBanks.map((bank) => (
+                    <button
+                      key={bank.id}
+                      onClick={() => setBankFilter(bank.id)}
+                      className={cn(
+                        "flex items-center justify-between px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
+                        bankFilter === bank.id 
+                          ? "bg-primary/5 border-primary text-primary" 
+                          : "bg-muted/30 border-transparent text-foreground"
+                      )}
+                    >
+                      <span className="font-bold text-sm truncate">{bank.name}</span>
+                      {bankFilter === bank.id && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       <div className="grid gap-4">

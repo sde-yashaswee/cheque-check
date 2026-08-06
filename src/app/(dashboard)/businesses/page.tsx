@@ -2,7 +2,7 @@
 
 import { useBusinesses } from "@/hooks/use-businesses-page"
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Building03Icon as Building2, PlusSignIcon as Plus, ArrowRight01Icon as ArrowRight, File02Icon as FileText, Delete02Icon as Trash2, Search01Icon as Search, TextSquareIcon as ArrowUpAz, SortingZA01Icon as ArrowDownAz } from '@hugeicons/core-free-icons';
+import { Building03Icon as Building2, PlusSignIcon as Plus, ArrowRight01Icon as ArrowRight, File02Icon as FileText, Delete02Icon as Trash2, Search01Icon as Search, Sorting05Icon as Filter, Tick02Icon as Check } from '@hugeicons/core-free-icons';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic'
 import { DataState } from "@/components/ui/data-state"
 import { EmptyState } from "@/components/ui/empty-state"
 import { useTranslations } from 'next-intl'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const DeleteConfirmationDialog = dynamic(() => import("@/components/ui/delete-dialog").then(mod => mod.DeleteConfirmationDialog), {
   loading: () => <Skeleton className="h-8 w-8 rounded-full"/>,
@@ -36,6 +37,8 @@ export default function BusinessesPage() {
     setSearch,
     sortOrder,
     setSortOrder,
+    sortBy,
+    setSortBy,
     getUpcomingTotal,
     deleteBusiness,
   } = useBusinesses()
@@ -43,6 +46,16 @@ export default function BusinessesPage() {
   const clearFilters = () => {
     setSearch('')
   }
+
+  const sortOptions = [
+    { label: t('sortByName'), value: 'name' },
+    { label: t('sortByUpcoming'), value: 'upcoming' },
+  ]
+
+  const orderOptions = [
+    { label: tc('ascending'), value: 'asc' },
+    { label: tc('descending'), value: 'desc' },
+  ]
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">
@@ -56,14 +69,67 @@ export default function BusinessesPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Button 
-          variant="outline"
-          size="icon"
-          className="rounded-full h-11 w-11 shrink-0 bg-white"
-          onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-        >
-          {sortOrder === 'asc' ? <HugeiconsIcon icon={ArrowUpAz} className="h-5 w-5"/> : <HugeiconsIcon icon={ArrowDownAz} className="h-5 w-5"/>}
-        </Button>
+        
+        <Sheet>
+          <SheetTrigger render={
+            <Button 
+              variant="outline"
+              size="icon"
+              className="rounded-full h-11 w-11 shrink-0 bg-white"
+            >
+              <HugeiconsIcon icon={Filter} className="h-5 w-5"/>
+            </Button>
+          } />
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>{tc('sortAndFilter')}</SheetTitle>
+            </SheetHeader>
+            
+            <div className="space-y-6 py-4">
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tc('sortBy')}</h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {sortOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setSortBy(option.value as any)}
+                      className={cn(
+                        "flex items-center justify-between px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
+                        sortBy === option.value 
+                          ? "bg-primary/5 border-primary text-primary" 
+                          : "bg-muted/30 border-transparent text-foreground"
+                      )}
+                    >
+                      <span className="font-bold text-sm">{option.label}</span>
+                      {sortBy === option.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tc('order')}</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {orderOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setSortOrder(option.value as any)}
+                      className={cn(
+                        "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
+                        sortOrder === option.value 
+                          ? "bg-primary/5 border-primary text-primary" 
+                          : "bg-muted/30 border-transparent text-foreground"
+                      )}
+                    >
+                      <span className="font-bold text-sm">{option.label}</span>
+                      {sortOrder === option.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       <div className="space-y-4">

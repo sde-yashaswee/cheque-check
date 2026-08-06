@@ -50,7 +50,12 @@
     "orContinueWith": "Ya phir isse continue karein",
     "noPhone": "Phone number nahi hai",
     "noEmail": "Email nahi hai",
-    "cheques": "Cheques"
+    "cheques": "Cheques",
+    "sortAndFilter": "Sort & Filter",
+    "sortBy": "Sort Karein",
+    "order": "Order",
+    "ascending": "Ascending (A-Z)",
+    "descending": "Descending (Z-A)"
   },
   "Navigation": {
     "dashboard": "Dashboard",
@@ -193,7 +198,9 @@
     "sortNewest": "Sabse Naye Pehle",
     "sortOldest": "Sabse Purane Pehle",
     "sortAmountHigh": "Rakam (Zyada se Kam)",
-    "sortAmountLow": "Rakam (Kam se Zyada)"
+    "sortAmountLow": "Rakam (Kam se Zyada)",
+    "sortDate": "Date",
+    "sortAmount": "Rakam (Amount)"
   },
   "Parties": {
     "title": "Parties",
@@ -224,7 +231,9 @@
     "deleteConfirmDesc": "Isse yeh party aur isse jude saare records hamesha ke liye delete ho jayenge.",
     "anyAdditionalNotes": "Koi aur notes",
     "reviewInformation": "Information Review karein",
-    "createParty": "Party Create karein"
+    "createParty": "Party Create karein",
+    "sortByName": "Naam",
+    "sortByBalance": "Baki Rakam"
   },
   "Accounts": {
     "title": "Accounts",
@@ -250,7 +259,9 @@
     "deleteConfirmTitle": "Account Delete karein?",
     "deleteConfirmDesc": "Isse yeh account aur isse jude saare records hamesha ke liye delete ho jayenge.",
     "addingAccount": "Account add ho raha hai...",
-    "selectBank": "Bank select karein"
+    "selectBank": "Bank select karein",
+    "sortByAccountName": "Account ka Naam",
+    "sortByBankName": "Bank ka Naam"
   },
   "Businesses": {
     "title": "Businesses",
@@ -282,7 +293,9 @@
     "activeNow": "Abhi Active hai",
     "businessEmail": "Business Email",
     "businessPhone": "Business Phone",
-    "businessAddress": "Business Address"
+    "businessAddress": "Business Address",
+    "sortByName": "Naam",
+    "sortByUpcoming": "Upcoming Total"
   },
   "Settings": {
     "general": "General Settings",

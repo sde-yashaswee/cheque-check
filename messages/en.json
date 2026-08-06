@@ -50,7 +50,12 @@
     "orContinueWith": "Or continue with",
     "noPhone": "No phone",
     "noEmail": "No email",
-    "cheques": "Cheques"
+    "cheques": "Cheques",
+    "sortAndFilter": "Sort & Filter",
+    "sortBy": "Sort By",
+    "order": "Order",
+    "ascending": "Ascending",
+    "descending": "Descending"
   },
   "Navigation": {
     "dashboard": "Dashboard",
@@ -193,7 +198,9 @@
     "sortNewest": "Newest First",
     "sortOldest": "Oldest First",
     "sortAmountHigh": "Amount (High to Low)",
-    "sortAmountLow": "Amount (Low to High)"
+    "sortAmountLow": "Amount (Low to High)",
+    "sortDate": "Date",
+    "sortAmount": "Amount"
   },
   "Parties": {
     "title": "Parties",
@@ -224,7 +231,9 @@
     "deleteConfirmDesc": "This will permanently delete this party and all associated records.",
     "anyAdditionalNotes": "Any additional notes",
     "reviewInformation": "Review Information",
-    "createParty": "Create Party"
+    "createParty": "Create Party",
+    "sortByName": "Name",
+    "sortByBalance": "Balance"
   },
   "Accounts": {
     "title": "Accounts",
@@ -250,7 +259,9 @@
     "deleteConfirmTitle": "Delete Account?",
     "deleteConfirmDesc": "This will permanently delete this account and all associated history.",
     "addingAccount": "Adding Account...",
-    "selectBank": "Select Bank"
+    "selectBank": "Select Bank",
+    "sortByAccountName": "Account Name",
+    "sortByBankName": "Bank Name"
   },
   "Businesses": {
     "title": "Businesses",
@@ -282,7 +293,9 @@
     "activeNow": "Active Now",
     "businessEmail": "Business Email",
     "businessPhone": "Business Phone",
-    "businessAddress": "Business Address"
+    "businessAddress": "Business Address",
+    "sortByName": "Name",
+    "sortByUpcoming": "Upcoming Total"
   },
   "Settings": {
     "general": "General",

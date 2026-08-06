@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react'
 export function useAccounts(businessId: string | undefined) {
   const [search, setSearch] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [sortBy, setSortBy] = useState<'account_name' | 'bank_name'>('account_name')
   const [bankFilter, setBankFilter] = useState<string | 'All'>('All')
 
   const { data: accounts, isLoading, error } = useQuery({
@@ -16,19 +17,29 @@ export function useAccounts(businessId: string | undefined) {
   const filteredAccounts = useMemo(() => {
     if (!accounts) return []
 
-    return accounts.filter(a => {
+    const result = accounts.filter(a => {
       const matchesSearch = a.account_name.toLowerCase().includes(search.toLowerCase()) ||
                            a.bank?.name?.toLowerCase().includes(search.toLowerCase()) ||
                            a.account_number.includes(search)
       const matchesBank = bankFilter === 'All' || a.bank_id === bankFilter
       return matchesSearch && matchesBank
-    }).sort((a, b) => {
-      const nameA = a.account_name.toLowerCase()
-      const nameB = b.account_name.toLowerCase()
-      if (sortOrder === 'asc') return nameA.localeCompare(nameB)
-      return nameB.localeCompare(nameA)
     })
-  }, [accounts, search, sortOrder, bankFilter])
+
+    result.sort((a, b) => {
+      if (sortBy === 'account_name') {
+        const nameA = a.account_name.toLowerCase()
+        const nameB = b.account_name.toLowerCase()
+        return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
+      } else if (sortBy === 'bank_name') {
+        const nameA = (a.bank?.name || '').toLowerCase()
+        const nameB = (b.bank?.name || '').toLowerCase()
+        return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
+      }
+      return 0
+    })
+
+    return result
+  }, [accounts, search, sortOrder, sortBy, bankFilter])
 
   const uniqueBanks = useMemo(() => {
     if (!accounts) return []
@@ -51,6 +62,8 @@ export function useAccounts(businessId: string | undefined) {
     setSearch,
     sortOrder,
     setSortOrder,
+    sortBy,
+    setSortBy,
     bankFilter,
     setBankFilter,
   }

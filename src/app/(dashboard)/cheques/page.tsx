@@ -3,18 +3,17 @@
 import { useCheques } from '@/hooks/use-cheques'
 import { ChequeCard } from '@/components/cheque-card'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { PlusSignIcon as Plus, Search01Icon as Search, FilterIcon as Filter, Invoice01Icon as ReceiptText, SortingZA01Icon as Sort } from '@hugeicons/core-free-icons';
+import { PlusSignIcon as Plus, Search01Icon as Search, Sorting05Icon as Filter, Invoice01Icon as ReceiptText, Tick02Icon as Check } from '@hugeicons/core-free-icons';
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useBusiness } from '@/hooks/use-business'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
-import { StatusPill } from '@/components/ui/status-pill'
 import { cn } from '@/lib/utils'
 import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
 import { useTranslations } from 'next-intl'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 import { ChequeWithRelations } from '@/types'
 
@@ -50,11 +49,14 @@ export default function ChequesPage() {
   const statusOptions = ['All', 'Issued', 'Received', 'Cleared', 'Bounced'] as const
 
   const sortOptions = [
-    { label: t('sortNewest', { fallback: 'Newest First' }), by: 'date', order: 'desc' },
-    { label: t('sortOldest', { fallback: 'Oldest First' }), by: 'date', order: 'asc' },
-    { label: t('sortAmountHigh', { fallback: 'Amount (High to Low)' }), by: 'amount', order: 'desc' },
-    { label: t('sortAmountLow', { fallback: 'Amount (Low to High)' }), by: 'amount', order: 'asc' },
-  ] as const
+    { label: t('sortDate'), value: 'date' },
+    { label: t('sortAmount'), value: 'amount' },
+  ]
+
+  const orderOptions = [
+    { label: tCommon('ascending'), value: 'asc' },
+    { label: tCommon('descending'), value: 'desc' },
+  ]
 
   return (
     <div className="max-w-2xl space-y-8 pb-24">
@@ -68,73 +70,88 @@ export default function ChequesPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Popover>
-          <PopoverTrigger 
-            nativeButton
-            render={
-              <Button variant={filter !== 'All' ? 'default' : 'outline'} size="icon"className="rounded-full h-11 w-11 shrink-0">
-                <HugeiconsIcon icon={Filter} className="h-4 w-4"/>
-              </Button>
-            } 
-          />
-          <PopoverContent className="w-56 p-2 rounded-lg"align="end">
-            <div className="flex flex-col gap-1">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">{t('filterStatus')}</p>
-              {statusOptions.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setFilter(s)}
-                  className={cn(
-                    "flex items-center justify-between rounded-sm px-3 py-2.5 text-sm font-semibold transition-all active:scale-95",
-                    filter === s ? "bg-primary text-white": "text-muted-foreground hover:bg-muted"
-                  )}
-                >
-                  {tCommon(s.toLowerCase() as any)}
-                  {filter === s ? (
-                    <div className="h-2 w-2 rounded-full bg-white"/>
-                  ) : (
-                    <StatusPill status={s as any} className="scale-75 origin-right opacity-50"/>
-                  )}
-                </button>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
+        
+        <Sheet>
+          <SheetTrigger render={
+            <Button 
+              variant={(filter !== 'All' || sortBy !== 'date' || sortOrder !== 'desc') ? 'default' : 'outline'} 
+              size="icon"
+              className="rounded-full h-11 w-11 shrink-0 bg-white"
+            >
+              <HugeiconsIcon icon={Filter} className="h-5 w-5"/>
+            </Button>
+          } />
+          <SheetContent className="max-h-[85dvh] overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle>{tCommon('sortAndFilter')}</SheetTitle>
+            </SheetHeader>
+            
+            <div className="space-y-6 py-4">
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tCommon('sortBy')}</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {sortOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setSortBy(option.value as any)}
+                      className={cn(
+                        "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
+                        sortBy === option.value 
+                          ? "bg-primary/5 border-primary text-primary" 
+                          : "bg-muted/30 border-transparent text-foreground"
+                      )}
+                    >
+                      <span className="font-bold text-sm">{option.label}</span>
+                      {sortBy === option.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-        <Popover>
-          <PopoverTrigger 
-            nativeButton
-            render={
-              <Button variant={(sortBy !== 'date' || sortOrder !== 'desc') ? 'default' : 'outline'} size="icon"className="rounded-full h-11 w-11 shrink-0">
-                <HugeiconsIcon icon={Sort} className="h-4 w-4"/>
-              </Button>
-            } 
-          />
-          <PopoverContent className="w-56 p-2 rounded-lg"align="end">
-            <div className="flex flex-col gap-1">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">{t('sortBy', { fallback: 'Sort By' })}</p>
-              {sortOptions.map((opt, i) => {
-                const isActive = sortBy === opt.by && sortOrder === opt.order;
-                return (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      setSortBy(opt.by)
-                      setSortOrder(opt.order as 'asc' | 'desc')
-                    }}
-                    className={cn(
-                      "flex items-center justify-between rounded-sm px-3 py-2.5 text-sm font-semibold transition-all active:scale-95",
-                      isActive ? "bg-primary text-white": "text-muted-foreground hover:bg-muted"
-                    )}
-                  >
-                    {opt.label}
-                    {isActive && <div className="h-2 w-2 rounded-full bg-white"/>}
-                  </button>
-                )
-              })}
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tCommon('order')}</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {orderOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setSortOrder(option.value as any)}
+                      className={cn(
+                        "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
+                        sortOrder === option.value 
+                          ? "bg-primary/5 border-primary text-primary" 
+                          : "bg-muted/30 border-transparent text-foreground"
+                      )}
+                    >
+                      <span className="font-bold text-sm">{option.label}</span>
+                      {sortOrder === option.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t('filterStatus')}</h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {statusOptions.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setFilter(s)}
+                      className={cn(
+                        "flex items-center justify-between px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
+                        filter === s 
+                          ? "bg-primary/5 border-primary text-primary" 
+                          : "bg-muted/30 border-transparent text-foreground"
+                      )}
+                    >
+                      <span className="font-bold text-sm">{tCommon(s.toLowerCase() as any)}</span>
+                      {filter === s && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          </PopoverContent>
-        </Popover>
+          </SheetContent>
+        </Sheet>
       </div>
 
       <div className="space-y-4">

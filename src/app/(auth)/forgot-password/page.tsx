@@ -38,7 +38,7 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-sm space-y-8">
         <div className="flex flex-col items-center text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white shadow-sm overflow-hidden border border-primary/10">
-            <img src="/android-chrome-192x192.png" alt="ChequeCheck Logo" className="h-full w-full object-contain p-2" />
+            <img src="/android-chrome-512x512.png" alt="ChequeCheck Logo" className="h-full w-full object-contain p-2" />
           </div>
           <h1 className="mt-6 text-display-md font-semibold tracking-tight">Reset Password</h1>
           <p className="text-body text-muted-foreground">

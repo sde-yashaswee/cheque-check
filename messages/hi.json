@@ -23,6 +23,27 @@
     "sortAmountHigh": "राशि (अधिक से कम)",
     "chequeCreated": "चेक सफलतापूर्वक रिकॉर्ड किया गया",
     "duplicateChequeError": "इस खाते के लिए इस नंबर का चेक पहले से मौजूद है",
-    "sortAmountLow": "राशि (कम से अधिक)"
+    "sortAmountLow": "राशि (कम से अधिक)",
+    "sortDate": "तारीख",
+    "sortAmount": "राशि"
+  },
+  "Common": {
+    "sortAndFilter": "क्रमबद्ध और फ़िल्टर करें",
+    "sortBy": "क्रमबद्ध करें",
+    "order": "क्रम",
+    "ascending": "आरोही (A-Z, 1-9)",
+    "descending": "अवरोही (Z-A, 9-1)"
+  },
+  "Parties": {
+    "sortByName": "नाम",
+    "sortByBalance": "बकाया राशि"
+  },
+  "Businesses": {
+    "sortByName": "नाम",
+    "sortByUpcoming": "आगामी कुल"
+  },
+  "Accounts": {
+    "sortByAccountName": "खाता नाम",
+    "sortByBankName": "बैंक का नाम"
   }
 }

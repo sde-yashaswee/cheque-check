@@ -81,8 +81,8 @@ export function useCheques(businessId: string | undefined) {
 
     result.sort((a, b) => {
       if (sortBy === 'date') {
-        const dateA = new Date(a.created_at).getTime()
-        const dateB = new Date(b.created_at).getTime()
+        const dateA = new Date(a.cheque_date).getTime()
+        const dateB = new Date(b.cheque_date).getTime()
         return sortOrder === 'desc' ? dateB - dateA : dateA - dateB
       } else if (sortBy === 'amount') {
         return sortOrder === 'desc' ? b.amount - a.amount : a.amount - b.amount
