@@ -116,6 +116,7 @@
   "Dashboard": {
     "totalOutstanding": "Total Outstanding",
     "quickActions": "Quick Actions",
+    "scanCheque": "Cheque Scan karein",
     "issueCheque": "Cheque Issue karein",
     "receiveCheque": "Cheque Receive karein",
     "todaysCheques": "Aaj ke Cheques",

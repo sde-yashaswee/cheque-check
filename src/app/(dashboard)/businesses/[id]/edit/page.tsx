@@ -14,7 +14,7 @@ import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { useTranslations } from 'next-intl'
 
 const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-dialog').then(mod => mod.DeleteConfirmationDialog), {
-  loading: () => <Skeleton className="h-14 w-full rounded-full" />,
+  loading: () => <Skeleton className="h-14 w-full rounded-full"/>,
   ssr: false
 })
 
@@ -39,9 +39,9 @@ export default function EditBusinessPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-2xl space-y-8 pb-20">
-        <Skeleton className="h-14 w-full rounded-lg" />
-        <Skeleton className="h-14 w-full rounded-lg" />
-        <Skeleton className="h-14 w-full rounded-lg" />
+        <Skeleton className="h-14 w-full rounded-lg"/>
+        <Skeleton className="h-14 w-full rounded-lg"/>
+        <Skeleton className="h-14 w-full rounded-lg"/>
       </div>
     )
   }
@@ -62,13 +62,13 @@ export default function EditBusinessPage() {
       <form onSubmit={onSubmit} className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('businessName')}</Label>
+            <Label htmlFor="name"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('businessName')}</Label>
             <div className="relative">
-              <HugeiconsIcon icon={Store} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+              <HugeiconsIcon icon={Store} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
               <Input 
-                id="name" 
+                id="name"
                 {...register('name')} 
-                placeholder="Enter business name" 
+                placeholder="Enter business name"
                 className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-semibold rounded-sm"
               />
             </div>
@@ -76,31 +76,31 @@ export default function EditBusinessPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('phoneNumber')}</Label>
+            <Label htmlFor="phone"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('phoneNumber')}</Label>
             <div className="relative">
-              <HugeiconsIcon icon={Phone} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+              <HugeiconsIcon icon={Phone} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
               <Input 
-                id="phone" 
+                id="phone"
                 {...register('phone')} 
-                placeholder="Business phone" 
+                placeholder="Business phone"
                 className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tc('email')}</Label>
+            <Label htmlFor="email"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tc('email')}</Label>
             <div className="relative">
-              <HugeiconsIcon icon={Mail} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
-              <Input id="email" {...register('email')} placeholder="business@email.com" className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm" />
+              <HugeiconsIcon icon={Mail} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
+              <Input id="email"{...register('email')} placeholder="business@email.com"className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"/>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tc('address')}</Label>
+            <Label htmlFor="address"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tc('address')}</Label>
             <div className="relative">
-              <HugeiconsIcon icon={MapPin} className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50" />
-              <Input id="address" {...register('address')} placeholder="Business location" className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm" />
+              <HugeiconsIcon icon={MapPin} className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50"/>
+              <Input id="address"{...register('address')} placeholder="Business location"className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"/>
             </div>
           </div>
 
@@ -113,8 +113,8 @@ export default function EditBusinessPage() {
                   type="button"
                   onClick={() => setValue('color', c)}
                   className={cn(
-                    "h-10 w-10 rounded-full transition-all active:scale-[0.9] ring-offset-2",
-                    watch('color') === c ? "ring-2 ring-primary scale-110" : "hover:scale-105"
+                    "h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2",
+                    watch('color') === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
                   )}
                   style={{ backgroundColor: c }}
                 />
@@ -124,8 +124,8 @@ export default function EditBusinessPage() {
         </div>
 
         <div className="pt-4 flex flex-col gap-3">
-          <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-            {isSaving ? tc('saving') : t('updateBusiness')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
+          <Button type="submit"className="w-full rounded-full h-14 text-lg"disabled={isSaving}>
+            {isSaving ? tc('saving') : t('updateBusiness')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5"/>
           </Button>
 
           <DeleteConfirmationDialog 
@@ -134,8 +134,8 @@ export default function EditBusinessPage() {
             confirmName={business?.name || ''}
             onDelete={async () => { onDelete() }}
             trigger={
-              <Button type="button" variant="ghost" className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">
-                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" /> {t('deleteBusiness')}
+              <Button type="button"variant="ghost"className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">
+                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5"/> {t('deleteBusiness')}
               </Button>
             }
           />

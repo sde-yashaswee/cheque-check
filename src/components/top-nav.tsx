@@ -93,7 +93,7 @@ export function TopNav() {
   return (
     <div className="sticky top-0 z-40 w-full flex flex-col">
       <header className="relative flex h-[52px] items-center justify-between bg-canvas-parchment/80 px-4 backdrop-blur-md dark:bg-black/80 border-b border-primary/5">
-        <div id="progress-bar-container" className="absolute bottom-0 left-0 right-0 h-[1.6px] z-50 pointer-events-none" />
+        <div id="progress-bar-container"className="absolute bottom-0 left-0 right-0 h-[1.6px] z-50 pointer-events-none"/>
         <div className="flex items-center gap-2">
           {!isMainTab && (
             <Button
@@ -102,7 +102,7 @@ export function TopNav() {
               onClick={() => router.back()}
               className="rounded-full -ml-2 h-9 w-9"
             >
-              <HugeiconsIcon icon={ChevronLeft} className="h-5 w-5" />
+              <HugeiconsIcon icon={ChevronLeft} className="h-5 w-5"/>
             </Button>
           )}
           <h1 className="text-lg font-semibold tracking-tight">
@@ -114,20 +114,20 @@ export function TopNav() {
           {!hideSettingsIcon && (
             <>
               <Button 
-                variant="ghost" 
-                size="icon" 
+                variant="ghost"
+                size="icon"
                 onClick={() => setSearchOpen(true)} 
                 className="rounded-full h-9 w-9"
               >
-                <HugeiconsIcon icon={Search} className="h-5 w-5 text-muted-foreground" />
+                <HugeiconsIcon icon={Search} className="h-5 w-5 text-muted-foreground"/>
               </Button>
 
               <Link href="/settings">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-all active:scale-95 overflow-hidden">
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt={profile.name || 'User'} className="h-full w-full object-cover" />
+                    <img src={profile.avatar_url} alt={profile.name || 'User'} className="h-full w-full object-cover"/>
                   ) : (
-                    <HugeiconsIcon icon={User} className="h-4 w-4" />
+                    <HugeiconsIcon icon={User} className="h-4 w-4"/>
                   )}
                 </div>
               </Link>
@@ -144,14 +144,14 @@ export function TopNav() {
               <div className="flex items-center gap-1.5 overflow-hidden">
                 <div className="h-4 w-4 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center shrink-0">
                   {activeBusiness.logo_url ? (
-                    <img src={activeBusiness.logo_url} alt={activeBusiness.name} className="h-full w-full object-cover" />
+                    <img src={activeBusiness.logo_url} alt={activeBusiness.name} className="h-full w-full object-cover"/>
                   ) : (
                     <span className="text-[8px] font-bold">{activeBusiness.name?.charAt(0)}</span>
                   )}
                 </div>
                 <span className="truncate">{activeBusiness.name}</span>
               </div>
-              <HugeiconsIcon icon={ChevronDown} className="ml-1.5 h-3 w-3 opacity-60 shrink-0" />
+              <HugeiconsIcon icon={ChevronDown} className="ml-1.5 h-3 w-3 opacity-60 shrink-0"/>
             </button>
           }
         />

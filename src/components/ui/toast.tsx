@@ -15,7 +15,7 @@ function ToastProvider({ ...props }: ToastPrimitive.Provider.Props) {
 }
 
 function ToastPortal({ ...props }: ToastPrimitive.Portal.Props) {
-  return <ToastPrimitive.Portal data-slot="toast-portal" {...props} />
+  return <ToastPrimitive.Portal data-slot="toast-portal"{...props} />
 }
 
 function ToastViewport({ className, ...props }: ToastPrimitive.Viewport.Props) {
@@ -36,7 +36,7 @@ function Toast({ className, ...props }: ToastPrimitive.Root.Props) {
     <ToastPrimitive.Root
       data-slot="toast"
       className={cn(
-        "group/toast pointer-events-auto absolute right-0 bottom-0 z-[calc(1000-var(--toast-index))] w-full origin-bottom rounded-2xl border bg-popover text-popover-foreground shadow-lg will-change-transform outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        "group/toast pointer-events-auto absolute right-0 bottom-0 z-[calc(1000-var(--toast-index))] w-full origin-bottom rounded-2xl border bg-popover text-popover-foreground will-change-transform outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
         "[--gap:0.75rem] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--toast-offset-y)*-1+calc(var(--toast-index)*var(--gap)*-1)+var(--toast-swipe-movement-y))] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--shrink:calc(1-var(--scale))]",
         "h-(--height) [transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--peek))-(var(--shrink)*var(--height))))_scale(var(--scale))] [transition:transform_500ms_cubic-bezier(0.22,1,0.36,1),opacity_500ms,height_150ms]",
         "after:absolute after:top-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-['']",
@@ -96,11 +96,11 @@ function ToastDescription({
 
 function ToastAction({
   className,
-  render = <Button variant="outline" size="sm" />,
+  render = <Button variant="outline"size="sm"/>,
   nativeButton,
   ...props
 }: ToastPrimitive.Action.Props) {
-  const isNativeButton = nativeButton ?? (React.isValidElement(render) && (render.type === "button" || render.type === Button))
+  const isNativeButton = nativeButton ?? (React.isValidElement(render) && (render.type ==="button"|| render.type === Button))
   return (
     <ToastPrimitive.Action
       data-slot="toast-action"
@@ -115,11 +115,11 @@ function ToastAction({
 function ToastClose({
   className,
   children,
-  render = <Button variant="ghost" size="icon-sm" />,
+  render = <Button variant="ghost"size="icon-sm"/>,
   nativeButton,
   ...props
 }: ToastPrimitive.Close.Props) {
-  const isNativeButton = nativeButton ?? (React.isValidElement(render) && (render.type === "button" || render.type === Button))
+  const isNativeButton = nativeButton ?? (React.isValidElement(render) && (render.type ==="button"|| render.type === Button))
   return (
     <ToastPrimitive.Close
       data-slot="toast-close"
@@ -133,7 +133,7 @@ function ToastClose({
       {...props}
     >
       {children ?? (
-        <HugeiconsIcon icon={XIcon} aria-hidden="true" />
+        <HugeiconsIcon icon={XIcon} aria-hidden="true"/>
       )}
     </ToastPrimitive.Close>
   )
@@ -142,33 +142,33 @@ function ToastClose({
 function ToastIcon({ type }: { type: string | undefined }) {
   let icon: React.ReactNode = null
 
-  if (type === "success") {
+  if (type ==="success") {
     icon = (
-      <HugeiconsIcon icon={CircleCheckIcon} aria-hidden="true" />
+      <HugeiconsIcon icon={CircleCheckIcon} aria-hidden="true"/>
     )
   }
 
-  if (type === "info") {
+  if (type ==="info") {
     icon = (
-      <HugeiconsIcon icon={InfoIcon} aria-hidden="true" />
+      <HugeiconsIcon icon={InfoIcon} aria-hidden="true"/>
     )
   }
 
-  if (type === "warning") {
+  if (type ==="warning") {
     icon = (
-      <HugeiconsIcon icon={TriangleAlertIcon} aria-hidden="true" />
+      <HugeiconsIcon icon={TriangleAlertIcon} aria-hidden="true"/>
     )
   }
 
-  if (type === "error") {
+  if (type ==="error") {
     icon = (
-      <HugeiconsIcon icon={OctagonXIcon} className="text-destructive" aria-hidden="true" />
+      <HugeiconsIcon icon={OctagonXIcon} className="text-destructive"aria-hidden="true"/>
     )
   }
 
-  if (type === "loading") {
+  if (type ==="loading") {
     icon = (
-      <HugeiconsIcon icon={Loader2Icon} className="animate-spin" aria-hidden="true" />
+      <HugeiconsIcon icon={Loader2Icon} className="animate-spin"aria-hidden="true"/>
     )
   }
 

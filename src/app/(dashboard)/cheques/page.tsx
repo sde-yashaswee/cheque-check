@@ -58,9 +58,9 @@ export default function ChequesPage() {
     <div className="mx-auto max-w-2xl space-y-8 pb-24">
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
           <Input 
-            className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
+            className="rounded-full pl-10 h-11 bg-canvas-parchment border-none"
             placeholder={t('searchPlaceholder')} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -70,12 +70,12 @@ export default function ChequesPage() {
           <PopoverTrigger 
             nativeButton
             render={
-              <Button variant={filter !== 'All' ? 'default' : 'outline'} size="icon" className="rounded-full h-11 w-11 shrink-0">
-                <HugeiconsIcon icon={Filter} className="h-4 w-4" />
+              <Button variant={filter !== 'All' ? 'default' : 'outline'} size="icon"className="rounded-full h-11 w-11 shrink-0">
+                <HugeiconsIcon icon={Filter} className="h-4 w-4"/>
               </Button>
             } 
           />
-          <PopoverContent className="w-56 p-2 rounded-lg" align="end">
+          <PopoverContent className="w-56 p-2 rounded-lg"align="end">
             <div className="flex flex-col gap-1">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">{t('filterStatus')}</p>
               {statusOptions.map((s) => (
@@ -84,14 +84,14 @@ export default function ChequesPage() {
                   onClick={() => setFilter(s)}
                   className={cn(
                     "flex items-center justify-between rounded-sm px-3 py-2.5 text-sm font-semibold transition-all active:scale-95",
-                    filter === s ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted"
+                    filter === s ? "bg-primary text-white": "text-muted-foreground hover:bg-muted"
                   )}
                 >
                   {tCommon(s.toLowerCase() as any)}
                   {filter === s ? (
-                    <div className="h-2 w-2 rounded-full bg-white" />
+                    <div className="h-2 w-2 rounded-full bg-white"/>
                   ) : (
-                    <StatusPill status={s as any} className="scale-75 origin-right opacity-50" />
+                    <StatusPill status={s as any} className="scale-75 origin-right opacity-50"/>
                   )}
                 </button>
               ))}
@@ -103,12 +103,12 @@ export default function ChequesPage() {
           <PopoverTrigger 
             nativeButton
             render={
-              <Button variant={(sortBy !== 'date' || sortOrder !== 'desc') ? 'default' : 'outline'} size="icon" className="rounded-full h-11 w-11 shrink-0">
-                <HugeiconsIcon icon={Sort} className="h-4 w-4" />
+              <Button variant={(sortBy !== 'date' || sortOrder !== 'desc') ? 'default' : 'outline'} size="icon"className="rounded-full h-11 w-11 shrink-0">
+                <HugeiconsIcon icon={Sort} className="h-4 w-4"/>
               </Button>
             } 
           />
-          <PopoverContent className="w-56 p-2 rounded-lg" align="end">
+          <PopoverContent className="w-56 p-2 rounded-lg"align="end">
             <div className="flex flex-col gap-1">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">{t('sortBy', { fallback: 'Sort By' })}</p>
               {sortOptions.map((opt, i) => {
@@ -122,11 +122,11 @@ export default function ChequesPage() {
                     }}
                     className={cn(
                       "flex items-center justify-between rounded-sm px-3 py-2.5 text-sm font-semibold transition-all active:scale-95",
-                      isActive ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted"
+                      isActive ? "bg-primary text-white": "text-muted-foreground hover:bg-muted"
                     )}
                   >
                     {opt.label}
-                    {isActive && <div className="h-2 w-2 rounded-full bg-white" />}
+                    {isActive && <div className="h-2 w-2 rounded-full bg-white"/>}
                   </button>
                 )
               })}
@@ -145,7 +145,7 @@ export default function ChequesPage() {
           loadingComponent={
             <div className="space-y-4">
               {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                <Skeleton key={i} className="h-32 w-full rounded-lg"/>
               ))}
             </div>
           }
@@ -172,8 +172,8 @@ export default function ChequesPage() {
       </div>
 
       <Link href="/cheques/create">
-        <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900" size="icon">
-          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
+        <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900"size="icon">
+          <HugeiconsIcon icon={Plus} className="h-8 w-8"/>
         </Button>
       </Link>
     </div>

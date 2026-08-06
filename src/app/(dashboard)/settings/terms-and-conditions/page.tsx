@@ -10,8 +10,8 @@ export default function TermsAndConditionsPage() {
       <div className="prose prose-sm dark:prose-invert max-w-none px-2">
         <div className="rounded-lg border bg-card p-6 space-y-4">
           <div className="flex items-center gap-3 text-primary mb-4">
-            <HugeiconsIcon icon={Terms} className="h-6 w-6" />
-            <span className="font-semibold uppercase tracking-wider text-xs">{t("lastUpdated", { date: "August 2026" })}</span>
+            <HugeiconsIcon icon={Terms} className="h-6 w-6"/>
+            <span className="font-semibold uppercase tracking-wider text-xs">{t("lastUpdated", { date: "August 2026"})}</span>
           </div>
           
           <section className="space-y-2">

@@ -50,7 +50,7 @@ export function Combobox({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
-        className={cn(buttonVariants({ variant: "outline" }), "w-full justify-between h-12 rounded-sm border-primary/10", className)}
+        className={cn(buttonVariants({ variant: "outline"}), "w-full justify-between h-12 rounded-sm border-primary/10", className)}
       >
         <div className="flex items-center gap-2 overflow-hidden">
           {selectedOption && (
@@ -59,18 +59,18 @@ export function Combobox({
               color={selectedOption.color} 
               icon={selectedOption.icon} 
               imageUrl={selectedOption.imageUrl}
-              size="sm" 
+              size="sm"
             />
           )}
           <span className="truncate font-semibold">
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
-        <HugeiconsIcon icon={ChevronsUpDown} className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        <HugeiconsIcon icon={ChevronsUpDown} className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 rounded-lg overflow-hidden border border-primary/5" align="start">
+      <PopoverContent className="w-full p-0 rounded-lg overflow-hidden border border-primary/5"align="start">
         <Command className="rounded-none">
-          <CommandInput placeholder={placeholder} className="h-12" />
+          <CommandInput placeholder={placeholder} className="h-12"/>
           <CommandList className="max-h-[300px]">
             <CommandEmpty className="py-6 text-center text-sm">
               <p className="text-muted-foreground font-semibold">{emptyMessage}</p>
@@ -81,18 +81,18 @@ export function Combobox({
                   key={option.value}
                   value={option.label} // Command uses value for filtering
                   onSelect={() => {
-                    onValueChange(option.value === value ? "" : option.value)
+                    onValueChange(option.value === value ? "": option.value)
                     setOpen(false)
                   }}
                   className="flex items-center justify-between py-3 px-4"
                 >
                   <div className="flex items-center gap-2">
-                    <EntityAvatar name={option.label} color={option.color} icon={option.icon} imageUrl={option.imageUrl} size="sm" />
+                    <EntityAvatar name={option.label} color={option.color} icon={option.icon} imageUrl={option.imageUrl} size="sm"/>
                     <span className="font-semibold">{option.label}</span>
                   </div>
                   <HugeiconsIcon icon={Check}                     className={cn(
                       "h-4 w-4 text-primary",
-                      value === option.value ? "opacity-100" : "opacity-0"
+                      value === option.value ? "opacity-100": "opacity-0"
                     )}
                   />
                 </CommandItem>
@@ -105,7 +105,7 @@ export function Combobox({
               <div className="p-1">
                 <Link href={createUrl}>
                   <div className="flex items-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors cursor-pointer">
-                    <HugeiconsIcon icon={PlusCircle} className="h-4 w-4" />
+                    <HugeiconsIcon icon={PlusCircle} className="h-4 w-4"/>
                     {createLabel}
                   </div>
                 </Link>

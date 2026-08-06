@@ -45,10 +45,10 @@ export default function AccountDetailPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-2xl space-y-8 pb-20">
-        <Skeleton className="h-40 w-full rounded-lg" />
+        <Skeleton className="h-40 w-full rounded-lg"/>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-32 w-full rounded-lg" />
+            <Skeleton key={i} className="h-32 w-full rounded-lg"/>
           ))}
         </div>
       </div>
@@ -67,7 +67,7 @@ export default function AccountDetailPage() {
               color={account.color} 
               icon={account.icon} 
               imageUrl={account.bank?.logo_url}
-              size="lg" 
+              size="lg"
             />
             <div>
               <h2 className="text-2xl font-semibold">{account.bank?.name}</h2>
@@ -75,8 +75,8 @@ export default function AccountDetailPage() {
             </div>
           </div>
           <Link href={`/accounts/${id}/edit`}>
-            <Button variant="ghost" size="icon" className="rounded-full bg-canvas-parchment/50">
-              <HugeiconsIcon icon={Pencil} className="h-4 w-4" />
+            <Button variant="ghost"size="icon"className="rounded-full bg-canvas-parchment/50">
+              <HugeiconsIcon icon={Pencil} className="h-4 w-4"/>
             </Button>
           </Link>
         </div>
@@ -85,7 +85,7 @@ export default function AccountDetailPage() {
           <div className="space-y-1">
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{t('accountNumber')}</p>
             <div className="flex items-center gap-2">
-              <HugeiconsIcon icon={Hash} className="h-3 w-3 text-primary" />
+              <HugeiconsIcon icon={Hash} className="h-3 w-3 text-primary"/>
               <p className="font-mono font-semibold">{account.account_number}</p>
             </div>
           </div>
@@ -98,15 +98,15 @@ export default function AccountDetailPage() {
 
       <div className="space-y-4">
         <div className="flex items-center gap-2 px-1">
-          <HugeiconsIcon icon={FileText} className="h-3 w-3 text-muted-foreground opacity-80" />
+          <HugeiconsIcon icon={FileText} className="h-3 w-3 text-muted-foreground opacity-80"/>
           <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tc('chequeHistory')}</h3>
         </div>
 
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
             <Input 
-              className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
+              className="rounded-full pl-10 h-11 bg-canvas-parchment border-none"
               placeholder={t('searchChequesPlaceholder')} 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -116,12 +116,12 @@ export default function AccountDetailPage() {
             <PopoverTrigger 
               nativeButton
               render={
-                <Button variant={filter !== 'All' ? 'default' : 'outline'} size="icon" className="rounded-full h-11 w-11 shrink-0">
-                  <HugeiconsIcon icon={Filter} className="h-4 w-4" />
+                <Button variant={filter !== 'All' ? 'default' : 'outline'} size="icon"className="rounded-full h-11 w-11 shrink-0">
+                  <HugeiconsIcon icon={Filter} className="h-4 w-4"/>
                 </Button>
               } 
             />
-            <PopoverContent className="w-56 p-2 rounded-lg" align="end">
+            <PopoverContent className="w-56 p-2 rounded-lg"align="end">
               <div className="flex flex-col gap-1">
                 <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">{tc('filterStatus')}</p>
                 {['All', 'Issued', 'Received', 'Cleared', 'Bounced'].map((s) => (
@@ -130,14 +130,14 @@ export default function AccountDetailPage() {
                     onClick={() => setFilter(s as any)}
                     className={cn(
                       "flex items-center justify-between rounded-sm px-3 py-2.5 text-sm font-semibold transition-all active:scale-95",
-                      filter === s ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted"
+                      filter === s ? "bg-primary text-white": "text-muted-foreground hover:bg-muted"
                     )}
                   >
                     {tc(s.toLowerCase() as any)}
                     {filter === s ? (
-                      <div className="h-2 w-2 rounded-full bg-white" />
+                      <div className="h-2 w-2 rounded-full bg-white"/>
                     ) : (
-                      <StatusPill status={s as any} className="scale-75 origin-right opacity-50" />
+                      <StatusPill status={s as any} className="scale-75 origin-right opacity-50"/>
                     )}
                   </button>
                 ))}
@@ -154,7 +154,7 @@ export default function AccountDetailPage() {
           loadingComponent={
             <div className="space-y-4">
               {[1, 2].map((i) => (
-                <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                <Skeleton key={i} className="h-32 w-full rounded-lg"/>
               ))}
             </div>
           }

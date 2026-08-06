@@ -160,12 +160,12 @@ export default function OnboardingPage() {
                 exit={{ opacity: 0, scale: 0.8 }}
               >
                 <Button 
-                  variant="ghost" 
-                  size="icon" 
+                  variant="ghost"
+                  size="icon"
                   onClick={prevStep} 
                   className="rounded-full h-12 w-12 hover:bg-canvas-parchment"
                 >
-                  <HugeiconsIcon icon={ArrowLeft} className="h-6 w-6" />
+                  <HugeiconsIcon icon={ArrowLeft} className="h-6 w-6"/>
                 </Button>
               </motion.div>
             )}
@@ -177,10 +177,10 @@ export default function OnboardingPage() {
                   {t('step', { step, total: 4 })}
                 </p>
                 <h1 className="text-display-md md:text-display-lg font-semibold tracking-tight text-ink dark:text-white flex items-center gap-3">
-                  {step === 1 && <HugeiconsIcon icon={Wallet} className="h-8 w-8 text-primary" />}
-                  {step === 2 && <HugeiconsIcon icon={Building2} className="h-8 w-8 text-primary" />}
-                  {step === 3 && <HugeiconsIcon icon={Settings2} className="h-8 w-8 text-primary" />}
-                  {step === 4 && <HugeiconsIcon icon={Bell} className="h-8 w-8 text-primary" />}
+                  {step === 1 && <HugeiconsIcon icon={Wallet} className="h-8 w-8 text-primary"/>}
+                  {step === 2 && <HugeiconsIcon icon={Building2} className="h-8 w-8 text-primary"/>}
+                  {step === 3 && <HugeiconsIcon icon={Settings2} className="h-8 w-8 text-primary"/>}
+                  {step === 4 && <HugeiconsIcon icon={Bell} className="h-8 w-8 text-primary"/>}
                   {step === 1 && t('welcome')}
                   {step === 2 && t('businessDetails')}
                   {step === 3 && t('personalizeExperience')}
@@ -201,7 +201,7 @@ export default function OnboardingPage() {
                 key={s} 
                 className={cn(
                   "h-1.5 flex-1 rounded-full transition-all duration-500",
-                  s <= step ? "bg-primary" : "bg-canvas-parchment dark:bg-surface-tile-1"
+                  s <= step ?"bg-primary":"bg-canvas-parchment dark:bg-surface-tile-1"
                 )} 
               />
             ))}
@@ -223,7 +223,7 @@ export default function OnboardingPage() {
                   <div className="space-y-3">
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('businessName')}</Label>
                     <div className="relative group">
-                      <HugeiconsIcon icon={Building2} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                      <HugeiconsIcon icon={Building2} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary"/>
                       <Input 
                         placeholder={t('businessNamePlaceholder')} 
                         value={formData.businessName}
@@ -242,8 +242,8 @@ export default function OnboardingPage() {
                           type="button"
                           onClick={() => setFormData({...formData, businessColor: c})}
                           className={cn(
-                            "h-12 w-12 rounded-full transition-all active:scale-[0.85] ring-offset-4 dark:ring-offset-black",
-                            formData.businessColor === c ? "ring-2 ring-primary scale-110 shadow-lg" : "hover:scale-105 opacity-80 hover:opacity-100"
+                            "h-12 w-12 rounded-full transition-all active:scale-95 ring-offset-4 dark:ring-offset-black",
+                            formData.businessColor === c ?"ring-2 ring-primary scale-110":"hover:scale-105 opacity-80 hover:opacity-100"
                           )}
                           style={{ backgroundColor: c }}
                         />
@@ -253,11 +253,11 @@ export default function OnboardingPage() {
                 </div>
                 
                 <Button 
-                  className="w-full rounded-pill h-14 text-lg font-medium shadow-xl shadow-primary/20 active:scale-[0.98] transition-transform" 
+                  className="w-full rounded-pill h-14 text-lg font-medium active:scale-95 transition-transform"
                   onClick={nextStep} 
                   disabled={!formData.businessName}
                 >
-                  {t('getStarted')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
+                  {t('getStarted')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
                 </Button>
               </motion.div>
             )}
@@ -275,7 +275,7 @@ export default function OnboardingPage() {
                   <div className="space-y-2">
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('businessEmail')}</Label>
                     <div className="relative group">
-                      <HugeiconsIcon icon={Mail} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <HugeiconsIcon icon={Mail} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"/>
                       <Input 
                         type="email"
                         placeholder={t('businessEmailPlaceholder')} 
@@ -289,7 +289,7 @@ export default function OnboardingPage() {
                   <div className="space-y-2">
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('businessPhone')}</Label>
                     <div className="relative group">
-                      <HugeiconsIcon icon={Phone} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <HugeiconsIcon icon={Phone} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"/>
                       <Input 
                         placeholder={t('businessPhonePlaceholder')} 
                         value={formData.businessPhone}
@@ -302,7 +302,7 @@ export default function OnboardingPage() {
                   <div className="space-y-2">
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('headquarters')}</Label>
                     <div className="relative group">
-                      <HugeiconsIcon icon={MapPin} className="absolute left-5 top-5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <HugeiconsIcon icon={MapPin} className="absolute left-5 top-5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"/>
                       <Input 
                         placeholder={t('headquartersPlaceholder')} 
                         value={formData.businessAddress}
@@ -314,10 +314,10 @@ export default function OnboardingPage() {
                 </div>
 
                 <Button 
-                  className="w-full rounded-pill h-14 text-lg font-medium shadow-xl shadow-primary/20 active:scale-[0.98] transition-transform" 
+                  className="w-full rounded-pill h-14 text-lg font-medium active:scale-95 transition-transform"
                   onClick={nextStep}
                 >
-                  {tc('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
+                  {tc('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
                 </Button>
               </motion.div>
             )}
@@ -384,10 +384,10 @@ export default function OnboardingPage() {
                 </div>
 
                 <Button 
-                  className="w-full rounded-pill h-14 text-lg font-medium shadow-xl shadow-primary/20 active:scale-[0.98] transition-transform" 
+                  className="w-full rounded-pill h-14 text-lg font-medium active:scale-95 transition-transform"
                   onClick={nextStep}
                 >
-                  {t('looksGood')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
+                  {t('looksGood')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
                 </Button>
               </motion.div>
             )}
@@ -441,11 +441,11 @@ export default function OnboardingPage() {
                 </div>
 
                 <Button 
-                  className="w-full rounded-pill h-14 text-lg font-medium shadow-xl shadow-primary/20 active:scale-[0.98] transition-transform" 
+                  className="w-full rounded-pill h-14 text-lg font-medium active:scale-95 transition-transform"
                   onClick={handleFinish}
                   disabled={loading}
                 >
-                  {loading ? t('completingSetup') : t('finishSetup')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
+                  {loading ? t('completingSetup') : t('finishSetup')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5"/>
                 </Button>
               </motion.div>
             )}
@@ -461,10 +461,10 @@ export default function OnboardingPage() {
                   <motion.div 
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ type: "spring", damping: 12, stiffness: 200, delay: 0.2 }}
-                    className="flex h-32 w-32 items-center justify-center rounded-full bg-green-500 text-white shadow-2xl shadow-green-500/20"
+                    transition={{ type:"spring", damping: 12, stiffness: 200, delay: 0.2 }}
+                    className="flex h-32 w-32 items-center justify-center rounded-full bg-green-500 text-white"
                   >
-                    <HugeiconsIcon icon={CheckCircle2} className="h-16 w-16" />
+                    <HugeiconsIcon icon={CheckCircle2} className="h-16 w-16"/>
                   </motion.div>
                   <motion.div 
                     animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.1, 0.3] }}
@@ -482,9 +482,9 @@ export default function OnboardingPage() {
 
                 <Button 
                   onClick={() => router.push('/')} 
-                  className="w-full max-w-sm rounded-pill h-14 text-xl font-semibold shadow-2xl shadow-primary/40 hover:scale-105 active:scale-95 transition-all"
+                  className="w-full max-w-sm rounded-pill h-14 text-xl font-semibold hover:scale-105 active:scale-95 transition-all"
                 >
-                  {t('enterDashboard')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-6 w-6" />
+                  {t('enterDashboard')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-6 w-6"/>
                 </Button>
               </motion.div>
             )}

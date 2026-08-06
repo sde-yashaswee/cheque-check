@@ -16,7 +16,7 @@ import { EmptyState } from "@/components/ui/empty-state"
 import { useTranslations } from 'next-intl'
 
 const DeleteConfirmationDialog = dynamic(() => import("@/components/ui/delete-dialog").then(mod => mod.DeleteConfirmationDialog), {
-  loading: () => <Skeleton className="h-8 w-8 rounded-full" />,
+  loading: () => <Skeleton className="h-8 w-8 rounded-full"/>,
   ssr: false
 })
 
@@ -48,21 +48,21 @@ export default function BusinessesPage() {
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
           <Input 
-            className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
+            className="rounded-full pl-10 h-11 bg-canvas-parchment border-none"
             placeholder={t('searchPlaceholder')} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <Button 
-          variant="outline" 
-          size="icon" 
+          variant="outline"
+          size="icon"
           className="rounded-full h-11 w-11 shrink-0 bg-white"
           onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
         >
-          {sortOrder === 'asc' ? <HugeiconsIcon icon={ArrowUpAz} className="h-5 w-5" /> : <HugeiconsIcon icon={ArrowDownAz} className="h-5 w-5" />}
+          {sortOrder === 'asc' ? <HugeiconsIcon icon={ArrowUpAz} className="h-5 w-5"/> : <HugeiconsIcon icon={ArrowDownAz} className="h-5 w-5"/>}
         </Button>
       </div>
 
@@ -75,7 +75,7 @@ export default function BusinessesPage() {
           loadingComponent={
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <Skeleton className="h-32 w-full rounded-lg" key={i} />
+                <Skeleton className="h-32 w-full rounded-lg"key={i} />
               ))}
             </div>
           }
@@ -86,7 +86,7 @@ export default function BusinessesPage() {
               description={t('noBusinessesDesc')}
               action={{
                 label: t('createFirstBusiness'),
-                href: "/businesses/create"
+                href:"/businesses/create"
               }}
             />
           }
@@ -96,8 +96,8 @@ export default function BusinessesPage() {
               key={business.id}
               onClick={() => setActiveBusiness(business)}
               className={cn(
-                "group relative overflow-hidden rounded-lg border p-6 transition-all active:scale-[0.98] cursor-pointer",
-                activeBusiness?.id === business.id ? "bg-primary/5 border-primary/20" : "bg-card border-primary/5"
+                "group relative overflow-hidden rounded-lg border p-6 transition-all active:scale-95 cursor-pointer",
+                activeBusiness?.id === business.id ?"bg-primary/5 border-primary/20":"bg-card border-primary/5"
               )}
             >
               <div className="flex items-start justify-between relative z-10">
@@ -107,7 +107,7 @@ export default function BusinessesPage() {
                     color={business.color} 
                     icon={business.icon} 
                     imageUrl={business.logo_url}
-                    size="lg" 
+                    size="lg"
                   />
                   <div>
                     <h3 className="text-lg font-semibold">{business.name}</h3>
@@ -127,17 +127,17 @@ export default function BusinessesPage() {
                       onDelete={async () => { deleteBusiness(business.id) }}
                       trigger={
                         <Button 
-                          variant="ghost" 
-                          size="icon" 
+                          variant="ghost"
+                          size="icon"
                           className="rounded-full h-8 w-8 text-muted-foreground hover:text-destructive transition-colors"
                         >
-                          <HugeiconsIcon icon={Trash2} className="h-4 w-4" />
+                          <HugeiconsIcon icon={Trash2} className="h-4 w-4"/>
                         </Button>
                       }
                     />
                    </div>
                    <Link href={`/businesses/${business.id}`} onClick={(e) => e.stopPropagation()}>
-                    <HugeiconsIcon icon={ArrowRight} className="h-5 w-5 text-muted-foreground opacity-20 transition-opacity group-hover:opacity-100 hover:text-primary hover:opacity-100" />
+                    <HugeiconsIcon icon={ArrowRight} className="h-5 w-5 text-muted-foreground opacity-20 transition-opacity group-hover:opacity-100 hover:text-primary hover:opacity-100"/>
                    </Link>
                 </div>
               </div>
@@ -145,7 +145,7 @@ export default function BusinessesPage() {
               <div className="mt-2 flex items-center justify-between border-t border-dashed pt-4">
                 <div className="flex items-center gap-2">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <HugeiconsIcon icon={FileText} className="h-3 w-3" />
+                    <HugeiconsIcon icon={FileText} className="h-3 w-3"/>
                   </div>
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{t('upcoming')}</span>
                 </div>
@@ -159,8 +159,8 @@ export default function BusinessesPage() {
       </div>
 
       <Link href="/businesses/create">
-        <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900" size="icon">
-          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
+        <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900"size="icon">
+          <HugeiconsIcon icon={Plus} className="h-8 w-8"/>
         </Button>
       </Link>
     </div>

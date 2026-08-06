@@ -37,7 +37,7 @@ export function EmptyState({
         {illustration ? (
           illustration
         ) : Icon ? (
-          <HugeiconsIcon icon={Icon} className="h-10 w-10 text-primary/40" />
+          <HugeiconsIcon icon={Icon} className="h-10 w-10 text-primary/40"/>
         ) : null}
       </div>
       <h3 className="text-xl font-semibold tracking-tight">{title}</h3>

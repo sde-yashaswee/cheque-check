@@ -1,13 +1,16 @@
 'use client'
 
 import { HugeiconsIcon } from '@hugeicons/react';
-import { PlusSignIcon as Plus, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, File02Icon as FileText, FlashIcon as Zap, Calendar03Icon as Calendar, Chart01Icon as Stats } from '@hugeicons/core-free-icons';
+import { PlusSignIcon as Plus, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, File02Icon as FileText, FlashIcon as Zap, Calendar03Icon as Calendar, Chart01Icon as Stats, Camera01Icon as Camera } from '@hugeicons/core-free-icons';
 import { Button } from "@/components/ui/button";
 import { useBusiness } from "@/hooks/use-business";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ChequeService } from "@/services/cheque.service";
+import { useCheques } from "@/hooks/use-cheques";
+import { useChequeActions } from "@/hooks/use-cheque-actions";
 import { ChequeCard } from "@/components/cheque-card";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useRef } from "react";
+import { StorageService } from "@/services/storage.service";
 import { ChequeStatus, ChequeWithRelations } from "@/types";
 import { useProfile } from "@/hooks/use-profile";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,22 +22,37 @@ import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl';
 
 const ChequeStatsChart = dynamic(() => import("@/components/cheque-stats-chart").then(mod => mod.ChequeStatsChart), {
-  loading: () => <Skeleton className="h-full w-full rounded-lg" />,
+  loading: () => <Skeleton className="h-full w-full rounded-lg"/>,
   ssr: false
 })
 
 export default function HomePage() {
   const tDashboard = useTranslations('Dashboard')
+  const tCheques = useTranslations('Cheques')
   const tCommon = useTranslations('Common')
   const { activeBusiness } = useBusiness()
   const { profile } = useProfile()
-  const queryClient = useQueryClient()
+  const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isUploading, setIsUploading] = useState(false)
 
-  const { data: cheques, isLoading } = useQuery<ChequeWithRelations[]>({
-    queryKey: ['cheques', activeBusiness?.id],
-    queryFn: () => ChequeService.getAll(activeBusiness!.id) as Promise<ChequeWithRelations[]>,
-    enabled: !!activeBusiness?.id,
-  })
+  const { cheques, isLoading, updateStatus } = useCheques(activeBusiness?.id)
+
+  const handleScan = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !activeBusiness) return
+
+    setIsUploading(true)
+    try {
+      const imageUrl = await StorageService.uploadChequeImage(file)
+      router.push(`/cheques/create?imageUrl=${encodeURIComponent(imageUrl)}&action=ocr&type=Inward`)
+    } catch (error) {
+      console.error('Scan error:', error)
+      alert('Failed to upload cheque image')
+    } finally {
+      setIsUploading(false)
+    }
+  }
 
   const {
     todayCheques,
@@ -46,14 +64,6 @@ export default function HomePage() {
     upcomingCount,
     overdueCount
   } = useChequeStats(cheques)
-
-  const mutation = useMutation({
-    mutationFn: ({ id, status }: { id: string, status: ChequeStatus }) => 
-      ChequeService.updateStatus(id, status),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cheques', activeBusiness?.id] })
-    }
-  })
 
   const currency = profile?.currency || '₹'
 
@@ -72,15 +82,15 @@ export default function HomePage() {
         allData={activeBusiness ? [activeBusiness] : []}
         loadingComponent={
           <>
-            <Skeleton className="h-40 w-full rounded-lg" />
+            <Skeleton className="h-40 w-full rounded-lg"/>
             <div className="grid grid-cols-2 gap-4">
               {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-24 w-full rounded-lg" />
+                <Skeleton key={i} className="h-24 w-full rounded-lg"/>
               ))}
             </div>
             <div className="space-y-4">
-              <Skeleton className="h-6 w-32" />
-              <Skeleton className="h-32 w-full rounded-lg" />
+              <Skeleton className="h-6 w-32"/>
+              <Skeleton className="h-32 w-full rounded-lg"/>
             </div>
           </>
         }
@@ -111,33 +121,59 @@ export default function HomePage() {
           {/* Quick Actions */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 px-1">
-              <HugeiconsIcon icon={Zap} className="h-3 w-3 text-muted-foreground opacity-80" />
+              <HugeiconsIcon icon={Zap} className="h-3 w-3 text-muted-foreground opacity-80"/>
               <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tDashboard('quickActions')}</h2>
             </div>
             <div className="flex gap-4">
-              <Link href="/cheques/create?type=Outward" className="flex-1">
+              <input 
+                type="file"
+                ref={fileInputRef} 
+                onChange={handleScan} 
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+              />
+              <button 
+                onClick={() => fileInputRef.current?.click()} 
+                className="flex-1 disabled:opacity-50"
+                disabled={isUploading}
+              >
                 <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 transition-transform active:scale-95 border border-primary/5">
                   <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/10 text-primary">
-                    <HugeiconsIcon icon={ArrowUpRight} className="h-6 w-6" />
+                    {isUploading ? (
+                      <div className="h-6 w-6 border-2 border-primary border-t-transparent animate-spin rounded-full"/>
+                    ) : (
+                      <HugeiconsIcon icon={Camera} className="h-6 w-6"/>
+                    )}
+                  </div>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{isUploading ? tCheques('uploading') : tDashboard('scanCheque')}</span>
+                </div>
+              </button>
+              <Link href="/cheques/create?type=Outward"className="flex-1">
+                <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 transition-transform active:scale-95 border border-primary/5">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/10 text-primary">
+                    <HugeiconsIcon icon={ArrowUpRight} className="h-6 w-6"/>
                   </div>
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{tDashboard('issueCheque')}</span>
                 </div>
               </Link>
-              <Link href="/cheques/create?type=Inward" className="flex-1">
-                <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 transition-transform active:scale-95 border border-primary/5">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-green-500/10 text-green-600">
-                    <HugeiconsIcon icon={ArrowDownLeft} className="h-6 w-6" />
+              {profile?.received_cheques_enabled !== false && (
+                <Link href="/cheques/create?type=Inward"className="flex-1">
+                  <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 transition-transform active:scale-95 border border-primary/5">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-green-500/10 text-green-600">
+                      <HugeiconsIcon icon={ArrowDownLeft} className="h-6 w-6"/>
+                    </div>
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-green-600">{tDashboard('receiveCheque')}</span>
                   </div>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-green-600">{tDashboard('receiveCheque')}</span>
-                </div>
-              </Link>
+                </Link>
+              )}
             </div>
           </div>
 
           {/* Today's Cheques */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 px-1">
-              <HugeiconsIcon icon={Calendar} className="h-3 w-3 text-muted-foreground opacity-80" />
+              <HugeiconsIcon icon={Calendar} className="h-3 w-3 text-muted-foreground opacity-80"/>
               <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tDashboard('todaysCheques')}</h2>
             </div>
             {todayCheques.length === 0 ? (
@@ -153,7 +189,7 @@ export default function HomePage() {
                   <ChequeCard 
                     key={cheque.id} 
                     cheque={cheque} 
-                    onStatusUpdate={(id, status) => mutation.mutate({ id, status })}
+                    onStatusUpdate={(id, status) => updateStatus(id, status)}
                   />
                 ))}
               </div>
@@ -177,7 +213,7 @@ export default function HomePage() {
           {/* Statistics Pie Chart */}
           <div className="space-y-4 pt-4">
             <div className="flex items-center gap-2 px-1">
-              <HugeiconsIcon icon={Stats} className="h-3 w-3 text-muted-foreground opacity-80" />
+              <HugeiconsIcon icon={Stats} className="h-3 w-3 text-muted-foreground opacity-80"/>
               <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tDashboard('statistics')}</h2>
             </div>
             <div className="rounded-lg border bg-card p-6 h-[300px] relative">
@@ -189,8 +225,8 @@ export default function HomePage() {
       </DataState>
 
       <Link href="/cheques/create">
-        <Button className="fixed bottom-24 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900" size="icon">
-          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
+        <Button className="fixed bottom-24 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900"size="icon">
+          <HugeiconsIcon icon={Plus} className="h-8 w-8"/>
         </Button>
       </Link>
     </div>

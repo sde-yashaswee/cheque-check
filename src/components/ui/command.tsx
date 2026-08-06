@@ -70,7 +70,7 @@ function CommandInput({
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.Input>) {
   return (
-    <div data-slot="command-input-wrapper" className="p-2">
+    <div data-slot="command-input-wrapper"className="p-2">
       <div className="relative flex items-center h-10 rounded-full border border-input/30 bg-canvas-parchment dark:bg-input/30">
         <CommandPrimitive.Input
           data-slot="command-input"
@@ -80,7 +80,7 @@ function CommandInput({
           )}
           {...props}
         />
-        <HugeiconsIcon icon={SearchIcon} className="absolute left-3.5 size-4 shrink-0 opacity-50" />
+        <HugeiconsIcon icon={SearchIcon} className="absolute left-3.5 size-4 shrink-0 opacity-50"/>
       </div>
     </div>
   )
@@ -160,7 +160,7 @@ function CommandItem({
       {...props}
     >
       {children}
-      <HugeiconsIcon icon={CheckIcon} className="ml-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100" />
+      <HugeiconsIcon icon={CheckIcon} className="ml-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100"/>
     </CommandPrimitive.Item>
   )
 }

@@ -41,7 +41,7 @@ export function EntityAvatar({ name, color, icon, imageUrl, className, size = 'm
       style={{ backgroundColor: imageUrl ? 'transparent' : defaultColor }}
     >
       {imageUrl ? (
-        <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
+        <img src={imageUrl} alt={name} className="h-full w-full object-cover"/>
       ) : IconComponent ? (
         <HugeiconsIcon icon={IconComponent} className={iconSizeClasses[size]} />
       ) : (

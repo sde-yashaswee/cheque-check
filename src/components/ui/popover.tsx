@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
 function Popover({ ...props }: PopoverPrimitive.Root.Props) {
-  return <PopoverPrimitive.Root data-slot="popover" {...props} />
+  return <PopoverPrimitive.Root data-slot="popover"{...props} />
 }
 
 function PopoverTrigger({ render, nativeButton, ...props }: PopoverPrimitive.Trigger.Props) {
-  const isNativeButton = nativeButton ?? (!render || (React.isValidElement(render) && (render.type === "button" || render.type === Button)))
+  const isNativeButton = nativeButton ?? (!render || (React.isValidElement(render) && (render.type === "button"|| render.type === Button)))
   return (
     <PopoverPrimitive.Trigger
       data-slot="popover-trigger"
@@ -32,7 +32,7 @@ function PopoverContent({
 }: PopoverPrimitive.Popup.Props &
   Pick<
     PopoverPrimitive.Positioner.Props,
-    "align" | "alignOffset" | "side" | "sideOffset"
+    "align"| "alignOffset"| "side"| "sideOffset"
   >) {
   return (
     <PopoverPrimitive.Portal>

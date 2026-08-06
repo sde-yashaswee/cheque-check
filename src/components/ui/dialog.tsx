@@ -9,11 +9,11 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { Cancel02Icon as XIcon } from '@hugeicons/core-free-icons';
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+  return <DialogPrimitive.Root data-slot="dialog"{...props} />
 }
 
 function DialogTrigger({ render, nativeButton, ...props }: DialogPrimitive.Trigger.Props) {
-  const isNativeButton = nativeButton ?? (!render || (React.isValidElement(render) && (render.type === "button" || render.type === Button)))
+  const isNativeButton = nativeButton ?? (!render || (React.isValidElement(render) && (render.type === "button"|| render.type === Button)))
   return (
     <DialogPrimitive.Trigger
       data-slot="dialog-trigger"
@@ -25,7 +25,7 @@ function DialogTrigger({ render, nativeButton, ...props }: DialogPrimitive.Trigg
 }
 
 function DialogClose({ render, nativeButton, ...props }: DialogPrimitive.Close.Props) {
-  const isNativeButton = nativeButton ?? (!render || (React.isValidElement(render) && (render.type === "button" || render.type === Button)))
+  const isNativeButton = nativeButton ?? (!render || (React.isValidElement(render) && (render.type === "button"|| render.type === Button)))
   return (
     <DialogPrimitive.Close
       data-slot="dialog-close"
@@ -37,7 +37,7 @@ function DialogClose({ render, nativeButton, ...props }: DialogPrimitive.Close.P
 }
 
 function DialogPortal({ ...props }: DialogPrimitive.Portal.Props) {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+  return <DialogPrimitive.Portal data-slot="dialog-portal"{...props} />
 }
 
 function DialogOverlay({
@@ -126,7 +126,7 @@ function DialogFooter({
     >
       {children}
       {showCloseButton && (
-        <DialogClose nativeButton render={<Button variant="outline" />}>
+        <DialogClose nativeButton render={<Button variant="outline"/>}>
           Close
         </DialogClose>
       )}

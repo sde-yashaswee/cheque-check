@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import"./globals.css";
 import Providers from "@/components/providers";
 import { Toaster } from "@/components/ui/toast";
 import { ProgressBar } from "@/components/progress-bar";
@@ -9,12 +9,12 @@ import { getMessages, getLocale, getTranslations } from 'next-intl/server';
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable:"--font-sans",
 });
 
 export const metadata: Metadata = {
-  title: "ChequeCheck",
-  description: "Never miss a cheque again.",
+  title:"ChequeCheck",
+  description:"Never miss a cheque again.",
 };
 
 export default async function RootLayout({
@@ -29,7 +29,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} className={`${inter.variable}`}>
       <body className="bg-primary font-sans text-foreground selection:bg-primary/10 antialiased flex items-center justify-center min-h-[100dvh] overflow-hidden">
-        <div className="relative w-full h-[100dvh] bg-background sm:h-[90dvh] sm:max-h-[932px] sm:max-w-[430px] sm:rounded-xl sm:border-[4px] sm:border-white sm:shadow-2xl overflow-hidden flex flex-col [transform:translateZ(0)]">
+        <div className="relative w-full h-[100dvh] bg-background sm:h-[90dvh] sm:max-h-[932px] sm:max-w-[430px] sm:rounded-xl sm:border-[4px] sm:border-white sm: overflow-hidden flex flex-col [transform:translateZ(0)]">
           <ProgressBar />
           <NextIntlClientProvider messages={messages}>
             <Providers>
@@ -44,9 +44,9 @@ export default async function RootLayout({
         {/* Landscape Warning Overlay: Visible only on mobile landscape devices */}
         <div className="hidden [@media(orientation:landscape)_and_(max-height:600px)]:flex fixed inset-0 z-[9999] bg-primary flex-col items-center justify-center text-center p-6 text-white">
           <div className="mb-6 animate-pulse">
-            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="rotate-90">
-              <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
-              <path d="M12 17h.01" />
+            <svg xmlns="http://www.w3.org/2000/svg"width="64"height="64"viewBox="0 0 24 24"fill="none"stroke="currentColor"strokeWidth="2"strokeLinecap="round"strokeLinejoin="round"className="rotate-90">
+              <rect width="14"height="20"x="5"y="2"rx="2"ry="2"/>
+              <path d="M12 17h.01"/>
             </svg>
           </div>
           <h2 className="text-2xl font-bold mb-2 text-white">{t('rotateDevice')}</h2>

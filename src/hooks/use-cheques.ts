@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChequeService } from '@/services/cheque.service'
 import { useState, useMemo } from 'react'
 import { ChequeStatus, ChequeWithRelations } from '@/types'
+import { useProfile } from './use-profile'
 
 export type SortBy = 'date' | 'amount'
 export type SortOrder = 'asc' | 'desc'
@@ -12,6 +13,7 @@ export function useCheques(businessId: string | undefined) {
   const [sortBy, setSortBy] = useState<SortBy>('date')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
   const queryClient = useQueryClient()
+  const { profile } = useProfile()
 
   const { data: cheques, isLoading, error } = useQuery<ChequeWithRelations[]>({
     queryKey: ['cheques', businessId],
@@ -39,9 +41,37 @@ export function useCheques(businessId: string | undefined) {
     }
   })
 
-  const filteredCheques = useMemo(() => {
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => ChequeService.delete(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
+      const previousCheques = queryClient.getQueryData(['cheques', businessId])
+      queryClient.setQueryData(['cheques', businessId], (old: any) => {
+        if (!old) return old
+        return old.filter((c: any) => c.id !== id)
+      })
+      return { previousCheques }
+    },
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(['cheques', businessId], context?.previousCheques)
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
+    }
+  })
+
+  const processedCheques = useMemo(() => {
     if (!cheques) return []
-    let result = cheques.filter((c) => {
+    return cheques.filter(c => {
+      if (profile?.received_cheques_enabled === false && c.type === 'Inward') {
+        return false
+      }
+      return true
+    })
+  }, [cheques, profile?.received_cheques_enabled])
+
+  const filteredCheques = useMemo(() => {
+    let result = [...processedCheques].filter((c) => {
       const matchesSearch = c.cheque_number.includes(search) || 
                            c.party?.name?.toLowerCase().includes(search.toLowerCase()) ||
                            c.amount.toString().includes(search)
@@ -61,14 +91,18 @@ export function useCheques(businessId: string | undefined) {
     })
 
     return result
-  }, [cheques, search, filter, sortBy, sortOrder])
+  }, [processedCheques, search, filter, sortBy, sortOrder])
 
   const updateStatus = (id: string, status: ChequeStatus) => {
     mutation.mutate({ id, status })
   }
 
+  const deleteCheque = (id: string) => {
+    deleteMutation.mutate(id)
+  }
+
   return {
-    cheques,
+    cheques: processedCheques,
     filteredCheques,
     isLoading,
     error,
@@ -81,6 +115,7 @@ export function useCheques(businessId: string | undefined) {
     sortOrder,
     setSortOrder,
     updateStatus,
-    isUpdating: mutation.isPending,
+    deleteCheque,
+    isUpdating: mutation.isPending || deleteMutation.isPending,
   }
 }

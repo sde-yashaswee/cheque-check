@@ -34,7 +34,7 @@ export function ErrorView({
       {...props}
     >
       <div className="flex h-20 w-20 items-center justify-center rounded-full bg-destructive/10 mb-6">
-        <HugeiconsIcon icon={AlertCircle} className="h-10 w-10 text-destructive/60" />
+        <HugeiconsIcon icon={AlertCircle} className="h-10 w-10 text-destructive/60"/>
       </div>
       <h3 className="text-xl font-semibold tracking-tight text-destructive">{displayTitle}</h3>
       <p className="mt-2 text-sm text-muted-foreground max-w-[280px] mx-auto">
@@ -47,7 +47,7 @@ export function ErrorView({
       )}
       {reset && (
         <div className="mt-6">
-          <Button onClick={reset} variant="destructive" className="rounded-full px-8">
+          <Button onClick={reset} variant="destructive"className="rounded-full px-8">
             {t('tryAgain')}
           </Button>
         </div>

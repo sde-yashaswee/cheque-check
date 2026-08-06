@@ -1,0 +1,126 @@
+'use client'
+
+import { useBusiness } from "@/hooks/use-business"
+import { useCheques } from "@/hooks/use-cheques"
+import { useProfile } from "@/hooks/use-profile"
+import { ReportService } from "@/services/report.service"
+import { Button } from "@/components/ui/button"
+import { HugeiconsIcon } from '@hugeicons/react';
+import { File02Icon as FileText, FileDownloadIcon as Download, FilterIcon as Filter, Calendar01Icon as Calendar } from '@hugeicons/core-free-icons';
+import { useChequeStats } from "@/hooks/use-cheque-stats"
+import { DataState } from "@/components/ui/data-state"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Skeleton } from "@/components/ui/skeleton"
+import { StatusPill } from "@/components/ui/status-pill"
+import { format } from "date-fns"
+import dynamic from 'next/dynamic'
+import { useTranslations } from 'next-intl';
+
+const ChequeStatsChart = dynamic(() => import("@/components/cheque-stats-chart").then(mod => mod.ChequeStatsChart), {
+  loading: () => <Skeleton className="h-full w-full rounded-lg"/>,
+  ssr: false
+})
+
+export default function ReportsPage() {
+  const t = useTranslations('Dashboard')
+  const tc = useTranslations('Common')
+  const { activeBusiness } = useBusiness()
+  const { profile } = useProfile()
+  const { cheques, isLoading, filter, setFilter } = useCheques(activeBusiness?.id)
+  const { outstanding, issuedCount, receivedCount, clearedCount, bouncedCount } = useChequeStats(cheques)
+
+  const currency = profile?.currency || '₹'
+
+  const chartData = [
+    { name: t('issued'), value: issuedCount, color: '#0066cc' },
+    { name: t('received'), value: receivedCount, color: '#2997ff' },
+    { name: t('cleared'), value: clearedCount, color: '#34C759' },
+    { name: t('bounced'), value: bouncedCount, color: '#FF3B30' },
+  ].filter(d => d.value > 0);
+
+  const handleExport = () => {
+    if (cheques) {
+      ReportService.exportToCSV(cheques, `cheques_report_${activeBusiness?.name || 'export'}.csv`)
+    }
+  }
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-8 pb-20 pt-2">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-display-sm font-semibold tracking-tight">Reports</h1>
+          <p className="text-body text-muted-foreground">Financial summary and exports</p>
+        </div>
+        <Button onClick={handleExport} className="rounded-full gap-2">
+          <HugeiconsIcon icon={Download} className="h-4 w-4"/> Export
+        </Button>
+      </div>
+
+      <DataState
+        isLoading={isLoading}
+        data={cheques || []}
+        allData={cheques || []}
+        loadingComponent={<Skeleton className="h-[300px] w-full rounded-lg"/>}
+      >
+        <div className="space-y-8">
+          {/* Summary Cards */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="rounded-lg bg-primary p-6 text-primary-foreground">
+              <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">{t('totalOutstanding')}</p>
+              <p className="mt-1 text-2xl font-semibold">{currency}{outstanding.toLocaleString()}</p>
+            </div>
+            <div className="rounded-lg bg-canvas-parchment p-6 dark:bg-surface-tile-1">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Total Cheques</p>
+              <p className="mt-1 text-2xl font-semibold">{cheques?.length || 0}</p>
+            </div>
+          </div>
+
+          {/* Chart */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 px-1">
+              <HugeiconsIcon icon={Calendar} className="h-3 w-3 text-muted-foreground opacity-80"/>
+              <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Distribution</h2>
+            </div>
+            <div className="rounded-lg border bg-card p-6 h-[300px] relative">
+              <ChequeStatsChart chartData={chartData} totalCheques={cheques?.length || 0} />
+            </div>
+          </div>
+
+          {/* List Preview */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-1">
+              <div className="flex items-center gap-2">
+                <HugeiconsIcon icon={FileText} className="h-3 w-3 text-muted-foreground opacity-80"/>
+                <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Recent Cheques</h2>
+              </div>
+            </div>
+            
+            <div className="divide-y rounded-lg border bg-card overflow-hidden">
+              {(cheques || []).slice(0, 10).map((c) => (
+                <div key={c.id} className="flex items-center justify-between p-4">
+                  <div>
+                    <p className="font-semibold">{c.party?.name}</p>
+                    <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
+                      {format(new Date(c.cheque_date), 'MMM d, yyyy')} • #{c.cheque_number}
+                    </p>
+                  </div>
+                  <div className="text-right space-y-1">
+                    <p className="font-bold">{currency}{c.amount.toLocaleString()}</p>
+                    <StatusPill status={c.status as any} className="scale-75 origin-right"/>
+                  </div>
+                </div>
+              ))}
+              {(cheques?.length || 0) > 10 && (
+                <div className="p-3 text-center bg-muted/20">
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Showing 10 of {cheques?.length} cheques. Export to see all.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </DataState>
+    </div>
+  )
+}

@@ -44,9 +44,9 @@ export default function AccountsPage() {
     <div className="mx-auto max-w-2xl space-y-8 pb-24">
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
           <Input 
-            className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
+            className="rounded-full pl-10 h-11 bg-canvas-parchment border-none"
             placeholder={t('searchPlaceholder')} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -57,19 +57,19 @@ export default function AccountsPage() {
           <PopoverTrigger 
             nativeButton
             render={
-              <Button variant={bankFilter !== 'All' ? 'default' : 'outline'} size="icon" className="rounded-full h-11 w-11 shrink-0">
-                <HugeiconsIcon icon={Filter} className="h-4 w-4" />
+              <Button variant={bankFilter !== 'All' ? 'default' : 'outline'} size="icon"className="rounded-full h-11 w-11 shrink-0">
+                <HugeiconsIcon icon={Filter} className="h-4 w-4"/>
               </Button>
             } 
           />
-          <PopoverContent className="w-56 p-2 rounded-lg" align="end">
+          <PopoverContent className="w-56 p-2 rounded-lg"align="end">
             <div className="flex flex-col gap-1">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">{t('filterBank')}</p>
               <button
                 onClick={() => setBankFilter('All')}
                 className={cn(
                   "flex items-center justify-between rounded-sm px-3 py-2.5 text-sm font-semibold transition-all",
-                  bankFilter === 'All' ? "bg-primary text-white" : "hover:bg-muted"
+                  bankFilter === 'All' ?"bg-primary text-white":"hover:bg-muted"
                 )}
               >
                 {tc('allBanks')}
@@ -80,7 +80,7 @@ export default function AccountsPage() {
                   onClick={() => setBankFilter(bank.id)}
                   className={cn(
                     "flex items-center justify-between rounded-sm px-3 py-2.5 text-sm font-semibold transition-all",
-                    bankFilter === bank.id ? "bg-primary text-white" : "hover:bg-muted"
+                    bankFilter === bank.id ?"bg-primary text-white":"hover:bg-muted"
                   )}
                 >
                   <span className="truncate">{bank.name}</span>
@@ -91,12 +91,12 @@ export default function AccountsPage() {
         </Popover>
 
         <Button 
-          variant="outline" 
-          size="icon" 
+          variant="outline"
+          size="icon"
           className="rounded-full h-11 w-11 shrink-0"
           onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
         >
-          {sortOrder === 'asc' ? <HugeiconsIcon icon={ArrowUpAz} className="h-5 w-5" /> : <HugeiconsIcon icon={ArrowDownAz} className="h-5 w-5" />}
+          {sortOrder === 'asc' ? <HugeiconsIcon icon={ArrowUpAz} className="h-5 w-5"/> : <HugeiconsIcon icon={ArrowDownAz} className="h-5 w-5"/>}
         </Button>
       </div>
 
@@ -110,7 +110,7 @@ export default function AccountsPage() {
           loadingComponent={
             <div className="grid gap-4">
               {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-28 w-full rounded-lg" />
+                <Skeleton key={i} className="h-28 w-full rounded-lg"/>
               ))}
             </div>
           }
@@ -121,32 +121,32 @@ export default function AccountsPage() {
               description={t('noAccountsDesc')}
               action={{
                 label: t('addFirstAccount'),
-                href: "/accounts/create"
+                href:"/accounts/create"
               }}
             />
           }
         >
           {filteredAccounts?.map((account) => (
             <Link key={account.id} href={`/accounts/${account.id}`}>
-              <div className="group relative rounded-xl border bg-card p-5 transition-all active:scale-[0.98] border-zinc-200 dark:border-zinc-800 shadow-sm">
+              <div className="group relative rounded-xl border bg-card p-5 transition-all active:scale-95 border-zinc-200 dark:border-zinc-800">
                 <div className="flex items-start gap-4">
                   <EntityAvatar 
                     name={account.bank?.name || 'A'} 
                     color={account.color} 
                     icon={account.icon} 
                     imageUrl={account.bank?.logo_url}
-                    size="md" 
+                    size="md"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <p className="text-base font-bold truncate">{account.bank?.name}</p>
-                      <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground/40 group-hover:translate-x-0.5 transition-transform" />
+                      <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground/40 group-hover:translate-x-0.5 transition-transform"/>
                     </div>
                     <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mt-0.5">{account.account_name}</p>
                     
                     <div className="mt-4 flex items-center justify-between border-t border-dashed border-zinc-100 dark:border-zinc-800 pt-4">
                       <p className="text-xs font-mono text-muted-foreground tracking-tighter">
-                        {account.account_number.replace(/\d(?=\d{4})/g, "•")}
+                        {account.account_number.replace(/\d(?=\d{4})/g,"•")}
                       </p>
                       <span className="rounded-full bg-primary/5 px-2 py-0.5 text-[9px] font-semibold text-primary uppercase tracking-wider">
                         {account.ifsc_code || tc('noIfsc')}
@@ -161,8 +161,8 @@ export default function AccountsPage() {
       </div>
 
       <Link href="/accounts/create">
-        <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900" size="icon">
-          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
+        <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900"size="icon">
+          <HugeiconsIcon icon={Plus} className="h-8 w-8"/>
         </Button>
       </Link>
     </div>

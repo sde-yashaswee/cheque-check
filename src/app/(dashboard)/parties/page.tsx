@@ -43,21 +43,21 @@ export default function PartiesPage() {
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
           <Input 
-            className="rounded-full pl-10 h-11 bg-canvas-parchment border-none" 
+            className="rounded-full pl-10 h-11 bg-canvas-parchment border-none"
             placeholder={t('searchPlaceholder')} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <Button 
-          variant="outline" 
-          size="icon" 
+          variant="outline"
+          size="icon"
           className="rounded-full h-11 w-11 shrink-0 bg-white"
           onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
         >
-          {sortOrder === 'asc' ? <HugeiconsIcon icon={ArrowUpAz} className="h-5 w-5" /> : <HugeiconsIcon icon={ArrowDownAz} className="h-5 w-5" />}
+          {sortOrder === 'asc' ? <HugeiconsIcon icon={ArrowUpAz} className="h-5 w-5"/> : <HugeiconsIcon icon={ArrowDownAz} className="h-5 w-5"/>}
         </Button>
       </div>
 
@@ -71,7 +71,7 @@ export default function PartiesPage() {
           loadingComponent={
             <div className="space-y-4">
               {[1, 2, 3, 4, 5].map((i) => (
-                <Skeleton key={i} className="h-24 w-full rounded-lg" />
+                <Skeleton key={i} className="h-24 w-full rounded-lg"/>
               ))}
             </div>
           }
@@ -82,20 +82,20 @@ export default function PartiesPage() {
               description={t('noPartiesDesc')}
               action={{
                 label: t('addFirstParty'),
-                href: "/parties/create"
+                href:"/parties/create"
               }}
             />
           }
         >
           {filteredParties?.map((party) => (
             <Link key={party.id} href={`/parties/${party.id}`} className="block">
-              <div className="group flex items-center gap-4 rounded-xl border bg-card p-4 transition-all active:scale-[0.98] border-zinc-200 dark:border-zinc-800 shadow-sm">
+              <div className="group flex items-center gap-4 rounded-xl border bg-card p-4 transition-all active:scale-95 border-zinc-200 dark:border-zinc-800">
                 <EntityAvatar 
                   name={party.name} 
                   color={party.color} 
                   icon={party.icon} 
                   imageUrl={party.avatar_url}
-                  size="md" 
+                  size="md"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-base truncate">{party.name}</p>
@@ -105,7 +105,7 @@ export default function PartiesPage() {
                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">{tCommon('balance')}</p>
                   <p className="text-sm font-bold text-primary">{currency}{getBalance(party.id).toLocaleString()}</p>
                 </div>
-                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 shrink-0 text-muted-foreground/40 group-hover:translate-x-0.5 transition-transform" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 shrink-0 text-muted-foreground/40 group-hover:translate-x-0.5 transition-transform"/>
               </div>
             </Link>
           ))}
@@ -113,8 +113,8 @@ export default function PartiesPage() {
       </div>
 
       <Link href="/parties/create">
-        <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900" size="icon">
-          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
+        <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900"size="icon">
+          <HugeiconsIcon icon={Plus} className="h-8 w-8"/>
         </Button>
       </Link>
     </div>

@@ -43,12 +43,12 @@ export function BottomNav() {
             href={item.href}
             onClick={() => setOptimisticPath(item.href)}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 transition-all active:scale-90",
-              isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+              "flex flex-col items-center justify-center gap-1 transition-all active:scale-95",
+              isActive ?"text-primary":"text-muted-foreground hover:text-foreground"
             )}
           >
-            <HugeiconsIcon icon={item.icon} className={cn("h-5 w-5", isActive && "stroke-[2.5px]")} />
-            <span className={cn("text-[10px] font-semibold tracking-tight", isActive ? "opacity-100" : "opacity-70")}>{t(item.name)}</span>
+            <HugeiconsIcon icon={item.icon} className={cn("h-5 w-5", isActive &&"stroke-[2.5px]")} />
+            <span className={cn("text-[10px] font-semibold tracking-tight", isActive ?"opacity-100":"opacity-70")}>{t(item.name)}</span>
           </Link>
         )
       })}

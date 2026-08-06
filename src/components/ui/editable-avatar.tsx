@@ -133,7 +133,7 @@ export function EditableAvatar({
             
             {/* Edit Overlay */}
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <HugeiconsIcon icon={Camera} className="text-white h-1/3 w-1/3" />
+              <HugeiconsIcon icon={Camera} className="text-white h-1/3 w-1/3"/>
             </div>
           </button>
         }
@@ -146,16 +146,16 @@ export function EditableAvatar({
         <div className="flex flex-col items-center gap-6 py-8">
           <div className={cn("rounded-full overflow-hidden border-4 border-muted/20", sizeClasses.xl)}>
             {imageUrl ? (
-              <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
+              <img src={imageUrl} alt={name} className="h-full w-full object-cover"/>
             ) : (
-              <EntityAvatar name={name} color={color} icon={icon} size="lg" className="h-full w-full" />
+              <EntityAvatar name={name} color={color} icon={icon} size="lg"className="h-full w-full"/>
             )}
           </div>
           
           <div className="flex w-full gap-3">
             <Button 
-              variant="outline" 
-              className="flex-1 rounded-full h-12" 
+              variant="outline"
+              className="flex-1 rounded-full h-12"
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
             >
@@ -163,20 +163,20 @@ export function EditableAvatar({
             </Button>
             {imageUrl && onDelete && (
               <Button 
-                variant="ghost" 
+                variant="ghost"
                 className="rounded-full h-12 w-12 p-0 text-destructive hover:bg-destructive/10"
                 onClick={handleDelete}
                 disabled={isUploading}
               >
-                <HugeiconsIcon icon={Trash} className="h-5 w-5" />
+                <HugeiconsIcon icon={Trash} className="h-5 w-5"/>
               </Button>
             )}
           </div>
           <input 
-            type="file" 
+            type="file"
             ref={fileInputRef} 
-            className="hidden" 
-            accept="image/*" 
+            className="hidden"
+            accept="image/*"
             onChange={handleFileChange} 
           />
         </div>

@@ -24,7 +24,7 @@ export default function WhatsNewPage() {
         {updates.map((update) => (
           <div key={update.version} className="relative pl-8 space-y-6">
             <div className="absolute left-0 top-0 bottom-0 w-px bg-border">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 h-4 w-4 rounded-full border-4 border-background bg-primary" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 h-4 w-4 rounded-full border-4 border-background bg-primary"/>
             </div>
             
             <div className="space-y-1">
@@ -36,7 +36,7 @@ export default function WhatsNewPage() {
               {update.items.map((item, i) => (
                 <div key={i} className="flex gap-4 p-4 rounded-lg border bg-card hover:bg-muted/30 transition-colors">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <HugeiconsIcon icon={item.icon} className="h-5 w-5" />
+                    <HugeiconsIcon icon={item.icon} className="h-5 w-5"/>
                   </div>
                   <div className="space-y-1">
                     <h3 className="font-bold">{item.title}</h3>

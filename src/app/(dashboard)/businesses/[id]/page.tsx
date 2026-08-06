@@ -30,14 +30,14 @@ export default function BusinessDetailPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-2xl space-y-8 pb-20">
-        <Skeleton className="h-40 w-full rounded-lg" />
+        <Skeleton className="h-40 w-full rounded-lg"/>
         <div className="grid grid-cols-2 gap-4">
-          <Skeleton className="h-24 w-full rounded-lg" />
-          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg"/>
+          <Skeleton className="h-24 w-full rounded-lg"/>
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-32 w-full rounded-lg" />
+            <Skeleton key={i} className="h-32 w-full rounded-lg"/>
           ))}
         </div>
       </div>
@@ -56,7 +56,7 @@ export default function BusinessDetailPage() {
               color={business.color} 
               icon={business.icon} 
               imageUrl={business.logo_url}
-              size="lg" 
+              size="lg"
             />
             <div>
               <h2 className="text-2xl font-semibold">{business.name}</h2>
@@ -64,8 +64,8 @@ export default function BusinessDetailPage() {
             </div>
           </div>
           <Link href={`/businesses/${id}/edit`}>
-            <Button variant="ghost" size="icon" className="rounded-full bg-canvas-parchment/50">
-              <HugeiconsIcon icon={Pencil} className="h-4 w-4" />
+            <Button variant="ghost"size="icon"className="rounded-full bg-canvas-parchment/50">
+              <HugeiconsIcon icon={Pencil} className="h-4 w-4"/>
             </Button>
           </Link>
         </div>
@@ -73,15 +73,15 @@ export default function BusinessDetailPage() {
         <div className="flex gap-3 relative z-10">
           {business.phone && (
             <a href={`tel:${business.phone}`} className="flex-1">
-              <Button className="w-full rounded-sm h-12" variant="outline">
-                <HugeiconsIcon icon={Phone} className="mr-2 h-4 w-4" /> {tc('contact')}
+              <Button className="w-full rounded-sm h-12"variant="outline">
+                <HugeiconsIcon icon={Phone} className="mr-2 h-4 w-4"/> {tc('contact')}
               </Button>
             </a>
           )}
           {business.email && (
             <a href={`mailto:${business.email}`} className="flex-1">
-              <Button className="w-full rounded-sm h-12" variant="outline">
-                <HugeiconsIcon icon={Mail} className="mr-2 h-4 w-4" /> {tc('email')}
+              <Button className="w-full rounded-sm h-12"variant="outline">
+                <HugeiconsIcon icon={Mail} className="mr-2 h-4 w-4"/> {tc('email')}
               </Button>
             </a>
           )}
@@ -116,7 +116,7 @@ export default function BusinessDetailPage() {
         {business.address && (
           <div className="pt-2 relative z-10">
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 flex items-center gap-1">
-              <HugeiconsIcon icon={MapPin} className="h-3 w-3" /> {tc('address')}
+              <HugeiconsIcon icon={MapPin} className="h-3 w-3"/> {tc('address')}
             </p>
             <p className="text-sm font-semibold">{business.address}</p>
           </div>
@@ -125,7 +125,7 @@ export default function BusinessDetailPage() {
 
       <div className="space-y-4">
         <div className="flex items-center gap-2 px-1">
-          <HugeiconsIcon icon={FileText} className="h-3 w-3 text-muted-foreground opacity-80" />
+          <HugeiconsIcon icon={FileText} className="h-3 w-3 text-muted-foreground opacity-80"/>
           <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{t('businessCheques')}</h3>
         </div>
         {cheques && cheques.length === 0 ? (

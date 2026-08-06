@@ -31,7 +31,7 @@ export function ChequeStatsChart({ chartData, totalCheques }: ChequeStatsChartPr
 
   return (
     <div className="relative h-full w-full">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%"height="100%">
         <PieChart>
           <Pie
             data={chartData}
@@ -43,7 +43,7 @@ export function ChequeStatsChart({ chartData, totalCheques }: ChequeStatsChartPr
             dataKey="value"
           >
             {chartData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+              <Cell key={`cell-${index}`} fill={entry.color} stroke="none"/>
             ))}
           </Pie>
           <Tooltip

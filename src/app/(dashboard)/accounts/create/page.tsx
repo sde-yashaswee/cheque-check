@@ -14,7 +14,7 @@ import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 
 const BankSelector = dynamic(() => import('@/components/bank-selector').then(mod => mod.BankSelector), {
-  loading: () => <Skeleton className="h-14 w-full rounded-2xl" />,
+  loading: () => <Skeleton className="h-14 w-full rounded-2xl"/>,
   ssr: false
 })
 
@@ -40,8 +40,8 @@ export default function CreateAccountPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8 pb-20">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => step > 1 ? prevStep() : router.back()} className="rounded-full">
-          <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5" />
+        <Button variant="ghost"size="icon"onClick={() => step > 1 ? prevStep() : router.back()} className="rounded-full">
+          <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5"/>
         </Button>
         <div>
           <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">{tc('step', { step, total: 3 })}</p>
@@ -55,7 +55,7 @@ export default function CreateAccountPage() {
             key={s} 
             className={cn(
               "h-1.5 flex-1 rounded-full transition-colors",
-              s <= step ? "bg-primary" : "bg-canvas-parchment"
+              s <= step ?"bg-primary":"bg-canvas-parchment"
             )} 
           />
         ))}
@@ -83,8 +83,8 @@ export default function CreateAccountPage() {
                       type="button"
                       onClick={() => setValue('color', c)}
                       className={cn(
-                        "h-10 w-10 rounded-full transition-all active:scale-[0.9] ring-offset-2",
-                        watch('color' as any) === c ? "ring-2 ring-primary scale-110" : "hover:scale-105"
+                        "h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2",
+                        watch('color' as any) === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
                       )}
                       style={{ backgroundColor: c }}
                     />
@@ -93,8 +93,8 @@ export default function CreateAccountPage() {
               </div>
             </div>
             
-            <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('bank_id')}>
-              {tc('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
+            <Button type="button"className="w-full rounded-full h-14 text-lg"onClick={nextStep} disabled={!watch('bank_id')}>
+              {tc('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
             </Button>
           </div>
         )}
@@ -102,13 +102,13 @@ export default function CreateAccountPage() {
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="account_name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('accountName')}</Label>
+              <Label htmlFor="account_name"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('accountName')}</Label>
               <div className="relative">
-                <HugeiconsIcon icon={User} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+                <HugeiconsIcon icon={User} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
                 <Input 
-                  id="account_name" 
+                  id="account_name"
                   {...register('account_name')} 
-                  placeholder="e.g. John Doe" 
+                  placeholder="e.g. John Doe"
                   className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
                 />
               </div>
@@ -116,11 +116,11 @@ export default function CreateAccountPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="account_number" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('accountNumber')}</Label>
+              <Label htmlFor="account_number"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('accountNumber')}</Label>
               <div className="relative">
-                <HugeiconsIcon icon={CreditCard} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+                <HugeiconsIcon icon={CreditCard} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
                 <Input 
-                  id="account_number" 
+                  id="account_number"
                   {...register('account_number')} 
                   placeholder={t('accountNumberPlaceholder')} 
                   className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
@@ -129,8 +129,8 @@ export default function CreateAccountPage() {
               {errors.account_number && <p className="text-xs text-destructive ml-1">{errors.account_number.message as string}</p>}
             </div>
 
-            <Button type="button" className="w-full rounded-full h-14 text-lg" onClick={nextStep} disabled={!watch('account_name') || !watch('account_number')}>
-              {tc('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
+            <Button type="button"className="w-full rounded-full h-14 text-lg"onClick={nextStep} disabled={!watch('account_name') || !watch('account_number')}>
+              {tc('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
             </Button>
           </div>
         )}
@@ -138,15 +138,15 @@ export default function CreateAccountPage() {
         {step === 3 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="ifsc_code" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('ifscCode')}</Label>
+              <Label htmlFor="ifsc_code"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('ifscCode')}</Label>
               <div className="relative">
-                <HugeiconsIcon icon={Hash} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
-                <Input id="ifsc_code" {...register('ifsc_code')} placeholder={t('ifscPlaceholder')} className="h-14 pl-12 bg-canvas-parchment border-none uppercase rounded-sm" />
+                <HugeiconsIcon icon={Hash} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
+                <Input id="ifsc_code"{...register('ifsc_code')} placeholder={t('ifscPlaceholder')} className="h-14 pl-12 bg-canvas-parchment border-none uppercase rounded-sm"/>
               </div>
             </div>
 
-            <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-              {isSaving ? t('addingAccount') : t('addAccount')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
+            <Button type="submit"className="w-full rounded-full h-14 text-lg"disabled={isSaving}>
+              {isSaving ? t('addingAccount') : t('addAccount')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5"/>
             </Button>
           </div>
         )}

@@ -1,9 +1,8 @@
 'use client'
 
 import { useEditCheque } from '@/hooks/use-edit-cheque'
-import { PartyService } from '@/services/party.service'
-import { AccountService } from '@/services/account.service'
-import { useQuery } from '@tanstack/react-query'
+import { useParties } from '@/hooks/use-parties'
+import { useAccounts } from '@/hooks/use-accounts'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,7 +18,7 @@ import { Party, AccountWithRelations } from '@/types'
 import { useTranslations } from 'next-intl'
 
 const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-dialog').then(mod => mod.DeleteConfirmationDialog), {
-  loading: () => <Skeleton className="h-14 w-full rounded-full" />,
+  loading: () => <Skeleton className="h-14 w-full rounded-full"/>,
   ssr: false
 })
 
@@ -41,17 +40,9 @@ export default function EditChequePage() {
 
   const { register, setValue, watch, formState: { errors } } = form
 
-  const { data: parties } = useQuery({
-    queryKey: ['parties', businessId],
-    queryFn: () => PartyService.getAll(businessId!),
-    enabled: !!businessId,
-  })
+  const { parties } = useParties(businessId)
 
-  const { data: accounts } = useQuery({
-    queryKey: ['accounts', businessId],
-    queryFn: () => AccountService.getAll(businessId!),
-    enabled: !!businessId,
-  })
+  const { accounts } = useAccounts(businessId)
 
   const partyOptions = parties?.map((p: Party) => ({ 
     label: p.name, 
@@ -72,9 +63,9 @@ export default function EditChequePage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-2xl space-y-8 pb-20">
-        <Skeleton className="h-14 w-full rounded-lg" />
-        <Skeleton className="h-14 w-full rounded-lg" />
-        <Skeleton className="h-14 w-full rounded-lg" />
+        <Skeleton className="h-14 w-full rounded-lg"/>
+        <Skeleton className="h-14 w-full rounded-lg"/>
+        <Skeleton className="h-14 w-full rounded-lg"/>
       </div>
     )
   }
@@ -90,21 +81,21 @@ export default function EditChequePage() {
                 type="button"
                 onClick={() => setValue('type', 'Outward')}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-3 rounded-lg p-6 border transition-all active:scale-[0.98]",
+                  "flex flex-col items-center justify-center gap-3 rounded-lg p-6 border transition-all active:scale-95",
                   watch('type') === 'Outward' 
-                    ? "bg-primary/5 border-primary" 
+                    ? "bg-primary/5 border-primary"
                     : "bg-card border-primary/5"
                 )}
               >
                 <div className={cn(
                   "h-12 w-12 rounded-sm flex items-center justify-center transition-colors",
-                  watch('type') === 'Outward' ? "bg-primary text-white" : "bg-primary/10 text-primary"
+                  watch('type') === 'Outward' ? "bg-primary text-white": "bg-primary/10 text-primary"
                 )}>
-                  <HugeiconsIcon icon={ArrowUpRight} className="h-6 w-6" />
+                  <HugeiconsIcon icon={ArrowUpRight} className="h-6 w-6"/>
                 </div>
                 <span className={cn(
                   "font-semibold text-xs uppercase tracking-wider",
-                  watch('type') === 'Outward' ? "text-primary" : "text-muted-foreground"
+                  watch('type') === 'Outward' ? "text-primary": "text-muted-foreground"
                 )}>{t('issued')}</span>
               </button>
 
@@ -112,35 +103,35 @@ export default function EditChequePage() {
                 type="button"
                 onClick={() => setValue('type', 'Inward')}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-3 rounded-lg p-6 border transition-all active:scale-[0.98]",
+                  "flex flex-col items-center justify-center gap-3 rounded-lg p-6 border transition-all active:scale-95",
                   watch('type') === 'Inward' 
-                    ? "bg-green-500/5 border-green-500" 
+                    ? "bg-green-500/5 border-green-500"
                     : "bg-card border-primary/5"
                 )}
               >
                 <div className={cn(
                   "h-12 w-12 rounded-sm flex items-center justify-center transition-colors",
-                  watch('type') === 'Inward' ? "bg-green-500 text-white" : "bg-green-500/10 text-green-600"
+                  watch('type') === 'Inward' ? "bg-green-500 text-white": "bg-green-500/10 text-green-600"
                 )}>
-                  <HugeiconsIcon icon={ArrowDownLeft} className="h-6 w-6" />
+                  <HugeiconsIcon icon={ArrowDownLeft} className="h-6 w-6"/>
                 </div>
                 <span className={cn(
                   "font-semibold text-xs uppercase tracking-wider",
-                  watch('type') === 'Inward' ? "text-green-600" : "text-muted-foreground"
+                  watch('type') === 'Inward' ? "text-green-600": "text-muted-foreground"
                 )}>{t('received')}</span>
               </button>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amount" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('amount')}</Label>
+            <Label htmlFor="amount"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('amount')}</Label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-semibold opacity-30">₹</span>
               <Input 
-                id="amount" 
-                type="number" 
+                id="amount"
+                type="number"
                 {...register('amount')} 
-                className="h-16 pl-10 text-3xl font-semibold border-none bg-canvas-parchment rounded-sm" 
+                className="h-16 pl-10 text-3xl font-semibold border-none bg-canvas-parchment rounded-sm"
               />
             </div>
             {errors.amount && <p className="text-xs text-destructive ml-1">{errors.amount.message as string}</p>}
@@ -148,14 +139,14 @@ export default function EditChequePage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="cheque_number" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('chequeNumber')}</Label>
-              <Input id="cheque_number" {...register('cheque_number')} placeholder={t('chequeNumberPlaceholder')} className="h-12 rounded-sm bg-canvas-parchment border-none" />
+              <Label htmlFor="cheque_number"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('chequeNumber')}</Label>
+              <Input id="cheque_number"{...register('cheque_number')} placeholder={t('chequeNumberPlaceholder')} className="h-12 rounded-sm bg-canvas-parchment border-none"/>
               {errors.cheque_number && <p className="text-xs text-destructive ml-1">{errors.cheque_number.message as string}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cheque_date" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('chequeDate')}</Label>
-              <Input id="cheque_date" type="date" {...register('cheque_date')} className="h-12 rounded-sm bg-canvas-parchment border-none" />
+              <Label htmlFor="cheque_date"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('chequeDate')}</Label>
+              <Input id="cheque_date"type="date"{...register('cheque_date')} className="h-12 rounded-sm bg-canvas-parchment border-none"/>
               {errors.cheque_date && <p className="text-xs text-destructive ml-1">{errors.cheque_date.message as string}</p>}
             </div>
           </div>
@@ -183,19 +174,19 @@ export default function EditChequePage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('notes')}</Label>
-            <Input id="notes" {...register('notes')} placeholder={t('notesPlaceholder')} className="h-12 rounded-sm bg-canvas-parchment border-none" />
+            <Label htmlFor="notes"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('notes')}</Label>
+            <Input id="notes"{...register('notes')} placeholder={t('notesPlaceholder')} className="h-12 rounded-sm bg-canvas-parchment border-none"/>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="deposit_date" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('depositDate')}</Label>
-            <Input id="deposit_date" type="date" {...register('deposit_date')} className="h-12 rounded-sm bg-canvas-parchment border-none" />
+            <Label htmlFor="deposit_date"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('depositDate')}</Label>
+            <Input id="deposit_date"type="date"{...register('deposit_date')} className="h-12 rounded-sm bg-canvas-parchment border-none"/>
           </div>
         </div>
 
         <div className="pt-4 flex flex-col gap-3">
-          <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-            {isSaving ? tCommon('saving') : t('updateAction')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
+          <Button type="submit"className="w-full rounded-full h-14 text-lg"disabled={isSaving}>
+            {isSaving ? tCommon('saving') : t('updateAction')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5"/>
           </Button>
 
           <DeleteConfirmationDialog 
@@ -204,8 +195,8 @@ export default function EditChequePage() {
             confirmName={cheque?.cheque_number || 'Cheque'}
             onDelete={async () => { onDelete() }}
             trigger={
-              <Button type="button" variant="ghost" className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">
-                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" /> {t('deleteAction')}
+              <Button type="button"variant="ghost"className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">
+                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5"/> {t('deleteAction')}
               </Button>
             }
           />

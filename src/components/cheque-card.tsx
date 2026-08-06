@@ -14,14 +14,12 @@ import { EntityAvatar } from '@/components/ui/entity-avatar'
 import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTranslations } from 'next-intl'
+import { useChequeActions } from '@/hooks/use-cheque-actions'
 
 const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-dialog').then(mod => mod.DeleteConfirmationDialog), {
-  loading: () => <Skeleton className="h-10 w-full rounded-lg" />,
+  loading: () => <Skeleton className="h-10 w-full rounded-lg"/>,
   ssr: false
 })
-import { ChequeService } from '@/services/cheque.service'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useBusiness } from '@/hooks/use-business'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import Image from 'next/image'
 
@@ -34,31 +32,10 @@ interface ChequeCardProps {
 
 export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
   const t = useTranslations('Cheques')
-  const tCommon = useTranslations('Common')
   const [offset, setOffset] = useState(0)
   const [swiping, setSwiping] = useState<'clear' | 'bounce' | null>(null)
   const { profile } = useProfile()
-  const { activeBusiness } = useBusiness()
-  const queryClient = useQueryClient()
-
-  const deleteMutation = useMutation({
-    mutationFn: () => ChequeService.delete(cheque.id),
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ['cheques', activeBusiness?.id] })
-      const previousCheques = queryClient.getQueryData(['cheques', activeBusiness?.id])
-      queryClient.setQueryData(['cheques', activeBusiness?.id], (old: any) => {
-        if (!old) return old
-        return old.filter((c: any) => c.id !== cheque.id)
-      })
-      return { previousCheques }
-    },
-    onError: (err, variables, context) => {
-      queryClient.setQueryData(['cheques', activeBusiness?.id], context?.previousCheques)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['cheques', activeBusiness?.id] })
-    }
-  })
+  const { deleteCheque } = useChequeActions()
 
   const currency = profile?.currency || '₹'
   const dateFormat = (profile?.date_format || 'dd/MM/yyyy')
@@ -111,17 +88,17 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
       <div className="absolute inset-0 flex items-center justify-between px-6">
         <div className={cn(
           "flex items-center gap-2 transition-opacity",
-          swiping === 'clear' ? "opacity-100" : "opacity-0"
+          swiping === 'clear' ? "opacity-100": "opacity-0"
         )}>
-          <HugeiconsIcon icon={Check} className="h-6 w-6 text-green-500" />
+          <HugeiconsIcon icon={Check} className="h-6 w-6 text-green-500"/>
           <span className="font-bold text-green-500 uppercase">{t('clear')}</span>
         </div>
         <div className={cn(
           "flex items-center gap-2 transition-opacity",
-          swiping === 'bounce' ? "opacity-100" : "opacity-0"
+          swiping === 'bounce' ? "opacity-100": "opacity-0"
         )}>
           <span className="font-bold text-destructive uppercase">{t('bounce')}</span>
-          <HugeiconsIcon icon={X} className="h-6 w-6 text-destructive" />
+          <HugeiconsIcon icon={X} className="h-6 w-6 text-destructive"/>
         </div>
       </div>
 
@@ -129,9 +106,9 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
         {...handlers}
         style={{ x: offset }}
         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-        className="relative z-10 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-card p-5 shadow-sm active:scale-[0.99] transition-transform"
+        className="relative z-10 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-card p-5 active:scale-95 transition-transform"
       >
-        <Link href={`/cheques/${cheque.id}`} className="absolute inset-0 z-0" />
+        <Link href={`/cheques/${cheque.id}`} className="absolute inset-0 z-0"/>
         <div className="flex justify-between items-start relative z-10 pointer-events-none">
           <div className="flex items-start gap-3">
             <EntityAvatar 
@@ -148,12 +125,12 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
                 {cheque.image_url && (
                   <Dialog>
                     <DialogTrigger render={
-                      <button className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center text-primary transition-transform active:scale-90 pointer-events-auto">
-                        <HugeiconsIcon icon={ImageIcon} className="h-3 w-3" />
+                      <button className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center text-primary transition-transform active:scale-95 pointer-events-auto">
+                        <HugeiconsIcon icon={ImageIcon} className="h-3 w-3"/>
                       </button>
                     } />
                     <DialogContent className="max-w-lg p-0 overflow-hidden bg-transparent border-none shadow-none">
-                      <Image src={cheque.image_url} alt={t('scan')} width={800} height={400} className="w-full h-auto rounded-3xl" />
+                      <Image src={cheque.image_url} alt={t('scan')} width={800} height={400} className="w-full h-auto rounded-3xl"/>
                     </DialogContent>
                   </Dialog>
                 )}
@@ -185,10 +162,10 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
                 title={t('deleteConfirmTitle')}
                 description={t('deleteConfirmDesc')}
                 confirmName={cheque.cheque_number}
-                onDelete={async () => { deleteMutation.mutate() }}
+                onDelete={async () => { deleteCheque(cheque.id) }}
                 trigger={
                   <button className="text-muted-foreground hover:text-destructive transition-colors">
-                    <HugeiconsIcon icon={Trash2} className="h-3 w-3" />
+                    <HugeiconsIcon icon={Trash2} className="h-3 w-3"/>
                   </button>
                 }
               />

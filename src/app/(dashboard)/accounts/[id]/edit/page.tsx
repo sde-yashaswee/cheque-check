@@ -14,12 +14,12 @@ import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 
 const DeleteConfirmationDialog = dynamic(() => import('@/components/ui/delete-dialog').then(mod => mod.DeleteConfirmationDialog), {
-  loading: () => <Skeleton className="h-14 w-full rounded-full" />,
+  loading: () => <Skeleton className="h-14 w-full rounded-full"/>,
   ssr: false
 })
 
 const BankSelector = dynamic(() => import('@/components/bank-selector').then(mod => mod.BankSelector), {
-  loading: () => <Skeleton className="h-14 w-full rounded-2xl" />,
+  loading: () => <Skeleton className="h-14 w-full rounded-2xl"/>,
   ssr: false
 })
 
@@ -45,9 +45,9 @@ export default function EditAccountPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-2xl space-y-8 pb-20">
-        <Skeleton className="h-14 w-full rounded-lg" />
-        <Skeleton className="h-14 w-full rounded-lg" />
-        <Skeleton className="h-14 w-full rounded-lg" />
+        <Skeleton className="h-14 w-full rounded-lg"/>
+        <Skeleton className="h-14 w-full rounded-lg"/>
+        <Skeleton className="h-14 w-full rounded-lg"/>
       </div>
     )
   }
@@ -66,13 +66,13 @@ export default function EditAccountPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="account_name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('accountName')}</Label>
+            <Label htmlFor="account_name"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('accountName')}</Label>
             <div className="relative">
-              <HugeiconsIcon icon={User} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+              <HugeiconsIcon icon={User} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
               <Input 
-                id="account_name" 
+                id="account_name"
                 {...register('account_name')} 
-                placeholder="e.g. John Doe" 
+                placeholder="e.g. John Doe"
                 className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
               />
             </div>
@@ -80,11 +80,11 @@ export default function EditAccountPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="account_number" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('accountNumber')}</Label>
+            <Label htmlFor="account_number"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('accountNumber')}</Label>
             <div className="relative">
-              <HugeiconsIcon icon={CreditCard} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
+              <HugeiconsIcon icon={CreditCard} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
               <Input 
-                id="account_number" 
+                id="account_number"
                 {...register('account_number')} 
                 placeholder={t('accountNumberPlaceholder')} 
                 className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
@@ -94,10 +94,10 @@ export default function EditAccountPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="ifsc_code" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('ifscCode')}</Label>
+            <Label htmlFor="ifsc_code"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('ifscCode')}</Label>
             <div className="relative">
-              <HugeiconsIcon icon={Hash} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50" />
-              <Input id="ifsc_code" {...register('ifsc_code')} placeholder={t('ifscPlaceholder')} className="h-14 pl-12 bg-canvas-parchment border-none uppercase rounded-sm" />
+              <HugeiconsIcon icon={Hash} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
+              <Input id="ifsc_code"{...register('ifsc_code')} placeholder={t('ifscPlaceholder')} className="h-14 pl-12 bg-canvas-parchment border-none uppercase rounded-sm"/>
             </div>
           </div>
 
@@ -110,8 +110,8 @@ export default function EditAccountPage() {
                   type="button"
                   onClick={() => setValue('color' as any, c)}
                   className={cn(
-                    "h-10 w-10 rounded-full transition-all active:scale-[0.9] ring-offset-2",
-                    watch('color' as any) === c ? "ring-2 ring-primary scale-110" : "hover:scale-105"
+                    "h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2",
+                    watch('color' as any) === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
                   )}
                   style={{ backgroundColor: c }}
                 />
@@ -121,8 +121,8 @@ export default function EditAccountPage() {
         </div>
 
         <div className="pt-4 flex flex-col gap-3">
-          <Button type="submit" className="w-full rounded-full h-14 text-lg" disabled={isSaving}>
-            {isSaving ? tc('saving') : t('updateAccount')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
+          <Button type="submit"className="w-full rounded-full h-14 text-lg"disabled={isSaving}>
+            {isSaving ? tc('saving') : t('updateAccount')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5"/>
           </Button>
 
           <DeleteConfirmationDialog 
@@ -131,8 +131,8 @@ export default function EditAccountPage() {
             confirmName={account?.bank?.name || 'Account'}
             onDelete={async () => { onDelete() }}
             trigger={
-              <Button type="button" variant="ghost" className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">
-                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" /> {t('deleteAccount')}
+              <Button type="button"variant="ghost"className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors">
+                <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5"/> {t('deleteAccount')}
               </Button>
             }
           />

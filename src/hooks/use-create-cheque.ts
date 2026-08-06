@@ -77,7 +77,7 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
       const url = await StorageService.uploadChequeImage(file)
       setValue('image_url', url)
     } catch (error: any) {
-      alert("Upload failed: " + error.message)
+      alert("Upload failed: "+ error.message)
     } finally {
       setIsUploading(false)
     }

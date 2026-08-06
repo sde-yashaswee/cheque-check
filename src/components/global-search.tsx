@@ -4,10 +4,9 @@ import { useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react';
 import { File02Icon as FileText, UserGroupIcon as Users, Building03Icon as Building2, ArrowRight01Icon as ChevronRight } from '@hugeicons/core-free-icons';
 import { useBusiness } from '@/hooks/use-business'
-import { ChequeService } from '@/services/cheque.service'
-import { PartyService } from '@/services/party.service'
-import { AccountService } from '@/services/account.service'
-import { useQuery } from '@tanstack/react-query'
+import { useCheques } from '@/hooks/use-cheques'
+import { useParties } from '@/hooks/use-parties'
+import { useAccounts } from '@/hooks/use-accounts'
 import { useRouter } from 'next/navigation'
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
@@ -18,23 +17,9 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
   const businessId = activeBusiness?.id
   const router = useRouter()
 
-  const { data: cheques } = useQuery({
-    queryKey: ['cheques', businessId],
-    queryFn: () => ChequeService.getAll(businessId!),
-    enabled: !!businessId && open,
-  })
-
-  const { data: parties } = useQuery({
-    queryKey: ['parties', businessId],
-    queryFn: () => PartyService.getAll(businessId!),
-    enabled: !!businessId && open,
-  })
-
-  const { data: accounts } = useQuery({
-    queryKey: ['accounts', businessId],
-    queryFn: () => AccountService.getAll(businessId!),
-    enabled: !!businessId && open,
-  })
+  const { cheques } = useCheques(open ? businessId : undefined)
+  const { parties } = useParties(open ? businessId : undefined)
+  const { accounts } = useAccounts(open ? businessId : undefined)
 
   const filteredCheques = query.length > 0 
     ? (cheques || []).filter((c: any) => 
@@ -69,7 +54,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <CommandInput 
-        placeholder="Search everything..." 
+        placeholder="Search everything..."
         value={query}
         onValueChange={setQuery}
       />
@@ -87,13 +72,13 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10 text-primary shrink-0">
-                  <HugeiconsIcon icon={FileText} className="h-5 w-5" />
+                  <HugeiconsIcon icon={FileText} className="h-5 w-5"/>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold">₹{c.amount.toLocaleString()}</p>
                   <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider">{c.party?.name} • #{c.cheque_number}</p>
                 </div>
-                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 shrink-0" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 shrink-0"/>
               </CommandItem>
             ))}
           </CommandGroup>
@@ -112,14 +97,14 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
                   color={p.color} 
                   icon={p.icon} 
                   imageUrl={p.avatar_url}
-                  size="lg" 
+                  size="lg"
                   className="rounded-sm shrink-0"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold">{p.name}</p>
                   <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider">{p.contact}</p>
                 </div>
-                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 shrink-0" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 shrink-0"/>
               </CommandItem>
             ))}
           </CommandGroup>
@@ -138,14 +123,14 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
                   color={a.color} 
                   icon={a.icon} 
                   imageUrl={a.bank?.logo_url}
-                  size="lg" 
+                  size="lg"
                   className="rounded-sm shrink-0"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold">{a.bank?.name || 'Bank'}</p>
                   <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider">{a.account_name} • {a.account_number}</p>
                 </div>
-                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 shrink-0" />
+                <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 shrink-0"/>
               </CommandItem>
             ))}
           </CommandGroup>

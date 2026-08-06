@@ -14,7 +14,7 @@ export default function FeaturesPage() {
     {
       id: 'receiving_mode',
       name: 'Receiving Cheques Mode',
-      description: 'Enable this if your business also receives cheques from parties. Adds "Inward" cheque support throughout the app.',
+      description: 'Enable this if your business also receives cheques from parties. Adds "Inward"cheque support throughout the app.',
       icon: CheckCircle2,
       checked: !!profile?.received_cheques_enabled,
       onChange: (val: boolean) => updateProfile({ received_cheques_enabled: val })
@@ -52,7 +52,7 @@ export default function FeaturesPage() {
           >
             <div className="flex items-start justify-between">
               <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/10 text-primary">
-                <HugeiconsIcon icon={feature.icon} className="h-6 w-6" />
+                <HugeiconsIcon icon={feature.icon} className="h-6 w-6"/>
               </div>
             </div>
             

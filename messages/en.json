@@ -116,6 +116,7 @@
   "Dashboard": {
     "totalOutstanding": "Total Outstanding",
     "quickActions": "Quick Actions",
+    "scanCheque": "Scan Cheque",
     "issueCheque": "Issue Cheque",
     "receiveCheque": "Receive Cheque",
     "todaysCheques": "Today's Cheques",
