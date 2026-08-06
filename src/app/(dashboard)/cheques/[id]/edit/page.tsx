@@ -130,7 +130,7 @@ export default function EditChequePage() {
               <Input 
                 id="amount"
                 type="number"
-                {...register('amount')} 
+                {...register('amount', { valueAsNumber: true })} 
                 className="h-16 pl-10 text-3xl font-semibold border-none bg-canvas-parchment rounded-sm"
               />
             </div>

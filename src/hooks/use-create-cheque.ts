@@ -6,6 +6,9 @@ import { ChequeService } from '@/services/cheque.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { StorageService } from '@/services/storage.service'
+import { z } from 'zod'
+
+type ChequeFormValues = z.infer<typeof chequeSchema>
 
 export function useCreateCheque(businessId: string | undefined, initialType: string | null) {
   const [step, setStep] = useState(1)
@@ -13,7 +16,7 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
   const router = useRouter()
   const queryClient = useQueryClient()
 
-  const form = useForm({
+  const form = useForm<ChequeFormValues>({
     resolver: zodResolver(chequeSchema),
     defaultValues: {
       amount: 0,
@@ -21,9 +24,9 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
       cheque_date: new Date().toISOString().split('T')[0],
       party_id: '',
       account_id: '',
-      type: (initialType === 'Inward' ? 'Inward' : 'Outward') as 'Outward' | 'Inward',
+      type: (initialType === 'Inward' ? 'Inward' : 'Outward'),
       notes: '',
-      image_url: null as string | null,
+      image_url: null,
       deposit_date: '',
     }
   })

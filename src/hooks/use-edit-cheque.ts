@@ -19,7 +19,7 @@ export function useEditCheque(id: string) {
   })
 
   const form = useForm<ChequeFormData>({
-    resolver: zodResolver(chequeSchema) as any,
+    resolver: zodResolver(chequeSchema),
     defaultValues: {
       cheque_number: '',
       amount: 0,
