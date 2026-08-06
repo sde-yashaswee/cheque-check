@@ -3,7 +3,7 @@
 import { useCheques } from '@/hooks/use-cheques'
 import { ChequeCard } from '@/components/cheque-card'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { PlusSignIcon as Plus, Search01Icon as Search, Sorting05Icon as Filter, Invoice01Icon as ReceiptText, Tick02Icon as Check } from '@hugeicons/core-free-icons';
+import { PlusSignIcon as Plus, Search01Icon as Search, Sorting05Icon as Filter, Invoice01Icon as ReceiptText, Tick02Icon as Check, Calendar03Icon as DateIcon, Money03Icon as AmountIcon, SortingAZ01Icon as AscIcon, SortingZA01Icon as DescIcon, CircleIcon as AllIcon, ArrowUpRight01Icon as IssuedIcon, ArrowDownLeft01Icon as ReceivedIcon, CheckmarkCircle01Icon as ClearedIcon, Cancel01Icon as BouncedIcon } from '@hugeicons/core-free-icons';
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -46,16 +46,22 @@ export default function ChequesPage() {
     setSortOrder('desc')
   }
 
-  const statusOptions = ['All', 'Issued', 'Received', 'Cleared', 'Bounced'] as const
+  const statusOptions = [
+    { label: 'All', value: 'All', icon: AllIcon },
+    { label: 'Issued', value: 'Issued', icon: IssuedIcon },
+    { label: 'Received', value: 'Received', icon: ReceivedIcon },
+    { label: 'Cleared', value: 'Cleared', icon: ClearedIcon },
+    { label: 'Bounced', value: 'Bounced', icon: BouncedIcon },
+  ] as const
 
   const sortOptions = [
-    { label: t('sortDate'), value: 'date' },
-    { label: t('sortAmount'), value: 'amount' },
+    { label: t('sortDate'), value: 'date', icon: DateIcon },
+    { label: t('sortAmount'), value: 'amount', icon: AmountIcon },
   ]
 
   const orderOptions = [
-    { label: tCommon('ascending'), value: 'asc' },
-    { label: tCommon('descending'), value: 'desc' },
+    { label: tCommon('ascending'), value: 'asc', icon: AscIcon },
+    { label: tCommon('descending'), value: 'desc', icon: DescIcon },
   ]
 
   return (
@@ -101,8 +107,8 @@ export default function ChequesPage() {
                           : "bg-muted/30 border-transparent text-foreground"
                       )}
                     >
+                      <HugeiconsIcon icon={option.icon} className="h-4 w-4"/>
                       <span className="font-bold text-sm">{option.label}</span>
-                      {sortBy === option.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
                     </button>
                   ))}
                 </div>
@@ -122,8 +128,8 @@ export default function ChequesPage() {
                           : "bg-muted/30 border-transparent text-foreground"
                       )}
                     >
+                      <HugeiconsIcon icon={option.icon} className="h-4 w-4"/>
                       <span className="font-bold text-sm">{option.label}</span>
-                      {sortOrder === option.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
                     </button>
                   ))}
                 </div>
@@ -134,17 +140,20 @@ export default function ChequesPage() {
                 <div className="grid grid-cols-1 gap-2">
                   {statusOptions.map((s) => (
                     <button
-                      key={s}
-                      onClick={() => setFilter(s)}
+                      key={s.value}
+                      onClick={() => setFilter(s.value as any)}
                       className={cn(
                         "flex items-center justify-between px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
-                        filter === s 
+                        filter === s.value 
                           ? "bg-primary/5 border-primary text-primary" 
                           : "bg-muted/30 border-transparent text-foreground"
                       )}
                     >
-                      <span className="font-bold text-sm">{tCommon(s.toLowerCase() as any)}</span>
-                      {filter === s && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
+                      <div className="flex items-center gap-3">
+                        <HugeiconsIcon icon={s.icon} className="h-4 w-4"/>
+                        <span className="font-bold text-sm">{tCommon(s.value.toLowerCase() as any)}</span>
+                      </div>
+                      {filter === s.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
                     </button>
                   ))}
                 </div>

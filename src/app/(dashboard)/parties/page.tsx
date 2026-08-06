@@ -2,7 +2,7 @@
 
 import { useParties } from '@/hooks/use-parties'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { PlusSignIcon as Plus, Search01Icon as Search, UserIcon as User, ArrowRight01Icon as ChevronRight, Sorting05Icon as Filter, Tick02Icon as Check } from '@hugeicons/core-free-icons';
+import { PlusSignIcon as Plus, Search01Icon as Search, UserIcon as User, ArrowRight01Icon as ChevronRight, Sorting05Icon as Filter, Tick02Icon as Check, TextSquareIcon as NameIcon, Money03Icon as BalanceIcon, SortingAZ01Icon as AscIcon, SortingZA01Icon as DescIcon } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
@@ -44,13 +44,13 @@ export default function PartiesPage() {
   }
 
   const sortOptions = [
-    { label: t('sortByName'), value: 'name' },
-    { label: t('sortByBalance'), value: 'balance' },
+    { label: t('sortByName'), value: 'name', icon: NameIcon },
+    { label: t('sortByBalance'), value: 'balance', icon: BalanceIcon },
   ]
 
   const orderOptions = [
-    { label: tCommon('ascending'), value: 'asc' },
-    { label: tCommon('descending'), value: 'desc' },
+    { label: tCommon('ascending'), value: 'asc', icon: AscIcon },
+    { label: tCommon('descending'), value: 'desc', icon: DescIcon },
   ]
 
   return (
@@ -96,7 +96,10 @@ export default function PartiesPage() {
                           : "bg-muted/30 border-transparent text-foreground"
                       )}
                     >
-                      <span className="font-bold text-sm">{option.label}</span>
+                      <div className="flex items-center gap-3">
+                        <HugeiconsIcon icon={option.icon} className="h-4 w-4"/>
+                        <span className="font-bold text-sm">{option.label}</span>
+                      </div>
                       {sortBy === option.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
                     </button>
                   ))}
@@ -117,8 +120,8 @@ export default function PartiesPage() {
                           : "bg-muted/30 border-transparent text-foreground"
                       )}
                     >
+                      <HugeiconsIcon icon={option.icon} className="h-4 w-4"/>
                       <span className="font-bold text-sm">{option.label}</span>
-                      {sortOrder === option.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
                     </button>
                   ))}
                 </div>

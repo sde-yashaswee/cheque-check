@@ -1,7 +1,7 @@
 'use client'
 
 import { HugeiconsIcon } from '@hugeicons/react';
-import { PlusSignIcon as Plus, ArrowRight01Icon as ChevronRight, Search01Icon as Search, BankIcon as Landmark, Sorting05Icon as Filter, Tick02Icon as Check } from '@hugeicons/core-free-icons';
+import { PlusSignIcon as Plus, ArrowRight01Icon as ChevronRight, Search01Icon as Search, BankIcon as Landmark, Sorting05Icon as Filter, Tick02Icon as Check, UserIcon as User, SortingAZ01Icon as AscIcon, SortingZA01Icon as DescIcon } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
@@ -43,13 +43,13 @@ export default function AccountsPage() {
   }
 
   const sortOptions = [
-    { label: t('sortByAccountName'), value: 'account_name' },
-    { label: t('sortByBankName'), value: 'bank_name' },
+    { label: t('sortByAccountName'), value: 'account_name', icon: User },
+    { label: t('sortByBankName'), value: 'bank_name', icon: Landmark },
   ]
 
   const orderOptions = [
-    { label: tc('ascending'), value: 'asc' },
-    { label: tc('descending'), value: 'desc' },
+    { label: tc('ascending'), value: 'asc', icon: AscIcon },
+    { label: tc('descending'), value: 'desc', icon: DescIcon },
   ]
 
   return (
@@ -95,7 +95,10 @@ export default function AccountsPage() {
                           : "bg-muted/30 border-transparent text-foreground"
                       )}
                     >
-                      <span className="font-bold text-sm">{option.label}</span>
+                      <div className="flex items-center gap-3">
+                        <HugeiconsIcon icon={option.icon} className="h-4 w-4"/>
+                        <span className="font-bold text-sm">{option.label}</span>
+                      </div>
                       {sortBy === option.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
                     </button>
                   ))}
@@ -116,8 +119,8 @@ export default function AccountsPage() {
                           : "bg-muted/30 border-transparent text-foreground"
                       )}
                     >
+                      <HugeiconsIcon icon={option.icon} className="h-4 w-4"/>
                       <span className="font-bold text-sm">{option.label}</span>
-                      {sortOrder === option.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
                     </button>
                   ))}
                 </div>
@@ -135,7 +138,10 @@ export default function AccountsPage() {
                         : "bg-muted/30 border-transparent text-foreground"
                     )}
                   >
-                    <span className="font-bold text-sm">{tc('allBanks')}</span>
+                    <div className="flex items-center gap-3">
+                      <HugeiconsIcon icon={Landmark} className="h-4 w-4"/>
+                      <span className="font-bold text-sm">{tc('allBanks')}</span>
+                    </div>
                     {bankFilter === 'All' && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
                   </button>
                   {uniqueBanks.map((bank) => (
@@ -149,7 +155,10 @@ export default function AccountsPage() {
                           : "bg-muted/30 border-transparent text-foreground"
                       )}
                     >
-                      <span className="font-bold text-sm truncate">{bank.name}</span>
+                      <div className="flex items-center gap-3">
+                        <HugeiconsIcon icon={Landmark} className="h-4 w-4 opacity-50"/>
+                        <span className="font-bold text-sm truncate">{bank.name}</span>
+                      </div>
                       {bankFilter === bank.id && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
                     </button>
                   ))}
