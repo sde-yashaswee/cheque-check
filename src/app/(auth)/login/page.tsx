@@ -50,7 +50,7 @@ export default function LoginPage() {
     <div className="flex min-h-full flex-col items-center justify-center bg-canvas-parchment px-6 dark:bg-black">
       <div className="w-full max-w-sm space-y-8">
         <div className="flex flex-col items-center text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white shadow-sm overflow-hidden border border-primary/10">
+          <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white shadow-sm overflow-hidden">
             <img src="/android-chrome-512x512.png" alt="ChequeCheck Logo" className="h-full w-full object-contain p-2" />
           </div>
           <h1 className="mt-6 text-display-md font-semibold tracking-tight">ChequeCheck</h1>

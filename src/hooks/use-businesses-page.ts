@@ -58,7 +58,7 @@ export function useBusinesses() {
     })
 
     return result
-  }, [businesses, search, sortOrder, sortBy, allCheques, getUpcomingTotal])
+  }, [businesses, search, sortOrder, sortBy, getUpcomingTotal])
 
   const deleteBusiness = async (id: string) => {
     await deleteMutation.mutateAsync(id)

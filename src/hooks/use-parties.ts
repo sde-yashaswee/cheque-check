@@ -48,7 +48,7 @@ export function useParties(businessId: string | undefined) {
     })
 
     return result
-  }, [parties, search, sortOrder, sortBy, cheques, getBalance])
+  }, [parties, search, sortOrder, sortBy, getBalance])
 
   return {
     parties,
