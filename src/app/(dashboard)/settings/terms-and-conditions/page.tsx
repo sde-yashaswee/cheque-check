@@ -6,7 +6,7 @@ export default function TermsAndConditionsPage() {
   const t = useTranslations("Settings")
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-20">
       <div className="prose prose-sm dark:prose-invert max-w-none px-2">
         <div className="rounded-lg border bg-card p-6 space-y-4">
           <div className="flex items-center gap-3 text-primary mb-4">

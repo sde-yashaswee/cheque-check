@@ -19,7 +19,7 @@ export default function WhatsNewPage() {
   ]
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-20">
       <div className="space-y-12 px-2">
         {updates.map((update) => (
           <div key={update.version} className="relative pl-8 space-y-6">

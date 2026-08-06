@@ -41,7 +41,7 @@ export default function AccountsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-24">
+    <div className="max-w-2xl space-y-8 pb-24">
       <div className="flex gap-2">
         <div className="relative flex-1">
           <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>

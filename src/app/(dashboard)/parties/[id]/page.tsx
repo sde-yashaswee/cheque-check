@@ -49,7 +49,7 @@ export default function PartyDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-2xl space-y-8 pb-20">
+      <div className="max-w-2xl space-y-8 pb-20">
         <Skeleton className="h-40 w-full rounded-lg"/>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
@@ -63,7 +63,7 @@ export default function PartyDetailPage() {
   if (!party) return <div className="text-center py-20 text-muted-foreground">{t('notFound')}</div>
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-20">
       <div className="rounded-lg border bg-card p-6 space-y-6 relative overflow-hidden border-primary/5">
         <div className="flex justify-between items-start relative z-10">
           <div className="flex items-center gap-4">

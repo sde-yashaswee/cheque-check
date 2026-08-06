@@ -38,7 +38,7 @@ export default function CreateAccountPage() {
   const colors = ['#007AFF', '#5856D6', '#AF52DE', '#FF2D55', '#FF3B30', '#FF9500', '#34C759']
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-20">
       <div className="flex items-center gap-4">
         <Button variant="ghost"size="icon"onClick={() => step > 1 ? prevStep() : router.back()} className="rounded-full">
           <HugeiconsIcon icon={ArrowLeft} className="h-5 w-5"/>

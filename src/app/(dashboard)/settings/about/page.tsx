@@ -7,7 +7,7 @@ export default function AboutPage() {
   const t = useTranslations("Settings")
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-20">
       <div className="space-y-6 px-2">
         <div className="rounded-lg border bg-card overflow-hidden">
           <div className="p-6 text-center space-y-2 bg-muted/20">

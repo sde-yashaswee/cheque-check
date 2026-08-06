@@ -253,7 +253,7 @@ export default function CreateChequePage() {
   const selectedParty = parties?.find(p => p.id === watch('party_id'))
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-20">
       <div className="flex items-center gap-4">
         {step > 1 && (
           <Button variant="ghost"size="icon"onClick={prevStep} className="rounded-full">

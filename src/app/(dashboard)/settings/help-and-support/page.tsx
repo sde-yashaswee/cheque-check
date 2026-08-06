@@ -14,7 +14,7 @@ export default function HelpAndSupportPage() {
   ]
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-20">
       <div className="space-y-8 px-2">
         <div className="grid grid-cols-2 gap-4">
           <Link href="mailto:support@chequecheck.com"className="flex flex-col items-center justify-center p-6 rounded-lg border bg-card hover:bg-muted/30 transition-all space-y-2 text-center">

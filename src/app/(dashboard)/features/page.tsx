@@ -42,7 +42,7 @@ export default function FeaturesPage() {
   ]
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-20">
       <div className="grid gap-4">
         {features.map((feature) => (
           <div

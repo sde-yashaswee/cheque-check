@@ -38,7 +38,7 @@ export default function EditBusinessPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-2xl space-y-8 pb-20">
+      <div className="max-w-2xl space-y-8 pb-20">
         <Skeleton className="h-14 w-full rounded-lg"/>
         <Skeleton className="h-14 w-full rounded-lg"/>
         <Skeleton className="h-14 w-full rounded-lg"/>
@@ -47,7 +47,7 @@ export default function EditBusinessPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-20">
       <div className="flex flex-col items-center gap-4 py-4">
         <EditableAvatar
           name={watch('name')}

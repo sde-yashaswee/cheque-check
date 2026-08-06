@@ -62,7 +62,7 @@ export default function EditChequePage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-2xl space-y-8 pb-20">
+      <div className="max-w-2xl space-y-8 pb-20">
         <Skeleton className="h-14 w-full rounded-lg"/>
         <Skeleton className="h-14 w-full rounded-lg"/>
         <Skeleton className="h-14 w-full rounded-lg"/>
@@ -71,7 +71,7 @@ export default function EditChequePage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-20">
       <form onSubmit={onSubmit} className="space-y-6">
         <div className="space-y-6">
           <div className="space-y-2">

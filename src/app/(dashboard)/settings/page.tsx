@@ -50,7 +50,7 @@ export default function SettingsPage() {
 
   if (profileLoading) {
     return (
-      <div className="mx-auto max-w-2xl space-y-8 pb-20">
+      <div className="max-w-2xl space-y-8 pb-20">
         <Skeleton className="h-20 w-full rounded-lg"/>
         <div className="space-y-8">
           {[1, 2, 3].map((i) => (
@@ -240,7 +240,7 @@ export default function SettingsPage() {
   ]
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-20">
       {/* Profile Section */}
       <div className="flex items-center gap-4 rounded-lg bg-canvas-parchment p-5 dark:bg-surface-tile-1">
         <EditableAvatar
