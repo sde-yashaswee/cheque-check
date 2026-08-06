@@ -8,12 +8,12 @@ import { logger } from '@/lib/logger';
  * Defined using Zod for type safety and validation.
  */
 const ChequeDetailsSchema = z.object({
-  amount: z.number().nullable().describe('The amount of the cheque in numeric format (e.g. 1500.00)'),
-  cheque_number: z.string().nullable().describe('The cheque number, usually 6 digits found at the bottom'),
-  cheque_date: z.string().nullable().describe('The date on the cheque in YYYY-MM-DD format'),
-  payee_name: z.string().nullable().describe('The name of the person or business the cheque is issued to'),
-  account_number: z.string().nullable().describe('The bank account number if visible'),
-  bank_name: z.string().nullable().describe('The name of the bank'),
+  amount: z.number().nullable().describe('The cheque amount as a number (e.g., 1500.00).'),
+  cheque_number: z.string().nullable().describe('Strictly 6 contiguous digits found at the left bottom of the cheque. Ignore letters/symbols.'),
+  cheque_date: z.string().nullable().describe('Date from the top-right boxes (originally DDMMYYYY). Convert and return strictly in YYYY-MM-DD format.'),
+  payee_name: z.string().nullable().describe('The name of the person or business the cheque is issued to.'),
+  account_number: z.string().nullable().describe('The bank account number, typically an 11-digit numerical sequence.'),
+  bank_name: z.string().nullable().describe('The name of the bank.'),
 });
 
 type ChequeDetails = z.infer<typeof ChequeDetailsSchema>;
@@ -28,12 +28,12 @@ interface IOcrProvider {
 
 /**
  * OpenAI Implementation of the OCR Provider.
- * Uses GPT-4o-mini for efficient and accurate vision processing.
+ * Uses GPT-4o for high-accuracy vision processing and document extraction.
  */
 class OpenAiOcrProvider implements IOcrProvider {
   private readonly modelName: string;
 
-  constructor(modelName: string = 'gpt-4o-mini') {
+  constructor(modelName: string = 'gpt-4o') {
     this.modelName = modelName;
   }
 
@@ -51,11 +51,15 @@ class OpenAiOcrProvider implements IOcrProvider {
           content: [
             {
               type: 'text',
-              text: 'Analyze this cheque image and extract all relevant details. If a field is not clearly visible or legible, return null for that field.',
+              text: `Analyze this cheque image and extract all relevant details. Adhere strictly to these rules:
+      - Date: Located in the top right corner. The block letters/boxes contain the date in DDMMYYYY format (8 numerical digits). Extract it and format your output as YYYY-MM-DD.
+      - Cheque Number: Located at the bottom. Find the contiguous strictly 6-digit numerical sequence, typically positioned towards the right side of the bottom sequence. Do not include any letters or separate numbers. Extract only that contiguous 6-digit sequence.
+      - Account Number: Usually an 11-digit numerical sequence.
+      - If any field is not clearly visible or legible, return null for that field. Keep processing fast and concise.`,
             },
             {
               type: 'image',
-              image: new URL(imageUrl),
+              image: imageUrl,
             },
           ],
         },
