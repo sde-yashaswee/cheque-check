@@ -98,7 +98,7 @@ export default function ChequeDetailPage() {
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{t('account')}</p>
               <div className="flex items-center gap-3">
                 <EntityAvatar 
-                  name={cheque.account?.account_name || 'A'} 
+                  name={cheque.account?.bank?.name || 'Bank'} 
                   color={cheque.account?.color} 
                   icon={cheque.account?.icon} 
                   imageUrl={cheque.account?.bank?.logo_url}

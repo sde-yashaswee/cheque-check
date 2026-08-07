@@ -183,16 +183,18 @@ export default function SettingsPage() {
         {sections.map((section: SettingsSection) => (
           <div key={section.title} className="space-y-3">
             <div className="flex items-center gap-2 px-2">
-              <HugeiconsIcon icon={section.icon} className="h-3 w-3 text-muted-foreground opacity-80"/>
-              <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{section.title}</h3>
+              <div className="flex h-5 w-5 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <HugeiconsIcon icon={section.icon} className="h-3 w-3"/>
+              </div>
+              <h3 className="text-[10px] font-semibold text-primary uppercase tracking-wider">{section.title}</h3>
             </div>
             <div className="divide-y divide-border/50 rounded-lg border bg-card overflow-hidden">
               {section.items.map((item: SettingsItem) => {
                 const content = (
                   <div key={item.name} className={cn("flex items-center justify-between p-4 transition-colors", (item.action || item.href) && "cursor-pointer active:bg-muted/50 hover:bg-muted/30")} onClick={item.action}>
                     <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-muted/50 text-muted-foreground">
-                        <HugeiconsIcon icon={item.icon} className="h-4 w-4"/>
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                        <HugeiconsIcon icon={item.icon} className="h-3 w-3"/>
                       </div>
                       <div className="flex flex-col">
                         <span className="text-sm font-semibold">{item.name}</span>
@@ -222,7 +224,9 @@ export default function SettingsPage() {
 
       <div className="space-y-3">
         <div className="flex items-center gap-2 px-2">
-          <HugeiconsIcon icon={Trash2} className="h-3 w-3 text-destructive opacity-80"/>
+          <div className="flex h-5 w-5 items-center justify-center rounded-md bg-destructive/10 text-destructive">
+            <HugeiconsIcon icon={Trash2} className="h-3 w-3"/>
+          </div>
           <h3 className="text-[10px] font-semibold text-destructive uppercase tracking-wider">{t('dangerZone')}</h3>
         </div>
         <div className="divide-y rounded-lg border border-destructive/20 bg-destructive/5 overflow-hidden">
@@ -234,7 +238,7 @@ export default function SettingsPage() {
             trigger={
               <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-destructive/10 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-destructive/10 text-destructive">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-destructive text-destructive-foreground shadow-sm">
                     <HugeiconsIcon icon={Trash2} className="h-4 w-4"/>
                   </div>
                   <div className="flex flex-col">

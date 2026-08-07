@@ -120,7 +120,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer"
               >
                 <EntityAvatar 
-                  name={a.bank?.name || 'A'} 
+                  name={a.bank?.name || 'Bank'} 
                   color={a.color} 
                   icon={a.icon} 
                   imageUrl={a.bank?.logo_url}

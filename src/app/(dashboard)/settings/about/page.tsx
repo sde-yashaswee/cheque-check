@@ -1,5 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react"
-import { InformationCircleIcon as Info, UserIcon as User, Mail01Icon as Mail, StarsIcon as Version } from "@hugeicons/core-free-icons"
+import { UserIcon as User, Mail01Icon as Mail, StarsIcon as Version } from "@hugeicons/core-free-icons"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 
@@ -7,17 +7,17 @@ export default function AboutPage() {
   const t = useTranslations("Settings")
 
   return (
-    <div className="max-w-2xl space-y-8 pb-20">
-      <div className="space-y-6 px-2">
-        <div className="rounded-lg border bg-card overflow-hidden">
-          <div className="p-6 text-center space-y-2 bg-muted/20">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-primary text-primary-foreground mb-4">
-              <HugeiconsIcon icon={Info} className="h-10 w-10"/>
-            </div>
-            <h2 className="text-xl font-bold">ChequeCheck</h2>
-            <p className="text-sm text-muted-foreground">{t("appDescription")}</p>
+    <div className="flex flex-col items-center justify-center px-4 pt-12 pb-20">
+      <div className="w-full max-w-sm space-y-8">
+        <div className="flex flex-col items-center text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white shadow-sm overflow-hidden">
+            <img src="/android-chrome-512x512.png" alt="ChequeCheck Logo" className="h-full w-full object-contain p-2" />
           </div>
-          
+          <h1 className="mt-6 text-display-md font-semibold tracking-tight">ChequeCheck</h1>
+          <p className="text-body text-muted-foreground">Never miss a check</p>
+        </div>
+
+        <div className="overflow-hidden rounded-lg bg-white dark:bg-surface-tile-1 border border-primary/5">
           <div className="divide-y divide-border/50">
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center gap-3">
@@ -36,7 +36,9 @@ export default function AboutPage() {
                 </div>
                 <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t("support")}</span>
               </div>
-              <Link href="mailto:support@chequecheck.com"className="text-sm font-bold text-primary">support@chequecheck.com</Link>
+              <a href="mailto:support@chequecheck.com" className="text-sm font-bold text-primary hover:underline">
+                support@chequecheck.com
+              </a>
             </div>
 
             <div className="flex items-center justify-between p-4">
@@ -46,7 +48,7 @@ export default function AboutPage() {
                 </div>
                 <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t("version")}</span>
               </div>
-              <span className="text-sm font-bold">1.0.0 (Build 2026.08)</span>
+              <span className="text-sm font-bold text-muted-foreground">1.0.0 (Build 2026.08)</span>
             </div>
           </div>
         </div>

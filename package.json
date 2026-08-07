@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "admin:monetization": "npx tsx scripts/admin-monetization.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.32",
@@ -51,6 +52,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-speech-recognition": "^3.9.6",
+    "dotenv": "^17.4.2",
+    "enquirer": "^2.4.1",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
     "tailwindcss": "^4",

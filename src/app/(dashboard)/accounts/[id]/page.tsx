@@ -91,7 +91,7 @@ export default function AccountDetailPage() {
         <div className="flex justify-between items-start relative z-10">
           <div className="flex items-center gap-4">
             <EntityAvatar 
-              name={account.account_name || 'A'} 
+              name={account.bank?.name || 'Bank'} 
               color={account.color} 
               icon={account.icon} 
               imageUrl={account.bank?.logo_url}

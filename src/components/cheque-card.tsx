@@ -145,7 +145,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
             <div className="mt-1 flex items-center justify-end gap-1.5">
               <span className="text-[10px] text-muted-foreground">{cheque.account?.account_name}</span>
               <EntityAvatar 
-                name={cheque.account?.account_name || '?'} 
+                name={cheque.account?.bank?.name || 'Bank'} 
                 color={cheque.account?.color} 
                 icon={cheque.account?.icon}
                 imageUrl={cheque.account?.bank?.logo_url}
