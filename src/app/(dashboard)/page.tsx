@@ -1,7 +1,7 @@
 'use client'
 
 import { HugeiconsIcon } from '@hugeicons/react';
-import { PlusSignIcon as Plus, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, File02Icon as FileText, FlashIcon as Zap, Calendar03Icon as Calendar, Chart01Icon as Stats, Camera01Icon as Camera } from '@hugeicons/core-free-icons';
+import { PlusSignIcon as Plus, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, File02Icon as FileText, FlashIcon as Zap, Calendar03Icon as Calendar, Chart01Icon as Stats, Camera01Icon as Camera, Building03Icon, Calendar01Icon } from '@hugeicons/core-free-icons';
 import { Button } from "@/components/ui/button";
 import { useBusiness } from "@/hooks/use-business";
 import { useCheques } from "@/hooks/use-cheques";
@@ -15,7 +15,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useChequeStats } from "@/hooks/use-cheque-stats";
 import { DataState } from "@/components/ui/data-state";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Building03Icon, Calendar01Icon } from "@hugeicons/core-free-icons";
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl';
 import { logger } from "@/lib/logger";

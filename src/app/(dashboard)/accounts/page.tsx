@@ -57,8 +57,8 @@ export default function AccountsPage() {
       <div className="flex gap-2">
         <div className="relative flex-1">
           <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
-          <Input 
-            className="rounded-full pl-10 h-11 bg-canvas-parchment border-none"
+          <Input leftIcon={Search}  
+            className="rounded-full  h-11 bg-canvas-parchment border-none"
             placeholder={t('searchPlaceholder')} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -77,7 +77,10 @@ export default function AccountsPage() {
           } />
           <SheetContent className="max-h-[80dvh] overflow-y-auto">
             <SheetHeader>
-              <SheetTitle>{tc('sortAndFilter')}</SheetTitle>
+              <SheetTitle className="flex items-center gap-2">
+                <HugeiconsIcon icon={Filter} className="h-5 w-5 text-primary" />
+                {tc('sortAndFilter')}
+              </SheetTitle>
             </SheetHeader>
             
             <div className="space-y-6 py-4">

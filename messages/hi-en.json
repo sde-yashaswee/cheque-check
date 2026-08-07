@@ -54,8 +54,8 @@
     "sortAndFilter": "Sort & Filter",
     "sortBy": "Sort Karein",
     "order": "Order",
-    "ascending": "Ascending (A-Z)",
-    "descending": "Descending (Z-A)"
+    "ascending": "Ascending",
+    "descending": "Descending"
   },
   "Navigation": {
     "dashboard": "Dashboard",
@@ -311,6 +311,7 @@
     "dateFormat": "Date Format",
     "timeZone": "Time Zone",
     "language": "Language",
+    "preferences": "Preferences",
     "myBusinesses": "My Businesses",
     "features": "Features",
     "remindersPerDay": "Reminders Per Day",

@@ -2,7 +2,7 @@
 
 import { useBusinesses } from "@/hooks/use-businesses-page"
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Building03Icon as Building2, PlusSignIcon as Plus, ArrowRight01Icon as ArrowRight, File02Icon as FileText, Delete02Icon as Trash2, Search01Icon as Search, Sorting05Icon as Filter, Tick02Icon as Check, TextSquareIcon as NameIcon, Clock01Icon as UpcomingIcon, SortingAZ01Icon as AscIcon, SortingZA01Icon as DescIcon } from '@hugeicons/core-free-icons';
+import { UserIcon as User, Mail01Icon as Mail, LockPasswordIcon as Lock, CallIcon as Phone, Calendar03Icon as Calendar, HashtagIcon as Hash, Note01Icon as Note, Building03Icon as Building, Wallet01Icon as Wallet, Search01Icon as Search, Location01Icon as Location, TextFontIcon as TextIcon, Building03Icon as Building2, PlusSignIcon as Plus, ArrowRight01Icon as ArrowRight, File02Icon as FileText, Delete02Icon as Trash2, Sorting05Icon as Filter, Tick02Icon as Check, TextSquareIcon as NameIcon, Clock01Icon as UpcomingIcon, SortingAZ01Icon as AscIcon, SortingZA01Icon as DescIcon } from '@hugeicons/core-free-icons';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
@@ -62,8 +62,8 @@ export default function BusinessesPage() {
       <div className="flex gap-3">
         <div className="relative flex-1">
           <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
-          <Input 
-            className="rounded-full pl-10 h-11 bg-canvas-parchment border-none"
+          <Input leftIcon={Search}  
+            className="rounded-full  h-11 bg-canvas-parchment border-none"
             placeholder={t('searchPlaceholder')} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -82,7 +82,10 @@ export default function BusinessesPage() {
           } />
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>{tc('sortAndFilter')}</SheetTitle>
+              <SheetTitle className="flex items-center gap-2">
+                <HugeiconsIcon icon={Filter} className="h-5 w-5 text-primary" />
+                {tc('sortAndFilter')}
+              </SheetTitle>
             </SheetHeader>
             
             <div className="space-y-6 py-4">

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { UserIcon as User, Mail01Icon as Mail, LockPasswordIcon as Lock, CallIcon as Phone, Calendar03Icon as Calendar, HashtagIcon as Hash, Note01Icon as Note, Building03Icon as Building, Wallet01Icon as Wallet, Search01Icon as Search, Location01Icon as Location, TextFontIcon as TextIcon, ViewIcon as Eye, ViewOffIcon as EyeOff } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,7 +9,6 @@ import { AuthService } from '@/services/auth.service'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Wallet01Icon as Wallet, ViewIcon as Eye, ViewOffIcon as EyeOff } from '@hugeicons/core-free-icons';
 import { useTranslations } from 'next-intl'
 
 export default function LoginPage() {
@@ -61,7 +61,7 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">{t('email')}</Label>
-              <Input 
+              <Input leftIcon={Mail}  
                 id="email"
                 type="email"
                 placeholder={t('emailPlaceholder')} 
@@ -79,7 +79,7 @@ export default function LoginPage() {
                 </Link>
               </div>
               <div className="relative">
-                <Input 
+                <Input leftIcon={Lock}  
                   id="password"
                   type={showPassword ? "text": "password"}
                   placeholder={t('passwordPlaceholder')} 

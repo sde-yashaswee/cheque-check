@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useParams } from 'next/navigation'
+import { UserIcon as User, Mail01Icon as Mail, LockPasswordIcon as Lock, CallIcon as Phone, Calendar03Icon as Calendar, HashtagIcon as Hash, Note01Icon as Note, Building03Icon as Building, Wallet01Icon as Wallet, Search01Icon as Search, Location01Icon as Location, TextFontIcon as TextIcon, Tick02Icon as Check, Store01Icon as Store, Location01Icon as MapPin, Delete02Icon as Trash2 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Tick02Icon as Check, Store01Icon as Store, CallIcon as Phone, Location01Icon as MapPin, Delete02Icon as Trash2, Mail01Icon as Mail } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import dynamic from 'next/dynamic'
@@ -65,12 +65,12 @@ export default function EditBusinessPage() {
             <Label htmlFor="name"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('businessName')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={Store} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-              <Input 
+              <Input leftIcon={User}  
                 id="name"
                 {...register('name')} 
                 placeholder="Enter business name"
-                className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-semibold rounded-sm"
-              />
+                className="h-14  bg-canvas-parchment border-none text-lg font-semibold rounded-sm"
+               />
             </div>
             {errors.name && <p className="text-xs text-destructive ml-1">{errors.name.message as string}</p>}
           </div>
@@ -79,12 +79,12 @@ export default function EditBusinessPage() {
             <Label htmlFor="phone"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('phoneNumber')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={Phone} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-              <Input 
+              <Input leftIcon={Phone}  
                 id="phone"
                 {...register('phone')} 
                 placeholder="Business phone"
-                className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
-              />
+                className="h-14  bg-canvas-parchment border-none rounded-sm"
+               />
             </div>
           </div>
 
@@ -92,7 +92,7 @@ export default function EditBusinessPage() {
             <Label htmlFor="email"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tc('email')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={Mail} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-              <Input id="email"{...register('email')} placeholder="business@email.com"className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"/>
+              <Input leftIcon={Mail}  id="email"{...register('email')} placeholder="business@email.com"className="h-14  bg-canvas-parchment border-none rounded-sm" />
             </div>
           </div>
 
@@ -100,7 +100,7 @@ export default function EditBusinessPage() {
             <Label htmlFor="address"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tc('address')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={MapPin} className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50"/>
-              <Input id="address"{...register('address')} placeholder="Business location"className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"/>
+              <Input leftIcon={Location}  id="address"{...register('address')} placeholder="Business location"className="h-14  bg-canvas-parchment border-none rounded-sm" />
             </div>
           </div>
 

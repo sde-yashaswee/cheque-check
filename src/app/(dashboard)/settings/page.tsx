@@ -5,7 +5,7 @@ import { useProfile } from "@/hooks/use-profile"
 import { useCheques } from "@/hooks/use-cheques"
 import { Button } from "@/components/ui/button"
 import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowRight01Icon as ChevronRight, Logout01Icon as LogOut, UserIcon as User, Notification01Icon as Bell, GlobalIcon as Globe, CreditCardIcon as CreditCard, File01Icon as FileSpreadsheet, Building03Icon as Building2, LayoutGridIcon as LayoutGrid, FlashIcon as Zap, TranslateIcon as Languages, Delete02Icon as Trash2, Clock01Icon as Clock, MegaphoneIcon as Megaphone, HelpCircleIcon as Help, InformationCircleIcon as Info, Shield01Icon as Shield, LicenseIcon as License, Money03Icon as Money } from '@hugeicons/core-free-icons';
+import { ArrowRight01Icon as ChevronRight, Logout01Icon as LogOut, UserIcon as User, Notification01Icon as Bell, GlobalIcon as Globe, CreditCardIcon as CreditCard, File01Icon as FileSpreadsheet, Building03Icon as Building2, LayoutGridIcon as LayoutGrid, FlashIcon as Zap, TranslateIcon as Languages, Settings02Icon as Settings2, Delete02Icon as Trash2, Clock01Icon as Clock, MegaphoneIcon as Megaphone, HelpCircleIcon as Help, InformationCircleIcon as Info, Shield01Icon as Shield, LicenseIcon as License, Money03Icon as Money } from '@hugeicons/core-free-icons';
 import { useRouter } from "next/navigation"
 import dynamic from 'next/dynamic'
 import { cn } from "@/lib/utils"
@@ -17,7 +17,11 @@ import { useSettings } from "@/hooks/use-settings"
 import { EditableAvatar } from "@/components/ui/editable-avatar"
 import { useTranslations } from 'next-intl';
 import { Switch } from "@/components/ui/switch"
+import { useState } from "react"
+import { PreferencesModal } from "@/components/preferences-modal"
 import { IconType, ChequeWithRelations } from "@/types"
+import { useMonetization } from "@/hooks/use-monetization"
+import { Badge } from "@/components/ui/badge"
 
 const DeleteConfirmationDialog = dynamic(() => import("@/components/ui/delete-dialog").then(mod => mod.DeleteConfirmationDialog), {
   loading: () => <Skeleton className="h-16 w-full rounded-lg"/>,
@@ -45,10 +49,12 @@ export default function SettingsPage() {
   const { activeBusiness } = useBusiness()
   const { profile, updateProfile, isLoading: profileLoading } = useProfile()
   const { handleExport, handleLogout, handleDeleteProfile } = useSettings()
+  const { isLifetimePremium, isLoading: monetizationLoading } = useMonetization()
+  const [preferencesOpen, setPreferencesOpen] = useState(false)
 
   const { cheques } = useCheques(activeBusiness?.id)
 
-  if (profileLoading) {
+  if (profileLoading || monetizationLoading) {
     return (
       <div className="max-w-2xl space-y-8 pb-20">
         <Skeleton className="h-20 w-full rounded-lg"/>
@@ -110,56 +116,10 @@ export default function SettingsPage() {
       icon: LayoutGrid,
       items: [
         { 
-          name: t('currency'), 
-          icon: CreditCard,
-          component: (
-            <Combobox 
-              options={currencyOptions} 
-              value={profile?.currency} 
-              onValueChange={(val) => updateProfile({ currency: val })}
-              className={selectorWidth}
-            />
-          )
-        },
-        { 
-          name: t('dateFormat'), 
-          icon: Globe,
-          component: (
-            <Combobox 
-              options={dateFormatOptions} 
-              value={profile?.date_format} 
-              onValueChange={(val) => updateProfile({ date_format: val })}
-              className={selectorWidth}
-            />
-          )
-        },
-        { 
-          name: t('timeZone'), 
-          icon: Clock,
-          component: (
-            <Combobox 
-              options={timezoneOptions} 
-              value={profile?.time_zone} 
-              onValueChange={(val) => updateProfile({ time_zone: val })}
-              className={selectorWidth}
-            />
-          )
-        },
-        { 
-          name: t('language'), 
-          icon: Languages,
-          component: (
-            <Combobox 
-              options={languageOptions} 
-              value={profile?.language || "en"} 
-              onValueChange={(val) => {
-                updateProfile({ language: val });
-                document.cookie = `NEXT_LOCALE=${val}; path=/; max-age=31536000`;
-                router.refresh();
-              }}
-              className={selectorWidth}
-            />
-          )
+          name: t('preferences') || 'Preferences', 
+          icon: Settings2,
+          action: () => setPreferencesOpen(true),
+          value: 'Manage'
         },
       ]
     },
@@ -173,41 +133,15 @@ export default function SettingsPage() {
         { 
           name: 'Enable Received Cheques', 
           icon: Money,
-          component: (
+          component: isLifetimePremium ? (
             <Switch 
               checked={profile?.received_cheques_enabled} 
               onCheckedChange={(checked) => updateProfile({ received_cheques_enabled: checked })}
             />
-          )
-        },
-      ]
-    },
-    {
-      title: t('reminders'),
-      icon: Bell,
-      items: [
-        { 
-          name: t('remindersPerDay'), 
-          icon: Bell,
-          component: (
-            <Combobox 
-              options={remindersPerDayOptions} 
-              value={profile?.reminders_per_day?.toString()} 
-              onValueChange={(val) => updateProfile({ reminders_per_day: parseInt(val) })}
-              className={selectorWidth}
-            />
-          )
-        },
-        { 
-          name: t('reminderFrequency'), 
-          icon: Zap,
-          component: (
-            <Combobox 
-              options={reminderFrequencyOptions} 
-              value={profile?.default_reminder_days?.toString()} 
-              onValueChange={(val) => updateProfile({ default_reminder_days: parseInt(val) })}
-              className={selectorWidth}
-            />
+          ) : (
+            <Badge variant="secondary" className="cursor-pointer" onClick={() => router.push('/features')}>
+              LOCKED
+            </Badge>
           )
         },
       ]
@@ -216,7 +150,14 @@ export default function SettingsPage() {
       title: t('dataAndReports'),
       icon: FileSpreadsheet,
       items: [
-        { name: t('exportCheques'), icon: FileSpreadsheet, action: () => handleExport((cheques || []) as ChequeWithRelations[], activeBusiness?.name || '') },
+        { 
+          name: t('exportCheques'), 
+          icon: FileSpreadsheet, 
+          action: isLifetimePremium 
+            ? () => handleExport((cheques || []) as ChequeWithRelations[], activeBusiness?.name || '')
+            : () => router.push('/features'),
+          value: isLifetimePremium ? undefined : 'PREMIUM'
+        },
       ]
     },
     {
@@ -334,6 +275,8 @@ export default function SettingsPage() {
           {format(new Date(), "PPpp")}
         </p>
       </div>
+
+      <PreferencesModal open={preferencesOpen} onOpenChange={setPreferencesOpen} />
     </div>
   )
 }

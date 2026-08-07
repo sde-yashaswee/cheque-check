@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useSearchParams } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Camera01Icon as Camera, Cancel01Icon as X, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, Invoice01Icon as ReceiptText, UserIcon as User, CreditCardIcon as CreditCard, BankIcon as Bank, Delete02Icon as Trash } from '@hugeicons/core-free-icons';
+import {  ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Camera01Icon as Camera, Cancel01Icon as X, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, Invoice01Icon as ReceiptText, UserIcon as User, CreditCardIcon as CreditCard, BankIcon as Bank, Delete02Icon as Trash , HashtagIcon as Hash, Calendar03Icon as Calendar, Note01Icon as Note } from '@hugeicons/core-free-icons';
 import { cn, numberToIndianWords, getSimilarityScore } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 import { Combobox } from '@/components/ui/combobox'
@@ -483,19 +483,19 @@ export default function CreateChequePage() {
 
             <div className="space-y-2">
               <Label htmlFor="cheque_number"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('chequeNumber')}</Label>
-              <Input id="cheque_number"{...register('cheque_number')} placeholder={t('chequeNumberPlaceholder')} className="h-12 rounded-sm"/>
+              <Input leftIcon={Hash}  id="cheque_number"{...register('cheque_number')} placeholder={t('chequeNumberPlaceholder')} className="h-12 rounded-sm" />
               {errors.cheque_number && <p className="text-xs text-destructive ml-1">{errors.cheque_number.message as string}</p>}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="cheque_date"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('chequeDate')}</Label>
-              <Input id="cheque_date"type="date"{...register('cheque_date')} className="h-12 rounded-sm"/>
+              <Input leftIcon={Calendar}  id="cheque_date"type="date"{...register('cheque_date')} className="h-12 rounded-sm" />
               {errors.cheque_date && <p className="text-xs text-destructive ml-1">{errors.cheque_date.message as string}</p>}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="deposit_date"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('depositDate')}</Label>
-              <Input id="deposit_date"type="date"{...register('deposit_date')} className="h-14 bg-canvas-parchment border-none rounded-sm"/>
+              <Input leftIcon={Calendar}  id="deposit_date"type="date"{...register('deposit_date')} className="h-14 bg-canvas-parchment border-none rounded-sm" />
               {errors.deposit_date && <p className="text-xs text-destructive ml-1">{errors.deposit_date.message as string}</p>}
             </div>
             
@@ -591,7 +591,7 @@ export default function CreateChequePage() {
 
             <div className="space-y-2">
               <Label htmlFor="notes"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('notes')}</Label>
-              <Input id="notes"{...register('notes')} placeholder={t('notesPlaceholder')} className="h-14 bg-canvas-parchment border-none rounded-sm"/>
+              <Input leftIcon={Note}  id="notes"{...register('notes')} placeholder={t('notesPlaceholder')} className="h-14 bg-canvas-parchment border-none rounded-sm" />
             </div>
 
             <div className="rounded-lg bg-primary/5 p-6 space-y-4 border border-primary/10">

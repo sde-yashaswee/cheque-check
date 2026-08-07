@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { UserIcon as User, Mail01Icon as Mail, LockPasswordIcon as Lock, CallIcon as Phone, Calendar03Icon as Calendar, HashtagIcon as Hash, Note01Icon as Note, Building03Icon as Building, Wallet01Icon as Wallet, Search01Icon as Search, Location01Icon as Location, TextFontIcon as TextIcon, Alert02Icon as AlertTriangle, Delete02Icon as Trash2 } from '@hugeicons/core-free-icons';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Alert02Icon as AlertTriangle, Delete02Icon as Trash2 } from '@hugeicons/core-free-icons';
 
 interface DeleteConfirmationDialogProps {
   title: string
@@ -65,7 +65,7 @@ export function DeleteConfirmationDialog({
               <Label htmlFor="confirm_name"className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block">
                 Type <span className="text-foreground font-mono font-black px-1.5 py-0.5 bg-muted rounded">{confirmName}</span> to confirm
               </Label>
-              <Input
+              <Input leftIcon={TextIcon} 
                 id="confirm_name"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}

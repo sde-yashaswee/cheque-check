@@ -15,6 +15,9 @@ import { StatusPill } from '@/components/ui/status-pill'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 
+import { PhotoProvider, PhotoView } from 'react-photo-view'
+import 'react-photo-view/dist/react-photo-view.css'
+
 export default function ChequeDetailPage() {
   const t = useTranslations('Cheques')
   const { id } = useParams() as { id: string }
@@ -137,9 +140,18 @@ export default function ChequeDetailPage() {
           {cheque.image_url && (
             <div className="space-y-4 pt-4 border-t border-primary/5">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{t('scan')}</p>
-              <div className="rounded-lg overflow-hidden border">
-                <Image src={cheque.image_url} alt={t('scan')} width={800} height={400} className="w-full h-auto object-cover"/>
-              </div>
+              <PhotoProvider>
+                <div className="rounded-lg overflow-hidden border relative group">
+                  <PhotoView src={cheque.image_url}>
+                    <div className="cursor-zoom-in relative">
+                      <Image src={cheque.image_url} alt={t('scan')} width={800} height={400} className="w-full h-auto object-cover transition-transform group-hover:scale-[1.02]"/>
+                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                      </div>
+                    </div>
+                  </PhotoView>
+                </div>
+              </PhotoProvider>
             </div>
           )}
         </div>

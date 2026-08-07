@@ -2,6 +2,8 @@ import { openai } from '@ai-sdk/openai';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 /**
  * Schema for extracting cheque details.
@@ -84,6 +86,32 @@ class OcrController {
 
   async handleRequest(req: Request): Promise<Response> {
     try {
+      const cookieStore = await cookies();
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    const supabase = createServerClient(supabaseUrl, supabaseKey, { cookies: { get: (name) => cookieStore.get(name)?.value } });
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        return this.respondWithError('Unauthorized', 401);
+      }
+
+      // Check Quota
+      const { data: quota, error: quotaError } = await supabase
+        .from('user_quotas')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('feature_id', 'ai_scan')
+        .single();
+
+      if (quotaError || !quota) {
+        return this.respondWithError('No AI scan quota found. Please subscribe to use this feature.', 402);
+      }
+
+      if (quota.used >= quota.limit) {
+        return this.respondWithError('AI scan quota exhausted. Please top-up to continue.', 402);
+      }
+
       const body = await req.json();
       const { imageUrl } = body;
 
@@ -91,9 +119,15 @@ class OcrController {
         return this.respondWithError('Image URL is required for processing.', 400);
       }
 
-      logger.info(`[OcrController] Processing request for image: ${imageUrl}`, { imageUrl });
+      logger.info(`[OcrController] Processing request for user ${user.id} for image: ${imageUrl}`, { imageUrl });
       
       const result = await this.ocrProvider.processImage(imageUrl);
+
+      // Increment usage
+      await supabase
+        .from('user_quotas')
+        .update({ used: quota.used + 1 })
+        .eq('id', quota.id);
 
       return this.respondWithSuccess(result);
     } catch (error: any) {

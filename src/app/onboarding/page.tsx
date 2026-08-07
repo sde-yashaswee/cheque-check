@@ -1,6 +1,27 @@
 'use client'
 
 import { useState } from 'react'
+import { 
+  UserIcon as User, 
+  Mail01Icon as Mail, 
+  LockPasswordIcon as Lock, 
+  CallIcon as Phone, 
+  Calendar03Icon as Calendar, 
+  HashtagIcon as Hash, 
+  Note01Icon as Note, 
+  Search01Icon as Search, 
+  Location01Icon as Location, 
+  TextFontIcon as TextIcon,
+  Wallet01Icon as Wallet, 
+  Building03Icon as Building2, 
+  Settings02Icon as Settings2, 
+  CheckmarkCircle01Icon as CheckCircle2, 
+  Notification01Icon as Bell, 
+  ArrowRight01Icon as ArrowRight, 
+  ArrowLeft01Icon as ArrowLeft, 
+  Location01Icon as MapPin, 
+  Tick02Icon as Check 
+} from '@hugeicons/core-free-icons';
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,7 +31,6 @@ import { useBusiness } from '@/hooks/use-business'
 import { useProfile } from '@/hooks/use-profile'
 import { useQueryClient } from '@tanstack/react-query'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Wallet01Icon as Wallet, Building03Icon as Building2, Settings02Icon as Settings2, CheckmarkCircle01Icon as CheckCircle2, Notification01Icon as Bell, ArrowRight01Icon as ArrowRight, ArrowLeft01Icon as ArrowLeft, Mail01Icon as Mail, CallIcon as Phone, Location01Icon as MapPin, Tick02Icon as Check } from '@hugeicons/core-free-icons';
 import { Combobox } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -305,7 +325,7 @@ export default function OnboardingPage() {
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('businessName')}</Label>
                     <div className="relative group">
                       <HugeiconsIcon icon={Building2} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary"/>
-                      <Input 
+                      <Input leftIcon={TextIcon}  
                         placeholder={t('businessNamePlaceholder')} 
                         value={formData.businessName}
                         onChange={(e) => setFormData({...formData, businessName: e.target.value})}
@@ -357,7 +377,7 @@ export default function OnboardingPage() {
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('businessEmail')}</Label>
                     <div className="relative group">
                       <HugeiconsIcon icon={Mail} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"/>
-                      <Input 
+                      <Input leftIcon={Mail}  
                         type="email"
                         placeholder={t('businessEmailPlaceholder')} 
                         value={formData.businessEmail}
@@ -371,7 +391,7 @@ export default function OnboardingPage() {
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('businessPhone')}</Label>
                     <div className="relative group">
                       <HugeiconsIcon icon={Phone} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"/>
-                      <Input 
+                      <Input leftIcon={TextIcon}  
                         placeholder={t('businessPhonePlaceholder')} 
                         value={formData.businessPhone}
                         onChange={(e) => setFormData({...formData, businessPhone: e.target.value})}
@@ -384,7 +404,7 @@ export default function OnboardingPage() {
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('headquarters')}</Label>
                     <div className="relative group">
                       <HugeiconsIcon icon={MapPin} className="absolute left-5 top-5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"/>
-                      <Input 
+                      <Input leftIcon={TextIcon}  
                         placeholder={t('headquartersPlaceholder')} 
                         value={formData.businessAddress}
                         onChange={(e) => setFormData({...formData, businessAddress: e.target.value})}

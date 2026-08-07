@@ -23,15 +23,48 @@ export class DatabaseService {
 
   async fetchProfiles(userIds: string[]) {
     // Added 'language' to the select query
-    const { data, error } = await this.supabase
+    const { data: profiles, error: profilesError } = await this.supabase
       .from('profiles')
       .select('user_id, name, phone, voice_call_enabled, language')
       .in('user_id', userIds)
       .eq('voice_call_enabled', true)
       .not('phone', 'is', null);
 
-    if (error) throw error;
-    return data;
+    if (profilesError) throw profilesError;
+
+    // Fetch Quotas
+    const { data: quotas, error: quotasError } = await this.supabase
+      .from('user_quotas')
+      .select('user_id, used, limit')
+      .in('user_id', userIds)
+      .eq('feature_id', 'voice_reminder');
+
+    if (quotasError) throw quotasError;
+
+    // Filter profiles that have remaining quota
+    return profiles.filter(p => {
+      const quota = quotas.find(q => q.user_id === p.user_id);
+      return quota && quota.used < quota.limit;
+    });
+  }
+
+  async incrementVoiceQuota(userId: string) {
+    // This is tricky because we don't have the current 'used' value here easily without another query
+    // or we can use a RPC or a raw SQL update.
+    // Let's just do a simple update for now.
+    const { data: quota } = await this.supabase
+      .from('user_quotas')
+      .select('id, used')
+      .eq('user_id', userId)
+      .eq('feature_id', 'voice_reminder')
+      .single();
+
+    if (quota) {
+      await this.supabase
+        .from('user_quotas')
+        .update({ used: (quota.used || 0) + 1 })
+        .eq('id', quota.id);
+    }
   }
 
   async markCallSent(chequeIds: string[]) {

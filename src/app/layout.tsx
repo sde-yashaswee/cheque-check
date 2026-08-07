@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toast";
 import { ProgressBar } from "@/components/progress-bar";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getLocale, getTranslations } from 'next-intl/server';
+import Script from 'next/script';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -52,8 +53,6 @@ export default async function RootLayout({
             </Providers>
           </NextIntlClientProvider>
         </div>
-
-        {/* Landscape Warning Overlay: Visible only on mobile landscape devices */}
         <div className="hidden [@media(orientation:landscape)_and_(max-height:600px)]:flex fixed inset-0 z-[9999] bg-primary flex-col items-center justify-center text-center p-6 text-white">
           <div className="mb-6 animate-pulse">
             <svg xmlns="http://www.w3.org/2000/svg"width="64"height="64"viewBox="0 0 24 24"fill="none"stroke="currentColor"strokeWidth="2"strokeLinecap="round"strokeLinejoin="round"className="rotate-90">
@@ -64,6 +63,7 @@ export default async function RootLayout({
           <h2 className="text-2xl font-bold mb-2 text-white">{t('rotateDevice')}</h2>
           <p className="text-blue-100">{t('portraitModeOnly')}</p>
         </div>
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       </body>
     </html>
   );

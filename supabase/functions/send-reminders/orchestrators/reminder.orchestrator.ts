@@ -47,6 +47,7 @@ export class ReminderOrchestrator {
 
       if (callResult.success) {
         await this.db.markCallSent(userCheques.map((c: any) => c.id));
+        await this.db.incrementVoiceQuota(profile.user_id);
       }
 
       results.push({

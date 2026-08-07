@@ -76,7 +76,7 @@ function SheetContent({
         )}
         {...props}
       >
-        <div className="mx-auto h-1.5 w-12 rounded-full bg-muted/30 mb-2 shrink-0" />
+        <div className="mx-auto h-1.5 w-12 rounded-full bg-muted/30 shrink-0" />
         {children}
         {showCloseButton && (
           <SheetClose
@@ -103,7 +103,7 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="sheet-header"
-      className={cn("flex flex-col gap-2 mb-4", className)}
+      className={cn("flex flex-col gap-2", className)}
       {...props}
     />
   )

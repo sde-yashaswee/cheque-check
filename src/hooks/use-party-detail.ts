@@ -4,10 +4,15 @@ import { ChequeService } from '@/services/cheque.service'
 import { ChequeStatus , Cheque } from '@/types'
 import { useMemo, useState } from 'react'
 
+export type SortBy = 'date' | 'amount'
+export type SortOrder = 'asc' | 'desc'
+
 export function usePartyDetail(id: string, businessId: string | undefined) {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'All' | ChequeStatus>('All')
+  const [sortBy, setSortBy] = useState<SortBy>('date')
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
 
   const { data: party, isLoading: partyLoading, error: partyError } = useQuery({
     queryKey: ['party', id],
@@ -34,12 +39,25 @@ export function usePartyDetail(id: string, businessId: string | undefined) {
   }, [cheques, id])
 
   const filteredCheques = useMemo(() => {
-    return partyCheques.filter((c: Cheque) => {
+    const result = partyCheques.filter((c: Cheque) => {
       const matchesSearch = c.cheque_number.includes(search) || c.amount.toString().includes(search)
       const matchesFilter = filter === 'All' || c.status === filter
       return matchesSearch && matchesFilter
     })
-  }, [partyCheques, search, filter])
+
+    result.sort((a: Cheque, b: Cheque) => {
+      if (sortBy === 'date') {
+        const dateA = new Date(a.cheque_date).getTime()
+        const dateB = new Date(b.cheque_date).getTime()
+        return sortOrder === 'desc' ? dateB - dateA : dateA - dateB
+      } else if (sortBy === 'amount') {
+        return sortOrder === 'desc' ? b.amount - a.amount : a.amount - b.amount
+      }
+      return 0
+    })
+
+    return result
+  }, [partyCheques, search, filter, sortBy, sortOrder])
 
   const outstanding = useMemo(() => {
     return partyCheques
@@ -63,6 +81,10 @@ export function usePartyDetail(id: string, businessId: string | undefined) {
     search,
     setSearch,
     filter,
-    setFilter
+    setFilter,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder
   }
 }

@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { UserIcon as User, Mail01Icon as Mail, LockPasswordIcon as Lock, CallIcon as Phone, Calendar03Icon as Calendar, HashtagIcon as Hash, Note01Icon as Note, Building03Icon as Building, Wallet01Icon as Wallet, Search01Icon as Search, Location01Icon as Location, TextFontIcon as TextIcon, ArrowLeft01Icon as ArrowLeft } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { AuthService } from '@/services/auth.service'
 import Link from 'next/link'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Wallet01Icon as Wallet, ArrowLeft01Icon as ArrowLeft, Mail01Icon as Mail } from '@hugeicons/core-free-icons';
 import { useTranslations } from 'next-intl'
 
 export default function ForgotPasswordPage() {
@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleReset} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">{t('email')}</Label>
-                <Input 
+                <Input leftIcon={Mail}  
                   id="email"
                   type="email"
                   placeholder={t('emailPlaceholder')} 

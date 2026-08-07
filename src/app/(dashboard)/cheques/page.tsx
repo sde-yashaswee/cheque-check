@@ -3,7 +3,7 @@
 import { useCheques } from '@/hooks/use-cheques'
 import { ChequeCard } from '@/components/cheque-card'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { PlusSignIcon as Plus, Search01Icon as Search, Sorting05Icon as Filter, Invoice01Icon as ReceiptText, Tick02Icon as Check, Calendar03Icon as DateIcon, Money03Icon as AmountIcon, SortingAZ01Icon as AscIcon, SortingZA01Icon as DescIcon, CircleIcon as AllIcon, ArrowUpRight01Icon as IssuedIcon, ArrowDownLeft01Icon as ReceivedIcon, CheckmarkCircle01Icon as ClearedIcon, Cancel01Icon as BouncedIcon } from '@hugeicons/core-free-icons';
+import { UserIcon as User, Mail01Icon as Mail, LockPasswordIcon as Lock, CallIcon as Phone, Calendar03Icon as Calendar, HashtagIcon as Hash, Note01Icon as Note, Building03Icon as Building, Wallet01Icon as Wallet, Search01Icon as Search, Location01Icon as Location, TextFontIcon as TextIcon, PlusSignIcon as Plus, Sorting05Icon as Filter, Invoice01Icon as ReceiptText, Tick02Icon as Check, Calendar03Icon as DateIcon, Money03Icon as AmountIcon, SortingAZ01Icon as AscIcon, SortingZA01Icon as DescIcon, CircleIcon as AllIcon, ArrowUpRight01Icon as IssuedIcon, ArrowDownLeft01Icon as ReceivedIcon, CheckmarkCircle01Icon as ClearedIcon, Cancel01Icon as BouncedIcon } from '@hugeicons/core-free-icons';
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -69,8 +69,8 @@ export default function ChequesPage() {
       <div className="flex gap-2">
         <div className="relative flex-1">
           <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
-          <Input 
-            className="rounded-full pl-10 h-11 bg-canvas-parchment border-none"
+          <Input leftIcon={Search}  
+            className="rounded-full  h-11 bg-canvas-parchment border-none"
             placeholder={t('searchPlaceholder')} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -89,7 +89,10 @@ export default function ChequesPage() {
           } />
           <SheetContent className="max-h-[85dvh] overflow-y-auto">
             <SheetHeader>
-              <SheetTitle>{tCommon('sortAndFilter')}</SheetTitle>
+              <SheetTitle className="flex items-center gap-2">
+                <HugeiconsIcon icon={Filter} className="h-5 w-5 text-primary" />
+                {tCommon('sortAndFilter')}
+              </SheetTitle>
             </SheetHeader>
             
             <div className="space-y-6 py-4">

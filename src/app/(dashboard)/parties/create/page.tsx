@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, UserIcon as User, CallIcon as Phone, Location01Icon as MapPin } from '@hugeicons/core-free-icons';
+import {  ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, UserIcon as User, CallIcon as Phone, Location01Icon as MapPin , TextFontIcon as TextIcon, Mail01Icon as Mail, Note01Icon as Note } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 import {
   Stepper,
@@ -134,12 +134,12 @@ export default function CreatePartyPage() {
                 <Label htmlFor="name"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('partyName')}</Label>
                 <div className="relative">
                   <HugeiconsIcon icon={User} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-                  <Input 
+                  <Input leftIcon={User}  
                     id="name"
                     {...register('name')} 
                     placeholder={t('enterFullName')} 
-                    className="h-14 pl-12 bg-canvas-parchment border-none text-lg font-semibold rounded-sm"
-                  />
+                    className="h-14  bg-canvas-parchment border-none text-lg font-semibold rounded-sm"
+                   />
                 </div>
                 {errors.name && <p className="text-xs text-destructive ml-1">{errors.name.message as string}</p>}
               </div>
@@ -175,19 +175,19 @@ export default function CreatePartyPage() {
               <Label htmlFor="contact"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('contactNumber')}</Label>
               <div className="relative">
                 <HugeiconsIcon icon={Phone} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-                <Input 
+                <Input leftIcon={TextIcon}  
                   id="contact"
                   {...register('contact')} 
                   placeholder={t('phoneNumber')} 
-                  className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
-                />
+                  className="h-14  bg-canvas-parchment border-none rounded-sm"
+                 />
               </div>
               {errors.contact && <p className="text-xs text-destructive ml-1">{errors.contact.message as string}</p>}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="email"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tCommon('email')}</Label>
-              <Input id="email"{...register('email')} placeholder="email@address.com"className="h-14 bg-canvas-parchment border-none rounded-sm"/>
+              <Input leftIcon={Mail}  id="email"{...register('email')} placeholder="email@address.com"className="h-14 bg-canvas-parchment border-none rounded-sm" />
             </div>
 
             <Button type="button"className="w-full rounded-full h-14 text-lg"onClick={nextStep} disabled={!watch('contact')}>
@@ -202,13 +202,13 @@ export default function CreatePartyPage() {
               <Label htmlFor="address"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tCommon('address')}</Label>
               <div className="relative">
                 <HugeiconsIcon icon={MapPin} className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50"/>
-                <Input id="address"{...register('address')} placeholder={t('locationDetails')} className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"/>
+                <Input leftIcon={Location}  id="address"{...register('address')} placeholder={t('locationDetails')} className="h-14  bg-canvas-parchment border-none rounded-sm" />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="notes"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tCommon('notes')}</Label>
-              <Input id="notes"{...register('notes')} placeholder={t('anyAdditionalNotes')} className="h-14 bg-canvas-parchment border-none rounded-sm"/>
+              <Input leftIcon={Note}  id="notes"{...register('notes')} placeholder={t('anyAdditionalNotes')} className="h-14 bg-canvas-parchment border-none rounded-sm" />
             </div>
 
             <div className="rounded-lg bg-primary/5 p-6 space-y-4 border border-primary/10">

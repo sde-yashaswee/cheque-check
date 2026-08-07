@@ -4,10 +4,15 @@ import { ChequeService } from '@/services/cheque.service'
 import { ChequeStatus, Cheque } from '@/types'
 import { useMemo, useState } from 'react'
 
+export type SortBy = 'date' | 'amount'
+export type SortOrder = 'asc' | 'desc'
+
 export function useAccountDetail(id: string, businessId: string | undefined) {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'All' | ChequeStatus>('All')
+  const [sortBy, setSortBy] = useState<SortBy>('date')
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
 
   const { data: account, isLoading: accountLoading, error: accountError } = useQuery({
     queryKey: ['account', id],
@@ -34,12 +39,25 @@ export function useAccountDetail(id: string, businessId: string | undefined) {
   }, [cheques, id])
 
   const filteredCheques = useMemo(() => {
-    return accountCheques.filter((c: Cheque) => {
+    const result = accountCheques.filter((c: Cheque) => {
       const matchesSearch = c.cheque_number.includes(search) || c.amount.toString().includes(search)
       const matchesFilter = filter === 'All' || c.status === filter
       return matchesSearch && matchesFilter
     })
-  }, [accountCheques, search, filter])
+
+    result.sort((a: Cheque, b: Cheque) => {
+      if (sortBy === 'date') {
+        const dateA = new Date(a.cheque_date).getTime()
+        const dateB = new Date(b.cheque_date).getTime()
+        return sortOrder === 'desc' ? dateB - dateA : dateA - dateB
+      } else if (sortBy === 'amount') {
+        return sortOrder === 'desc' ? b.amount - a.amount : a.amount - b.amount
+      }
+      return 0
+    })
+
+    return result
+  }, [accountCheques, search, filter, sortBy, sortOrder])
 
   const updateChequeStatus = (id: string, status: ChequeStatus) => {
     mutation.mutate({ id, status })
@@ -56,6 +74,10 @@ export function useAccountDetail(id: string, businessId: string | undefined) {
     search,
     setSearch,
     filter,
-    setFilter
+    setFilter,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder
   }
 }

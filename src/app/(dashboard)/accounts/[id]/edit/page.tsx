@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { useParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Tick02Icon as Check, UserIcon as User, CreditCardIcon as CreditCard, HashtagIcon as Hash, Delete02Icon as Trash2 } from '@hugeicons/core-free-icons';
+import {  Tick02Icon as Check, UserIcon as User, CreditCardIcon as CreditCard, HashtagIcon as Hash, Delete02Icon as Trash2 , TextFontIcon as TextIcon } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import dynamic from 'next/dynamic'
@@ -69,12 +69,12 @@ export default function EditAccountPage() {
             <Label htmlFor="account_name"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('accountName')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={User} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-              <Input 
+              <Input leftIcon={TextIcon}  
                 id="account_name"
                 {...register('account_name')} 
                 placeholder="e.g. John Doe"
-                className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
-              />
+                className="h-14  bg-canvas-parchment border-none rounded-sm"
+               />
             </div>
             {errors.account_name && <p className="text-xs text-destructive ml-1">{errors.account_name.message as string}</p>}
           </div>
@@ -83,12 +83,12 @@ export default function EditAccountPage() {
             <Label htmlFor="account_number"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('accountNumber')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={CreditCard} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-              <Input 
+              <Input leftIcon={TextIcon}  
                 id="account_number"
                 {...register('account_number')} 
                 placeholder={t('accountNumberPlaceholder')} 
-                className="h-14 pl-12 bg-canvas-parchment border-none rounded-sm"
-              />
+                className="h-14  bg-canvas-parchment border-none rounded-sm"
+               />
             </div>
             {errors.account_number && <p className="text-xs text-destructive ml-1">{errors.account_number.message as string}</p>}
           </div>
@@ -97,7 +97,7 @@ export default function EditAccountPage() {
             <Label htmlFor="ifsc_code"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('ifscCode')}</Label>
             <div className="relative">
               <HugeiconsIcon icon={Hash} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-              <Input id="ifsc_code"{...register('ifsc_code')} placeholder={t('ifscPlaceholder')} className="h-14 pl-12 bg-canvas-parchment border-none uppercase rounded-sm"/>
+              <Input leftIcon={TextIcon}  id="ifsc_code"{...register('ifsc_code')} placeholder={t('ifscPlaceholder')} className="h-14  bg-canvas-parchment border-none uppercase rounded-sm" />
             </div>
           </div>
 
