@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import"./globals.css";
 import Providers from "@/components/providers";
@@ -7,15 +7,29 @@ import { ProgressBar } from "@/components/progress-bar";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getLocale, getTranslations } from 'next-intl/server';
 import Script from 'next/script';
+import { PwaRegistrar } from "@/components/pwa-registrar";
 
 const inter = Inter({
   subsets: ["latin"],
   variable:"--font-sans",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
   title: "ChequeCheck",
   description: "Never miss a cheque again.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ChequeCheck",
+  },
   icons: {
     icon: [
       { url: '/favicon.ico' },
@@ -41,6 +55,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} className={`${inter.variable}`}>
       <body className="bg-primary font-sans text-foreground selection:bg-primary/10 antialiased flex items-center justify-center min-h-[100dvh] overflow-hidden">
+        <PwaRegistrar />
         <div className="relative w-full h-[100dvh] bg-background sm:h-[90dvh] sm:max-h-[932px] sm:max-w-[430px] sm:rounded-xl sm:border-[4px] sm:border-white sm: overflow-hidden flex flex-col [transform:translateZ(0)]">
           <div id="progress-bar-container" className="absolute top-0 left-0 right-0 z-[100]" />
           <ProgressBar />
