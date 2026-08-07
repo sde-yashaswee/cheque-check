@@ -17,6 +17,20 @@ export interface Quota {
   reset_at: string | null;
 }
 
+export interface Transaction {
+  id: string;
+  user_id: string;
+  razorpay_order_id: string | null;
+  razorpay_payment_id: string | null;
+  amount: number;
+  currency: string;
+  status: 'created' | 'authorized' | 'captured' | 'refunded' | 'failed';
+  type: 'lifetime' | 'subscription' | 'top_up';
+  feature_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export class MonetizationService {
   static async getEntitlements(): Promise<Entitlement[]> {
     const supabase = createClient();
@@ -41,6 +55,21 @@ export class MonetizationService {
       .from('user_quotas')
       .select('*')
       .eq('user_id', user.id);
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async getTransactions(): Promise<Transaction[]> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     return data || [];

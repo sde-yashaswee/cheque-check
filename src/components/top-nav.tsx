@@ -38,6 +38,8 @@ export function TopNav() {
         'about': { title: t('Settings.aboutApp'), icon: Star },
         'help-and-support': { title: t('Settings.helpAndSupport'), icon: Help },
         'whats-new': { title: t('Settings.whatsNew'), icon: Rocket },
+        'preferences': { title: t('Settings.preferences'), icon: Settings },
+        'transactions': { title: t('Settings.transactions'), icon: Pay },
       }
       if (subInfo[sub]) return subInfo[sub]
     }

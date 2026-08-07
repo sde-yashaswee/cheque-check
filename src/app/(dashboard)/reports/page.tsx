@@ -45,7 +45,7 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20 pt-2">
+    <div className="max-w-2xl space-y-8 pb-20 pt-2">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-display-sm font-semibold tracking-tight">Reports</h1>

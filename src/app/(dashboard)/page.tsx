@@ -73,7 +73,7 @@ export default function HomePage() {
   ].filter(d => d.value > 0);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 pb-20 pt-2">
+    <div className="max-w-2xl space-y-8 pb-20 pt-2">
       <DataState
         isLoading={isLoading}
         data={activeBusiness ? [activeBusiness] : []}

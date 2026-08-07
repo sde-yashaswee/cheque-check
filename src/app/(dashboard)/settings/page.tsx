@@ -18,7 +18,6 @@ import { EditableAvatar } from "@/components/ui/editable-avatar"
 import { useTranslations } from 'next-intl';
 import { Switch } from "@/components/ui/switch"
 import { useState } from "react"
-import { PreferencesModal } from "@/components/preferences-modal"
 import { IconType, ChequeWithRelations } from "@/types"
 import { useMonetization } from "@/hooks/use-monetization"
 import { Badge } from "@/components/ui/badge"
@@ -30,6 +29,7 @@ const DeleteConfirmationDialog = dynamic(() => import("@/components/ui/delete-di
 
 interface SettingsItem {
   name: string
+  description?: string
   icon: IconType
   href?: string
   action?: () => void
@@ -50,7 +50,6 @@ export default function SettingsPage() {
   const { profile, updateProfile, isLoading: profileLoading } = useProfile()
   const { handleExport, handleLogout, handleDeleteProfile } = useSettings()
   const { isLifetimePremium, isLoading: monetizationLoading } = useMonetization()
-  const [preferencesOpen, setPreferencesOpen] = useState(false)
 
   const { cheques } = useCheques(activeBusiness?.id)
 
@@ -70,56 +69,28 @@ export default function SettingsPage() {
     )
   }
 
-  const currencyOptions = [
-    { label: '₹ (INR)', value: '₹' },
-    { label: '$ (USD)', value: '$' },
-    { label: '€ (EUR)', value: '€' },
-    { label: '£ (GBP)', value: '£' },
-  ]
-
-  const dateFormatOptions = [
-    { label: 'DD/MM/YYYY', value: 'dd/MM/yyyy' },
-    { label: 'MM/DD/YYYY', value: 'MM/dd/yyyy' },
-    { label: 'YYYY-MM-DD', value: 'yyyy-MM-dd' },
-  ]
-
-  const languageOptions = [
-    { label: 'English', value: 'en' },
-    { label: 'Hindi', value: 'hi' },
-    { label: 'Hinglish', value: 'hi-en' },
-  ]
-
-  const timezoneOptions = [
-    { label: 'IST (UTC+5:30)', value: 'Asia/Kolkata' },
-    { label: 'UTC', value: 'UTC' },
-    { label: 'EST (UTC-5)', value: 'America/New_York' },
-    { label: 'GMT (UTC+0)', value: 'Europe/London' },
-  ]
-
-  const remindersPerDayOptions = [
-    { label: '1 time/day', value: '1' },
-    { label: '2 times/day', value: '2' },
-    { label: '3 times/day', value: '3' },
-  ]
-
-  const reminderFrequencyOptions = [
-    { label: '1 day before', value: '1' },
-    { label: '3 days before', value: '3' },
-    { label: '7 days before', value: '7' },
-  ]
-
-  const selectorWidth = "h-9 w-[180px]"
-
   const sections: SettingsSection[] = [
     {
       title: t('general'),
       icon: LayoutGrid,
       items: [
         { 
-          name: t('preferences') || 'Preferences', 
+          name: t('preferences'), 
+          description: t('preferencesDesc'),
           icon: Settings2,
-          action: () => setPreferencesOpen(true),
-          value: 'Manage'
+          href: '/settings/preferences'
+        },
+        { 
+          name: t('transactions'), 
+          description: t('transactionsDesc'),
+          icon: Money, 
+          href: '/settings/transactions' 
+        },
+        { 
+          name: t('features'), 
+          description: t('featuresDesc'),
+          icon: Zap, 
+          href: '/features' 
         },
       ]
     },
@@ -127,36 +98,17 @@ export default function SettingsPage() {
       title: t('management'),
       icon: Building2,
       items: [
-        { name: t('myBusinesses'), icon: Building2, href: '/businesses' },
-        { name: 'Reports', icon: FileSpreadsheet, href: '/reports' },
-        { name: t('features'), icon: LayoutGrid, href: '/features' },
         { 
-          name: 'Enable Received Cheques', 
-          icon: Money,
-          component: isLifetimePremium ? (
-            <Switch 
-              checked={profile?.received_cheques_enabled} 
-              onCheckedChange={(checked) => updateProfile({ received_cheques_enabled: checked })}
-            />
-          ) : (
-            <Badge variant="secondary" className="cursor-pointer" onClick={() => router.push('/features')}>
-              LOCKED
-            </Badge>
-          )
+          name: t('businesses'), 
+          description: t('businessesDesc'),
+          icon: Building2, 
+          href: '/businesses' 
         },
-      ]
-    },
-    {
-      title: t('dataAndReports'),
-      icon: FileSpreadsheet,
-      items: [
         { 
-          name: t('exportCheques'), 
+          name: t('reports'), 
+          description: t('reportsDesc'),
           icon: FileSpreadsheet, 
-          action: isLifetimePremium 
-            ? () => handleExport((cheques || []) as ChequeWithRelations[], activeBusiness?.name || '')
-            : () => router.push('/features'),
-          value: isLifetimePremium ? undefined : 'PREMIUM'
+          href: '/reports' 
         },
       ]
     },
@@ -164,18 +116,48 @@ export default function SettingsPage() {
       title: t('support'),
       icon: Help,
       items: [
-        { name: t('whatsNew'), icon: Megaphone, href: '/settings/whats-new' },
-        { name: t('helpAndSupport'), icon: Help, href: '/settings/help-and-support' },
-        { name: t('aboutApp'), icon: Info, href: '/settings/about' },
+        { 
+          name: t('whatsNew'), 
+          description: t('whatsNewDesc'),
+          icon: Megaphone, 
+          href: '/settings/whats-new' 
+        },
+        { 
+          name: t('helpAndSupport'), 
+          description: t('helpAndSupportDesc'),
+          icon: Help, 
+          href: '/settings/help-and-support' 
+        },
+        { 
+          name: t('aboutApp'), 
+          description: t('aboutAppDesc'),
+          icon: Info, 
+          href: '/settings/about' 
+        },
       ]
     },
     {
       title: t('legal'),
       icon: Shield,
       items: [
-        { name: t('privacyPolicy'), icon: Shield, href: '/settings/privacy-policy' },
-        { name: t('termsAndConditions'), icon: License, href: '/settings/terms-and-conditions' },
-        { name: t('refundPolicy'), icon: Money, href: '/settings/refund-policy' },
+        { 
+          name: t('privacyPolicy'), 
+          description: t('privacyPolicyDesc'),
+          icon: Shield, 
+          href: '/settings/privacy-policy' 
+        },
+        { 
+          name: t('termsAndConditions'), 
+          description: t('termsAndConditionsDesc'),
+          icon: License, 
+          href: '/settings/terms-and-conditions' 
+        },
+        { 
+          name: t('refundPolicy'), 
+          description: t('refundPolicyDesc'),
+          icon: Money, 
+          href: '/settings/refund-policy' 
+        },
       ]
     }
   ]
@@ -212,7 +194,10 @@ export default function SettingsPage() {
                       <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-muted/50 text-muted-foreground">
                         <HugeiconsIcon icon={item.icon} className="h-4 w-4"/>
                       </div>
-                      <span className="text-sm font-semibold">{item.name}</span>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold">{item.name}</span>
+                        {item.description && <span className="text-[10px] text-muted-foreground font-medium leading-tight mt-0.5">{item.description}</span>}
+                      </div>
                     </div>
                     {item.component ? (
                       item.component
@@ -252,7 +237,10 @@ export default function SettingsPage() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-destructive/10 text-destructive">
                     <HugeiconsIcon icon={Trash2} className="h-4 w-4"/>
                   </div>
-                  <span className="text-sm font-semibold text-destructive">{t('deleteMyAccount')}</span>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-destructive">{t('deleteMyAccount')}</span>
+                    <span className="text-[10px] text-destructive/70 font-medium leading-tight mt-0.5">{t('deleteMyAccountDesc')}</span>
+                  </div>
                 </div>
                 <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-destructive opacity-30"/>
               </div>
@@ -275,8 +263,6 @@ export default function SettingsPage() {
           {format(new Date(), "PPpp")}
         </p>
       </div>
-
-      <PreferencesModal open={preferencesOpen} onOpenChange={setPreferencesOpen} />
     </div>
   )
 }
