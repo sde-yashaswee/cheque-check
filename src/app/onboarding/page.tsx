@@ -40,10 +40,8 @@ import {
   StepperItem,
   StepperNav,
   StepperSeparator,
-  StepperTitle,
   StepperTrigger,
 } from '@/components/reui/stepper'
-import { Badge } from '@/components/reui/badge'
 import { useTranslations } from 'next-intl'
 
 const COLORS = ['#0066cc', '#34C759', '#FF9500', '#FF3B30', '#AF52DE', '#5856D6', '#8E8E93']
@@ -257,37 +255,6 @@ export default function OnboardingPage() {
                       <StepperIndicator className="data-[state=inactive]:border-border data-[state=inactive]:text-muted-foreground data-[state=completed]:bg-success size-8 border-2 data-[state=completed]:text-white data-[state=inactive]:bg-background z-10">
                         {s.icon}
                       </StepperIndicator>
-                      <div className="flex flex-col items-center gap-1">
-                        <div className="text-muted-foreground text-[10px] font-semibold uppercase text-center">
-                          Step {index + 1}
-                        </div>
-                        <StepperTitle className="group-data-[state=inactive]/step:text-muted-foreground text-center text-[10px] font-semibold hidden md:block">
-                          {s.title}
-                        </StepperTitle>
-                        <div className="hidden md:block mt-0.5">
-                          <Badge
-                            size="sm"
-                            variant="primary-light"
-                            className="hidden group-data-[state=active]/step:inline-flex text-[8px] h-4 px-1"
-                          >
-                            In Progress
-                          </Badge>
-                          <Badge
-                            variant="success-light"
-                            size="sm"
-                            className="hidden group-data-[state=completed]/step:inline-flex text-[8px] h-4 px-1"
-                          >
-                            Completed
-                          </Badge>
-                          <Badge
-                            variant="secondary"
-                            size="sm"
-                            className="text-muted-foreground hidden group-data-[state=inactive]/step:inline-flex text-[8px] h-4 px-1"
-                          >
-                            Pending
-                          </Badge>
-                        </div>
-                      </div>
                     </StepperTrigger>
                     {4 > index + 1 && (
                       <StepperSeparator className="group-data-[state=completed]/step:bg-success absolute inset-x-0 left-[50%] top-4 m-0 w-full z-0" />

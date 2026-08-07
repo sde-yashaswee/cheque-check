@@ -6,7 +6,7 @@ import { useProfile } from "@/hooks/use-profile"
 import { ReportService } from "@/services/report.service"
 import { Button } from "@/components/ui/button"
 import { HugeiconsIcon } from '@hugeicons/react';
-import { File02Icon as FileText, FileDownloadIcon as Download, FilterIcon as Filter, Calendar01Icon as Calendar, Building03Icon } from '@hugeicons/core-free-icons';
+import { File02Icon as FileText, FileDownloadIcon as Download, FilterIcon as Filter, Calendar01Icon as Calendar, Building03Icon, LockPasswordIcon } from '@hugeicons/core-free-icons';
 import { useChequeStats } from "@/hooks/use-cheque-stats"
 import { DataState } from "@/components/ui/data-state"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -15,6 +15,9 @@ import { StatusPill } from "@/components/ui/status-pill"
 import { format } from "date-fns"
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl';
+import { useMonetization } from "@/hooks/use-monetization"
+import { PremiumModal } from "@/components/premium-modal"
+import { useRouter } from "next/navigation"
 
 const ChequeStatsChart = dynamic(() => import("@/components/cheque-stats-chart").then(mod => mod.ChequeStatsChart), {
   loading: () => <Skeleton className="h-full w-full rounded-lg"/>,
@@ -24,10 +27,16 @@ const ChequeStatsChart = dynamic(() => import("@/components/cheque-stats-chart")
 export default function ReportsPage() {
   const t = useTranslations('Dashboard')
   const tc = useTranslations('Common')
+  const router = useRouter()
+  
   const { activeBusiness } = useBusiness()
   const { profile } = useProfile()
-  const { cheques, isLoading, filter, setFilter } = useCheques(activeBusiness?.id)
+  const { isLifetimePremium, isLoading: isLoadingMonetization } = useMonetization()
+
+  const { cheques, isLoading: chequesLoading, filter, setFilter } = useCheques(activeBusiness?.id)
   const { outstanding, issuedCount, receivedCount, clearedCount, bouncedCount } = useChequeStats(cheques)
+
+  const isLoading = chequesLoading || isLoadingMonetization
 
   const currency = profile?.currency || '₹'
 
@@ -39,9 +48,38 @@ export default function ReportsPage() {
   ].filter(d => d.value > 0);
 
   const handleExport = () => {
-    if (cheques) {
+    if (cheques && isLifetimePremium) {
       ReportService.exportToCSV(cheques, `cheques_report_${activeBusiness?.name || 'export'}.csv`)
     }
+  }
+
+  if (!isLoadingMonetization && !isLifetimePremium) {
+    return (
+      <div className="max-w-2xl space-y-8 pb-20 pt-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-display-sm font-semibold tracking-tight">Reports</h1>
+            <p className="text-body text-muted-foreground">Financial summary and exports</p>
+          </div>
+        </div>
+        <EmptyState
+          icon={LockPasswordIcon}
+          title="Premium Feature"
+          description="Reports and Data Exports are only available on the Lifetime Premium plan."
+          action={{
+            label: "View Features",
+            onClick: () => router.push('/features')
+          }}
+        />
+        <PremiumModal 
+          open={!isLoadingMonetization && !isLifetimePremium} 
+          onOpenChange={() => {}} 
+          featureName="Reports & Data Export"
+          description="You need to purchase the Lifetime Premium plan to access detailed financial reports and data exports."
+          onCloseRedirect="/settings"
+        />
+      </div>
+    )
   }
 
   return (
