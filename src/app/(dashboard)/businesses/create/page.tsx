@@ -175,7 +175,7 @@ export default function CreateBusinessPage() {
               <Label htmlFor="address"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('businessAddress')}</Label>
               <div className="relative">
                 <HugeiconsIcon icon={MapPin} className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50"/>
-                <Input leftIcon={Location}  id="address"{...register('address')} placeholder="Headquarters location"className="h-14  bg-canvas-parchment border-none rounded-sm" />
+                <Input leftIcon={MapPin}  id="address"{...register('address')} placeholder="Headquarters location"className="h-14  bg-canvas-parchment border-none rounded-sm" />
               </div>
             </div>
 

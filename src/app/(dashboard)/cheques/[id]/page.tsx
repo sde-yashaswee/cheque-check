@@ -9,6 +9,7 @@ import { PencilEdit01Icon as Pencil, Calendar03Icon as Calendar, HashtagIcon as 
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useProfile } from '@/hooks/use-profile'
+import { TextTruncate } from '@/components/ui/text-truncate'
 import { cn } from '@/lib/utils'
 import { ChequeStatus } from '@/types'
 import { StatusPill } from '@/components/ui/status-pill'
@@ -87,8 +88,8 @@ export default function ChequeDetailPage() {
                   icon={cheque.party?.icon} 
                   imageUrl={cheque.party?.avatar_url}
                 />
-                <div>
-                  <p className="font-semibold">{cheque.party?.name}</p>
+                <div className="flex-1 min-w-0">
+                  <TextTruncate text={cheque.party?.name || ''} maxLength={25} className="font-semibold block" />
                   <p className="text-[10px] text-muted-foreground uppercase font-semibold">{t('recipientPayer')}</p>
                 </div>
               </div>
@@ -103,9 +104,9 @@ export default function ChequeDetailPage() {
                   icon={cheque.account?.icon} 
                   imageUrl={cheque.account?.bank?.logo_url}
                 />
-                <div>
-                  <p className="font-semibold">{cheque.account?.account_name}</p>
-                  <p className="text-[10px] text-muted-foreground uppercase font-semibold">{cheque.account?.bank?.name}</p>
+                <div className="flex-1 min-w-0 flex flex-col">
+                  <TextTruncate text={cheque.account?.account_name || ''} maxLength={25} className="font-semibold block" />
+                  <TextTruncate text={cheque.account?.bank?.name || ''} maxLength={30} className="text-[10px] text-muted-foreground uppercase font-semibold block" />
                 </div>
               </div>
             </div>

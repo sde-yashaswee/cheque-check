@@ -55,7 +55,9 @@
     "sortBy": "Sort Karein",
     "order": "Order",
     "ascending": "Ascending",
-    "descending": "Descending"
+    "descending": "Descending",
+    "date": "Date",
+    "amount": "Amount"
   },
   "Navigation": {
     "dashboard": "Dashboard",
@@ -124,7 +126,7 @@
   "Dashboard": {
     "totalOutstanding": "Total Outstanding",
     "quickActions": "Quick Actions",
-    "scanCheque": "Cheque Scan karein",
+    "scanCheque": "Scan Cheque",
     "issueCheque": "Cheque Issue karein",
     "receiveCheque": "Cheque Receive karein",
     "todaysCheques": "Aaj ke Cheques",
@@ -341,18 +343,14 @@
     "termsAndConditionsDesc": "Hamari service ke terms padhein",
     "refundPolicy": "Refund Policy",
     "refundPolicyDesc": "Refunds aur payments par hamari policy",
-    "dangerZone": "Danger Zone",
     "deleteMyAccount": "Mera Account Delete karein",
     "deleteMyAccountDesc": "Apna account aur data hamesha ke liye hatayein",
-    "signOut": "Sign Out karein",
-
     "voiceCallSummary": "Voice Call Summary",
     "enableDailyCall": "Daily Call enable karein",
     "phoneNumber": "Phone Number",
     "phoneNumberPlaceholder": "+91 00000 00000",
     "deleteProfileTitle": "Pura Profile Delete karein?",
     "deleteProfileDescription": "Isse aapka account aur saara associated data permanently delete ho jayega.",
-    "deleteMyAccount": "Mera Account Delete karein",
     "version": "Version",
     "emailUs": "Hamein Email karein",
     "getHelpViaEmail": "Email ke zariye help lein",

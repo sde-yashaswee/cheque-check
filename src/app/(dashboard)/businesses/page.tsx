@@ -13,7 +13,8 @@ import { cn } from "@/lib/utils"
 import dynamic from 'next/dynamic'
 import { DataState } from "@/components/ui/data-state"
 import { EmptyState } from "@/components/ui/empty-state"
-import { useTranslations } from 'next-intl'
+import { TextTruncate } from "@/components/ui/text-truncate"
+import { useTranslations } from "next-intl"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const DeleteConfirmationDialog = dynamic(() => import("@/components/ui/delete-dialog").then(mod => mod.DeleteConfirmationDialog), {
@@ -182,7 +183,7 @@ export default function BusinessesPage() {
                     size="lg"
                   />
                   <div>
-                    <h3 className="text-lg font-semibold">{business.name}</h3>
+                    <TextTruncate text={business.name} maxLength={25} className="text-lg font-semibold block" />
                     <p className="text-[10px] text-muted-foreground font-semibold truncate max-w-[150px]">{business.email || tc('noEmail')}</p>
                   </div>
                 </div>

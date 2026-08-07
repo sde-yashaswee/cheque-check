@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
 import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
+import { TextTruncate } from '@/components/ui/text-truncate'
 import { useTranslations } from 'next-intl';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
@@ -171,7 +172,7 @@ export default function PartiesPage() {
                   size="md"
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-base truncate">{party.name}</p>
+                  <TextTruncate text={party.name} maxLength={25} className="font-bold text-base" />
                   <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider truncate">{party.contact}</p>
                 </div>
                 <div className="text-right shrink-0">

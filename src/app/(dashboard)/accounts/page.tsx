@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils'
 import { useAccounts } from '@/hooks/use-accounts'
 import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
+import { TextTruncate } from '@/components/ui/text-truncate'
 import { useTranslations } from 'next-intl'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
@@ -211,10 +212,10 @@ export default function AccountsPage() {
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <p className="text-base font-bold truncate">{account.account_name}</p>
+                      <TextTruncate text={account.account_name} maxLength={25} className="text-base font-bold" />
                       <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground/40 group-hover:translate-x-0.5 transition-transform"/>
                     </div>
-                    <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mt-0.5">{account.bank?.name}</p>
+                    <TextTruncate text={account.bank?.name || ''} maxLength={30} className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mt-0.5 block" />
                     
                     <div className="mt-4 flex items-center justify-between border-t border-dashed border-zinc-100 dark:border-zinc-800 pt-4">
                       <p className="text-xs font-mono text-muted-foreground tracking-tighter">

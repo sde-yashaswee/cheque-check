@@ -10,6 +10,7 @@ import { useAccounts } from '@/hooks/use-accounts'
 import { useRouter } from 'next/navigation'
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
+import { TextTruncate } from '@/components/ui/text-truncate'
 import { ChequeWithRelations, Party, AccountWithRelations } from '@/types'
 
 export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
@@ -101,8 +102,8 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
                   size="lg"
                   className="rounded-sm shrink-0"
                 />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold">{p.name}</p>
+                <div className="flex-1 min-w-0 flex flex-col">
+                  <TextTruncate text={p.name} maxLength={25} className="text-sm font-semibold block" />
                   <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider">{p.contact}</p>
                 </div>
                 <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 shrink-0"/>
@@ -127,9 +128,11 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
                   size="lg"
                   className="rounded-sm shrink-0"
                 />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold">{a.bank?.name || 'Bank'}</p>
-                  <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider">{a.account_name} • {a.account_number}</p>
+                <div className="flex-1 min-w-0 flex flex-col">
+                  <TextTruncate text={a.bank?.name || 'Bank'} maxLength={25} className="text-sm font-semibold block" />
+                  <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider">
+                    <TextTruncate text={a.account_name} maxLength={15} /> • {a.account_number}
+                  </p>
                 </div>
                 <HugeiconsIcon icon={ChevronRight} className="h-4 w-4 text-muted-foreground opacity-40 shrink-0"/>
               </CommandItem>

@@ -10,6 +10,7 @@ import { File02Icon as FileText, FileDownloadIcon as Download, FilterIcon as Fil
 import { useChequeStats } from "@/hooks/use-cheque-stats"
 import { DataState } from "@/components/ui/data-state"
 import { EmptyState } from "@/components/ui/empty-state"
+import { TextTruncate } from "@/components/ui/text-truncate"
 import { Skeleton } from "@/components/ui/skeleton"
 import { StatusPill } from "@/components/ui/status-pill"
 import { format } from "date-fns"
@@ -174,9 +175,9 @@ export default function ReportsPage() {
               <div className="divide-y rounded-lg border bg-card overflow-hidden">
                 {(cheques || []).slice(0, 10).map((c) => (
                   <div key={c.id} className="flex items-center justify-between p-4">
-                    <div>
-                      <p className="font-semibold">{c.party?.name}</p>
-                      <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
+                    <div className="min-w-0 flex-1">
+                      <TextTruncate text={c.party?.name || ''} maxLength={20} className="font-semibold block" />
+                      <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider truncate">
                         {format(new Date(c.cheque_date), 'MMM d, yyyy')} • #{c.cheque_number}
                       </p>
                     </div>

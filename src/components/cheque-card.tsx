@@ -11,6 +11,7 @@ import { useProfile } from '@/hooks/use-profile'
 import { format } from 'date-fns'
 import { StatusPill } from '@/components/ui/status-pill'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
+import { TextTruncate } from '@/components/ui/text-truncate'
 import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTranslations } from 'next-intl'
@@ -135,7 +136,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
                   </Dialog>
                 )}
               </div>
-              <p className="text-body-strong">{cheque.party?.name}</p>
+              <TextTruncate text={cheque.party?.name || ''} maxLength={20} className="text-body-strong block" />
             </div>
           </div>
           <div className="text-right">
@@ -143,7 +144,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
               {format(new Date(cheque.cheque_date), dateFormat)}
             </p>
             <div className="mt-1 flex items-center justify-end gap-1.5">
-              <span className="text-[10px] text-muted-foreground">{cheque.account?.account_name}</span>
+              <TextTruncate text={cheque.account?.account_name || ''} maxLength={15} className="text-[10px] text-muted-foreground" />
               <EntityAvatar 
                 name={cheque.account?.bank?.name || 'Bank'} 
                 color={cheque.account?.color} 

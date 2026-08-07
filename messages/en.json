@@ -55,7 +55,9 @@
     "sortBy": "Sort By",
     "order": "Order",
     "ascending": "Ascending",
-    "descending": "Descending"
+    "descending": "Descending",
+    "date": "Date",
+    "amount": "Amount"
   },
   "Navigation": {
     "dashboard": "Dashboard",

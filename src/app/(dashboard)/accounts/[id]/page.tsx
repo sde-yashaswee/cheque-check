@@ -16,6 +16,7 @@ import { StatusPill } from '@/components/ui/status-pill'
 import { cn } from '@/lib/utils'
 import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
+import { TextTruncate } from '@/components/ui/text-truncate'
 import { useTranslations } from 'next-intl'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
@@ -97,9 +98,9 @@ export default function AccountDetailPage() {
               imageUrl={account.bank?.logo_url}
               size="lg"
             />
-            <div>
-              <h2 className="text-2xl font-semibold">{account.account_name}</h2>
-              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{account.bank?.name}</p>
+            <div className="flex flex-col min-w-0">
+              <TextTruncate text={account.account_name} maxLength={40} className="text-2xl font-semibold block" />
+              <TextTruncate text={account.bank?.name || ''} maxLength={40} className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider block" />
             </div>
           </div>
           <Link href={`/accounts/${id}/edit`}>

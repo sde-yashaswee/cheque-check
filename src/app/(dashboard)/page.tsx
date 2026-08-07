@@ -1,7 +1,7 @@
 'use client'
 
 import { HugeiconsIcon } from '@hugeicons/react';
-import { PlusSignIcon as Plus, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, File02Icon as FileText, FlashIcon as Zap, Calendar03Icon as Calendar, Chart01Icon as Stats, Camera01Icon as Camera, Building03Icon, Calendar01Icon } from '@hugeicons/core-free-icons';
+import { PlusSignIcon as Plus, File02Icon as FileText, FlashIcon as Zap, Calendar03Icon as Calendar, Chart01Icon as Stats, Camera01Icon as Camera, Building03Icon, Calendar01Icon } from '@hugeicons/core-free-icons';
 import { Button } from "@/components/ui/button";
 import { useBusiness } from "@/hooks/use-business";
 import { useCheques } from "@/hooks/use-cheques";
@@ -32,24 +32,18 @@ export default function HomePage() {
   const { profile } = useProfile()
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [isUploading, setIsUploading] = useState(false)
 
   const { cheques, isLoading, updateStatus } = useCheques(activeBusiness?.id)
 
-  const handleScan = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleScan = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file || !activeBusiness) return
-
-    setIsUploading(true)
-    try {
-      const imageUrl = await StorageService.uploadChequeImage(file)
-      router.push(`/cheques/create?imageUrl=${encodeURIComponent(imageUrl)}&action=ocr&type=Inward`)
-    } catch (error) {
-      logger.error('Scan error', error)
-      alert('Failed to upload cheque image')
-    } finally {
-      setIsUploading(false)
-    }
+    if (!file) return
+    
+    // Store file for the next page to pick up
+    import('@/lib/scan-store').then(({ ScanStore }) => {
+      ScanStore.setFile(file)
+      router.push('/cheques/create?action=scan')
+    })
   }
 
   const {
@@ -133,38 +127,31 @@ export default function HomePage() {
               />
               <button 
                 onClick={() => fileInputRef.current?.click()} 
-                className="flex-1 disabled:opacity-50"
-                disabled={isUploading}
+                className="flex-1 transition-transform active:scale-95"
               >
-                <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 transition-transform active:scale-95 border border-primary/5">
+                <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 border border-primary/5">
                   <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/10 text-primary">
-                    {isUploading ? (
-                      <div className="h-6 w-6 border-2 border-primary border-t-transparent animate-spin rounded-full"/>
-                    ) : (
-                      <HugeiconsIcon icon={Camera} className="h-6 w-6"/>
-                    )}
+                    <HugeiconsIcon icon={Camera} className="h-6 w-6"/>
                   </div>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{isUploading ? tCheques('uploading') : tDashboard('scanCheque')}</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{tDashboard('scanCheque')}</span>
                 </div>
               </button>
-              <Link href="/cheques/create?type=Outward"className="flex-1">
+              <Link href="/businesses" className="flex-1">
                 <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 transition-transform active:scale-95 border border-primary/5">
                   <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/10 text-primary">
-                    <HugeiconsIcon icon={ArrowUpRight} className="h-6 w-6"/>
+                    <HugeiconsIcon icon={Building03Icon} className="h-6 w-6"/>
                   </div>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{tDashboard('issueCheque')}</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">Businesses</span>
                 </div>
               </Link>
-              {profile?.received_cheques_enabled !== false && (
-                <Link href="/cheques/create?type=Inward"className="flex-1">
-                  <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 transition-transform active:scale-95 border border-primary/5">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-green-500/10 text-green-600">
-                      <HugeiconsIcon icon={ArrowDownLeft} className="h-6 w-6"/>
-                    </div>
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-green-600">{tDashboard('receiveCheque')}</span>
+              <Link href="/reports" className="flex-1">
+                <div className="flex flex-col items-center gap-2 rounded-lg bg-canvas-parchment p-4 transition-transform active:scale-95 border border-primary/5">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/10 text-primary">
+                    <HugeiconsIcon icon={FileText} className="h-6 w-6"/>
                   </div>
-                </Link>
-              )}
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">Reports</span>
+                </div>
+              </Link>
             </div>
           </div>
 

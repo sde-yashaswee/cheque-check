@@ -105,8 +105,10 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
     try {
       const url = await StorageService.uploadChequeImage(file)
       setValue('image_url', url)
+      return url
     } catch (error) {
       alert("Upload failed: "+ (error instanceof Error ? error.message : String(error)))
+      return null
     } finally {
       setIsUploading(false)
     }
@@ -115,7 +117,7 @@ export function useCreateCheque(businessId: string | undefined, initialType: str
   const nextStep = async () => {
     let isValid = false
     if (step === 1) {
-      isValid = await trigger(['amount', 'cheque_number', 'cheque_date', 'deposit_date'])
+      isValid = await trigger(['amount', 'cheque_number'])
     } else if (step === 2) {
       isValid = await trigger(['party_id', 'account_id'])
     }

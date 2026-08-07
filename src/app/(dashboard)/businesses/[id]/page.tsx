@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useProfile } from '@/hooks/use-profile'
 import type { ChequeWithRelations } from '@/types'
+import { TextTruncate } from '@/components/ui/text-truncate'
 import { useTranslations } from 'next-intl'
 
 export default function BusinessDetailPage() {
@@ -58,9 +59,9 @@ export default function BusinessDetailPage() {
               imageUrl={business.logo_url}
               size="lg"
             />
-            <div>
-              <h2 className="text-2xl font-semibold">{business.name}</h2>
-              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{business.phone || tc('noPhone')}</p>
+            <div className="flex flex-col min-w-0">
+              <TextTruncate text={business.name} maxLength={40} className="text-2xl font-semibold block" />
+              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider truncate">{business.phone || tc('noPhone')}</p>
             </div>
           </div>
           <Link href={`/businesses/${id}/edit`}>

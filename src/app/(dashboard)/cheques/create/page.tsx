@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useSearchParams } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react';
-import {  ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Camera01Icon as Camera, Cancel01Icon as X, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, Invoice01Icon as ReceiptText, UserIcon as User, CreditCardIcon as CreditCard, BankIcon as Bank, Delete02Icon as Trash , HashtagIcon as Hash, Calendar03Icon as Calendar, Note01Icon as Note } from '@hugeicons/core-free-icons';
+import {  ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Camera01Icon as Camera, Cancel01Icon as X, ArrowUpRight01Icon as ArrowUpRight, ArrowDownLeft01Icon as ArrowDownLeft, Invoice01Icon as ReceiptText, UserIcon as User, CreditCardIcon as CreditCard, BankIcon as Bank, Delete02Icon as Trash , HashtagIcon as Hash, Calendar03Icon as Calendar, Note01Icon as Note, Loading03Icon } from '@hugeicons/core-free-icons';
 import { cn, numberToIndianWords, getSimilarityScore } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 import { Combobox } from '@/components/ui/combobox'
@@ -32,6 +32,7 @@ import { AccountService } from '@/services/account.service'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Checkbox } from '@/components/ui/checkbox'
 import { BankSelector } from '@/components/bank-selector'
+import { ScanStore } from '@/lib/scan-store'
 
 export default function CreateChequePage() {
   const t = useTranslations('Cheques')
@@ -39,11 +40,9 @@ export default function CreateChequePage() {
   const searchParams = useSearchParams()
   const typeParam = searchParams.get('type')
   const imageUrlParam = searchParams.get('imageUrl')
-  const actionParam = searchParams.get('action')
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
   const [isExtracting, setIsExtracting] = useState(false)
-  const [extractionProgress, setExtractionProgress] = useState(0)
   const queryClient = useQueryClient()
   const { data: banks } = useBanks()
 
@@ -79,149 +78,144 @@ export default function CreateChequePage() {
   const { parties } = useParties(businessId)
   const { accounts } = useAccounts(businessId)
 
-  useEffect(() => {
-    if (actionParam === 'ocr' && imageUrlParam && !isExtracting) {
-      const extractData = async () => {
-        setIsExtracting(true)
-        setExtractionProgress(10)
-        setValue('image_url', imageUrlParam)
-        
-        const toastId = toast.add({
-          title: t('scan'),
-          description: t('loading'),
-          type: 'loading',
-        })
+  const extractData = async (url: string) => {
+    if (!url || isExtracting) return
+    
+    setIsExtracting(true)
+    setValue('image_url', url)
+    
+    const toastId = toast.add({
+      title: t('scan'),
+      description: t('loading'),
+      type: 'loading',
+    })
 
-        const progressInterval = setInterval(() => {
-          setExtractionProgress(prev => {
-            if (prev >= 90) {
-              clearInterval(progressInterval)
-              return 90
-            }
-            return prev + 5
-          })
-        }, 300)
+    try {
+      const response = await fetch('/api/ocr/cheque', {
+        method: 'POST',
+        body: JSON.stringify({ imageUrl: url }),
+        headers: { 'Content-Type': 'application/json' },
+      })
 
-        try {
-          const response = await fetch('/api/ocr/cheque', {
-            method: 'POST',
-            body: JSON.stringify({ imageUrl: imageUrlParam }),
-            headers: { 'Content-Type': 'application/json' },
-          })
+      if (!response.ok) throw new Error('Failed to extract data')
 
-          if (!response.ok) throw new Error('Failed to extract data')
+      const data = await response.json()
+      
+      if (data.amount !== null) setValue('amount', data.amount)
+      if (data.cheque_number !== null) setValue('cheque_number', data.cheque_number)
+      if (data.cheque_date !== null) setValue('cheque_date', data.cheque_date)
+      
+      let matchedPartyId = ''
+      let matchedAccountId = ''
 
-          const data = await response.json()
-          
-          if (data.amount !== null) setValue('amount', data.amount)
-          if (data.cheque_number !== null) setValue('cheque_number', data.cheque_number)
-          if (data.cheque_date !== null) setValue('cheque_date', data.cheque_date)
-          
-          let matchedPartyId = ''
-          let matchedAccountId = ''
+      const chequeType = watch('type')
 
-          const chequeType = watch('type')
+      // Enhanced fuzzy match for party using similarity score
+      const partyNameToMatch = chequeType === 'Inward' ? data.account_name : data.payee_name
 
-          // Enhanced fuzzy match for party using similarity score
-          // If Inward (received), the issuer (account_name) is the Party.
-          // If Outward (issued), the payee (payee_name) is the Party.
-          const partyNameToMatch = chequeType === 'Inward' ? data.account_name : data.payee_name
+      if (partyNameToMatch && parties) {
+        const matches = parties.map(p => ({
+          id: p.id,
+          name: p.name,
+          score: getSimilarityScore(p.name, partyNameToMatch)
+        })).sort((a, b) => b.score - a.score)
 
-          if (partyNameToMatch && parties) {
-            const matches = parties.map(p => ({
-              id: p.id,
-              name: p.name,
-              score: getSimilarityScore(p.name, partyNameToMatch)
-            })).sort((a, b) => b.score - a.score)
-
-            if (matches[0]?.score >= 0.7) {
-              matchedPartyId = matches[0].id
-              setValue('party_id', matchedPartyId)
-            }
-          }
-
-          // Enhanced fuzzy match for account using similarity score (on account name)
-          // Only match our accounts if it's an Outward cheque (our cheque)
-          if (chequeType === 'Outward' && accounts) {
-            const ocrAcc = data.account_number?.replace(/\D/g, '') || ''
-            
-            // Try number match first (exact or partial)
-            const exactNumMatch = accounts.find(a => {
-              const localAcc = a.account_number.replace(/\D/g, '')
-              return ocrAcc.length >= 4 && localAcc.length >= 4 && 
-                     (localAcc.endsWith(ocrAcc) || ocrAcc.endsWith(localAcc))
-            })
-
-            if (exactNumMatch) {
-              matchedAccountId = exactNumMatch.id
-              setValue('account_id', matchedAccountId)
-            } else if (data.account_name) {
-              // Try name match if number fails
-              const nameMatches = accounts.map(a => ({
-                id: a.id,
-                score: getSimilarityScore(a.account_name, data.account_name!)
-              })).sort((a, b) => b.score - a.score)
-
-              if (nameMatches[0]?.score >= 0.7) {
-                matchedAccountId = nameMatches[0].id
-                setValue('account_id', matchedAccountId)
-              }
-            }
-          }
-
-          // If something is not matched, show the dialog
-          if ((partyNameToMatch && !matchedPartyId) || (chequeType === 'Outward' && data.account_number && !matchedAccountId)) {
-            // Try to pre-match bank
-            let matchedBankId = ''
-            if (data.bank_name && banks) {
-              const normalizedOcr = data.bank_name.toLowerCase().replace(/\s/g, '').replace(/bank/g, '')
-              const matchedBank = banks.find(b => {
-                const normalizedBank = b.name.toLowerCase().replace(/\s/g, '').replace(/bank/g, '')
-                return normalizedOcr.includes(normalizedBank) || normalizedBank.includes(normalizedOcr)
-              })
-              if (matchedBank) matchedBankId = matchedBank.id
-            }
-
-            setUnmatchedEntities({
-              payee_name: !matchedPartyId ? partyNameToMatch || undefined : undefined,
-              account_name: data.account_name,
-              account_number: !matchedAccountId ? data.account_number : undefined,
-              ifsc_code: data.ifsc_code,
-              bank_name: data.bank_name,
-              bank_id: matchedBankId
-            })
-            
-            setCreateOptions({
-              party: !matchedPartyId,
-              account: chequeType === 'Outward' && !matchedAccountId
-            })
-          }
-
-          setExtractionProgress(100)
-          if (toastId) toast.close(toastId)
-          toast.add({
-            title: tCommon('success'),
-            description: "Cheque details extracted successfully",
-            type: 'success',
-          })
-        } catch (error) {
-          logger.error('OCR Error', error)
-          if (toastId) toast.close(toastId)
-          toast.add({
-            title: tCommon('error'),
-            description: "Failed to extract cheque details",
-            type: 'error',
-          })
-        } finally {
-          clearInterval(progressInterval)
-          setIsExtracting(false)
+        if (matches[0]?.score >= 0.7) {
+          matchedPartyId = matches[0].id
+          setValue('party_id', matchedPartyId)
         }
       }
 
-      extractData()
+      // Enhanced fuzzy match for account using similarity score (on account name)
+      if (chequeType === 'Outward' && accounts) {
+        const ocrAcc = data.account_number?.replace(/\D/g, '') || ''
+        
+        const exactNumMatch = accounts.find(a => {
+          const localAcc = a.account_number.replace(/\D/g, '')
+          return ocrAcc.length >= 4 && localAcc.length >= 4 && 
+                 (localAcc.endsWith(ocrAcc) || ocrAcc.endsWith(localAcc))
+        })
+
+        if (exactNumMatch) {
+          matchedAccountId = exactNumMatch.id
+          setValue('account_id', matchedAccountId)
+        } else if (data.account_name) {
+          const nameMatches = accounts.map(a => ({
+            id: a.id,
+            score: getSimilarityScore(a.account_name, data.account_name!)
+          })).sort((a, b) => b.score - a.score)
+
+          if (nameMatches[0]?.score >= 0.7) {
+            matchedAccountId = nameMatches[0].id
+            setValue('account_id', matchedAccountId)
+          }
+        }
+      }
+
+      if ((partyNameToMatch && !matchedPartyId) || (chequeType === 'Outward' && data.account_number && !matchedAccountId)) {
+        let matchedBankId = ''
+        if (data.bank_name && banks) {
+          const normalizedOcr = data.bank_name.toLowerCase().replace(/\s/g, '').replace(/bank/g, '')
+          const matchedBank = banks.find(b => {
+            const normalizedBank = b.name.toLowerCase().replace(/\s/g, '').replace(/bank/g, '')
+            return normalizedOcr.includes(normalizedBank) || normalizedBank.includes(normalizedOcr)
+          })
+          if (matchedBank) matchedBankId = matchedBank.id
+        }
+
+        setUnmatchedEntities({
+          payee_name: !matchedPartyId ? partyNameToMatch || undefined : undefined,
+          account_name: data.account_name,
+          account_number: !matchedAccountId ? data.account_number : undefined,
+          ifsc_code: data.ifsc_code,
+          bank_name: data.bank_name,
+          bank_id: matchedBankId
+        })
+        
+        setCreateOptions({
+          party: !matchedPartyId,
+          account: chequeType === 'Outward' && !matchedAccountId
+        })
+      }
+
+      if (toastId) toast.close(toastId)
+      toast.add({
+        title: tCommon('success'),
+        description: "Cheque details extracted successfully",
+        type: 'success',
+      })
+    } catch (error) {
+      logger.error('OCR Error', error)
+      if (toastId) toast.close(toastId)
+      toast.add({
+        title: tCommon('error'),
+        description: "Failed to extract cheque details",
+        type: 'error',
+      })
+    } finally {
+      setIsExtracting(false)
+    }
+  }
+
+  useEffect(() => {
+    const handlePendingScan = async () => {
+      const pendingFile = ScanStore.getFile()
+      if (pendingFile) {
+        const url = await handleImageUpload(pendingFile)
+        if (url) extractData(url)
+      }
+    }
+    handlePendingScan()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (imageUrlParam && !isExtracting) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      extractData(imageUrlParam)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actionParam, imageUrlParam, parties, accounts, banks, setValue, t, tCommon])
+  }, [imageUrlParam, parties, accounts, banks, setValue, t, tCommon])
 
   const handleInlineCreate = async () => {
     if (!unmatchedEntities || !businessId) return
@@ -331,9 +325,9 @@ export default function CreateChequePage() {
 
             <StepperNav className="gap-3 flex-1">
               {[
-                { title: "Amount & Dates", icon: <HugeiconsIcon icon={ReceiptText} className="size-4" /> },
+                { title: "Scan & Details", icon: <HugeiconsIcon icon={Camera} className="size-4" /> },
                 { title: "Entities", icon: <HugeiconsIcon icon={User} className="size-4" /> },
-                { title: "Documentation", icon: <HugeiconsIcon icon={Camera} className="size-4" /> }
+                { title: "Dates & Review", icon: <HugeiconsIcon icon={ReceiptText} className="size-4" /> }
               ].map((s, index) => (
                 <StepperItem
                   key={index}
@@ -363,25 +357,71 @@ export default function CreateChequePage() {
             </Button>
           </div>
         </Stepper>
-        
-        {isExtracting && (
-          <div className="space-y-2 animate-in fade-in duration-500">
-            <div className="flex justify-between text-[10px] font-bold text-primary uppercase tracking-widest">
-              <span>Extracting Cheque Details... {extractionProgress}%</span>
-            </div>
-            <div className="h-1 w-full bg-primary/10 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-primary transition-all duration-300" 
-                style={{ width: `${extractionProgress}%` }}
-              />
-            </div>
-          </div>
-        )}
       </div>
 
       <form onSubmit={onSubmit} className="space-y-8">
         {step === 1 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+            {/* Cheque Photo Widget */}
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('photo')}</Label>
+              <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-4 bg-canvas-parchment/30 min-h-[140px] transition-colors hover:bg-canvas-parchment/50 border-primary/10 relative overflow-hidden">
+                {watch('image_url' as any) ? (
+                  <div className="relative w-full aspect-video rounded-sm overflow-hidden border">
+                    <img src={watch('image_url' as any)} alt="Cheque" className="w-full h-full object-cover"/>
+                    <button 
+                      type="button"
+                      onClick={() => setValue('image_url', null)}
+                      className="absolute top-3 right-3 p-2 bg-black/60 text-white rounded-full hover:bg-black transition-colors z-20"
+                    >
+                      <HugeiconsIcon icon={X} className="h-4 w-4"/>
+                    </button>
+                    {isExtracting && (
+                      <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 z-10 animate-in fade-in duration-300">
+                        <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                          <HugeiconsIcon icon={Loading03Icon} className="h-7 w-7 animate-spin" />
+                        </div>
+                        <div className="text-center">
+                          <span className="text-sm font-semibold text-primary block">{t('loading')}</span>
+                          <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">{t('photoInstruction')}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center gap-3 cursor-pointer py-6 w-full relative">
+                    <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                      {isUploading || isExtracting ? (
+                        <HugeiconsIcon icon={Loading03Icon} className="h-7 w-7 animate-spin" />
+                      ) : (
+                        <HugeiconsIcon icon={Camera} className="h-7 w-7"/>
+                      )}
+                    </div>
+                    <div className="text-center">
+                      <span className="text-sm font-semibold text-primary block">
+                        {(isUploading || isExtracting) ? t('loading') : t('scanUpload')}
+                      </span>
+                      <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">{t('photoInstruction')}</p>
+                    </div>
+                    <input 
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          const url = await handleImageUpload(file)
+                          if (url) extractData(url)
+                        }
+                      }}
+                      disabled={isUploading || isExtracting}
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('type')}</Label>
               <div className="grid grid-cols-2 gap-4">
@@ -453,18 +493,6 @@ export default function CreateChequePage() {
               <Input leftIcon={Hash}  id="cheque_number"{...register('cheque_number')} placeholder={t('chequeNumberPlaceholder')} className="h-12 rounded-sm" />
               {errors.cheque_number && <p className="text-xs text-destructive ml-1">{errors.cheque_number.message as string}</p>}
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="cheque_date"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('chequeDate')}</Label>
-              <Input leftIcon={Calendar}  id="cheque_date"type="date"{...register('cheque_date')} className="h-12 rounded-sm" />
-              {errors.cheque_date && <p className="text-xs text-destructive ml-1">{errors.cheque_date.message as string}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="deposit_date"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('depositDate')}</Label>
-              <Input leftIcon={Calendar}  id="deposit_date"type="date"{...register('deposit_date')} className="h-14 bg-canvas-parchment border-none rounded-sm" />
-              {errors.deposit_date && <p className="text-xs text-destructive ml-1">{errors.deposit_date.message as string}</p>}
-            </div>
             
             <Button type="button"className="w-full rounded-full h-14 text-lg"onClick={nextStep}>
               {tCommon('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
@@ -511,49 +539,15 @@ export default function CreateChequePage() {
         {step === 3 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('photo')}</Label>
-              <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-4 bg-canvas-parchment/30 min-h-[140px] transition-colors hover:bg-canvas-parchment/50 border-primary/10">
-                {watch('image_url' as any) ? (
-                  <div className="relative w-full aspect-video rounded-sm overflow-hidden border">
-                    { }
-                    <img src={watch('image_url' as any)} alt="Cheque"className="w-full h-full object-cover"/>
-                    <button 
-                      type="button"
-                      onClick={() => setValue('image_url', null)}
-                      className="absolute top-3 right-3 p-2 bg-black/60 text-white rounded-full hover:bg-black transition-colors"
-                    >
-                      <HugeiconsIcon icon={X} className="h-4 w-4"/>
-                    </button>
-                  </div>
-                ) : (
-                  <label className="flex flex-col items-center gap-3 cursor-pointer py-6 w-full">
-                    <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      {isUploading ? (
-                        <div className="h-6 w-6 border-2 border-primary border-t-transparent animate-spin rounded-full"/>
-                      ) : (
-                        <HugeiconsIcon icon={Camera} className="h-7 w-7"/>
-                      )}
-                    </div>
-                    <div className="text-center">
-                      <span className="text-sm font-semibold text-primary block">
-                        {isUploading ? t('uploading') : t('scanUpload')}
-                      </span>
-                      <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">{t('photoInstruction')}</p>
-                    </div>
-                    <input 
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (file) handleImageUpload(file)
-                      }}
-                      disabled={isUploading}
-                    />
-                  </label>
-                )}
-              </div>
+              <Label htmlFor="cheque_date"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('chequeDate')}</Label>
+              <Input leftIcon={Calendar}  id="cheque_date"type="date"{...register('cheque_date')} className="h-12 rounded-sm" />
+              {errors.cheque_date && <p className="text-xs text-destructive ml-1">{errors.cheque_date.message as string}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="deposit_date"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('depositDate')}</Label>
+              <Input leftIcon={Calendar}  id="deposit_date"type="date"{...register('deposit_date')} className="h-14 bg-canvas-parchment border-none rounded-sm" />
+              {errors.deposit_date && <p className="text-xs text-destructive ml-1">{errors.deposit_date.message as string}</p>}
             </div>
 
             <div className="space-y-2">
