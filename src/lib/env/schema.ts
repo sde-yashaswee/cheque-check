@@ -12,6 +12,7 @@ export const publicEnvSchema = z.object({
     .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
     .optional(),
   NEXT_PUBLIC_RAZORPAY_KEY_ID: optionalString,
+  NEXT_PUBLIC_SENTRY_DSN: optionalString,
 })
 
 export const openAiEnvSchema = z.object({

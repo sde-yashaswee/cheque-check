@@ -1,10 +1,11 @@
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from '@sentry/nextjs'
+
+const isProduction = process.env.NODE_ENV === 'production'
 
 Sentry.init({
-  dsn: "https://c506609cc50e737041573ea61532bd6c@o4511763990577152.ingest.us.sentry.io/4511859247153152",
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
-  // Adjust this value in production, or use tracesSampler for greater control
-  tracesSampleRate: 1,
+  tracesSampleRate: isProduction ? 0.1 : 1,
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
@@ -13,7 +14,7 @@ Sentry.init({
 
   // This sets the sample rate to be 10%. You may want this to be 100% while
   // in development and sample at a lower rate in production
-  replaysSessionSampleRate: 0.1,
+  replaysSessionSampleRate: isProduction ? 0.1 : 0,
 
   // You can remove this option if you're not planning to use the Sentry browser profiling integration:
   integrations: [
@@ -23,4 +24,4 @@ Sentry.init({
       blockAllMedia: true,
     }),
   ],
-});
+})
