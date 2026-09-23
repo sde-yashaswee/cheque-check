@@ -1,7 +1,8 @@
-import pino from 'pino';
-import * as Sentry from "@sentry/nextjs";
+import pino from 'pino'
+import * as Sentry from '@sentry/nextjs'
+import { publicEnv } from '@/lib/env/client'
 
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isDevelopment = process.env.NODE_ENV === 'development'
 
 /**
  * Universal logger using Pino.
@@ -9,11 +10,11 @@ const isDevelopment = process.env.NODE_ENV === 'development';
  * Logs are output as JSON strings for structured log management.
  */
 const pinoLogger = pino({
-  level: process.env.NEXT_PUBLIC_LOG_LEVEL || (isDevelopment ? 'debug' : 'info'),
+  level: publicEnv.NEXT_PUBLIC_LOG_LEVEL || (isDevelopment ? 'debug' : 'info'),
   browser: {
     asObject: true,
   },
-});
+})
 
 /**
  * Enhanced logger that wraps Pino and integrates with Sentry.
@@ -21,25 +22,25 @@ const pinoLogger = pino({
 export const logger = {
   debug: (msg: string, context?: Record<string, any>) => {
     if (context) {
-      pinoLogger.debug(context, msg);
+      pinoLogger.debug(context, msg)
     } else {
-      pinoLogger.debug(msg);
+      pinoLogger.debug(msg)
     }
   },
 
   info: (msg: string, context?: Record<string, any>) => {
     if (context) {
-      pinoLogger.info(context, msg);
+      pinoLogger.info(context, msg)
     } else {
-      pinoLogger.info(msg);
+      pinoLogger.info(msg)
     }
   },
 
   warn: (msg: string, context?: Record<string, any>) => {
     if (context) {
-      pinoLogger.warn(context, msg);
+      pinoLogger.warn(context, msg)
     } else {
-      pinoLogger.warn(msg);
+      pinoLogger.warn(msg)
     }
   },
 
@@ -49,31 +50,34 @@ export const logger = {
   error: (msg: string, error?: unknown, context?: Record<string, any>) => {
     const logData = {
       ...(context || {}),
-      error: error instanceof Error ? {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      } : error
-    };
+      error:
+        error instanceof Error
+          ? {
+              message: error.message,
+              stack: error.stack,
+              name: error.name,
+            }
+          : error,
+    }
 
-    pinoLogger.error(logData, msg);
+    pinoLogger.error(logData, msg)
 
     // Send to Sentry
     if (error instanceof Error) {
       Sentry.captureException(error, {
         extra: {
           msg,
-          ...context
-        }
-      });
+          ...context,
+        },
+      })
     } else {
       Sentry.captureMessage(msg, {
         level: 'error',
         extra: {
           error,
-          ...context
-        }
-      });
+          ...context,
+        },
+      })
     }
   },
 
@@ -83,14 +87,17 @@ export const logger = {
   fatal: (msg: string, error?: unknown, context?: Record<string, any>) => {
     const logData = {
       ...(context || {}),
-      error: error instanceof Error ? {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      } : error
-    };
+      error:
+        error instanceof Error
+          ? {
+              message: error.message,
+              stack: error.stack,
+              name: error.name,
+            }
+          : error,
+    }
 
-    pinoLogger.fatal(logData, msg);
+    pinoLogger.fatal(logData, msg)
 
     // Send to Sentry
     if (error instanceof Error) {
@@ -98,17 +105,17 @@ export const logger = {
         level: 'fatal',
         extra: {
           msg,
-          ...context
-        }
-      });
+          ...context,
+        },
+      })
     } else {
       Sentry.captureMessage(msg, {
         level: 'fatal',
         extra: {
           error,
-          ...context
-        }
-      });
+          ...context,
+        },
+      })
     }
   },
-};
+}

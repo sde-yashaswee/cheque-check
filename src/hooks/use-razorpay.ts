@@ -1,73 +1,74 @@
-import { useState } from 'react';
+import { useState } from 'react'
+import { getRazorpayPublicKey } from '@/lib/env/client'
 
 declare global {
   interface Window {
-    Razorpay: any;
+    Razorpay: any
   }
 }
 
 export function useRazorpay() {
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const createOrder = async (type: string, featureId: string) => {
     const res = await fetch('/api/payments/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type, featureId }),
-    });
-    return res.json();
-  };
+    })
+    return res.json()
+  }
 
   const processPayment = async ({
     type,
     featureId,
     onSuccess,
   }: {
-    type: string;
-    featureId: string;
-    onSuccess?: () => void;
+    type: string
+    featureId: string
+    onSuccess?: () => void
   }) => {
-    setIsProcessing(true);
+    setIsProcessing(true)
     try {
-      const order = await createOrder(type, featureId);
-      
+      const order = await createOrder(type, featureId)
+
       if (order.error) {
-        throw new Error(order.error);
+        throw new Error(order.error)
       }
 
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        key: getRazorpayPublicKey(),
         amount: order.amount,
         currency: order.currency,
-        name: "Cheque Check",
+        name: 'Cheque Check',
         description: `Purchase ${featureId}`,
         order_id: order.id,
         handler: function (response: any) {
           // Razorpay returns razorpay_payment_id, razorpay_order_id, razorpay_signature
           // Our webhook will handle the DB update, but we can refresh UI here
-          if (onSuccess) onSuccess();
+          if (onSuccess) onSuccess()
         },
         prefill: {
-          name: "", // Can be filled from profile
-          email: "", // Can be filled from profile
+          name: '', // Can be filled from profile
+          email: '', // Can be filled from profile
         },
         theme: {
-          color: "#000000",
+          color: '#000000',
         },
-      };
+      }
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      const rzp = new window.Razorpay(options)
+      rzp.open()
     } catch (error) {
-      console.error('Payment error:', error);
-      alert('Failed to initiate payment. Please try again.');
+      console.error('Payment error:', error)
+      alert('Failed to initiate payment. Please try again.')
     } finally {
-      setIsProcessing(false);
+      setIsProcessing(false)
     }
-  };
+  }
 
   return {
     processPayment,
     isProcessing,
-  };
+  }
 }
