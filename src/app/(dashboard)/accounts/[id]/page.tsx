@@ -1,6 +1,6 @@
 'use client'
 
-import { useAccountDetail } from '@/hooks/use-account-detail'
+import { useAccountDetail, type SortBy, type SortOrder } from '@/hooks/use-account-detail'
 import { ChequeCard } from '@/components/cheque-card'
 import { useParams } from 'next/navigation'
 import { UserIcon as User, Mail01Icon as Mail, LockPasswordIcon as Lock, CallIcon as Phone, Calendar03Icon as Calendar, HashtagIcon as Hash, Note01Icon as Note, Building03Icon as Building, Wallet01Icon as Wallet, Search01Icon as Search, Location01Icon as Location, TextFontIcon as TextIcon, PencilEdit01Icon as Pencil, File02Icon as FileText, FilterIcon as Filter, Invoice01Icon as ReceiptText, Tick02Icon as Check, Calendar03Icon as DateIcon, Money03Icon as AmountIcon, SortingAZ01Icon as AscIcon, SortingZA01Icon as DescIcon, CircleIcon as AllIcon, ArrowUpRight01Icon as IssuedIcon, ArrowDownLeft01Icon as ReceivedIcon, CheckmarkCircle01Icon as ClearedIcon, Cancel01Icon as BouncedIcon } from '@hugeicons/core-free-icons';
@@ -20,12 +20,11 @@ import { TextTruncate } from '@/components/ui/text-truncate'
 import { useTranslations } from 'next-intl'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
-import { ChequeWithRelations } from '@/types'
+import { type ChequeStatus, type ChequeWithRelations } from '@/types'
 
 export default function AccountDetailPage() {
   const t = useTranslations('Accounts')
   const tc = useTranslations('Common')
-  const tCommon = tc;
   const { id } = useParams() as { id: string }
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
@@ -53,22 +52,22 @@ export default function AccountDetailPage() {
     setSortOrder('desc')
   }
 
-  const sortOptions = [
-    { label: tc('date') || tCommon('date'), value: 'date', icon: DateIcon },
-    { label: tc('amount') || tCommon('amount'), value: 'amount', icon: AmountIcon }
+  const sortOptions: Array<{ label: string; value: SortBy; icon: typeof DateIcon }> = [
+    { label: tc('date'), value: 'date', icon: DateIcon },
+    { label: tc('amount'), value: 'amount', icon: AmountIcon }
   ]
 
-  const orderOptions = [
-    { label: tc('descending') || tCommon('descending'), value: 'desc', icon: DescIcon },
-    { label: tc('ascending') || tCommon('ascending'), value: 'asc', icon: AscIcon }
+  const orderOptions: Array<{ label: string; value: SortOrder; icon: typeof DescIcon }> = [
+    { label: tc('descending'), value: 'desc', icon: DescIcon },
+    { label: tc('ascending'), value: 'asc', icon: AscIcon }
   ]
 
-  const statusOptions = [
-    { label: tc('all') || tCommon('all'), value: 'All', icon: AllIcon },
-    { label: tc('issued') || tCommon('issued'), value: 'Issued', icon: IssuedIcon },
-    { label: tc('received') || tCommon('received'), value: 'Received', icon: ReceivedIcon },
-    { label: tc('cleared') || tCommon('cleared'), value: 'Cleared', icon: ClearedIcon },
-    { label: tc('bounced') || tCommon('bounced'), value: 'Bounced', icon: BouncedIcon },
+  const statusOptions: Array<{ label: string; value: ChequeStatus | 'All'; icon: typeof AllIcon }> = [
+    { label: tc('all'), value: 'All', icon: AllIcon },
+    { label: tc('issued'), value: 'Issued', icon: IssuedIcon },
+    { label: tc('received'), value: 'Received', icon: ReceivedIcon },
+    { label: tc('cleared'), value: 'Cleared', icon: ClearedIcon },
+    { label: tc('bounced'), value: 'Bounced', icon: BouncedIcon },
   ]
 
   if (isLoading) {
@@ -166,18 +165,18 @@ export default function AccountDetailPage() {
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-2">
                   <HugeiconsIcon icon={Filter} className="h-5 w-5 text-primary" />
-                  {tCommon ? tCommon('sortAndFilter') : tc('sortAndFilter')}
+                  {tc('sortAndFilter')}
                 </SheetTitle>
               </SheetHeader>
               
               <div className="space-y-6 py-4">
                 <div className="space-y-3">
-                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tCommon ? tCommon('sortBy') : tc('sortBy')}</h3>
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tc('sortBy')}</h3>
                   <div className="grid grid-cols-2 gap-3">
                     {sortOptions.map((option) => (
                       <button
                         key={option.value}
-                        onClick={() => setSortBy(option.value as any)}
+                        onClick={() => setSortBy(option.value)}
                         className={cn(
                           "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
                           sortBy === option.value 
@@ -193,12 +192,12 @@ export default function AccountDetailPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tCommon ? tCommon('order') : tc('order')}</h3>
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tc('order')}</h3>
                   <div className="grid grid-cols-2 gap-3">
                     {orderOptions.map((option) => (
                       <button
                         key={option.value}
-                        onClick={() => setSortOrder(option.value as any)}
+                        onClick={() => setSortOrder(option.value)}
                         className={cn(
                           "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
                           sortOrder === option.value 
@@ -214,12 +213,12 @@ export default function AccountDetailPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tCommon ? tCommon('filterStatus') : tc('filterStatus')}</h3>
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tc('filterStatus')}</h3>
                   <div className="grid grid-cols-1 gap-2">
                     {statusOptions.map((s) => (
                       <button
                         key={s.value}
-                        onClick={() => setFilter(s.value as any)}
+                        onClick={() => setFilter(s.value)}
                         className={cn(
                           "flex items-center justify-between px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
                           filter === s.value 
