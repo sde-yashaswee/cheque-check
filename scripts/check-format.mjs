@@ -11,6 +11,8 @@ const supportedExtensions = new Set([
   '.mts',
   '.ts',
   '.tsx',
+  '.yaml',
+  '.yml',
 ])
 
 function gitFiles(args) {
