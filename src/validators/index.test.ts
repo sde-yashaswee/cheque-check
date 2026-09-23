@@ -8,12 +8,14 @@ import {
 
 describe('businessSchema', () => {
   it('accepts a business with optional blank contact fields', () => {
-    expect(businessSchema.safeParse({
-      name: 'Acme Traders',
-      email: '',
-      phone: '',
-      address: '',
-    }).success).toBe(true)
+    expect(
+      businessSchema.safeParse({
+        name: 'Acme Traders',
+        email: '',
+        phone: '',
+        address: '',
+      }).success,
+    ).toBe(true)
   })
 
   it('rejects a missing business name', () => {
@@ -23,20 +25,24 @@ describe('businessSchema', () => {
 
 describe('partySchema', () => {
   it('requires a contact number with at least ten characters', () => {
-    expect(partySchema.safeParse({
-      name: 'Supplier',
-      contact: '123456789',
-    }).success).toBe(false)
+    expect(
+      partySchema.safeParse({
+        name: 'Supplier',
+        contact: '123456789',
+      }).success,
+    ).toBe(false)
   })
 })
 
 describe('accountSchema', () => {
   it('requires a bank, account holder, and account number', () => {
-    expect(accountSchema.safeParse({
-      bank_id: '',
-      account_name: '',
-      account_number: '',
-    }).success).toBe(false)
+    expect(
+      accountSchema.safeParse({
+        bank_id: '',
+        account_name: '',
+        account_number: '',
+      }).success,
+    ).toBe(false)
   })
 })
 
@@ -56,11 +62,17 @@ describe('chequeSchema', () => {
   })
 
   it('rejects zero and negative amounts', () => {
-    expect(chequeSchema.safeParse({ ...validCheque, amount: 0 }).success).toBe(false)
-    expect(chequeSchema.safeParse({ ...validCheque, amount: -1 }).success).toBe(false)
+    expect(chequeSchema.safeParse({ ...validCheque, amount: 0 }).success).toBe(
+      false,
+    )
+    expect(chequeSchema.safeParse({ ...validCheque, amount: -1 }).success).toBe(
+      false,
+    )
   })
 
   it('rejects unsupported cheque types', () => {
-    expect(chequeSchema.safeParse({ ...validCheque, type: 'Unknown' }).success).toBe(false)
+    expect(
+      chequeSchema.safeParse({ ...validCheque, type: 'Unknown' }).success,
+    ).toBe(false)
   })
 })
