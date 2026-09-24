@@ -1,4 +1,4 @@
-export class AppError extends Error {
+export abstract class AppError extends Error {
   readonly code: string
   readonly cause?: unknown
 

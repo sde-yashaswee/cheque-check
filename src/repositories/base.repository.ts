@@ -1,5 +1,17 @@
 import { createClient } from '@/lib/supabase/client'
-import { AppError, mapSupabaseError } from '@/lib/errors'
+import { DatabaseError, mapSupabaseError } from '@/lib/errors'
+
+export interface Repository<
+  Entity,
+  CreateDTO = Partial<Entity>,
+  UpdateDTO = Partial<Entity>,
+> {
+  getAll(...args: unknown[]): Promise<Entity[]>
+  getById(id: string): Promise<Entity>
+  create(input: CreateDTO): Promise<Entity>
+  update(id: string, input: UpdateDTO): Promise<Entity>
+  delete(id: string): Promise<void>
+}
 
 export abstract class SupabaseRepository {
   protected readonly supabase = createClient()
@@ -14,7 +26,7 @@ export abstract class SupabaseRepository {
     }
 
     if (data === null || data === undefined) {
-      throw new AppError('No data returned from the database', 'NO_DATA')
+      throw new DatabaseError('No data returned from the database')
     }
 
     return data as T
