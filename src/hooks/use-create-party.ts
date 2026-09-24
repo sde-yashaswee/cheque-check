@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { partySchema } from '@/validators'
-import { PartyService } from '@/services/party.service'
+import { partyService } from '@/services/party.service'
 import { useOptimisticMutation } from './use-optimistic-mutation'
 import { useRouter } from 'next/navigation'
 
@@ -27,7 +27,7 @@ export function useCreateParty(businessId: string | undefined) {
   const mutation = useOptimisticMutation<any[], any, any>({
     queryKey: ['parties', businessId],
     mutationFn: (data: any) =>
-      PartyService.create({ ...data, business_id: businessId! }),
+      partyService.create({ ...data, business_id: businessId! }),
     update: (current, newParty) => [
       ...(current || []),
       {

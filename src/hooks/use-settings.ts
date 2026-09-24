@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation'
 import { authService } from '@/services/auth.service'
 import { reportService } from '@/services/report.service'
-import { ProfileService } from '@/services/profile.service'
+import { profileService } from '@/services/profile.service'
 import { ChequeWithRelations } from '@/types'
 
 export function useSettings() {
@@ -27,7 +27,7 @@ export function useSettings() {
   }
 
   const handleDeleteProfile = async () => {
-    await ProfileService.delete()
+    await profileService.delete()
     router.push('/login')
   }
 

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { PartyService } from '@/services/party.service'
+import { partyService } from '@/services/party.service'
 import { chequeService } from '@/services/cheque.service'
 import { ChequeStatus, Cheque } from '@/types'
 import { useMemo, useState } from 'react'
@@ -20,7 +20,7 @@ export function usePartyDetail(id: string, businessId: string | undefined) {
     error: partyError,
   } = useQuery({
     queryKey: ['party', id],
-    queryFn: () => PartyService.getById(id),
+    queryFn: () => partyService.getById(id),
   })
 
   const { data: cheques, isLoading: chequesLoading } = useQuery({

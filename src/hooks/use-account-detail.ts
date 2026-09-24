@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { AccountService } from '@/services/account.service'
+import { accountService } from '@/services/account.service'
 import { chequeService } from '@/services/cheque.service'
 import { ChequeStatus, Cheque } from '@/types'
 import { useMemo, useState } from 'react'
@@ -20,7 +20,7 @@ export function useAccountDetail(id: string, businessId: string | undefined) {
     error: accountError,
   } = useQuery({
     queryKey: ['account', id],
-    queryFn: () => AccountService.getById(id),
+    queryFn: () => accountService.getById(id),
   })
 
   const { data: cheques, isLoading: chequesLoading } = useQuery({

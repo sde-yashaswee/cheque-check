@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { PartyService } from '@/services/party.service'
+import { partyService } from '@/services/party.service'
 import { chequeService } from '@/services/cheque.service'
 import { useState, useMemo, useCallback } from 'react'
+import type { Party } from '@/types'
 
 export function useParties(businessId: string | undefined) {
   const [search, setSearch] = useState('')
@@ -12,9 +13,9 @@ export function useParties(businessId: string | undefined) {
     data: parties,
     isLoading: partiesLoading,
     error: partiesError,
-  } = useQuery({
+  } = useQuery<Party[]>({
     queryKey: ['parties', businessId],
-    queryFn: () => PartyService.getAll(businessId!),
+    queryFn: () => partyService.getAll(businessId!),
     enabled: !!businessId,
   })
 
@@ -42,12 +43,12 @@ export function useParties(businessId: string | undefined) {
   const filteredParties = useMemo(() => {
     if (!parties) return []
     const result = parties.filter(
-      (p) =>
+      (p: Party) =>
         p.name.toLowerCase().includes(search.toLowerCase()) ||
         p.contact.includes(search),
     )
 
-    result.sort((a, b) => {
+    result.sort((a: Party, b: Party) => {
       if (sortBy === 'name') {
         return sortOrder === 'asc'
           ? a.name.localeCompare(b.name)

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { accountSchema } from '@/validators'
-import { AccountService } from '@/services/account.service'
+import { accountService } from '@/services/account.service'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useOptimisticMutation } from './use-optimistic-mutation'
@@ -16,7 +16,7 @@ export function useEditAccount(id: string, businessId: string | undefined) {
     error,
   } = useQuery({
     queryKey: ['account', id],
-    queryFn: () => AccountService.getById(id),
+    queryFn: () => accountService.getById(id),
   })
 
   const form = useForm({
@@ -47,7 +47,7 @@ export function useEditAccount(id: string, businessId: string | undefined) {
   const updateMutation = useOptimisticMutation<any[], any, any>({
     queryKey: ['accounts', businessId],
     additionalQueryKeys: [['account', id]],
-    mutationFn: (data: any) => AccountService.update(id, data),
+    mutationFn: (data: any) => accountService.update(id, data),
     update: (current, newAccount) =>
       current?.map((account) =>
         account.id === id ? { ...account, ...newAccount } : account,
@@ -56,7 +56,7 @@ export function useEditAccount(id: string, businessId: string | undefined) {
 
   const deleteMutation = useOptimisticMutation<any[], void, void>({
     queryKey: ['accounts', businessId],
-    mutationFn: () => AccountService.delete(id),
+    mutationFn: () => accountService.delete(id),
     update: (current) => current?.filter((account) => account.id !== id),
   })
 

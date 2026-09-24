@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { accountSchema } from '@/validators'
-import { AccountService } from '@/services/account.service'
+import { accountService } from '@/services/account.service'
 import { useOptimisticMutation } from './use-optimistic-mutation'
 import { useRouter } from 'next/navigation'
 
@@ -27,7 +27,7 @@ export function useCreateAccount(businessId: string | undefined) {
   const mutation = useOptimisticMutation<any[], any, any>({
     queryKey: ['accounts', businessId],
     mutationFn: (data: any) =>
-      AccountService.create({ ...data, business_id: businessId! }),
+      accountService.create({ ...data, business_id: businessId! }),
     update: (current, newAccount) => [
       ...(current || []),
       {

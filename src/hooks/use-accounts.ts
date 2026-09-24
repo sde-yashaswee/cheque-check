@@ -1,39 +1,51 @@
 import { useQuery } from '@tanstack/react-query'
-import { AccountService } from '@/services/account.service'
+import { accountService } from '@/services/account.service'
 import { useState, useMemo } from 'react'
+import type { Account } from '@/types'
 
 export function useAccounts(businessId: string | undefined) {
   const [search, setSearch] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
-  const [sortBy, setSortBy] = useState<'account_name' | 'bank_name'>('account_name')
+  const [sortBy, setSortBy] = useState<'account_name' | 'bank_name'>(
+    'account_name',
+  )
   const [bankFilter, setBankFilter] = useState<string | 'All'>('All')
 
-  const { data: accounts, isLoading, error } = useQuery({
+  const {
+    data: accounts,
+    isLoading,
+    error,
+  } = useQuery<Account[]>({
     queryKey: ['accounts', businessId],
-    queryFn: () => AccountService.getAll(businessId!),
+    queryFn: () => accountService.getAll(businessId!),
     enabled: !!businessId,
   })
 
   const filteredAccounts = useMemo(() => {
     if (!accounts) return []
 
-    const result = accounts.filter(a => {
-      const matchesSearch = a.account_name.toLowerCase().includes(search.toLowerCase()) ||
-                           a.bank?.name?.toLowerCase().includes(search.toLowerCase()) ||
-                           a.account_number.includes(search)
+    const result = accounts.filter((a: Account) => {
+      const matchesSearch =
+        a.account_name.toLowerCase().includes(search.toLowerCase()) ||
+        a.bank?.name?.toLowerCase().includes(search.toLowerCase()) ||
+        a.account_number.includes(search)
       const matchesBank = bankFilter === 'All' || a.bank_id === bankFilter
       return matchesSearch && matchesBank
     })
 
-    result.sort((a, b) => {
+    result.sort((a: Account, b: Account) => {
       if (sortBy === 'account_name') {
         const nameA = a.account_name.toLowerCase()
         const nameB = b.account_name.toLowerCase()
-        return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
+        return sortOrder === 'asc'
+          ? nameA.localeCompare(nameB)
+          : nameB.localeCompare(nameA)
       } else if (sortBy === 'bank_name') {
         const nameA = (a.bank?.name || '').toLowerCase()
         const nameB = (b.bank?.name || '').toLowerCase()
-        return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
+        return sortOrder === 'asc'
+          ? nameA.localeCompare(nameB)
+          : nameB.localeCompare(nameA)
       }
       return 0
     })
@@ -44,7 +56,7 @@ export function useAccounts(businessId: string | undefined) {
   const uniqueBanks = useMemo(() => {
     if (!accounts) return []
     const banks = new Map()
-    accounts.forEach(a => {
+    accounts.forEach((a: Account) => {
       if (a.bank) {
         banks.set(a.bank_id, a.bank.name)
       }
