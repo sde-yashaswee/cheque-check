@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { partySchema } from '@/validators'
 import { partyService } from '@/services/party.service'
-import { useOptimisticMutation } from './use-optimistic-mutation'
+import { useEntityCreateMutation } from './use-entity-mutations'
 import { useRouter } from 'next/navigation'
 import type { Party } from '@/types'
 
@@ -28,7 +28,7 @@ export function useCreateParty(businessId: string | undefined) {
 
   const { trigger } = form
 
-  const mutation = useOptimisticMutation<Party[], PartyFormData, Party>({
+  const mutation = useEntityCreateMutation<Party, PartyFormData, Party>({
     queryKey: ['parties', businessId],
     mutationFn: (data) =>
       partyService.create({
@@ -39,7 +39,7 @@ export function useCreateParty(businessId: string | undefined) {
         notes: data.notes || null,
         avatar_url: data.avatar_url || null,
       }),
-    update: (current, newParty) => [
+    addToList: (current, newParty) => [
       ...(current || []),
       {
         ...newParty,

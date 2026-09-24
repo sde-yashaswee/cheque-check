@@ -1,5 +1,6 @@
 import type { QueryKey } from '@tanstack/react-query'
 import { useOptimisticMutation } from './use-optimistic-mutation'
+import type { MutationFunction } from '@tanstack/react-query'
 
 interface UseEntityMutationsOptions<TEntity, TUpdate, TUpdateResult> {
   listQueryKey: QueryKey
@@ -16,6 +17,21 @@ interface UseEntityMutationsOptions<TEntity, TUpdate, TUpdateResult> {
     mutationFn: () => Promise<void>
     updateList: (current: TEntity[] | undefined) => TEntity[] | undefined
   }
+}
+
+interface UseEntityCreateMutationOptions<TEntity, TCreate, TResult> {
+  queryKey: QueryKey
+  mutationFn: MutationFunction<TResult, TCreate>
+  addToList: (
+    current: TEntity[] | undefined,
+    variables: TCreate,
+  ) => TEntity[] | undefined
+  onSuccess?: (data: TResult, variables: TCreate) => void
+  onError?: (
+    error: unknown,
+    variables: TCreate,
+    context: { previousValues: Record<string, unknown> } | undefined,
+  ) => void
 }
 
 export function useEntityMutations<TEntity, TUpdate, TUpdateResult>({
@@ -44,4 +60,20 @@ export function useEntityMutations<TEntity, TUpdate, TUpdateResult>({
   })
 
   return { updateMutation, deleteMutation }
+}
+
+export function useEntityCreateMutation<TEntity, TCreate, TResult>({
+  queryKey,
+  mutationFn,
+  addToList,
+  onSuccess,
+  onError,
+}: UseEntityCreateMutationOptions<TEntity, TCreate, TResult>) {
+  return useOptimisticMutation<TEntity[], TCreate, TResult>({
+    queryKey,
+    mutationFn,
+    update: addToList,
+    onSuccess,
+    onError,
+  })
 }

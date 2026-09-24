@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { accountSchema } from '@/validators'
 import { accountService } from '@/services/account.service'
-import { useOptimisticMutation } from './use-optimistic-mutation'
+import { useEntityCreateMutation } from './use-entity-mutations'
 import { useRouter } from 'next/navigation'
 import type { Account } from '@/types'
 
@@ -28,7 +28,7 @@ export function useCreateAccount(businessId: string | undefined) {
 
   const { trigger } = form
 
-  const mutation = useOptimisticMutation<Account[], AccountFormData, Account>({
+  const mutation = useEntityCreateMutation<Account, AccountFormData, Account>({
     queryKey: ['accounts', businessId],
     mutationFn: (data) =>
       accountService.create({
@@ -36,7 +36,7 @@ export function useCreateAccount(businessId: string | undefined) {
         business_id: businessId!,
         ifsc_code: data.ifsc_code || null,
       }),
-    update: (current, newAccount) => [
+    addToList: (current, newAccount) => [
       ...(current || []),
       {
         ...newAccount,

@@ -12,7 +12,7 @@ import { ChequeWithRelations, Party } from '@/types'
 import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useProfile } from './use-profile'
 import { ConflictError } from '@/lib/errors'
-import { useOptimisticMutation } from './use-optimistic-mutation'
+import { useEntityCreateMutation } from './use-entity-mutations'
 import { useQueryClient } from '@tanstack/react-query'
 
 type ChequeFormValues = z.infer<typeof chequeSchema>
@@ -52,10 +52,10 @@ export function useCreateCheque(
     }
   }, [initialType, setValue])
 
-  const mutation = useOptimisticMutation<
-    ChequeWithRelations[],
+  const mutation = useEntityCreateMutation<
+    ChequeWithRelations,
     ChequeFormValues,
-    unknown
+    ChequeEntity
   >({
     queryKey: businessId ? ['cheques', businessId] : ['cheques'],
     mutationFn: (data: ChequeFormValues) => {
@@ -71,7 +71,7 @@ export function useCreateCheque(
         status: ChequeEntity.initialStatusFor(data.type),
       })
     },
-    update: (current, newCheque) => {
+    addToList: (current, newCheque) => {
       if (!businessId) return current
 
       const optimisticCheque: ChequeWithRelations = {

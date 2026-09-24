@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { businessSchema } from '@/validators'
 import { businessService } from '@/services/business.service'
-import { useOptimisticMutation } from './use-optimistic-mutation'
+import { useEntityCreateMutation } from './use-entity-mutations'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 import type { Business } from '@/types'
@@ -29,8 +29,8 @@ export function useCreateBusiness() {
 
   const { trigger } = form
 
-  const mutation = useOptimisticMutation<
-    Business[],
+  const mutation = useEntityCreateMutation<
+    Business,
     BusinessFormData,
     Business
   >({
@@ -43,7 +43,7 @@ export function useCreateBusiness() {
         address: data.address || null,
         logo_url: data.logo_url || null,
       }),
-    update: (current, newBusiness) => [
+    addToList: (current, newBusiness) => [
       ...(current || []),
       {
         ...newBusiness,
