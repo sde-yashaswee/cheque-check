@@ -55,6 +55,10 @@ const ChequeDetailsSchema = z.object({
 
 type ChequeDetails = z.infer<typeof ChequeDetailsSchema>
 
+const OcrRequestSchema = z.object({
+  imageUrl: z.url(),
+})
+
 /**
  * Interface for OCR Service Providers.
  * Allows for easy swapping of AI models or OCR engines in the future.
@@ -153,15 +157,11 @@ class OcrController {
         )
       }
 
-      const body = await req.json()
-      const { imageUrl } = body
-
-      if (!imageUrl) {
-        return this.respondWithError(
-          'Image URL is required for processing.',
-          400,
-        )
+      const requestResult = OcrRequestSchema.safeParse(await req.json())
+      if (!requestResult.success) {
+        return this.respondWithError('A valid image URL is required.', 400)
       }
+      const { imageUrl } = requestResult.data
 
       logger.info(
         `[OcrController] Processing request for user ${user.id} for image: ${imageUrl}`,
@@ -177,10 +177,11 @@ class OcrController {
         .eq('id', quota.id)
 
       return this.respondWithSuccess(result)
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('[OcrController Error]', error)
 
-      const status = error.message?.includes('credentials') ? 500 : 400
+      const status =
+        error instanceof Error && error.message.includes('OpenAI') ? 500 : 400
       const message =
         error instanceof Error
           ? error.message
@@ -190,7 +191,7 @@ class OcrController {
     }
   }
 
-  private respondWithSuccess(data: any): Response {
+  private respondWithSuccess(data: ChequeDetails): Response {
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
