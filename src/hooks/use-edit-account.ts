@@ -46,6 +46,7 @@ export function useEditAccount(id: string, businessId: string | undefined) {
 
   const updateMutation = useOptimisticMutation<any[], any, any>({
     queryKey: ['accounts', businessId],
+    additionalQueryKeys: [['account', id]],
     mutationFn: (data: any) => AccountService.update(id, data),
     update: (current, newAccount) =>
       current?.map((account) =>

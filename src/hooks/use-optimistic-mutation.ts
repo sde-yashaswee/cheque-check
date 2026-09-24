@@ -7,17 +7,21 @@ import {
 
 interface UseOptimisticMutationOptions<TData, TVariables, TResult> {
   queryKey: QueryKey
+  additionalQueryKeys?: QueryKey[]
   mutationFn: MutationFunction<TResult, TVariables>
   update: (
     current: TData | undefined,
     variables: TVariables,
   ) => TData | undefined
+  onSuccess?: (data: TResult, variables: TVariables) => void
 }
 
 export function useOptimisticMutation<TData, TVariables, TResult>({
   queryKey,
+  additionalQueryKeys = [],
   mutationFn,
   update,
+  onSuccess,
 }: UseOptimisticMutationOptions<TData, TVariables, TResult>) {
   const queryClient = useQueryClient()
 
@@ -34,8 +38,12 @@ export function useOptimisticMutation<TData, TVariables, TResult>({
     onError: (_error, _variables, context) => {
       queryClient.setQueryData(queryKey, context?.previous)
     },
+    onSuccess,
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey })
+      for (const additionalQueryKey of additionalQueryKeys) {
+        queryClient.invalidateQueries({ queryKey: additionalQueryKey })
+      }
     },
   })
 }

@@ -51,6 +51,7 @@ export function useEditParty(id: string, businessId: string | undefined) {
 
   const updateMutation = useOptimisticMutation<any[], any, any>({
     queryKey: ['parties', businessId],
+    additionalQueryKeys: [['party', id]],
     mutationFn: (data: any) => PartyService.update(id, data),
     update: (current, newParty) =>
       current?.map((party) =>
