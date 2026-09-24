@@ -3,14 +3,13 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { accountSchema } from '@/validators'
 import { AccountService } from '@/services/account.service'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useOptimisticMutation } from './use-optimistic-mutation'
 import { useRouter } from 'next/navigation'
 
 export function useCreateAccount(businessId: string | undefined) {
   const [step, setStep] = useState(1)
   const router = useRouter()
-  const queryClient = useQueryClient()
-  
+
   const form = useForm({
     resolver: zodResolver(accountSchema),
     defaultValues: {
@@ -19,35 +18,26 @@ export function useCreateAccount(businessId: string | undefined) {
       account_number: '',
       ifsc_code: '',
       color: '#007AFF',
-      notes: ''
-    }
+      notes: '',
+    },
   })
 
   const { trigger } = form
 
-  const mutation = useMutation({
-    mutationFn: (data: any) => AccountService.create({ ...data, business_id: businessId! }),
-    onMutate: async (newAccount: any) => {
-      await queryClient.cancelQueries({ queryKey: ['accounts', businessId] })
-      const previousAccounts = queryClient.getQueryData(['accounts', businessId])
-      queryClient.setQueryData(['accounts', businessId], (old: any[]) => {
-        const optimisticAccount = {
-          ...newAccount,
-          id: 'temp-' + Date.now(),
-          business_id: businessId,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }
-        return old ? [...old, optimisticAccount] : [optimisticAccount]
-      })
-      return { previousAccounts }
-    },
-    onError: (err, newAccount, context: any) => {
-      queryClient.setQueryData(['accounts', businessId], context?.previousAccounts)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['accounts', businessId] })
-    }
+  const mutation = useOptimisticMutation<any[], any, any>({
+    queryKey: ['accounts', businessId],
+    mutationFn: (data: any) =>
+      AccountService.create({ ...data, business_id: businessId! }),
+    update: (current, newAccount) => [
+      ...(current || []),
+      {
+        ...newAccount,
+        id: 'temp-' + Date.now(),
+        business_id: businessId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ],
   })
 
   const nextStep = async () => {
@@ -57,11 +47,11 @@ export function useCreateAccount(businessId: string | undefined) {
     } else if (step === 2) {
       isValid = await trigger(['account_name', 'account_number'])
     }
-    
-    if (isValid) setStep(s => Math.min(s + 1, 3))
+
+    if (isValid) setStep((s) => Math.min(s + 1, 3))
   }
 
-  const prevStep = () => setStep(s => Math.max(s - 1, 1))
+  const prevStep = () => setStep((s) => Math.max(s - 1, 1))
 
   return {
     form,

@@ -3,15 +3,19 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { partySchema } from '@/validators'
 import { PartyService } from '@/services/party.service'
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { Party } from '@/types'
+import { useOptimisticMutation } from './use-optimistic-mutation'
 
 export function useEditParty(id: string, businessId: string | undefined) {
   const router = useRouter()
-  const queryClient = useQueryClient()
-  
-  const { data: party, isLoading, error } = useQuery({
+
+  const {
+    data: party,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['party', id],
     queryFn: () => PartyService.getById(id),
   })
@@ -26,7 +30,7 @@ export function useEditParty(id: string, businessId: string | undefined) {
       notes: '',
       color: '#007AFF',
       avatar_url: null,
-    }
+    },
   })
 
   const { reset } = form
@@ -45,43 +49,19 @@ export function useEditParty(id: string, businessId: string | undefined) {
     }
   }, [party, reset])
 
-  const updateMutation = useMutation({
+  const updateMutation = useOptimisticMutation<any[], any, any>({
+    queryKey: ['parties', businessId],
     mutationFn: (data: any) => PartyService.update(id, data),
-    onMutate: async (newParty: any) => {
-      await queryClient.cancelQueries({ queryKey: ['parties', businessId] })
-      const previousParties = queryClient.getQueryData(['parties', businessId])
-      queryClient.setQueryData(['parties', businessId], (old: any[]) => {
-        if (!old) return old
-        return old.map((p) => p.id === id ? { ...p, ...newParty } : p)
-      })
-      return { previousParties }
-    },
-    onError: (err, newParty, context: any) => {
-      queryClient.setQueryData(['parties', businessId], context?.previousParties)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['parties', businessId] })
-      queryClient.invalidateQueries({ queryKey: ['party', id] })
-    }
+    update: (current, newParty) =>
+      current?.map((party) =>
+        party.id === id ? { ...party, ...newParty } : party,
+      ),
   })
 
-  const deleteMutation = useMutation({
+  const deleteMutation = useOptimisticMutation<any[], void, void>({
+    queryKey: ['parties', businessId],
     mutationFn: () => PartyService.delete(id),
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ['parties', businessId] })
-      const previousParties = queryClient.getQueryData(['parties', businessId])
-      queryClient.setQueryData(['parties', businessId], (old: any[]) => {
-        if (!old) return old
-        return old.filter((p) => p.id !== id)
-      })
-      return { previousParties }
-    },
-    onError: (err, variables, context: any) => {
-      queryClient.setQueryData(['parties', businessId], context?.previousParties)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['parties', businessId] })
-    }
+    update: (current) => current?.filter((party) => party.id !== id),
   })
 
   return {
