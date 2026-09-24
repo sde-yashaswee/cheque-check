@@ -2,17 +2,22 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { accountSchema } from '@/validators'
-import { AccountService } from '@/services/account.service'
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { AccountService, accountService } from '@/services/account.service'
+import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { useEntityMutations } from './use-entity-mutations'
+import type { Account } from '@/types'
 
 export function useEditAccount(id: string, businessId: string | undefined) {
   const router = useRouter()
-  const queryClient = useQueryClient()
-  
-  const { data: account, isLoading, error } = useQuery({
+
+  const {
+    data: account,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['account', id],
-    queryFn: () => AccountService.getById(id),
+    queryFn: () => accountService.getById(id),
   })
 
   const form = useForm({
@@ -23,7 +28,7 @@ export function useEditAccount(id: string, businessId: string | undefined) {
       account_number: '',
       ifsc_code: '',
       color: '#007AFF',
-    }
+    },
   })
 
   const { reset } = form
@@ -40,43 +45,24 @@ export function useEditAccount(id: string, businessId: string | undefined) {
     }
   }, [account, reset])
 
-  const updateMutation = useMutation({
-    mutationFn: (data: any) => AccountService.update(id, data),
-    onMutate: async (newAccount: any) => {
-      await queryClient.cancelQueries({ queryKey: ['accounts', businessId] })
-      const previousAccounts = queryClient.getQueryData(['accounts', businessId])
-      queryClient.setQueryData(['accounts', businessId], (old: any[]) => {
-        if (!old) return old
-        return old.map((a) => a.id === id ? { ...a, ...newAccount } : a)
-      })
-      return { previousAccounts }
+  const { updateMutation, deleteMutation } = useEntityMutations<
+    Account,
+    Parameters<AccountService['update']>[1],
+    Account
+  >({
+    listQueryKey: ['accounts', businessId],
+    detailQueryKey: ['account', id],
+    update: {
+      mutationFn: (data) => accountService.update(id, data),
+      updateList: (current, newAccount) =>
+        current?.map((account) =>
+          account.id === id ? { ...account, ...newAccount } : account,
+        ),
     },
-    onError: (err, newAccount, context: any) => {
-      queryClient.setQueryData(['accounts', businessId], context?.previousAccounts)
+    remove: {
+      mutationFn: () => accountService.delete(id),
+      updateList: (current) => current?.filter((account) => account.id !== id),
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['accounts', businessId] })
-      queryClient.invalidateQueries({ queryKey: ['account', id] })
-    }
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: () => AccountService.delete(id),
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ['accounts', businessId] })
-      const previousAccounts = queryClient.getQueryData(['accounts', businessId])
-      queryClient.setQueryData(['accounts', businessId], (old: any[]) => {
-        if (!old) return old
-        return old.filter((a) => a.id !== id)
-      })
-      return { previousAccounts }
-    },
-    onError: (err, variables, context: any) => {
-      queryClient.setQueryData(['accounts', businessId], context?.previousAccounts)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['accounts', businessId] })
-    }
   })
 
   return {

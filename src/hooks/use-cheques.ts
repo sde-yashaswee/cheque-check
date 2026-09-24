@@ -1,8 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ChequeService } from '@/services/cheque.service'
+import { useQuery } from '@tanstack/react-query'
+import { chequeService } from '@/services/cheque.service'
 import { useState, useMemo } from 'react'
 import { ChequeStatus, ChequeWithRelations } from '@/types'
 import { useProfile } from './use-profile'
+import { useOptimisticMutation } from './use-optimistic-mutation'
 
 export type SortBy = 'date' | 'amount'
 export type SortOrder = 'asc' | 'desc'
@@ -12,7 +13,6 @@ export function useCheques(businessId: string | undefined) {
   const [filter, setFilter] = useState<ChequeStatus | 'All'>('All')
   const [sortBy, setSortBy] = useState<SortBy>('date')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
-  const queryClient = useQueryClient()
   const { profile } = useProfile()
 
   const {
@@ -21,66 +21,36 @@ export function useCheques(businessId: string | undefined) {
     error,
   } = useQuery<ChequeWithRelations[]>({
     queryKey: ['cheques', businessId],
-    queryFn: () => ChequeService.getAll(businessId!),
+    queryFn: () => chequeService.getAll(businessId!),
     enabled: !!businessId,
   })
 
-  const mutation = useMutation({
+  const mutation = useOptimisticMutation<
+    ChequeWithRelations[],
+    { id: string; status: ChequeStatus },
+    ChequeWithRelations
+  >({
+    queryKey: ['cheques', businessId],
     mutationFn: ({ id, status }: { id: string; status: ChequeStatus }) =>
-      ChequeService.updateStatus(id, status),
-    onMutate: async ({ id, status }) => {
-      await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-      const prev = queryClient.getQueryData<ChequeWithRelations[]>([
-        'cheques',
-        businessId,
-      ])
-      queryClient.setQueryData<ChequeWithRelations[]>(
-        ['cheques', businessId],
-        (old) => {
-          if (!old) return old
-          return old.map((cheque) =>
-            cheque.id === id ? { ...cheque, status } : cheque,
-          )
-        },
+      chequeService.updateStatus(id, status),
+    update: (current, { id, status }) => {
+      if (!current) return current
+      return current.map((cheque) =>
+        cheque.id === id ? { ...cheque, status } : cheque,
       )
-      return { previousCheques: prev }
-    },
-    onError: (err, variables, context) => {
-      queryClient.setQueryData(
-        ['cheques', businessId],
-        context?.previousCheques,
-      )
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
     },
   })
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => ChequeService.delete(id),
-    onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-      const prev = queryClient.getQueryData<ChequeWithRelations[]>([
-        'cheques',
-        businessId,
-      ])
-      queryClient.setQueryData<ChequeWithRelations[]>(
-        ['cheques', businessId],
-        (old) => {
-          if (!old) return old
-          return old.filter((cheque) => cheque.id !== id)
-        },
-      )
-      return { previousCheques: prev }
-    },
-    onError: (err, variables, context) => {
-      queryClient.setQueryData(
-        ['cheques', businessId],
-        context?.previousCheques,
-      )
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
+  const deleteMutation = useOptimisticMutation<
+    ChequeWithRelations[],
+    string,
+    void
+  >({
+    queryKey: ['cheques', businessId],
+    mutationFn: (id: string) => chequeService.delete(id),
+    update: (current, id) => {
+      if (!current) return current
+      return current.filter((cheque) => cheque.id !== id)
     },
   })
 

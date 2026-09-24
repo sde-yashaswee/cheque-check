@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useMemo } from 'react'
 import { Business } from '@/types'
-import { BusinessService } from '@/services/business.service'
+import { businessService } from '@/services/business.service'
 import { useQuery } from '@tanstack/react-query'
 
 interface BusinessContextType {
@@ -13,20 +13,28 @@ interface BusinessContextType {
   isFetching: boolean
 }
 
-const BusinessContext = createContext<BusinessContextType | undefined>(undefined)
+const BusinessContext = createContext<BusinessContextType | undefined>(
+  undefined,
+)
 
 export function BusinessProvider({ children }: { children: React.ReactNode }) {
-  const { data: businesses, isLoading, isFetching } = useQuery({
+  const {
+    data: businesses,
+    isLoading,
+    isFetching,
+  } = useQuery({
     queryKey: ['businesses'],
-    queryFn: () => BusinessService.getAll(),
+    queryFn: () => businessService.getAll(),
   })
 
-  const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(null)
+  const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(
+    null,
+  )
 
   const activeBusiness = useMemo(() => {
     if (!businesses || businesses.length === 0) return null
     if (!selectedBusinessId) return businesses[0]
-    return businesses.find(b => b.id === selectedBusinessId) || businesses[0]
+    return businesses.find((b) => b.id === selectedBusinessId) || businesses[0]
   }, [businesses, selectedBusinessId])
 
   const setActiveBusiness = (business: Business) => {
@@ -34,13 +42,15 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <BusinessContext.Provider value={{ 
-      activeBusiness, 
-      setActiveBusiness, 
-      businesses: businesses || [], 
-      isLoading,
-      isFetching
-    }}>
+    <BusinessContext.Provider
+      value={{
+        activeBusiness,
+        setActiveBusiness,
+        businesses: businesses || [],
+        isLoading,
+        isFetching,
+      }}
+    >
       {children}
     </BusinessContext.Provider>
   )

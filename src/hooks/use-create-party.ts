@@ -1,17 +1,20 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { partySchema } from '@/validators'
-import { PartyService } from '@/services/party.service'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { partyService } from '@/services/party.service'
+import { useEntityCreateMutation } from './use-entity-mutations'
 import { useRouter } from 'next/navigation'
+import type { Party } from '@/types'
+
+type PartyFormData = z.infer<typeof partySchema>
 
 export function useCreateParty(businessId: string | undefined) {
   const [step, setStep] = useState(1)
   const router = useRouter()
-  const queryClient = useQueryClient()
-  
-  const form = useForm({
+
+  const form = useForm<PartyFormData>({
     resolver: zodResolver(partySchema),
     defaultValues: {
       name: '',
@@ -19,35 +22,37 @@ export function useCreateParty(businessId: string | undefined) {
       email: '',
       address: '',
       notes: '',
-      color: '#34C759'
-    }
+      color: '#34C759',
+    },
   })
 
   const { trigger } = form
 
-  const mutation = useMutation({
-    mutationFn: (data: any) => PartyService.create({ ...data, business_id: businessId! }),
-    onMutate: async (newParty: any) => {
-      await queryClient.cancelQueries({ queryKey: ['parties', businessId] })
-      const previousParties = queryClient.getQueryData(['parties', businessId])
-      queryClient.setQueryData(['parties', businessId], (old: any[]) => {
-        const optimisticParty = {
-          ...newParty,
-          id: 'temp-' + Date.now(),
-          business_id: businessId,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }
-        return old ? [...old, optimisticParty] : [optimisticParty]
-      })
-      return { previousParties }
-    },
-    onError: (err, newParty, context: any) => {
-      queryClient.setQueryData(['parties', businessId], context?.previousParties)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['parties', businessId] })
-    }
+  const mutation = useEntityCreateMutation<Party, PartyFormData, Party>({
+    queryKey: ['parties', businessId],
+    mutationFn: (data) =>
+      partyService.create({
+        ...data,
+        business_id: businessId!,
+        email: data.email || null,
+        address: data.address || null,
+        notes: data.notes || null,
+        avatar_url: data.avatar_url || null,
+      }),
+    addToList: (current, newParty) => [
+      ...(current || []),
+      {
+        ...newParty,
+        email: newParty.email || null,
+        address: newParty.address || null,
+        notes: newParty.notes || null,
+        avatar_url: newParty.avatar_url || null,
+        id: 'temp-' + Date.now(),
+        business_id: businessId!,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ],
   })
 
   const nextStep = async () => {
@@ -57,11 +62,11 @@ export function useCreateParty(businessId: string | undefined) {
     } else if (step === 2) {
       isValid = await trigger(['contact'])
     }
-    
-    if (isValid) setStep(s => Math.min(s + 1, 3))
+
+    if (isValid) setStep((s) => Math.min(s + 1, 3))
   }
 
-  const prevStep = () => setStep(s => Math.max(s - 1, 1))
+  const prevStep = () => setStep((s) => Math.max(s - 1, 1))
 
   return {
     form,

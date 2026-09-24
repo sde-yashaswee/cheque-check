@@ -2,7 +2,10 @@
 
 import { useState, useRef } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Camera01Icon as Camera, Delete02Icon as Trash } from '@hugeicons/core-free-icons'
+import {
+  Camera01Icon as Camera,
+  Delete02Icon as Trash,
+} from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
 import { EntityAvatar } from './entity-avatar'
 import { Button } from './button'
@@ -13,9 +16,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './dialog'
-import { StorageService } from '@/services/storage.service'
+import { storageService } from '@/services/storage.service'
 import { toast } from './toast'
 import { logger } from '@/lib/logger'
+import { useTranslations } from 'next-intl'
 
 interface EditableAvatarProps {
   name: string
@@ -38,6 +42,7 @@ export function EditableAvatar({
   className,
   size = 'lg',
 }: EditableAvatarProps) {
+  const t = useTranslations('Common')
   const [isUploading, setIsUploading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -55,19 +60,19 @@ export function EditableAvatar({
 
     setIsUploading(true)
     try {
-      const publicUrl = await StorageService.uploadAvatar(file)
+      const publicUrl = await storageService.uploadAvatar(file)
       await onUpload(publicUrl)
       toast.add({
-        title: 'Success',
-        description: 'Avatar updated successfully',
+        title: t('success'),
+        description: t('avatarUpdated'),
         type: 'success',
       })
       setIsOpen(false)
     } catch (error) {
       logger.error('Error uploading avatar', error)
       toast.add({
-        title: 'Error',
-        description: 'Failed to upload avatar',
+        title: t('error'),
+        description: t('avatarUploadFailed'),
         type: 'error',
       })
     } finally {
@@ -81,16 +86,16 @@ export function EditableAvatar({
     try {
       await onDelete()
       toast.add({
-        title: 'Success',
-        description: 'Avatar removed successfully',
+        title: t('success'),
+        description: t('avatarRemoved'),
         type: 'success',
       })
       setIsOpen(false)
     } catch (error) {
       logger.error('Error deleting avatar', error)
       toast.add({
-        title: 'Error',
-        description: 'Failed to remove avatar',
+        title: t('error'),
+        description: t('avatarRemoveFailed'),
         type: 'error',
       })
     } finally {
@@ -100,78 +105,93 @@ export function EditableAvatar({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger 
+      <DialogTrigger
         render={
-          <button 
+          <button
             className={cn(
-              "relative group rounded-full overflow-hidden border-2 border-background transition-all active:scale-95",
+              'relative group rounded-full overflow-hidden border-2 border-background transition-all active:scale-95',
               sizeClasses[size],
-              className
+              className,
             )}
           >
             {imageUrl ? (
-              <img 
-                src={imageUrl} 
-                alt={name} 
+              <img
+                src={imageUrl}
+                alt={name}
                 className="h-full w-full object-cover"
               />
             ) : (
-              <EntityAvatar 
-                name={name} 
-                color={color} 
-                icon={icon} 
-                size={size === 'xl' ? 'lg' : size} 
+              <EntityAvatar
+                name={name}
+                color={color}
+                icon={icon}
+                size={size === 'xl' ? 'lg' : size}
                 className="h-full w-full"
               />
             )}
-            
+
             {/* Edit Overlay */}
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <HugeiconsIcon icon={Camera} className="text-white h-1/3 w-1/3"/>
+              <HugeiconsIcon icon={Camera} className="text-white h-1/3 w-1/3" />
             </div>
           </button>
         }
       />
-      
+
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Change Photo</DialogTitle>
+          <DialogTitle>{t('changePhoto')}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center gap-6 py-8">
-          <div className={cn("rounded-full overflow-hidden border-4 border-muted/20", sizeClasses.xl)}>
+          <div
+            className={cn(
+              'rounded-full overflow-hidden border-4 border-muted/20',
+              sizeClasses.xl,
+            )}
+          >
             {imageUrl ? (
-              <img src={imageUrl} alt={name} className="h-full w-full object-cover"/>
+              <img
+                src={imageUrl}
+                alt={name}
+                className="h-full w-full object-cover"
+              />
             ) : (
-              <EntityAvatar name={name} color={color} icon={icon} size="lg"className="h-full w-full"/>
+              <EntityAvatar
+                name={name}
+                color={color}
+                icon={icon}
+                size="lg"
+                className="h-full w-full"
+              />
             )}
           </div>
-          
+
           <div className="flex w-full gap-3">
-            <Button 
+            <Button
               variant="outline"
               className="flex-1 rounded-full h-12"
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
             >
-              {isUploading ? 'Uploading...' : 'Upload New'}
+              {isUploading ? t('uploadingShort') : t('uploadNew')}
             </Button>
             {imageUrl && onDelete && (
-              <Button 
+              <Button
                 variant="ghost"
                 className="rounded-full h-12 w-12 p-0 text-destructive hover:bg-destructive/10"
                 onClick={handleDelete}
                 disabled={isUploading}
               >
-                <HugeiconsIcon icon={Trash} className="h-5 w-5"/>
+                <HugeiconsIcon icon={Trash} className="h-5 w-5" />
               </Button>
             )}
           </div>
-          <input 
+          <input
             type="file"
-            ref={fileInputRef} 
+            ref={fileInputRef}
             className="hidden"
             accept="image/*"
-            onChange={handleFileChange} 
+            onChange={handleFileChange}
           />
         </div>
       </DialogContent>

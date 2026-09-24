@@ -1,36 +1,47 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { PartyService } from '@/services/party.service'
-import { ChequeService } from '@/services/cheque.service'
-import { ChequeStatus , Cheque } from '@/types'
+import { useQuery } from '@tanstack/react-query'
+import { partyService } from '@/services/party.service'
+import { chequeService } from '@/services/cheque.service'
+import { ChequeStatus, Cheque } from '@/types'
 import { useMemo, useState } from 'react'
+import { useOptimisticMutation } from './use-optimistic-mutation'
 
 export type SortBy = 'date' | 'amount'
 export type SortOrder = 'asc' | 'desc'
 
 export function usePartyDetail(id: string, businessId: string | undefined) {
-  const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'All' | ChequeStatus>('All')
   const [sortBy, setSortBy] = useState<SortBy>('date')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
 
-  const { data: party, isLoading: partyLoading, error: partyError } = useQuery({
+  const {
+    data: party,
+    isLoading: partyLoading,
+    error: partyError,
+  } = useQuery({
     queryKey: ['party', id],
-    queryFn: () => PartyService.getById(id),
+    queryFn: () => partyService.getById(id),
   })
 
   const { data: cheques, isLoading: chequesLoading } = useQuery({
     queryKey: ['cheques', businessId],
-    queryFn: () => ChequeService.getAll(businessId!),
+    queryFn: () => chequeService.getAll(businessId!),
     enabled: !!businessId,
   })
 
-  const mutation = useMutation({
-    mutationFn: ({ id, status }: { id: string, status: ChequeStatus }) => 
-      ChequeService.updateStatus(id, status),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
-    }
+  const mutation = useOptimisticMutation<
+    Cheque[],
+    { id: string; status: ChequeStatus },
+    Cheque
+  >({
+    queryKey: ['cheques', businessId],
+    mutationFn: ({ id, status }) => chequeService.updateStatus(id, status),
+    update: (current, { id, status }) => {
+      if (!current) return current
+      return current.map((cheque) =>
+        cheque.id === id ? { ...cheque, status } : cheque,
+      )
+    },
   })
 
   const partyCheques = useMemo(() => {
@@ -40,7 +51,8 @@ export function usePartyDetail(id: string, businessId: string | undefined) {
 
   const filteredCheques = useMemo(() => {
     const result = partyCheques.filter((c: Cheque) => {
-      const matchesSearch = c.cheque_number.includes(search) || c.amount.toString().includes(search)
+      const matchesSearch =
+        c.cheque_number.includes(search) || c.amount.toString().includes(search)
       const matchesFilter = filter === 'All' || c.status === filter
       return matchesSearch && matchesFilter
     })
@@ -85,6 +97,6 @@ export function usePartyDetail(id: string, businessId: string | undefined) {
     sortBy,
     setSortBy,
     sortOrder,
-    setSortOrder
+    setSortOrder,
   }
 }

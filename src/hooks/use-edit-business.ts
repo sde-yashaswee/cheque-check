@@ -3,17 +3,22 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { businessSchema } from '@/validators'
-import { BusinessService } from '@/services/business.service'
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { businessService } from '@/services/business.service'
+import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { useEntityMutations } from './use-entity-mutations'
+import type { Business } from '@/types'
 
 export function useEditBusiness(id: string) {
   const router = useRouter()
-  const queryClient = useQueryClient()
-  
-  const { data: business, isLoading, error } = useQuery({
+
+  const {
+    data: business,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['business', id],
-    queryFn: () => BusinessService.getById(id),
+    queryFn: () => businessService.getById(id),
   })
 
   const form = useForm<z.infer<typeof businessSchema>>({
@@ -26,7 +31,7 @@ export function useEditBusiness(id: string) {
       color: '#007AFF',
       icon: 'Store',
       logo_url: null,
-    }
+    },
   })
 
   const { reset } = form
@@ -45,43 +50,25 @@ export function useEditBusiness(id: string) {
     }
   }, [business, reset])
 
-  const updateMutation = useMutation({
-    mutationFn: (data: z.infer<typeof businessSchema>) => BusinessService.update(id, data),
-    onMutate: async (newBusiness) => {
-      await queryClient.cancelQueries({ queryKey: ['businesses'] })
-      const previousBusinesses = queryClient.getQueryData(['businesses'])
-      queryClient.setQueryData(['businesses'], (old: any[]) => {
-        if (!old) return old
-        return old.map((b) => b.id === id ? { ...b, ...newBusiness } : b)
-      })
-      return { previousBusinesses }
+  const { updateMutation, deleteMutation } = useEntityMutations<
+    Business,
+    z.infer<typeof businessSchema>,
+    Business
+  >({
+    listQueryKey: ['businesses'],
+    detailQueryKey: ['business', id],
+    update: {
+      mutationFn: (data) => businessService.update(id, data),
+      updateList: (current, newBusiness) =>
+        current?.map((business) =>
+          business.id === id ? { ...business, ...newBusiness } : business,
+        ),
     },
-    onError: (err, newBusiness, context: any) => {
-      queryClient.setQueryData(['businesses'], context?.previousBusinesses)
+    remove: {
+      mutationFn: () => businessService.delete(id),
+      updateList: (current) =>
+        current?.filter((business) => business.id !== id),
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['businesses'] })
-      queryClient.invalidateQueries({ queryKey: ['business', id] })
-    }
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: () => BusinessService.delete(id),
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ['businesses'] })
-      const previousBusinesses = queryClient.getQueryData(['businesses'])
-      queryClient.setQueryData(['businesses'], (old: any[]) => {
-        if (!old) return old
-        return old.filter((b) => b.id !== id)
-      })
-      return { previousBusinesses }
-    },
-    onError: (err, variables, context: any) => {
-      queryClient.setQueryData(['businesses'], context?.previousBusinesses)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['businesses'] })
-    }
   })
 
   return {

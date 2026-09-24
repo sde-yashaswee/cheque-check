@@ -5,8 +5,26 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
-import { UserIcon as User, Mail01Icon as Mail, LockPasswordIcon as Lock, CallIcon as Phone, Calendar03Icon as Calendar, HashtagIcon as Hash, Note01Icon as Note, Building03Icon as Building, Wallet01Icon as Wallet, Search01Icon as Search, Location01Icon as Location, TextFontIcon as TextIcon, ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, Building03Icon as Building2, Location01Icon as MapPin } from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
+import {
+  UserIcon as User,
+  Mail01Icon as Mail,
+  LockPasswordIcon as Lock,
+  CallIcon as Phone,
+  Calendar03Icon as Calendar,
+  HashtagIcon as Hash,
+  Note01Icon as Note,
+  Building03Icon as Building,
+  Wallet01Icon as Wallet,
+  Search01Icon as Search,
+  Location01Icon as Location,
+  TextFontIcon as TextIcon,
+  ArrowLeft01Icon as ArrowLeft,
+  ArrowRight01Icon as ArrowRight,
+  Tick02Icon as Check,
+  Building03Icon as Building2,
+  Location01Icon as MapPin,
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { cn } from '@/lib/utils'
 import {
   Stepper,
@@ -22,19 +40,26 @@ export default function CreateBusinessPage() {
   const t = useTranslations('Businesses')
   const tc = useTranslations('Common')
   const router = useRouter()
-  
+
+  const { form, step, nextStep, prevStep, isSaving, onSubmit } =
+    useCreateBusiness()
+
   const {
-    form,
-    step,
-    nextStep,
-    prevStep,
-    isSaving,
-    onSubmit,
-  } = useCreateBusiness()
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = form
 
-  const { register, watch, setValue, formState: { errors } } = form
-
-  const colors = ['#007AFF', '#34C759', '#FF9500', '#FF3B30', '#AF52DE', '#5856D6', '#8E8E93']
+  const colors = [
+    '#007AFF',
+    '#34C759',
+    '#FF9500',
+    '#FF3B30',
+    '#AF52DE',
+    '#5856D6',
+    '#8E8E93',
+  ]
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">
@@ -53,14 +78,23 @@ export default function CreateBusinessPage() {
             disabled={step === 1}
             className="rounded-full h-8 w-8 shrink-0 hover:bg-canvas-parchment"
           >
-            <HugeiconsIcon icon={ArrowLeft} className="h-4 w-4"/>
+            <HugeiconsIcon icon={ArrowLeft} className="h-4 w-4" />
           </Button>
 
           <StepperNav className="gap-3 flex-1">
             {[
-              { title: "Business Profile", icon: <HugeiconsIcon icon={Building2} className="size-4" /> },
-              { title: "Contact Info", icon: <HugeiconsIcon icon={Phone} className="size-4" /> },
-              { title: "Location", icon: <HugeiconsIcon icon={MapPin} className="size-4" /> }
+              {
+                title: t('businessProfile'),
+                icon: <HugeiconsIcon icon={Building2} className="size-4" />,
+              },
+              {
+                title: t('contactInfo'),
+                icon: <HugeiconsIcon icon={Phone} className="size-4" />,
+              },
+              {
+                title: t('location'),
+                icon: <HugeiconsIcon icon={MapPin} className="size-4" />,
+              },
             ].map((s, index) => (
               <StepperItem
                 key={index}
@@ -86,7 +120,7 @@ export default function CreateBusinessPage() {
             disabled={step === 3 || (step === 1 && !watch('name'))}
             className="rounded-full h-8 w-8 shrink-0 hover:bg-canvas-parchment"
           >
-            <HugeiconsIcon icon={ArrowRight} className="h-4 w-4"/>
+            <HugeiconsIcon icon={ArrowRight} className="h-4 w-4" />
           </Button>
         </div>
       </Stepper>
@@ -96,21 +130,36 @@ export default function CreateBusinessPage() {
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('businessName')}</Label>
+                <Label
+                  htmlFor="name"
+                  className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+                >
+                  {t('businessName')}
+                </Label>
                 <div className="relative">
-                  <HugeiconsIcon icon={Building2} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-                  <Input leftIcon={User}  
+                  <HugeiconsIcon
+                    icon={Building2}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
+                  />
+                  <Input
+                    leftIcon={User}
                     id="name"
-                    {...register('name')} 
-                    placeholder="e.g. Acme Corp"
+                    {...register('name')}
+                    placeholder={t('businessNamePlaceholder')}
                     className="h-14  bg-canvas-parchment border-none text-lg font-semibold rounded-sm"
-                   />
+                  />
                 </div>
-                {errors.name && <p className="text-xs text-destructive ml-1">{errors.name.message as string}</p>}
+                {errors.name && (
+                  <p className="text-xs text-destructive ml-1">
+                    {errors.name.message as string}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tc('themeColor')}</Label>
+                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+                  {tc('themeColor')}
+                </Label>
                 <div className="flex flex-wrap gap-3 p-1">
                   {colors.map((c) => (
                     <button
@@ -118,8 +167,10 @@ export default function CreateBusinessPage() {
                       type="button"
                       onClick={() => setValue('color', c)}
                       className={cn(
-                        "h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2",
-                        (watch as any)('color') === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
+                        'h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2',
+                        (watch as any)('color') === c
+                          ? 'ring-2 ring-primary scale-110'
+                          : 'hover:scale-105',
                       )}
                       style={{ backgroundColor: c }}
                     />
@@ -127,9 +178,15 @@ export default function CreateBusinessPage() {
                 </div>
               </div>
             </div>
-            
-            <Button type="button"className="w-full rounded-full h-14 text-lg"onClick={nextStep} disabled={!watch('name')}>
-              {tc('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
+
+            <Button
+              type="button"
+              className="w-full rounded-full h-14 text-lg"
+              onClick={nextStep}
+              disabled={!watch('name')}
+            >
+              {tc('continue')}{' '}
+              <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -137,34 +194,62 @@ export default function CreateBusinessPage() {
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="email"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('businessEmail')}</Label>
+              <Label
+                htmlFor="email"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+              >
+                {t('businessEmail')}
+              </Label>
               <div className="relative">
-                <HugeiconsIcon icon={Mail} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-                <Input leftIcon={Mail}  
+                <HugeiconsIcon
+                  icon={Mail}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
+                />
+                <Input
+                  leftIcon={Mail}
                   id="email"
-                  {...register('email')} 
-                  placeholder="contact@business.com"
+                  {...register('email')}
+                  placeholder={t('contactEmailPlaceholder')}
                   className="h-14  bg-canvas-parchment border-none rounded-sm"
-                 />
+                />
               </div>
-              {errors.email && <p className="text-xs text-destructive ml-1">{errors.email.message as string}</p>}
+              {errors.email && (
+                <p className="text-xs text-destructive ml-1">
+                  {errors.email.message as string}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('businessPhone')}</Label>
+              <Label
+                htmlFor="phone"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+              >
+                {t('businessPhone')}
+              </Label>
               <div className="relative">
-                <HugeiconsIcon icon={Phone} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-                <Input leftIcon={Phone}  
+                <HugeiconsIcon
+                  icon={Phone}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
+                />
+                <Input
+                  leftIcon={Phone}
                   id="phone"
-                  {...register('phone')} 
+                  {...register('phone')}
                   placeholder="+91 ..."
                   className="h-14  bg-canvas-parchment border-none rounded-sm"
-                 />
+                />
               </div>
             </div>
 
-            <Button type="button"className="w-full rounded-full h-14 text-lg"onClick={nextStep} disabled={!watch('email')}>
-              {tc('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
+            <Button
+              type="button"
+              className="w-full rounded-full h-14 text-lg"
+              onClick={nextStep}
+              disabled={!watch('email')}
+            >
+              {tc('continue')}{' '}
+              <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -172,31 +257,62 @@ export default function CreateBusinessPage() {
         {step === 3 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="address"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('businessAddress')}</Label>
+              <Label
+                htmlFor="address"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+              >
+                {t('businessAddress')}
+              </Label>
               <div className="relative">
-                <HugeiconsIcon icon={MapPin} className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50"/>
-                <Input leftIcon={MapPin}  id="address"{...register('address')} placeholder="Headquarters location"className="h-14  bg-canvas-parchment border-none rounded-sm" />
+                <HugeiconsIcon
+                  icon={MapPin}
+                  className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50"
+                />
+                <Input
+                  leftIcon={MapPin}
+                  id="address"
+                  {...register('address')}
+                  placeholder={t('headquartersPlaceholder')}
+                  className="h-14  bg-canvas-parchment border-none rounded-sm"
+                />
               </div>
             </div>
 
             <div className="rounded-lg bg-primary/5 p-6 space-y-4 border border-primary/10">
               <div className="flex items-center gap-2">
-                <HugeiconsIcon icon={Building2} className="h-3 w-3 text-primary opacity-80"/>
-                <h3 className="font-semibold text-primary uppercase tracking-wider text-[10px]">{t('businessSummary')}</h3>
+                <HugeiconsIcon
+                  icon={Building2}
+                  className="h-3 w-3 text-primary opacity-80"
+                />
+                <h3 className="font-semibold text-primary uppercase tracking-wider text-[10px]">
+                  {t('businessSummary')}
+                </h3>
               </div>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold"style={{ backgroundColor: (watch as any)('color') || '#007AFF' }}>
+                <div
+                  className="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold"
+                  style={{
+                    backgroundColor: (watch as any)('color') || '#007AFF',
+                  }}
+                >
                   {watch('name')?.charAt(0) || 'B'}
                 </div>
                 <div>
                   <p className="font-semibold">{watch('name')}</p>
-                  <p className="text-xs text-muted-foreground">{watch('email')}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {watch('email')}
+                  </p>
                 </div>
               </div>
             </div>
 
-            <Button type="submit"className="w-full rounded-full h-14 text-lg"disabled={isSaving}>
-              {isSaving ? t('creatingBusiness') : t('newBusiness')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5"/>
+            <Button
+              type="submit"
+              className="w-full rounded-full h-14 text-lg"
+              disabled={isSaving}
+            >
+              {isSaving ? t('creatingBusiness') : t('newBusiness')}{' '}
+              <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -204,4 +320,3 @@ export default function CreateBusinessPage() {
     </div>
   )
 }
-

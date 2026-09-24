@@ -1,36 +1,40 @@
-import { ChequeWithRelations } from "@/types";
+import { ChequeWithRelations } from '@/types'
+import {
+  BrowserReportRepository,
+  IReportRepository,
+} from '@/repositories/report.repository'
+
+let defaultReportService: ReportService | undefined
+
+function getDefaultReportService(): ReportService {
+  if (!defaultReportService) defaultReportService = new ReportService()
+  return defaultReportService
+}
 
 export class ReportService {
-  static exportToCSV(cheques: ChequeWithRelations[], filename: string = 'cheques_report.csv') {
-    if (!cheques || cheques.length === 0) return;
+  constructor(
+    private readonly repository: IReportRepository = new BrowserReportRepository(),
+  ) {}
 
-    const headers = ['Cheque Number', 'Party', 'Account', 'Amount', 'Date', 'Type', 'Status', 'Notes'];
-    const rows = cheques.map(c => [
-      c.cheque_number,
-      c.party?.name || '',
-      (c.account as any)?.bank?.name || '',
-      c.amount,
-      c.cheque_date,
-      c.type,
-      c.status,
-      c.notes || ''
-    ]);
+  static exportToCSV(
+    cheques: ChequeWithRelations[],
+    filename = 'cheques_report.csv',
+  ) {
+    return getDefaultReportService().exportToCSV(cheques, filename)
+  }
 
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', filename);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+  exportToCSV(
+    cheques: ChequeWithRelations[],
+    filename = 'cheques_report.csv',
+  ): void {
+    this.repository.exportToCSV(cheques, filename)
   }
 }
+
+export const reportService = new Proxy(Object.create(ReportService.prototype), {
+  get(_target, property, receiver) {
+    const service = getDefaultReportService()
+    const value = Reflect.get(service, property, receiver)
+    return typeof value === 'function' ? value.bind(service) : value
+  },
+})

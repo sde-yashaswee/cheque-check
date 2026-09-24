@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react'
 import { Profile } from '@/types'
-import { ProfileService } from '@/services/profile.service'
+import { profileService } from '@/services/profile.service'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 interface ProfileContextType {
@@ -18,11 +18,12 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile'],
-    queryFn: () => ProfileService.get(),
+    queryFn: () => profileService.get(),
   })
 
   const mutation = useMutation({
-    mutationFn: (newProfile: Partial<Profile>) => ProfileService.update(newProfile),
+    mutationFn: (newProfile: Partial<Profile>) =>
+      profileService.update(newProfile),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] })
     },
@@ -33,11 +34,13 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ProfileContext.Provider value={{ 
-      profile: profile || null, 
-      isLoading,
-      updateProfile
-    }}>
+    <ProfileContext.Provider
+      value={{
+        profile: profile || null,
+        isLoading,
+        updateProfile,
+      }}
+    >
       {children}
     </ProfileContext.Provider>
   )

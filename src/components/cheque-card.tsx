@@ -43,6 +43,7 @@ interface ChequeCardProps {
 
 export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
   const t = useTranslations('Cheques')
+  const tc = useTranslations('Common')
   const [offset, setOffset] = useState(0)
   const [swiping, setSwiping] = useState<'clear' | 'bounce' | null>(null)
   const { profile } = useProfile()
@@ -196,7 +197,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
                 className="text-[10px] text-muted-foreground"
               />
               <EntityAvatar
-                name={cheque.account?.bank?.name || 'Bank'}
+                name={cheque.account?.bank?.name || tc('bank')}
                 color={cheque.account?.color}
                 icon={cheque.account?.icon}
                 imageUrl={cheque.account?.bank?.logo_url}

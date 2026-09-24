@@ -3,19 +3,24 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { chequeSchema } from '@/validators'
-import { ChequeService } from '@/services/cheque.service'
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { chequeService } from '@/services/cheque.service'
+import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
+import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { useEntityMutations } from './use-entity-mutations'
 
 type ChequeFormData = z.infer<typeof chequeSchema>
 
 export function useEditCheque(id: string) {
   const router = useRouter()
-  const queryClient = useQueryClient()
-  
-  const { data: cheque, isLoading, error } = useQuery({
+
+  const {
+    data: cheque,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['cheque', id],
-    queryFn: () => ChequeService.getById(id),
+    queryFn: () => chequeService.getById(id),
   })
 
   const form = useForm<ChequeFormData>({
@@ -30,7 +35,7 @@ export function useEditCheque(id: string) {
       type: 'Outward',
       notes: '',
       image_url: null,
-    }
+    },
   })
 
   const { reset } = form
@@ -51,59 +56,34 @@ export function useEditCheque(id: string) {
     }
   }, [cheque, reset])
 
-  const updateMutation = useMutation({
-    mutationFn: (data: ChequeFormData) => ChequeService.update(id, data),
-    onMutate: async (newCheque) => {
-      const businessId = cheque?.business_id
-      if (businessId) {
-        await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-        const prev = queryClient.getQueryData(['cheques', businessId])
-        queryClient.setQueryData(['cheques', businessId], (old: any[]) => {
-          if (!old) return old
-          return old.map((c) => c.id === id ? { ...c, ...newCheque } : c)
-        })
-        return { previousCheques: prev }
-      }
+  const { updateMutation, deleteMutation } = useEntityMutations<
+    ChequeEntity,
+    ChequeFormData,
+    ChequeEntity
+  >({
+    listQueryKey: ['cheques', cheque?.business_id],
+    detailQueryKey: ['cheque', id],
+    deleteQueryKeys: [['cheque', id]],
+    update: {
+      mutationFn: (data) => chequeService.update(id, data),
+      updateList: (current, newCheque) =>
+        current?.map((cachedCheque) =>
+          cachedCheque.id === id
+            ? ChequeEntity.fromRow({
+                ...cachedCheque.toJSON(),
+                ...newCheque,
+                deposit_date: newCheque.deposit_date || null,
+                notes: newCheque.notes || null,
+                image_url: newCheque.image_url || null,
+              })
+            : cachedCheque,
+        ),
     },
-    onError: (err, newCheque, context: any) => {
-      const businessId = cheque?.business_id
-      if (businessId && context?.previousCheques) {
-        queryClient.setQueryData(['cheques', businessId], context.previousCheques)
-      }
+    remove: {
+      mutationFn: () => chequeService.delete(id),
+      updateList: (current) =>
+        current?.filter((cachedCheque) => cachedCheque.id !== id),
     },
-    onSettled: () => {
-      if (cheque?.business_id) {
-        queryClient.invalidateQueries({ queryKey: ['cheques', cheque.business_id] })
-      }
-      queryClient.invalidateQueries({ queryKey: ['cheque', id] })
-    }
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: () => ChequeService.delete(id),
-    onMutate: async () => {
-      const businessId = cheque?.business_id
-      if (businessId) {
-        await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-        const prev = queryClient.getQueryData(['cheques', businessId])
-        queryClient.setQueryData(['cheques', businessId], (old: any[]) => {
-          if (!old) return old
-          return old.filter((c) => c.id !== id)
-        })
-        return { previousCheques: prev }
-      }
-    },
-    onError: (err, variables, context: any) => {
-      const businessId = cheque?.business_id
-      if (businessId && context?.previousCheques) {
-        queryClient.setQueryData(['cheques', businessId], context.previousCheques)
-      }
-    },
-    onSettled: () => {
-      if (cheque?.business_id) {
-        queryClient.invalidateQueries({ queryKey: ['cheques', cheque.business_id] })
-      }
-    }
   })
 
   const onSubmit = form.handleSubmit((data) => {

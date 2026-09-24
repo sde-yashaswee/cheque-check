@@ -1,13 +1,27 @@
 'use client'
 
 import { useState } from 'react'
-import { UserIcon as User, Mail01Icon as Mail, LockPasswordIcon as Lock, CallIcon as Phone, Calendar03Icon as Calendar, HashtagIcon as Hash, Note01Icon as Note, Building03Icon as Building, Wallet01Icon as Wallet, Search01Icon as Search, Location01Icon as Location, TextFontIcon as TextIcon, ArrowLeft01Icon as ArrowLeft } from '@hugeicons/core-free-icons';
+import {
+  UserIcon as User,
+  Mail01Icon as Mail,
+  LockPasswordIcon as Lock,
+  CallIcon as Phone,
+  Calendar03Icon as Calendar,
+  HashtagIcon as Hash,
+  Note01Icon as Note,
+  Building03Icon as Building,
+  Wallet01Icon as Wallet,
+  Search01Icon as Search,
+  Location01Icon as Location,
+  TextFontIcon as TextIcon,
+  ArrowLeft01Icon as ArrowLeft,
+} from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { AuthService } from '@/services/auth.service'
+import { authService } from '@/services/auth.service'
 import Link from 'next/link'
-import { HugeiconsIcon } from '@hugeicons/react';
+import { HugeiconsIcon } from '@hugeicons/react'
 import { useTranslations } from 'next-intl'
 
 export default function ForgotPasswordPage() {
@@ -20,14 +34,14 @@ export default function ForgotPasswordPage() {
     e.preventDefault()
     setLoading(true)
     try {
-      const { error } = await AuthService.resetPassword(email)
+      const { error } = await authService.resetPassword(email)
       if (error) {
         alert(error.message)
       } else {
         setSent(true)
       }
     } catch (error) {
-      alert(error instanceof Error ? error.message : "An error occurred")
+      alert(error instanceof Error ? error.message : t('unknownError'))
     } finally {
       setLoading(false)
     }
@@ -38,11 +52,19 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-sm space-y-8">
         <div className="flex flex-col items-center text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white shadow-sm overflow-hidden">
-            <img src="/android-chrome-512x512.png" alt="ChequeCheck Logo" className="h-full w-full object-contain p-2" />
+            <img
+              src="/android-chrome-512x512.png"
+              alt="ChequeCheck Logo"
+              className="h-full w-full object-contain p-2"
+            />
           </div>
-          <h1 className="mt-6 text-display-md font-semibold tracking-tight">Reset Password</h1>
+          <h1 className="mt-6 text-display-md font-semibold tracking-tight">
+            Reset Password
+          </h1>
           <p className="text-body text-muted-foreground">
-            {sent ? "Check your email for the reset link": "Enter your email to receive a reset link"}
+            {sent
+              ? 'Check your email for the reset link'
+              : 'Enter your email to receive a reset link'}
           </p>
         </div>
 
@@ -50,32 +72,47 @@ export default function ForgotPasswordPage() {
           {sent ? (
             <div className="space-y-6 text-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10 text-green-600 mx-auto">
-                <HugeiconsIcon icon={Mail} className="h-6 w-6"/>
+                <HugeiconsIcon icon={Mail} className="h-6 w-6" />
               </div>
-              <p className="text-sm">We&apos;ve sent a password reset link to <strong>{email}</strong>.</p>
-              <Button render={<Link href="/login" />} className="w-full rounded-full h-12">
-                Back to Login
+              <p className="text-sm">
+                We&apos;ve sent a password reset link to{' '}
+                <strong>{email}</strong>.
+              </p>
+              <Button
+                render={<Link href="/login" />}
+                className="w-full rounded-full h-12"
+              >
+                {t('backToLogin')}
               </Button>
             </div>
           ) : (
             <form onSubmit={handleReset} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">{t('email')}</Label>
-                <Input leftIcon={Mail}  
+                <Input
+                  leftIcon={Mail}
                   id="email"
                   type="email"
-                  placeholder={t('emailPlaceholder')} 
+                  placeholder={t('emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="h-12 bg-canvas-parchment border-none rounded-sm"
                 />
               </div>
-              <Button type="submit"className="w-full rounded-full h-12 text-lg"disabled={loading}>
-                {loading ? "Sending...": "Send Reset Link"}
+              <Button
+                type="submit"
+                className="w-full rounded-full h-12 text-lg"
+                disabled={loading}
+              >
+                {loading ? t('sending') : t('sendResetLink')}
               </Button>
-              <Link href="/login"className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mt-2">
-                <HugeiconsIcon icon={ArrowLeft} className="h-4 w-4"/> Back to Login
+              <Link
+                href="/login"
+                className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mt-2"
+              >
+                <HugeiconsIcon icon={ArrowLeft} className="h-4 w-4" />{' '}
+                {t('backToLogin')}
               </Link>
             </form>
           )}

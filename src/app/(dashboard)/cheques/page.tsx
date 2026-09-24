@@ -2,8 +2,34 @@
 
 import { useCheques } from '@/hooks/use-cheques'
 import { ChequeCard } from '@/components/cheque-card'
-import { HugeiconsIcon } from '@hugeicons/react';
-import { UserIcon as User, Mail01Icon as Mail, LockPasswordIcon as Lock, CallIcon as Phone, Calendar03Icon as Calendar, HashtagIcon as Hash, Note01Icon as Note, Building03Icon as Building, Wallet01Icon as Wallet, Search01Icon as Search, Location01Icon as Location, TextFontIcon as TextIcon, PlusSignIcon as Plus, Sorting05Icon as Filter, Invoice01Icon as ReceiptText, Tick02Icon as Check, Calendar03Icon as DateIcon, Money03Icon as AmountIcon, SortingAZ01Icon as AscIcon, SortingZA01Icon as DescIcon, CircleIcon as AllIcon, ArrowUpRight01Icon as IssuedIcon, ArrowDownLeft01Icon as ReceivedIcon, CheckmarkCircle01Icon as ClearedIcon, Cancel01Icon as BouncedIcon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  UserIcon as User,
+  Mail01Icon as Mail,
+  LockPasswordIcon as Lock,
+  CallIcon as Phone,
+  Calendar03Icon as Calendar,
+  HashtagIcon as Hash,
+  Note01Icon as Note,
+  Building03Icon as Building,
+  Wallet01Icon as Wallet,
+  Search01Icon as Search,
+  Location01Icon as Location,
+  TextFontIcon as TextIcon,
+  PlusSignIcon as Plus,
+  Sorting05Icon as Filter,
+  Invoice01Icon as ReceiptText,
+  Tick02Icon as Check,
+  Calendar03Icon as DateIcon,
+  Money03Icon as AmountIcon,
+  SortingAZ01Icon as AscIcon,
+  SortingZA01Icon as DescIcon,
+  CircleIcon as AllIcon,
+  ArrowUpRight01Icon as IssuedIcon,
+  ArrowDownLeft01Icon as ReceivedIcon,
+  CheckmarkCircle01Icon as ClearedIcon,
+  Cancel01Icon as BouncedIcon,
+} from '@hugeicons/core-free-icons'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -13,7 +39,13 @@ import { cn } from '@/lib/utils'
 import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
 import { useTranslations } from 'next-intl'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 
 import { ChequeWithRelations } from '@/types'
 
@@ -47,11 +79,11 @@ export default function ChequesPage() {
   }
 
   const statusOptions = [
-    { label: 'All', value: 'All', icon: AllIcon },
-    { label: 'Issued', value: 'Issued', icon: IssuedIcon },
-    { label: 'Received', value: 'Received', icon: ReceivedIcon },
-    { label: 'Cleared', value: 'Cleared', icon: ClearedIcon },
-    { label: 'Bounced', value: 'Bounced', icon: BouncedIcon },
+    { label: tCommon('all'), value: 'All', icon: AllIcon },
+    { label: tCommon('issued'), value: 'Issued', icon: IssuedIcon },
+    { label: tCommon('received'), value: 'Received', icon: ReceivedIcon },
+    { label: tCommon('cleared'), value: 'Cleared', icon: ClearedIcon },
+    { label: tCommon('bounced'), value: 'Bounced', icon: BouncedIcon },
   ] as const
 
   const sortOptions = [
@@ -68,25 +100,35 @@ export default function ChequesPage() {
     <div className="max-w-2xl space-y-8 pb-24">
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <HugeiconsIcon icon={Search} className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
-          <Input leftIcon={Search}  
+          <HugeiconsIcon
+            icon={Search}
+            className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          />
+          <Input
+            leftIcon={Search}
             className="rounded-full  h-11 bg-canvas-parchment border-none"
-            placeholder={t('searchPlaceholder')} 
+            placeholder={t('searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        
+
         <Sheet>
-          <SheetTrigger render={
-            <Button 
-              variant={(filter !== 'All' || sortBy !== 'date' || sortOrder !== 'desc') ? 'default' : 'outline'} 
-              size="icon"
-              className="rounded-full h-11 w-11 shrink-0 bg-white"
-            >
-              <HugeiconsIcon icon={Filter} className="h-5 w-5"/>
-            </Button>
-          } />
+          <SheetTrigger
+            render={
+              <Button
+                variant={
+                  filter !== 'All' || sortBy !== 'date' || sortOrder !== 'desc'
+                    ? 'default'
+                    : 'outline'
+                }
+                size="icon"
+                className="rounded-full h-11 w-11 shrink-0 bg-white"
+              >
+                <HugeiconsIcon icon={Filter} className="h-5 w-5" />
+              </Button>
+            }
+          />
           <SheetContent className="max-h-[85dvh] overflow-y-auto">
             <SheetHeader>
               <SheetTitle className="flex items-center gap-2">
@@ -94,23 +136,25 @@ export default function ChequesPage() {
                 {tCommon('sortAndFilter')}
               </SheetTitle>
             </SheetHeader>
-            
+
             <div className="space-y-6 py-4">
               <div className="space-y-3">
-                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tCommon('sortBy')}</h3>
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  {tCommon('sortBy')}
+                </h3>
                 <div className="grid grid-cols-2 gap-3">
                   {sortOptions.map((option) => (
                     <button
                       key={option.value}
                       onClick={() => setSortBy(option.value as any)}
                       className={cn(
-                        "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
-                        sortBy === option.value 
-                          ? "bg-primary/5 border-primary text-primary" 
-                          : "bg-muted/30 border-transparent text-foreground"
+                        'flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all active:scale-[0.98]',
+                        sortBy === option.value
+                          ? 'bg-primary/5 border-primary text-primary'
+                          : 'bg-muted/30 border-transparent text-foreground',
                       )}
                     >
-                      <HugeiconsIcon icon={option.icon} className="h-4 w-4"/>
+                      <HugeiconsIcon icon={option.icon} className="h-4 w-4" />
                       <span className="font-bold text-sm">{option.label}</span>
                     </button>
                   ))}
@@ -118,20 +162,22 @@ export default function ChequesPage() {
               </div>
 
               <div className="space-y-3">
-                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{tCommon('order')}</h3>
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  {tCommon('order')}
+                </h3>
                 <div className="grid grid-cols-2 gap-3">
                   {orderOptions.map((option) => (
                     <button
                       key={option.value}
                       onClick={() => setSortOrder(option.value as any)}
                       className={cn(
-                        "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
-                        sortOrder === option.value 
-                          ? "bg-primary/5 border-primary text-primary" 
-                          : "bg-muted/30 border-transparent text-foreground"
+                        'flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all active:scale-[0.98]',
+                        sortOrder === option.value
+                          ? 'bg-primary/5 border-primary text-primary'
+                          : 'bg-muted/30 border-transparent text-foreground',
                       )}
                     >
-                      <HugeiconsIcon icon={option.icon} className="h-4 w-4"/>
+                      <HugeiconsIcon icon={option.icon} className="h-4 w-4" />
                       <span className="font-bold text-sm">{option.label}</span>
                     </button>
                   ))}
@@ -139,24 +185,33 @@ export default function ChequesPage() {
               </div>
 
               <div className="space-y-3">
-                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t('filterStatus')}</h3>
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  {t('filterStatus')}
+                </h3>
                 <div className="grid grid-cols-1 gap-2">
                   {statusOptions.map((s) => (
                     <button
                       key={s.value}
                       onClick={() => setFilter(s.value as any)}
                       className={cn(
-                        "flex items-center justify-between px-4 py-3 rounded-xl border transition-all active:scale-[0.98]",
-                        filter === s.value 
-                          ? "bg-primary/5 border-primary text-primary" 
-                          : "bg-muted/30 border-transparent text-foreground"
+                        'flex items-center justify-between px-4 py-3 rounded-xl border transition-all active:scale-[0.98]',
+                        filter === s.value
+                          ? 'bg-primary/5 border-primary text-primary'
+                          : 'bg-muted/30 border-transparent text-foreground',
                       )}
                     >
                       <div className="flex items-center gap-3">
-                        <HugeiconsIcon icon={s.icon} className="h-4 w-4"/>
-                        <span className="font-bold text-sm">{tCommon(s.value.toLowerCase() as any)}</span>
+                        <HugeiconsIcon icon={s.icon} className="h-4 w-4" />
+                        <span className="font-bold text-sm">
+                          {tCommon(s.value.toLowerCase() as any)}
+                        </span>
                       </div>
-                      {filter === s.value && <HugeiconsIcon icon={Check} className="h-4 w-4 stroke-[3]"/>}
+                      {filter === s.value && (
+                        <HugeiconsIcon
+                          icon={Check}
+                          className="h-4 w-4 stroke-[3]"
+                        />
+                      )}
                     </button>
                   ))}
                 </div>
@@ -176,7 +231,7 @@ export default function ChequesPage() {
           loadingComponent={
             <div className="space-y-4">
               {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-32 w-full rounded-lg"/>
+                <Skeleton key={i} className="h-32 w-full rounded-lg" />
               ))}
             </div>
           }
@@ -187,15 +242,15 @@ export default function ChequesPage() {
               description={t('noChequesDesc')}
               action={{
                 label: t('recordFirst'),
-                href: "/cheques/create"
+                href: '/cheques/create',
               }}
             />
           }
         >
           {filteredCheques?.map((cheque: ChequeWithRelations) => (
-            <ChequeCard 
-              key={cheque.id} 
-              cheque={cheque} 
+            <ChequeCard
+              key={cheque.id}
+              cheque={cheque}
               onStatusUpdate={updateStatus}
             />
           ))}
@@ -203,11 +258,13 @@ export default function ChequesPage() {
       </div>
 
       <Link href="/cheques/create">
-        <Button className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900"size="icon">
-          <HugeiconsIcon icon={Plus} className="h-8 w-8"/>
+        <Button
+          className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900"
+          size="icon"
+        >
+          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
         </Button>
       </Link>
     </div>
   )
 }
-

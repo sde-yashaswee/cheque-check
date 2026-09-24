@@ -6,8 +6,17 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
-import { HugeiconsIcon } from '@hugeicons/react';
-import {  ArrowLeft01Icon as ArrowLeft, ArrowRight01Icon as ArrowRight, Tick02Icon as Check, CreditCardIcon as CreditCard, UserIcon as User, HashtagIcon as Hash, Invoice01Icon as ReceiptText , TextFontIcon as TextIcon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  ArrowLeft01Icon as ArrowLeft,
+  ArrowRight01Icon as ArrowRight,
+  Tick02Icon as Check,
+  CreditCardIcon as CreditCard,
+  UserIcon as User,
+  HashtagIcon as Hash,
+  Invoice01Icon as ReceiptText,
+  TextFontIcon as TextIcon,
+} from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import dynamic from 'next/dynamic'
@@ -22,10 +31,13 @@ import {
 } from '@/components/reui/stepper'
 import { useEffect } from 'react'
 
-const BankSelector = dynamic(() => import('@/components/bank-selector').then(mod => mod.BankSelector), {
-  loading: () => <Skeleton className="h-14 w-full rounded-2xl"/>,
-  ssr: false
-})
+const BankSelector = dynamic(
+  () => import('@/components/bank-selector').then((mod) => mod.BankSelector),
+  {
+    loading: () => <Skeleton className="h-14 w-full rounded-2xl" />,
+    ssr: false,
+  },
+)
 
 export default function CreateAccountPage() {
   const t = useTranslations('Accounts')
@@ -33,17 +45,16 @@ export default function CreateAccountPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { activeBusiness } = useBusiness()
-  
-  const {
-    form,
-    step,
-    nextStep,
-    prevStep,
-    isSaving,
-    onSubmit,
-  } = useCreateAccount(activeBusiness?.id)
 
-  const { register, watch, setValue, formState: { errors } } = form
+  const { form, step, nextStep, prevStep, isSaving, onSubmit } =
+    useCreateAccount(activeBusiness?.id)
+
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = form
 
   useEffect(() => {
     const name = searchParams.get('name')
@@ -54,17 +65,26 @@ export default function CreateAccountPage() {
     if (name) setValue('account_name', name)
     if (number) setValue('account_number', number)
     if (ifsc) setValue('ifsc_code', ifsc)
-    if (auto === 'true') setValue('notes', 'Automatically Generated from Cheque Scan')
+    if (auto === 'true')
+      setValue('notes', 'Automatically Generated from Cheque Scan')
   }, [searchParams, setValue])
 
-  const colors = ['#007AFF', '#5856D6', '#AF52DE', '#FF2D55', '#FF3B30', '#FF9500', '#34C759']
+  const colors = [
+    '#007AFF',
+    '#5856D6',
+    '#AF52DE',
+    '#FF2D55',
+    '#FF3B30',
+    '#FF9500',
+    '#34C759',
+  ]
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">
       {searchParams.get('auto') === 'true' && (
         <div className="bg-primary/5 border border-primary/10 rounded-sm p-4 animate-in fade-in slide-in-from-top-2 duration-500">
           <p className="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-2">
-            <HugeiconsIcon icon={ReceiptText} className="h-4 w-4"/>
+            <HugeiconsIcon icon={ReceiptText} className="h-4 w-4" />
             Automatically Generated from Cheque Scan
           </p>
         </div>
@@ -85,14 +105,23 @@ export default function CreateAccountPage() {
             disabled={step === 1}
             className="rounded-full h-8 w-8 shrink-0 hover:bg-canvas-parchment"
           >
-            <HugeiconsIcon icon={ArrowLeft} className="h-4 w-4"/>
+            <HugeiconsIcon icon={ArrowLeft} className="h-4 w-4" />
           </Button>
 
           <StepperNav className="gap-3 flex-1">
             {[
-              { title: "Account Info", icon: <HugeiconsIcon icon={User} className="size-4" /> },
-              { title: "Bank Details", icon: <HugeiconsIcon icon={CreditCard} className="size-4" /> },
-              { title: "More Details", icon: <HugeiconsIcon icon={Hash} className="size-4" /> }
+              {
+                title: t('accountInfo'),
+                icon: <HugeiconsIcon icon={User} className="size-4" />,
+              },
+              {
+                title: t('bankDetails'),
+                icon: <HugeiconsIcon icon={CreditCard} className="size-4" />,
+              },
+              {
+                title: t('moreDetails'),
+                icon: <HugeiconsIcon icon={Hash} className="size-4" />,
+              },
             ].map((s, index) => (
               <StepperItem
                 key={index}
@@ -118,7 +147,7 @@ export default function CreateAccountPage() {
             disabled={step === 3 || (step === 1 && !watch('bank_id'))}
             className="rounded-full h-8 w-8 shrink-0 hover:bg-canvas-parchment"
           >
-            <HugeiconsIcon icon={ArrowRight} className="h-4 w-4"/>
+            <HugeiconsIcon icon={ArrowRight} className="h-4 w-4" />
           </Button>
         </div>
       </Stepper>
@@ -128,17 +157,25 @@ export default function CreateAccountPage() {
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('selectBank')}</Label>
-                <BankSelector 
+                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+                  {t('selectBank')}
+                </Label>
+                <BankSelector
                   value={watch('bank_id')}
                   onValueChange={(val) => setValue('bank_id', val)}
                   className="rounded-sm"
                 />
-                {errors.bank_id && <p className="text-xs text-destructive ml-1">{errors.bank_id.message as string}</p>}
+                {errors.bank_id && (
+                  <p className="text-xs text-destructive ml-1">
+                    {errors.bank_id.message as string}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{tc('themeColor')}</Label>
+                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+                  {tc('themeColor')}
+                </Label>
                 <div className="flex flex-wrap gap-3 p-1">
                   {colors.map((c) => (
                     <button
@@ -146,8 +183,10 @@ export default function CreateAccountPage() {
                       type="button"
                       onClick={() => setValue('color', c)}
                       className={cn(
-                        "h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2",
-                        (watch as any)('color') === c ?"ring-2 ring-primary scale-110":"hover:scale-105"
+                        'h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2',
+                        (watch as any)('color') === c
+                          ? 'ring-2 ring-primary scale-110'
+                          : 'hover:scale-105',
                       )}
                       style={{ backgroundColor: c }}
                     />
@@ -155,9 +194,15 @@ export default function CreateAccountPage() {
                 </div>
               </div>
             </div>
-            
-            <Button type="button"className="w-full rounded-full h-14 text-lg"onClick={nextStep} disabled={!watch('bank_id')}>
-              {tc('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
+
+            <Button
+              type="button"
+              className="w-full rounded-full h-14 text-lg"
+              onClick={nextStep}
+              disabled={!watch('bank_id')}
+            >
+              {tc('continue')}{' '}
+              <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -165,35 +210,67 @@ export default function CreateAccountPage() {
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="account_name"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('accountName')}</Label>
+              <Label
+                htmlFor="account_name"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+              >
+                {t('accountName')}
+              </Label>
               <div className="relative">
-                <HugeiconsIcon icon={User} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-                <Input leftIcon={TextIcon}  
+                <HugeiconsIcon
+                  icon={User}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
+                />
+                <Input
+                  leftIcon={TextIcon}
                   id="account_name"
-                  {...register('account_name')} 
-                  placeholder="e.g. John Doe"
+                  {...register('account_name')}
+                  placeholder={t('accountNamePlaceholder')}
                   className="h-14  bg-canvas-parchment border-none rounded-sm"
-                 />
+                />
               </div>
-              {errors.account_name && <p className="text-xs text-destructive ml-1">{errors.account_name.message as string}</p>}
+              {errors.account_name && (
+                <p className="text-xs text-destructive ml-1">
+                  {errors.account_name.message as string}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="account_number"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('accountNumber')}</Label>
+              <Label
+                htmlFor="account_number"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+              >
+                {t('accountNumber')}
+              </Label>
               <div className="relative">
-                <HugeiconsIcon icon={CreditCard} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-                <Input leftIcon={TextIcon}  
+                <HugeiconsIcon
+                  icon={CreditCard}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
+                />
+                <Input
+                  leftIcon={TextIcon}
                   id="account_number"
-                  {...register('account_number')} 
-                  placeholder={t('accountNumberPlaceholder')} 
+                  {...register('account_number')}
+                  placeholder={t('accountNumberPlaceholder')}
                   className="h-14  bg-canvas-parchment border-none rounded-sm"
-                 />
+                />
               </div>
-              {errors.account_number && <p className="text-xs text-destructive ml-1">{errors.account_number.message as string}</p>}
+              {errors.account_number && (
+                <p className="text-xs text-destructive ml-1">
+                  {errors.account_number.message as string}
+                </p>
+              )}
             </div>
 
-            <Button type="button"className="w-full rounded-full h-14 text-lg"onClick={nextStep} disabled={!watch('account_name') || !watch('account_number')}>
-              {tc('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
+            <Button
+              type="button"
+              className="w-full rounded-full h-14 text-lg"
+              onClick={nextStep}
+              disabled={!watch('account_name') || !watch('account_number')}
+            >
+              {tc('continue')}{' '}
+              <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -201,15 +278,34 @@ export default function CreateAccountPage() {
         {step === 3 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="ifsc_code"className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">{t('ifscCode')}</Label>
+              <Label
+                htmlFor="ifsc_code"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+              >
+                {t('ifscCode')}
+              </Label>
               <div className="relative">
-                <HugeiconsIcon icon={Hash} className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"/>
-                <Input leftIcon={TextIcon}  id="ifsc_code"{...register('ifsc_code')} placeholder={t('ifscPlaceholder')} className="h-14  bg-canvas-parchment border-none uppercase rounded-sm" />
+                <HugeiconsIcon
+                  icon={Hash}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
+                />
+                <Input
+                  leftIcon={TextIcon}
+                  id="ifsc_code"
+                  {...register('ifsc_code')}
+                  placeholder={t('ifscPlaceholder')}
+                  className="h-14  bg-canvas-parchment border-none uppercase rounded-sm"
+                />
               </div>
             </div>
 
-            <Button type="submit"className="w-full rounded-full h-14 text-lg"disabled={isSaving}>
-              {isSaving ? t('addingAccount') : t('addAccount')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5"/>
+            <Button
+              type="submit"
+              className="w-full rounded-full h-14 text-lg"
+              disabled={isSaving}
+            >
+              {isSaving ? t('addingAccount') : t('addAccount')}{' '}
+              <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
             </Button>
           </div>
         )}
@@ -217,4 +313,3 @@ export default function CreateAccountPage() {
     </div>
   )
 }
-

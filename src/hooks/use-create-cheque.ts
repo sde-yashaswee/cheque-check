@@ -2,16 +2,18 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { chequeSchema } from '@/validators'
-import { ChequeService } from '@/services/cheque.service'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { chequeService } from '@/services/cheque.service'
 import { useRouter } from 'next/navigation'
-import { StorageService } from '@/services/storage.service'
+import { storageService } from '@/services/storage.service'
 import { z } from 'zod'
 import { toast } from '@/components/ui/toast'
 import { useTranslations } from 'next-intl'
 import { ChequeWithRelations, Party } from '@/types'
-import { getInitialChequeStatus } from '@/lib/cheque-state'
+import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useProfile } from './use-profile'
+import { ConflictError } from '@/lib/errors'
+import { useEntityCreateMutation } from './use-entity-mutations'
+import { useQueryClient } from '@tanstack/react-query'
 
 type ChequeFormValues = z.infer<typeof chequeSchema>
 
@@ -50,59 +52,45 @@ export function useCreateCheque(
     }
   }, [initialType, setValue])
 
-  const mutation = useMutation({
+  const mutation = useEntityCreateMutation<
+    ChequeWithRelations,
+    ChequeFormValues,
+    ChequeEntity
+  >({
+    queryKey: businessId ? ['cheques', businessId] : ['cheques'],
     mutationFn: (data: ChequeFormValues) => {
       if (!businessId)
         throw new Error('Select a business before creating a cheque')
 
-      return ChequeService.create({
+      return chequeService.create({
         ...data,
         business_id: businessId,
         image_url: data.image_url ?? null,
         notes: data.notes || null,
         remind_before_days: profile?.default_reminder_days ?? null,
-        status: getInitialChequeStatus(data.type),
+        status: ChequeEntity.initialStatusFor(data.type),
       })
     },
-    onMutate: async (newCheque) => {
-      if (!businessId)
-        throw new Error('Select a business before creating a cheque')
+    addToList: (current, newCheque) => {
+      if (!businessId) return current
 
-      // Stop any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-
-      // Snapshot the previous value
-      const prev = queryClient.getQueryData<ChequeWithRelations[]>([
-        'cheques',
-        businessId,
-      ])
-
-      // Optimistically update to the new value
-      queryClient.setQueryData<ChequeWithRelations[]>(
-        ['cheques', businessId],
-        (old) => {
-          const optimisticCheque: ChequeWithRelations = {
-            ...newCheque,
-            id: 'temp-' + Date.now(),
-            business_id: businessId,
-            image_url: newCheque.image_url ?? null,
-            notes: newCheque.notes || null,
-            remind_before_days: profile?.default_reminder_days ?? null,
-            status: getInitialChequeStatus(newCheque.type),
-            voice_call_sent: false,
-            last_call_at: null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            party: queryClient
-              .getQueryData<Party[]>(['parties', businessId])
-              ?.find((party) => party.id === newCheque.party_id),
-          }
-          return old ? [optimisticCheque, ...old] : [optimisticCheque]
-        },
-      )
-
-      // Return a context object with the snapshotted value
-      return { previousCheques: prev }
+      const optimisticCheque: ChequeWithRelations = {
+        ...newCheque,
+        id: 'temp-' + Date.now(),
+        business_id: businessId,
+        image_url: newCheque.image_url ?? null,
+        notes: newCheque.notes || null,
+        remind_before_days: profile?.default_reminder_days ?? null,
+        status: ChequeEntity.initialStatusFor(newCheque.type),
+        voice_call_sent: false,
+        last_call_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        party: queryClient
+          .getQueryData<Party[]>(['parties', businessId])
+          ?.find((party) => party.id === newCheque.party_id),
+      }
+      return current ? [optimisticCheque, ...current] : [optimisticCheque]
     },
     onSuccess: () => {
       toast.add({
@@ -112,19 +100,10 @@ export function useCreateCheque(
       })
       router.push('/cheques')
     },
-    onError: (error, _newCheque, context) => {
-      queryClient.setQueryData(
-        ['cheques', businessId],
-        context?.previousCheques,
-      )
-
-      const errorCode =
-        typeof error === 'object' && error && 'code' in error
-          ? error.code
-          : undefined
+    onError: (error) => {
       const errorMessage = error instanceof Error ? error.message : tc('error')
 
-      if (errorCode === '23505') {
+      if (error instanceof ConflictError) {
         toast.add({
           title: tc('error'),
           description: t('duplicateChequeError'),
@@ -138,15 +117,12 @@ export function useCreateCheque(
         })
       }
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
-    },
   })
 
   const handleImageUpload = async (file: File) => {
     setIsUploading(true)
     try {
-      const url = await StorageService.uploadChequeImage(file)
+      const url = await storageService.uploadChequeImage(file)
       setValue('image_url', url)
       return url
     } catch (error) {
