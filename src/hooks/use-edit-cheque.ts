@@ -4,14 +4,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { chequeSchema } from '@/validators'
 import { chequeService } from '@/services/cheque.service'
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { useOptimisticMutation } from './use-optimistic-mutation'
 
 type ChequeFormData = z.infer<typeof chequeSchema>
 
 export function useEditCheque(id: string) {
   const router = useRouter()
-  const queryClient = useQueryClient()
 
   const {
     data: cheque,
@@ -55,69 +55,24 @@ export function useEditCheque(id: string) {
     }
   }, [cheque, reset])
 
-  const updateMutation = useMutation({
+  const updateMutation = useOptimisticMutation<any[], ChequeFormData, any>({
+    queryKey: ['cheques', cheque?.business_id],
+    additionalQueryKeys: [['cheque', id]],
     mutationFn: (data: ChequeFormData) => chequeService.update(id, data),
-    onMutate: async (newCheque) => {
-      const businessId = cheque?.business_id
-      if (businessId) {
-        await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-        const prev = queryClient.getQueryData(['cheques', businessId])
-        queryClient.setQueryData(['cheques', businessId], (old: any[]) => {
-          if (!old) return old
-          return old.map((c) => (c.id === id ? { ...c, ...newCheque } : c))
-        })
-        return { previousCheques: prev }
-      }
-    },
-    onError: (err, newCheque, context: any) => {
-      const businessId = cheque?.business_id
-      if (businessId && context?.previousCheques) {
-        queryClient.setQueryData(
-          ['cheques', businessId],
-          context.previousCheques,
-        )
-      }
-    },
-    onSettled: () => {
-      if (cheque?.business_id) {
-        queryClient.invalidateQueries({
-          queryKey: ['cheques', cheque.business_id],
-        })
-      }
-      queryClient.invalidateQueries({ queryKey: ['cheque', id] })
-    },
+    update: (current, newCheque) =>
+      current?.map((cachedCheque) =>
+        cachedCheque.id === id
+          ? { ...cachedCheque, ...newCheque }
+          : cachedCheque,
+      ),
   })
 
-  const deleteMutation = useMutation({
+  const deleteMutation = useOptimisticMutation<any[], void, void>({
+    queryKey: ['cheques', cheque?.business_id],
+    additionalQueryKeys: [['cheque', id]],
     mutationFn: () => chequeService.delete(id),
-    onMutate: async () => {
-      const businessId = cheque?.business_id
-      if (businessId) {
-        await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-        const prev = queryClient.getQueryData(['cheques', businessId])
-        queryClient.setQueryData(['cheques', businessId], (old: any[]) => {
-          if (!old) return old
-          return old.filter((c) => c.id !== id)
-        })
-        return { previousCheques: prev }
-      }
-    },
-    onError: (err, variables, context: any) => {
-      const businessId = cheque?.business_id
-      if (businessId && context?.previousCheques) {
-        queryClient.setQueryData(
-          ['cheques', businessId],
-          context.previousCheques,
-        )
-      }
-    },
-    onSettled: () => {
-      if (cheque?.business_id) {
-        queryClient.invalidateQueries({
-          queryKey: ['cheques', cheque.business_id],
-        })
-      }
-    },
+    update: (current) =>
+      current?.filter((cachedCheque) => cachedCheque.id !== id),
   })
 
   const onSubmit = form.handleSubmit((data) => {
