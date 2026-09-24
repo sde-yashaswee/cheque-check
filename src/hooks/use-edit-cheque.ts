@@ -4,9 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { chequeSchema } from '@/validators'
 import { chequeService } from '@/services/cheque.service'
+import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { useOptimisticMutation } from './use-optimistic-mutation'
+import { useEntityMutations } from './use-entity-mutations'
 
 type ChequeFormData = z.infer<typeof chequeSchema>
 
@@ -55,24 +56,34 @@ export function useEditCheque(id: string) {
     }
   }, [cheque, reset])
 
-  const updateMutation = useOptimisticMutation<any[], ChequeFormData, any>({
-    queryKey: ['cheques', cheque?.business_id],
-    additionalQueryKeys: [['cheque', id]],
-    mutationFn: (data: ChequeFormData) => chequeService.update(id, data),
-    update: (current, newCheque) =>
-      current?.map((cachedCheque) =>
-        cachedCheque.id === id
-          ? { ...cachedCheque, ...newCheque }
-          : cachedCheque,
-      ),
-  })
-
-  const deleteMutation = useOptimisticMutation<any[], void, void>({
-    queryKey: ['cheques', cheque?.business_id],
-    additionalQueryKeys: [['cheque', id]],
-    mutationFn: () => chequeService.delete(id),
-    update: (current) =>
-      current?.filter((cachedCheque) => cachedCheque.id !== id),
+  const { updateMutation, deleteMutation } = useEntityMutations<
+    ChequeEntity,
+    ChequeFormData,
+    ChequeEntity
+  >({
+    listQueryKey: ['cheques', cheque?.business_id],
+    detailQueryKey: ['cheque', id],
+    deleteQueryKeys: [['cheque', id]],
+    update: {
+      mutationFn: (data) => chequeService.update(id, data),
+      updateList: (current, newCheque) =>
+        current?.map((cachedCheque) =>
+          cachedCheque.id === id
+            ? ChequeEntity.fromRow({
+                ...cachedCheque.toJSON(),
+                ...newCheque,
+                deposit_date: newCheque.deposit_date || null,
+                notes: newCheque.notes || null,
+                image_url: newCheque.image_url || null,
+              })
+            : cachedCheque,
+        ),
+    },
+    remove: {
+      mutationFn: () => chequeService.delete(id),
+      updateList: (current) =>
+        current?.filter((cachedCheque) => cachedCheque.id !== id),
+    },
   })
 
   const onSubmit = form.handleSubmit((data) => {
