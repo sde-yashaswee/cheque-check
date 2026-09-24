@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { businessSchema } from '@/validators'
-import { BusinessService } from '@/services/business.service'
+import { businessService } from '@/services/business.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
@@ -12,7 +12,7 @@ export function useCreateBusiness() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { setActiveBusiness } = useBusiness()
-  
+
   const form = useForm({
     resolver: zodResolver(businessSchema),
     defaultValues: {
@@ -20,14 +20,14 @@ export function useCreateBusiness() {
       email: '',
       phone: '',
       address: '',
-      color: '#007AFF'
-    }
+      color: '#007AFF',
+    },
   })
 
   const { trigger } = form
 
   const mutation = useMutation({
-    mutationFn: (data: any) => BusinessService.create(data),
+    mutationFn: (data: any) => businessService.create(data),
     onMutate: async (newBusiness: any) => {
       await queryClient.cancelQueries({ queryKey: ['businesses'] })
       const previousBusinesses = queryClient.getQueryData(['businesses'])
@@ -50,7 +50,7 @@ export function useCreateBusiness() {
       if (newBusiness) {
         setActiveBusiness(newBusiness)
       }
-    }
+    },
   })
 
   const nextStep = async () => {
@@ -60,11 +60,11 @@ export function useCreateBusiness() {
     } else if (step === 2) {
       isValid = await trigger(['email'])
     }
-    
-    if (isValid) setStep(s => Math.min(s + 1, 3))
+
+    if (isValid) setStep((s) => Math.min(s + 1, 3))
   }
 
-  const prevStep = () => setStep(s => Math.max(s - 1, 1))
+  const prevStep = () => setStep((s) => Math.max(s - 1, 1))
 
   return {
     form,

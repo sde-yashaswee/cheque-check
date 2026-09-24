@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { chequeSchema } from '@/validators'
-import { ChequeService } from '@/services/cheque.service'
+import { chequeService } from '@/services/cheque.service'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 
@@ -12,10 +12,14 @@ type ChequeFormData = z.infer<typeof chequeSchema>
 export function useEditCheque(id: string) {
   const router = useRouter()
   const queryClient = useQueryClient()
-  
-  const { data: cheque, isLoading, error } = useQuery({
+
+  const {
+    data: cheque,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['cheque', id],
-    queryFn: () => ChequeService.getById(id),
+    queryFn: () => chequeService.getById(id),
   })
 
   const form = useForm<ChequeFormData>({
@@ -30,7 +34,7 @@ export function useEditCheque(id: string) {
       type: 'Outward',
       notes: '',
       image_url: null,
-    }
+    },
   })
 
   const { reset } = form
@@ -52,7 +56,7 @@ export function useEditCheque(id: string) {
   }, [cheque, reset])
 
   const updateMutation = useMutation({
-    mutationFn: (data: ChequeFormData) => ChequeService.update(id, data),
+    mutationFn: (data: ChequeFormData) => chequeService.update(id, data),
     onMutate: async (newCheque) => {
       const businessId = cheque?.business_id
       if (businessId) {
@@ -60,7 +64,7 @@ export function useEditCheque(id: string) {
         const prev = queryClient.getQueryData(['cheques', businessId])
         queryClient.setQueryData(['cheques', businessId], (old: any[]) => {
           if (!old) return old
-          return old.map((c) => c.id === id ? { ...c, ...newCheque } : c)
+          return old.map((c) => (c.id === id ? { ...c, ...newCheque } : c))
         })
         return { previousCheques: prev }
       }
@@ -68,19 +72,24 @@ export function useEditCheque(id: string) {
     onError: (err, newCheque, context: any) => {
       const businessId = cheque?.business_id
       if (businessId && context?.previousCheques) {
-        queryClient.setQueryData(['cheques', businessId], context.previousCheques)
+        queryClient.setQueryData(
+          ['cheques', businessId],
+          context.previousCheques,
+        )
       }
     },
     onSettled: () => {
       if (cheque?.business_id) {
-        queryClient.invalidateQueries({ queryKey: ['cheques', cheque.business_id] })
+        queryClient.invalidateQueries({
+          queryKey: ['cheques', cheque.business_id],
+        })
       }
       queryClient.invalidateQueries({ queryKey: ['cheque', id] })
-    }
+    },
   })
 
   const deleteMutation = useMutation({
-    mutationFn: () => ChequeService.delete(id),
+    mutationFn: () => chequeService.delete(id),
     onMutate: async () => {
       const businessId = cheque?.business_id
       if (businessId) {
@@ -96,14 +105,19 @@ export function useEditCheque(id: string) {
     onError: (err, variables, context: any) => {
       const businessId = cheque?.business_id
       if (businessId && context?.previousCheques) {
-        queryClient.setQueryData(['cheques', businessId], context.previousCheques)
+        queryClient.setQueryData(
+          ['cheques', businessId],
+          context.previousCheques,
+        )
       }
     },
     onSettled: () => {
       if (cheque?.business_id) {
-        queryClient.invalidateQueries({ queryKey: ['cheques', cheque.business_id] })
+        queryClient.invalidateQueries({
+          queryKey: ['cheques', cheque.business_id],
+        })
       }
-    }
+    },
   })
 
   const onSubmit = form.handleSubmit((data) => {

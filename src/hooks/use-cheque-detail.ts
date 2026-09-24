@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ChequeService } from '@/services/cheque.service'
+import { chequeService } from '@/services/cheque.service'
 import { ChequeStatus, ChequeWithRelations } from '@/types'
 
 export function useChequeDetail(id: string) {
@@ -11,12 +11,12 @@ export function useChequeDetail(id: string) {
     error,
   } = useQuery({
     queryKey: ['cheque', id],
-    queryFn: () => ChequeService.getById(id),
+    queryFn: () => chequeService.getById(id),
   })
 
   const mutation = useMutation({
     mutationFn: (status: ChequeStatus) =>
-      ChequeService.updateStatus(id, status),
+      chequeService.updateStatus(id, status),
     onMutate: async (status) => {
       await queryClient.cancelQueries({ queryKey: ['cheque', id] })
       const previousCheque = queryClient.getQueryData<ChequeWithRelations>([

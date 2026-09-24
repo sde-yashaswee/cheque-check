@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ChequeService } from '@/services/cheque.service'
+import { chequeService } from '@/services/cheque.service'
 import { useState, useMemo } from 'react'
 import { ChequeStatus, ChequeWithRelations } from '@/types'
 import { useProfile } from './use-profile'
@@ -21,13 +21,13 @@ export function useCheques(businessId: string | undefined) {
     error,
   } = useQuery<ChequeWithRelations[]>({
     queryKey: ['cheques', businessId],
-    queryFn: () => ChequeService.getAll(businessId!),
+    queryFn: () => chequeService.getAll(businessId!),
     enabled: !!businessId,
   })
 
   const mutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: ChequeStatus }) =>
-      ChequeService.updateStatus(id, status),
+      chequeService.updateStatus(id, status),
     onMutate: async ({ id, status }) => {
       await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
       const prev = queryClient.getQueryData<ChequeWithRelations[]>([
@@ -57,7 +57,7 @@ export function useCheques(businessId: string | undefined) {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => ChequeService.delete(id),
+    mutationFn: (id: string) => chequeService.delete(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
       const prev = queryClient.getQueryData<ChequeWithRelations[]>([

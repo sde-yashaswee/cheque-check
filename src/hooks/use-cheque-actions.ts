@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { ChequeService } from '@/services/cheque.service'
+import { chequeService } from '@/services/cheque.service'
 import { ChequeStatus, ChequeWithRelations } from '@/types'
 import { useBusiness } from './use-business'
 
@@ -9,7 +9,7 @@ export function useChequeActions() {
 
   const updateStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: ChequeStatus }) =>
-      ChequeService.updateStatus(id, status),
+      chequeService.updateStatus(id, status),
     onMutate: async ({ id, status }) => {
       // Invalidate/Update list cache
       let previousCheques: ChequeWithRelations[] = []
@@ -55,7 +55,7 @@ export function useChequeActions() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => ChequeService.delete(id),
+    mutationFn: (id: string) => chequeService.delete(id),
     onMutate: async (id) => {
       let previousCheques: ChequeWithRelations[] = []
       if (activeBusiness?.id) {

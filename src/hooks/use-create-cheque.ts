@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { chequeSchema } from '@/validators'
-import { ChequeService } from '@/services/cheque.service'
+import { chequeService } from '@/services/cheque.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { StorageService } from '@/services/storage.service'
@@ -12,6 +12,7 @@ import { useTranslations } from 'next-intl'
 import { ChequeWithRelations, Party } from '@/types'
 import { getInitialChequeStatus } from '@/lib/cheque-state'
 import { useProfile } from './use-profile'
+import { ConflictError } from '@/lib/errors'
 
 type ChequeFormValues = z.infer<typeof chequeSchema>
 
@@ -55,7 +56,7 @@ export function useCreateCheque(
       if (!businessId)
         throw new Error('Select a business before creating a cheque')
 
-      return ChequeService.create({
+      return chequeService.create({
         ...data,
         business_id: businessId,
         image_url: data.image_url ?? null,
@@ -118,13 +119,9 @@ export function useCreateCheque(
         context?.previousCheques,
       )
 
-      const errorCode =
-        typeof error === 'object' && error && 'code' in error
-          ? error.code
-          : undefined
       const errorMessage = error instanceof Error ? error.message : tc('error')
 
-      if (errorCode === '23505') {
+      if (error instanceof ConflictError) {
         toast.add({
           title: tc('error'),
           description: t('duplicateChequeError'),

@@ -1,36 +1,36 @@
 'use client'
 
 import { useState } from 'react'
-import { 
-  UserIcon as User, 
-  Mail01Icon as Mail, 
-  LockPasswordIcon as Lock, 
-  CallIcon as Phone, 
-  Calendar03Icon as Calendar, 
-  HashtagIcon as Hash, 
-  Note01Icon as Note, 
-  Search01Icon as Search, 
-  Location01Icon as Location, 
+import {
+  UserIcon as User,
+  Mail01Icon as Mail,
+  LockPasswordIcon as Lock,
+  CallIcon as Phone,
+  Calendar03Icon as Calendar,
+  HashtagIcon as Hash,
+  Note01Icon as Note,
+  Search01Icon as Search,
+  Location01Icon as Location,
   TextFontIcon as TextIcon,
-  Wallet01Icon as Wallet, 
-  Building03Icon as Building2, 
-  Settings02Icon as Settings2, 
-  CheckmarkCircle01Icon as CheckCircle2, 
-  Notification01Icon as Bell, 
-  ArrowRight01Icon as ArrowRight, 
-  ArrowLeft01Icon as ArrowLeft, 
-  Location01Icon as MapPin, 
-  Tick02Icon as Check 
-} from '@hugeicons/core-free-icons';
+  Wallet01Icon as Wallet,
+  Building03Icon as Building2,
+  Settings02Icon as Settings2,
+  CheckmarkCircle01Icon as CheckCircle2,
+  Notification01Icon as Bell,
+  ArrowRight01Icon as ArrowRight,
+  ArrowLeft01Icon as ArrowLeft,
+  Location01Icon as MapPin,
+  Tick02Icon as Check,
+} from '@hugeicons/core-free-icons'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { BusinessService } from '@/services/business.service'
+import { businessService } from '@/services/business.service'
 import { useBusiness } from '@/hooks/use-business'
 import { useProfile } from '@/hooks/use-profile'
 import { useQueryClient } from '@tanstack/react-query'
-import { HugeiconsIcon } from '@hugeicons/react';
+import { HugeiconsIcon } from '@hugeicons/react'
 import { Combobox } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -44,7 +44,15 @@ import {
 } from '@/components/reui/stepper'
 import { useTranslations } from 'next-intl'
 
-const COLORS = ['#0066cc', '#34C759', '#FF9500', '#FF3B30', '#AF52DE', '#5856D6', '#8E8E93']
+const COLORS = [
+  '#0066cc',
+  '#34C759',
+  '#FF9500',
+  '#FF3B30',
+  '#AF52DE',
+  '#5856D6',
+  '#8E8E93',
+]
 
 const CURRENCY_OPTIONS = [
   { label: '₹ (INR)', value: '₹' },
@@ -79,7 +87,7 @@ const TIMEZONE_OPTIONS = [
 export default function OnboardingPage() {
   const t = useTranslations('Onboarding')
   const tc = useTranslations('Common')
-  
+
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -116,10 +124,12 @@ export default function OnboardingPage() {
   })
 
   // Synchronize form data with profile when it loads
-  const [prevProfileId, setPrevProfileId] = useState<string | undefined>(profile?.id)
+  const [prevProfileId, setPrevProfileId] = useState<string | undefined>(
+    profile?.id,
+  )
   if (profile && profile.id !== prevProfileId) {
     setPrevProfileId(profile.id)
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       currency: profile.currency || '₹',
       dateFormat: profile.date_format || 'dd/MM/yyyy',
@@ -131,14 +141,14 @@ export default function OnboardingPage() {
     }))
   }
 
-  const nextStep = () => setStep(s => Math.min(s + 1, 5))
-  const prevStep = () => setStep(s => Math.max(s - 1, 1))
+  const nextStep = () => setStep((s) => Math.min(s + 1, 5))
+  const prevStep = () => setStep((s) => Math.max(s - 1, 1))
 
   const handleFinish = async () => {
     setLoading(true)
     try {
       // 1. Create Business
-      const business = await BusinessService.create({
+      const business = await businessService.create({
         name: formData.businessName,
         email: formData.businessEmail || null,
         phone: formData.businessPhone || null,
@@ -157,12 +167,12 @@ export default function OnboardingPage() {
         time_zone: formData.timeZone,
         language: formData.language,
         reminders_per_day: parseInt(formData.remindersPerDay),
-        default_reminder_days: parseInt(formData.defaultReminderDays)
+        default_reminder_days: parseInt(formData.defaultReminderDays),
       })
 
       setStep(5)
     } catch (error) {
-      alert(error instanceof Error ? error.message : "An error occurred")
+      alert(error instanceof Error ? error.message : 'An error occurred')
     } finally {
       setLoading(false)
     }
@@ -171,13 +181,12 @@ export default function OnboardingPage() {
   const containerVariants = {
     initial: { opacity: 0, x: 20 },
     animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -20 }
+    exit: { opacity: 0, x: -20 },
   }
 
   return (
     <div className="min-h-full bg-background dark:bg-black selection:bg-primary/10 transition-colors duration-500">
       <div className="mx-auto max-w-2xl px-6 py-12 md:py-24 space-y-12">
-        
         {/* Header */}
         <div className="relative flex items-center justify-center min-h-[64px]">
           <AnimatePresence mode="wait">
@@ -188,13 +197,13 @@ export default function OnboardingPage() {
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="absolute left-0"
               >
-                <Button 
+                <Button
                   variant="ghost"
                   size="icon"
-                  onClick={prevStep} 
+                  onClick={prevStep}
                   className="rounded-full h-12 w-12 hover:bg-canvas-parchment"
                 >
-                  <HugeiconsIcon icon={ArrowLeft} className="h-6 w-6"/>
+                  <HugeiconsIcon icon={ArrowLeft} className="h-6 w-6" />
                 </Button>
               </motion.div>
             )}
@@ -202,10 +211,27 @@ export default function OnboardingPage() {
           <div className="text-center">
             {step < 5 ? (
               <h1 className="text-display-md md:text-display-lg font-semibold tracking-tight text-ink dark:text-white flex items-center justify-center gap-3">
-                {step === 1 && <HugeiconsIcon icon={Wallet} className="h-8 w-8 text-primary"/>}
-                {step === 2 && <HugeiconsIcon icon={Building2} className="h-8 w-8 text-primary"/>}
-                {step === 3 && <HugeiconsIcon icon={Settings2} className="h-8 w-8 text-primary"/>}
-                {step === 4 && <HugeiconsIcon icon={Bell} className="h-8 w-8 text-primary"/>}
+                {step === 1 && (
+                  <HugeiconsIcon
+                    icon={Wallet}
+                    className="h-8 w-8 text-primary"
+                  />
+                )}
+                {step === 2 && (
+                  <HugeiconsIcon
+                    icon={Building2}
+                    className="h-8 w-8 text-primary"
+                  />
+                )}
+                {step === 3 && (
+                  <HugeiconsIcon
+                    icon={Settings2}
+                    className="h-8 w-8 text-primary"
+                  />
+                )}
+                {step === 4 && (
+                  <HugeiconsIcon icon={Bell} className="h-8 w-8 text-primary" />
+                )}
                 <span>
                   {step === 1 && t('welcome')}
                   {step === 2 && t('businessDetails')}
@@ -214,7 +240,9 @@ export default function OnboardingPage() {
                 </span>
               </h1>
             ) : (
-              <h1 className="text-display-lg font-semibold tracking-tight text-ink dark:text-white">{t('allSet')}</h1>
+              <h1 className="text-display-lg font-semibold tracking-tight text-ink dark:text-white">
+                {t('allSet')}
+              </h1>
             )}
           </div>
         </div>
@@ -236,15 +264,27 @@ export default function OnboardingPage() {
                 disabled={step === 1}
                 className="rounded-full h-8 w-8 shrink-0 hover:bg-canvas-parchment"
               >
-                <HugeiconsIcon icon={ArrowLeft} className="h-4 w-4"/>
+                <HugeiconsIcon icon={ArrowLeft} className="h-4 w-4" />
               </Button>
-              
+
               <StepperNav className="gap-3 flex-1">
                 {[
-                  { title: tc('welcome'), icon: <HugeiconsIcon icon={Wallet} className="size-4" /> },
-                  { title: tc('businesses'), icon: <HugeiconsIcon icon={Building2} className="size-4" /> },
-                  { title: tc('activeNow'), icon: <HugeiconsIcon icon={Settings2} className="size-4" /> },
-                  { title: t('notifications'), icon: <HugeiconsIcon icon={Bell} className="size-4" /> }
+                  {
+                    title: tc('welcome'),
+                    icon: <HugeiconsIcon icon={Wallet} className="size-4" />,
+                  },
+                  {
+                    title: tc('businesses'),
+                    icon: <HugeiconsIcon icon={Building2} className="size-4" />,
+                  },
+                  {
+                    title: tc('activeNow'),
+                    icon: <HugeiconsIcon icon={Settings2} className="size-4" />,
+                  },
+                  {
+                    title: t('notifications'),
+                    icon: <HugeiconsIcon icon={Bell} className="size-4" />,
+                  },
                 ].map((s, index) => (
                   <StepperItem
                     key={index}
@@ -270,7 +310,7 @@ export default function OnboardingPage() {
                 disabled={step === 4 || (step === 1 && !formData.businessName)}
                 className="rounded-full h-8 w-8 shrink-0 hover:bg-canvas-parchment"
               >
-                <HugeiconsIcon icon={ArrowRight} className="h-4 w-4"/>
+                <HugeiconsIcon icon={ArrowRight} className="h-4 w-4" />
               </Button>
             </div>
           </Stepper>
@@ -279,7 +319,7 @@ export default function OnboardingPage() {
         <div className="relative min-h-[400px]">
           <AnimatePresence mode="wait">
             {step === 1 && (
-              <motion.div 
+              <motion.div
                 key="step1"
                 variants={containerVariants}
                 initial="initial"
@@ -289,29 +329,46 @@ export default function OnboardingPage() {
               >
                 <div className="space-y-6">
                   <div className="space-y-3">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('businessName')}</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                      {t('businessName')}
+                    </Label>
                     <div className="relative group">
-                      <HugeiconsIcon icon={Building2} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary"/>
-                      <Input leftIcon={TextIcon}  
-                        placeholder={t('businessNamePlaceholder')} 
+                      <HugeiconsIcon
+                        icon={Building2}
+                        className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary"
+                      />
+                      <Input
+                        leftIcon={TextIcon}
+                        placeholder={t('businessNamePlaceholder')}
                         value={formData.businessName}
-                        onChange={(e) => setFormData({...formData, businessName: e.target.value})}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            businessName: e.target.value,
+                          })
+                        }
                         className="h-14 pl-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none text-xl font-medium rounded-sm transition-all focus:ring-2 focus:ring-primary/20"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('brandColor')}</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                      {t('brandColor')}
+                    </Label>
                     <div className="flex flex-wrap gap-4 p-1">
                       {COLORS.map((c) => (
                         <button
                           key={c}
                           type="button"
-                          onClick={() => setFormData({...formData, businessColor: c})}
+                          onClick={() =>
+                            setFormData({ ...formData, businessColor: c })
+                          }
                           className={cn(
-                            "h-12 w-12 rounded-full transition-all active:scale-95 ring-offset-4 dark:ring-offset-black",
-                            formData.businessColor === c ?"ring-2 ring-primary scale-110":"hover:scale-105 opacity-80 hover:opacity-100"
+                            'h-12 w-12 rounded-full transition-all active:scale-95 ring-offset-4 dark:ring-offset-black',
+                            formData.businessColor === c
+                              ? 'ring-2 ring-primary scale-110'
+                              : 'hover:scale-105 opacity-80 hover:opacity-100',
                           )}
                           style={{ backgroundColor: c }}
                         />
@@ -319,19 +376,20 @@ export default function OnboardingPage() {
                     </div>
                   </div>
                 </div>
-                
-                <Button 
+
+                <Button
                   className="w-full rounded-pill h-14 text-lg font-medium active:scale-95 transition-transform"
-                  onClick={nextStep} 
+                  onClick={nextStep}
                   disabled={!formData.businessName}
                 >
-                  {t('getStarted')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
+                  {t('getStarted')}{' '}
+                  <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
                 </Button>
               </motion.div>
             )}
 
             {step === 2 && (
-              <motion.div 
+              <motion.div
                 key="step2"
                 variants={containerVariants}
                 initial="initial"
@@ -341,57 +399,91 @@ export default function OnboardingPage() {
               >
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('businessEmail')}</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                      {t('businessEmail')}
+                    </Label>
                     <div className="relative group">
-                      <HugeiconsIcon icon={Mail} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"/>
-                      <Input leftIcon={Mail}  
+                      <HugeiconsIcon
+                        icon={Mail}
+                        className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"
+                      />
+                      <Input
+                        leftIcon={Mail}
                         type="email"
-                        placeholder={t('businessEmailPlaceholder')} 
+                        placeholder={t('businessEmailPlaceholder')}
                         value={formData.businessEmail}
-                        onChange={(e) => setFormData({...formData, businessEmail: e.target.value})}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            businessEmail: e.target.value,
+                          })
+                        }
                         className="h-14 pl-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none text-lg rounded-sm"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('businessPhone')}</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                      {t('businessPhone')}
+                    </Label>
                     <div className="relative group">
-                      <HugeiconsIcon icon={Phone} className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"/>
-                      <Input leftIcon={TextIcon}  
-                        placeholder={t('businessPhonePlaceholder')} 
+                      <HugeiconsIcon
+                        icon={Phone}
+                        className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"
+                      />
+                      <Input
+                        leftIcon={TextIcon}
+                        placeholder={t('businessPhonePlaceholder')}
                         value={formData.businessPhone}
-                        onChange={(e) => setFormData({...formData, businessPhone: e.target.value})}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            businessPhone: e.target.value,
+                          })
+                        }
                         className="h-14 pl-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none text-lg rounded-sm"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('headquarters')}</Label>
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                      {t('headquarters')}
+                    </Label>
                     <div className="relative group">
-                      <HugeiconsIcon icon={MapPin} className="absolute left-5 top-5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"/>
-                      <Input leftIcon={TextIcon}  
-                        placeholder={t('headquartersPlaceholder')} 
+                      <HugeiconsIcon
+                        icon={MapPin}
+                        className="absolute left-5 top-5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"
+                      />
+                      <Input
+                        leftIcon={TextIcon}
+                        placeholder={t('headquartersPlaceholder')}
                         value={formData.businessAddress}
-                        onChange={(e) => setFormData({...formData, businessAddress: e.target.value})}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            businessAddress: e.target.value,
+                          })
+                        }
                         className="h-14 pl-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none text-lg rounded-sm"
                       />
                     </div>
                   </div>
                 </div>
 
-                <Button 
+                <Button
                   className="w-full rounded-pill h-14 text-lg font-medium active:scale-95 transition-transform"
                   onClick={nextStep}
                 >
-                  {tc('continue')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
+                  {tc('continue')}{' '}
+                  <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
                 </Button>
               </motion.div>
             )}
 
             {step === 3 && (
-              <motion.div 
+              <motion.div
                 key="step3"
                 variants={containerVariants}
                 initial="initial"
@@ -401,67 +493,88 @@ export default function OnboardingPage() {
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('currency')}</Label>
-                    <Combobox 
-                      options={CURRENCY_OPTIONS} 
-                      value={formData.currency} 
-                      onValueChange={(v) => setFormData({...formData, currency: v})}
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                      {t('currency')}
+                    </Label>
+                    <Combobox
+                      options={CURRENCY_OPTIONS}
+                      value={formData.currency}
+                      onValueChange={(v) =>
+                        setFormData({ ...formData, currency: v })
+                      }
                       className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('language')}</Label>
-                    <Combobox 
-                      options={LANGUAGE_OPTIONS} 
-                      value={formData.language} 
-                      onValueChange={(v) => setFormData({...formData, language: v})}
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                      {t('language')}
+                    </Label>
+                    <Combobox
+                      options={LANGUAGE_OPTIONS}
+                      value={formData.language}
+                      onValueChange={(v) =>
+                        setFormData({ ...formData, language: v })
+                      }
                       className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('dateFormat')}</Label>
-                  <Combobox 
-                    options={DATE_FORMAT_OPTIONS} 
-                    value={formData.dateFormat} 
-                    onValueChange={(v) => setFormData({...formData, dateFormat: v})}
+                  <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                    {t('dateFormat')}
+                  </Label>
+                  <Combobox
+                    options={DATE_FORMAT_OPTIONS}
+                    value={formData.dateFormat}
+                    onValueChange={(v) =>
+                      setFormData({ ...formData, dateFormat: v })
+                    }
                     className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('timeFormat')}</Label>
-                    <Combobox 
-                      options={TIME_FORMAT_OPTIONS} 
-                      value={formData.timeFormat} 
-                      onValueChange={(v) => setFormData({...formData, timeFormat: v})}
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                      {t('timeFormat')}
+                    </Label>
+                    <Combobox
+                      options={TIME_FORMAT_OPTIONS}
+                      value={formData.timeFormat}
+                      onValueChange={(v) =>
+                        setFormData({ ...formData, timeFormat: v })
+                      }
                       className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('timeZone')}</Label>
-                    <Combobox 
-                      options={TIMEZONE_OPTIONS} 
-                      value={formData.timeZone} 
-                      onValueChange={(v) => setFormData({...formData, timeZone: v})}
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                      {t('timeZone')}
+                    </Label>
+                    <Combobox
+                      options={TIMEZONE_OPTIONS}
+                      value={formData.timeZone}
+                      onValueChange={(v) =>
+                        setFormData({ ...formData, timeZone: v })
+                      }
                       className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
                     />
                   </div>
                 </div>
 
-                <Button 
+                <Button
                   className="w-full rounded-pill h-14 text-lg font-medium active:scale-95 transition-transform"
                   onClick={nextStep}
                 >
-                  {t('looksGood')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5"/>
+                  {t('looksGood')}{' '}
+                  <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
                 </Button>
               </motion.div>
             )}
 
             {step === 4 && (
-              <motion.div 
+              <motion.div
                 key="step4"
                 variants={containerVariants}
                 initial="initial"
@@ -471,70 +584,92 @@ export default function OnboardingPage() {
               >
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('dailyFrequency')}</Label>
-                    <Combobox 
-                      options={REMINDERS_PER_DAY_OPTIONS} 
-                      value={formData.remindersPerDay} 
-                      onValueChange={(v) => setFormData({...formData, remindersPerDay: v})}
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                      {t('dailyFrequency')}
+                    </Label>
+                    <Combobox
+                      options={REMINDERS_PER_DAY_OPTIONS}
+                      value={formData.remindersPerDay}
+                      onValueChange={(v) =>
+                        setFormData({ ...formData, remindersPerDay: v })
+                      }
                       className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
                     />
-                    <p className="text-[11px] text-muted-foreground px-1">{t('dailyFrequencyHelp')}</p>
+                    <p className="text-[11px] text-muted-foreground px-1">
+                      {t('dailyFrequencyHelp')}
+                    </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{t('advancedWarning')}</Label>
-                    <Combobox 
-                      options={REMINDER_FREQUENCY_OPTIONS} 
-                      value={formData.defaultReminderDays} 
-                      onValueChange={(v) => setFormData({...formData, defaultReminderDays: v})}
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                      {t('advancedWarning')}
+                    </Label>
+                    <Combobox
+                      options={REMINDER_FREQUENCY_OPTIONS}
+                      value={formData.defaultReminderDays}
+                      onValueChange={(v) =>
+                        setFormData({ ...formData, defaultReminderDays: v })
+                      }
                       className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
                     />
-                    <p className="text-[11px] text-muted-foreground px-1">{t('advancedWarningHelp')}</p>
+                    <p className="text-[11px] text-muted-foreground px-1">
+                      {t('advancedWarningHelp')}
+                    </p>
                   </div>
                 </div>
 
                 <div className="p-6 rounded-lg bg-primary/5 dark:bg-primary/10 border border-primary/10 space-y-4">
                   <div className="flex items-center gap-4">
-                    <div 
+                    <div
                       className="h-12 w-12 rounded-full flex items-center justify-center text-white text-xl font-bold"
                       style={{ backgroundColor: formData.businessColor }}
                     >
                       {formData.businessName?.charAt(0) || 'B'}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-ink dark:text-white">{formData.businessName}</h3>
-                      <p className="text-sm text-muted-foreground">{t('readyToManage')}</p>
+                      <h3 className="font-semibold text-ink dark:text-white">
+                        {formData.businessName}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {t('readyToManage')}
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <Button 
+                <Button
                   className="w-full rounded-pill h-14 text-lg font-medium active:scale-95 transition-transform"
                   onClick={handleFinish}
                   disabled={loading}
                 >
-                  {loading ? t('completingSetup') : t('finishSetup')} <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5"/>
+                  {loading ? t('completingSetup') : t('finishSetup')}{' '}
+                  <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
                 </Button>
               </motion.div>
             )}
 
             {step === 5 && (
-              <motion.div 
+              <motion.div
                 key="step5"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="flex flex-col items-center text-center space-y-12 py-12"
               >
                 <div className="relative">
-                  <motion.div 
+                  <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ type:"spring", damping: 12, stiffness: 200, delay: 0.2 }}
+                    transition={{
+                      type: 'spring',
+                      damping: 12,
+                      stiffness: 200,
+                      delay: 0.2,
+                    }}
                     className="flex h-32 w-32 items-center justify-center rounded-full bg-green-500 text-white"
                   >
-                    <HugeiconsIcon icon={CheckCircle2} className="h-16 w-16"/>
+                    <HugeiconsIcon icon={CheckCircle2} className="h-16 w-16" />
                   </motion.div>
-                  <motion.div 
+                  <motion.div
                     animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.1, 0.3] }}
                     transition={{ duration: 2, repeat: Infinity }}
                     className="absolute inset-0 bg-green-500 rounded-full -z-10"
@@ -542,17 +677,20 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <h2 className="text-display-md font-semibold tracking-tight">{t('readyToGo')}</h2>
+                  <h2 className="text-display-md font-semibold tracking-tight">
+                    {t('readyToGo')}
+                  </h2>
                   <p className="text-lead text-muted-foreground max-w-sm mx-auto">
                     {t('successMessage')}
                   </p>
                 </div>
 
-                <Button 
-                  onClick={() => router.push('/')} 
+                <Button
+                  onClick={() => router.push('/')}
                   className="w-full max-w-sm rounded-pill h-14 text-xl font-semibold hover:scale-105 active:scale-95 transition-all"
                 >
-                  {t('enterDashboard')} <HugeiconsIcon icon={ArrowRight} className="ml-2 h-6 w-6"/>
+                  {t('enterDashboard')}{' '}
+                  <HugeiconsIcon icon={ArrowRight} className="ml-2 h-6 w-6" />
                 </Button>
               </motion.div>
             )}
