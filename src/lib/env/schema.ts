@@ -24,6 +24,10 @@ export const razorpayEnvSchema = z.object({
   RAZORPAY_KEY_SECRET: z.string().min(1),
 })
 
+export const supabaseAdminEnvSchema = z.object({
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+})
+
 export function envError(scope: string, error: z.ZodError) {
   return new Error(
     `Invalid ${scope} environment variables:\n${z.prettifyError(error)}`,
