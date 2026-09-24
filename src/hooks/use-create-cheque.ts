@@ -10,7 +10,7 @@ import { z } from 'zod'
 import { toast } from '@/components/ui/toast'
 import { useTranslations } from 'next-intl'
 import { ChequeWithRelations, Party } from '@/types'
-import { getInitialChequeStatus } from '@/lib/cheque-state'
+import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useProfile } from './use-profile'
 import { ConflictError } from '@/lib/errors'
 
@@ -62,7 +62,7 @@ export function useCreateCheque(
         image_url: data.image_url ?? null,
         notes: data.notes || null,
         remind_before_days: profile?.default_reminder_days ?? null,
-        status: getInitialChequeStatus(data.type),
+        status: ChequeEntity.initialStatusFor(data.type),
       })
     },
     onMutate: async (newCheque) => {
@@ -89,7 +89,7 @@ export function useCreateCheque(
             image_url: newCheque.image_url ?? null,
             notes: newCheque.notes || null,
             remind_before_days: profile?.default_reminder_days ?? null,
-            status: getInitialChequeStatus(newCheque.type),
+            status: ChequeEntity.initialStatusFor(newCheque.type),
             voice_call_sent: false,
             last_call_at: null,
             created_at: new Date().toISOString(),
