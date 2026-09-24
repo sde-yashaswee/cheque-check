@@ -6,6 +6,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { publicEnv } from '@/lib/env/client'
 import { getOpenAiEnv } from '@/lib/env/server'
+import { parsePrivateMediaUrl, PRIVATE_CHEQUE_BUCKET } from '@/lib/storage'
 
 /**
  * Schema for extracting cheque details.
@@ -56,7 +57,13 @@ const ChequeDetailsSchema = z.object({
 type ChequeDetails = z.infer<typeof ChequeDetailsSchema>
 
 const OcrRequestSchema = z.object({
-  imageUrl: z.url(),
+  imageUrl: z
+    .string()
+    .refine(
+      (value) =>
+        z.url().safeParse(value).success || parsePrivateMediaUrl(value),
+      'A valid image URL is required',
+    ),
 })
 
 /**
@@ -162,13 +169,31 @@ class OcrController {
         return this.respondWithError('A valid image URL is required.', 400)
       }
       const { imageUrl } = requestResult.data
+      let providerImageUrl = imageUrl
+      const privateMedia = parsePrivateMediaUrl(imageUrl)
 
-      logger.info(
-        `[OcrController] Processing request for user ${user.id} for image: ${imageUrl}`,
-        { imageUrl },
-      )
+      if (privateMedia) {
+        if (
+          privateMedia.bucket !== PRIVATE_CHEQUE_BUCKET ||
+          privateMedia.path[0] !== user.id
+        ) {
+          return this.respondWithError('Forbidden image reference.', 403)
+        }
 
-      const result = await this.ocrProvider.processImage(imageUrl)
+        const { data: signedImage, error: signedImageError } =
+          await supabase.storage
+            .from(privateMedia.bucket)
+            .createSignedUrl(privateMedia.path.join('/'), 300)
+
+        if (signedImageError || !signedImage?.signedUrl) {
+          return this.respondWithError('Cheque image not found.', 404)
+        }
+        providerImageUrl = signedImage.signedUrl
+      }
+
+      logger.info(`[OcrController] Processing request for user ${user.id}`)
+
+      const result = await this.ocrProvider.processImage(providerImageUrl)
 
       // Increment usage
       await supabase
