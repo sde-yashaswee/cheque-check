@@ -1,87 +1,56 @@
-import { createClient } from '@/lib/supabase/client'
 import { Profile } from '@/types'
+import {
+  IProfileRepository,
+  SupabaseProfileRepository,
+} from '@/repositories/profile.repository'
 
-export const ProfileService = {
-  async get() {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return null
+let defaultProfileService: ProfileService | undefined
 
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .is('deleted_at', null)
-      .maybeSingle()
+function getDefaultProfileService(): ProfileService {
+  if (!defaultProfileService) {
+    defaultProfileService = new ProfileService()
+  }
 
-    if (error) throw error
-    
-    if (!data) {
-      const { data: existing } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle()
+  return defaultProfileService
+}
 
-      if (existing && existing.deleted_at) {
-        // Reactivate soft-deleted profile
-        const { data: reactivated, error: reactError } = await supabase
-          .from('profiles')
-          .update({ deleted_at: null })
-          .eq('user_id', user.id)
-          .select()
-          .single()
-        if (reactError) throw reactError
-        return reactivated as Profile
-      }
+export class ProfileService {
+  constructor(
+    private readonly repository: IProfileRepository = new SupabaseProfileRepository(),
+  ) {}
 
-      if (!existing) {
-        const { data: newProfile, error: createError } = await supabase
-          .from('profiles')
-          .insert([{ 
-            user_id: user.id, 
-            email: user.email,
-            name: user.user_metadata?.name || ''
-          }])
-          .select()
-          .single()
-        
-        if (createError) throw createError
-        return newProfile as Profile
-      }
-    }
+  static async get(): Promise<Profile | null> {
+    return getDefaultProfileService().get()
+  }
 
-    return data as Profile
-  },
+  static async update(profile: Partial<Profile>): Promise<Profile> {
+    return getDefaultProfileService().update(profile)
+  }
 
-  async update(profile: Partial<Profile>) {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('Not authenticated')
+  static async delete(): Promise<void> {
+    return getDefaultProfileService().delete()
+  }
 
-    const { data, error } = await supabase
-      .from('profiles')
-      .update(profile)
-      .eq('user_id', user.id)
-      .select()
-      .single()
+  async get(): Promise<Profile | null> {
+    return this.repository.get()
+  }
 
-    if (error) throw error
-    return data as Profile
-  },
+  async update(profile: Partial<Profile>): Promise<Profile> {
+    return this.repository.update(profile)
+  }
 
-  async delete() {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('Not authenticated')
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({ deleted_at: new Date().toISOString() })
-      .eq('user_id', user.id)
-
-    if (error) throw error
-
-    await supabase.auth.signOut()
+  async delete(): Promise<void> {
+    return this.repository.delete()
   }
 }
+
+export const profileService = new Proxy(
+  Object.create(ProfileService.prototype),
+  {
+    get(_target, property, receiver) {
+      const service = getDefaultProfileService()
+      const value = Reflect.get(service, property, receiver)
+      return typeof value === 'function' ? value.bind(service) : value
+    },
+  },
+)

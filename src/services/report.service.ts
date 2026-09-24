@@ -1,11 +1,40 @@
-import { ChequeWithRelations } from "@/types";
+import { ChequeWithRelations } from '@/types'
+
+let defaultReportService: ReportService | undefined
+
+function getDefaultReportService(): ReportService {
+  if (!defaultReportService) {
+    defaultReportService = new ReportService()
+  }
+
+  return defaultReportService
+}
 
 export class ReportService {
-  static exportToCSV(cheques: ChequeWithRelations[], filename: string = 'cheques_report.csv') {
-    if (!cheques || cheques.length === 0) return;
+  static exportToCSV(
+    cheques: ChequeWithRelations[],
+    filename: string = 'cheques_report.csv',
+  ) {
+    return getDefaultReportService().exportToCSV(cheques, filename)
+  }
 
-    const headers = ['Cheque Number', 'Party', 'Account', 'Amount', 'Date', 'Type', 'Status', 'Notes'];
-    const rows = cheques.map(c => [
+  exportToCSV(
+    cheques: ChequeWithRelations[],
+    filename: string = 'cheques_report.csv',
+  ) {
+    if (!cheques || cheques.length === 0) return
+
+    const headers = [
+      'Cheque Number',
+      'Party',
+      'Account',
+      'Amount',
+      'Date',
+      'Type',
+      'Status',
+      'Notes',
+    ]
+    const rows = cheques.map((c) => [
       c.cheque_number,
       c.party?.name || '',
       (c.account as any)?.bank?.name || '',
@@ -13,24 +42,32 @@ export class ReportService {
       c.cheque_date,
       c.type,
       c.status,
-      c.notes || ''
-    ]);
+      c.notes || '',
+    ])
 
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-    ].join('\n');
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
+    ].join('\n')
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
     if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', filename);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      link.setAttribute('download', filename)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
     }
   }
 }
+
+export const reportService = new Proxy(Object.create(ReportService.prototype), {
+  get(_target, property, receiver) {
+    const service = getDefaultReportService()
+    const value = Reflect.get(service, property, receiver)
+    return typeof value === 'function' ? value.bind(service) : value
+  },
+})

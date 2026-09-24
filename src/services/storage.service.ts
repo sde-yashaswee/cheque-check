@@ -31,12 +31,14 @@ async function uploadPrivateImage(
   return buildPrivateMediaUrl(bucket, filePath)
 }
 
-export const StorageService = {
-  async uploadChequeImage(file: File) {
+export class StorageService {
+  static async uploadChequeImage(file: File) {
     return uploadPrivateImage(PRIVATE_CHEQUE_BUCKET, file, 10 * 1024 * 1024)
-  },
+  }
 
-  async uploadAvatar(file: File) {
+  static async uploadAvatar(file: File) {
     return uploadPrivateImage(PRIVATE_AVATAR_BUCKET, file, 5 * 1024 * 1024)
-  },
+  }
 }
+
+export const storageService = new StorageService()

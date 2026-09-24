@@ -1,77 +1,60 @@
-import { createClient } from '@/lib/supabase/client';
+import {
+  Entitlement,
+  IMonetizationRepository,
+  Quota,
+  SupabaseMonetizationRepository,
+  Transaction,
+} from '@/repositories/monetization.repository'
 
-export interface Entitlement {
-  id: string;
-  user_id: string;
-  feature_id: string;
-  status: 'active' | 'expired' | 'canceled';
-  valid_until: string | null;
+let defaultMonetizationService: MonetizationService | undefined
+
+function getDefaultMonetizationService(): MonetizationService {
+  if (!defaultMonetizationService) {
+    defaultMonetizationService = new MonetizationService()
+  }
+
+  return defaultMonetizationService
 }
 
-export interface Quota {
-  id: string;
-  user_id: string;
-  feature_id: string;
-  used: number;
-  limit: number;
-  reset_at: string | null;
-}
-
-export interface Transaction {
-  id: string;
-  user_id: string;
-  razorpay_order_id: string | null;
-  razorpay_payment_id: string | null;
-  amount: number;
-  currency: string;
-  status: 'created' | 'authorized' | 'captured' | 'refunded' | 'failed';
-  type: 'lifetime' | 'subscription' | 'top_up';
-  feature_id: string;
-  created_at: string;
-  updated_at: string;
-}
+export type { Entitlement, Quota, Transaction }
 
 export class MonetizationService {
+  constructor(
+    private readonly repository: IMonetizationRepository = new SupabaseMonetizationRepository(),
+  ) {}
+
   static async getEntitlements(): Promise<Entitlement[]> {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return [];
-
-    const { data, error } = await supabase
-      .from('user_entitlements')
-      .select('*')
-      .eq('user_id', user.id);
-
-    if (error) throw error;
-    return data || [];
+    return getDefaultMonetizationService().getEntitlements()
   }
 
   static async getQuotas(): Promise<Quota[]> {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return [];
-
-    const { data, error } = await supabase
-      .from('user_quotas')
-      .select('*')
-      .eq('user_id', user.id);
-
-    if (error) throw error;
-    return data || [];
+    return getDefaultMonetizationService().getQuotas()
   }
 
   static async getTransactions(): Promise<Transaction[]> {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return [];
-
-    const { data, error } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data || [];
+    return getDefaultMonetizationService().getTransactions()
   }
-} 
+
+  async getEntitlements(): Promise<Entitlement[]> {
+    return this.repository.getEntitlements()
+  }
+
+  async getQuotas(): Promise<Quota[]> {
+    return this.repository.getQuotas()
+  }
+
+  async getTransactions(): Promise<Transaction[]> {
+    return this.repository.getTransactions()
+  }
+}
+
+export const monetizationService = new Proxy(
+  Object.create(MonetizationService.prototype),
+  {
+    get(_target, property, receiver) {
+      const service = getDefaultMonetizationService()
+      const value = Reflect.get(service, property, receiver)
+      return typeof value === 'function' ? value.bind(service) : value
+    },
+  },
+)

@@ -1,30 +1,67 @@
 import { createClient } from '@/lib/supabase/client'
 import { Provider } from '@supabase/supabase-js'
 
-const supabase = createClient()
+let defaultAuthService: AuthService | undefined
 
-export class AuthService {
-  static async loginWithPassword(email: string, password: string) {
-    return await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+function getDefaultAuthService(): AuthService {
+  if (!defaultAuthService) {
+    defaultAuthService = new AuthService()
   }
 
-  static async signupWithPassword(email: string, password: string, name: string) {
-    return await supabase.auth.signUp({
+  return defaultAuthService
+}
+
+export class AuthService {
+  private readonly supabase = createClient()
+
+  static async loginWithPassword(email: string, password: string) {
+    return getDefaultAuthService().loginWithPassword(email, password)
+  }
+
+  static async signupWithPassword(
+    email: string,
+    password: string,
+    name: string,
+  ) {
+    return getDefaultAuthService().signupWithPassword(email, password, name)
+  }
+
+  static async loginWithOAuth(provider: Provider) {
+    return getDefaultAuthService().loginWithOAuth(provider)
+  }
+
+  static async signOut() {
+    return getDefaultAuthService().signOut()
+  }
+
+  static async resetPassword(email: string) {
+    return getDefaultAuthService().resetPassword(email)
+  }
+
+  static async getSession() {
+    return getDefaultAuthService().getSession()
+  }
+
+  static async getUser() {
+    return getDefaultAuthService().getUser()
+  }
+
+  async loginWithPassword(email: string, password: string) {
+    return await this.supabase.auth.signInWithPassword({ email, password })
+  }
+
+  async signupWithPassword(email: string, password: string, name: string) {
+    return await this.supabase.auth.signUp({
       email,
       password,
       options: {
-        data: {
-          name,
-        },
+        data: { name },
       },
     })
   }
 
-  static async loginWithOAuth(provider: Provider) {
-    return await supabase.auth.signInWithOAuth({
+  async loginWithOAuth(provider: Provider) {
+    return await this.supabase.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
@@ -32,22 +69,32 @@ export class AuthService {
     })
   }
 
-  static async signOut() {
-    return await supabase.auth.signOut()
+  async signOut() {
+    return await this.supabase.auth.signOut()
   }
 
-  static async resetPassword(email: string) {
-    return await supabase.auth.resetPasswordForEmail(email, {
+  async resetPassword(email: string) {
+    return await this.supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/callback?next=/settings/password`,
     })
   }
 
-  static async getSession() {
-    return await supabase.auth.getSession()
+  async getSession() {
+    return await this.supabase.auth.getSession()
   }
 
-  static async getUser() {
-    const { data: { user } } = await supabase.auth.getUser()
+  async getUser() {
+    const {
+      data: { user },
+    } = await this.supabase.auth.getUser()
     return user
   }
 }
+
+export const authService = new Proxy(Object.create(AuthService.prototype), {
+  get(_target, property, receiver) {
+    const service = getDefaultAuthService()
+    const value = Reflect.get(service, property, receiver)
+    return typeof value === 'function' ? value.bind(service) : value
+  },
+})

@@ -1,61 +1,89 @@
-import { createClient } from '@/lib/supabase/client'
 import { Party } from '@/types'
+import {
+  IPartyRepository,
+  SupabasePartyRepository,
+} from '@/repositories/party.repository'
 
-const supabase = createClient()
+let defaultPartyService: PartyService | undefined
+
+function getDefaultPartyService(): PartyService {
+  if (!defaultPartyService) {
+    defaultPartyService = new PartyService()
+  }
+
+  return defaultPartyService
+}
 
 export class PartyService {
+  constructor(
+    private readonly repository: IPartyRepository = new SupabasePartyRepository(),
+  ) {}
+
   static async getAll(businessId: string) {
-    const { data, error } = await supabase
-      .from('parties')
-      .select('*')
-      .eq('business_id', businessId)
-      .is('deleted_at', null)
-      .order('name', { ascending: true })
-    
-    if (error) throw error
-    return data as Party[]
+    return getDefaultPartyService().getAll(businessId)
   }
 
   static async getById(id: string) {
-    const { data, error } = await supabase
-      .from('parties')
-      .select('*')
-      .eq('id', id)
-      .single()
-    
-    if (error) throw error
-    return data as Party
+    return getDefaultPartyService().getById(id)
   }
 
-  static async create(party: Omit<Party, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>) {
-    const { data, error } = await supabase
-      .from('parties')
-      .insert([party])
-      .select()
-      .single()
-    
-    if (error) throw error
-    return data as Party
+  static async create(
+    party: Omit<Party, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>,
+  ) {
+    return getDefaultPartyService().create(party)
   }
 
-  static async update(id: string, party: Partial<Omit<Party, 'id' | 'business_id' | 'created_at' | 'updated_at' | 'deleted_at'>>) {
-    const { data, error } = await supabase
-      .from('parties')
-      .update(party)
-      .eq('id', id)
-      .select()
-      .single()
-    
-    if (error) throw error
-    return data as Party
+  static async update(
+    id: string,
+    party: Partial<
+      Omit<
+        Party,
+        'id' | 'business_id' | 'created_at' | 'updated_at' | 'deleted_at'
+      >
+    >,
+  ) {
+    return getDefaultPartyService().update(id, party)
   }
 
   static async delete(id: string) {
-    const { error } = await supabase
-      .from('parties')
-      .update({ deleted_at: new Date().toISOString() })
-      .eq('id', id)
-    
-    if (error) throw error
+    return getDefaultPartyService().delete(id)
+  }
+
+  async getAll(businessId: string): Promise<Party[]> {
+    return this.repository.getAll(businessId)
+  }
+
+  async getById(id: string): Promise<Party> {
+    return this.repository.getById(id)
+  }
+
+  async create(
+    party: Omit<Party, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>,
+  ): Promise<Party> {
+    return this.repository.create(party)
+  }
+
+  async update(
+    id: string,
+    party: Partial<
+      Omit<
+        Party,
+        'id' | 'business_id' | 'created_at' | 'updated_at' | 'deleted_at'
+      >
+    >,
+  ): Promise<Party> {
+    return this.repository.update(id, party)
+  }
+
+  async delete(id: string): Promise<void> {
+    return this.repository.delete(id)
   }
 }
+
+export const partyService = new Proxy(Object.create(PartyService.prototype), {
+  get(_target, property, receiver) {
+    const service = getDefaultPartyService()
+    const value = Reflect.get(service, property, receiver)
+    return typeof value === 'function' ? value.bind(service) : value
+  },
+})
