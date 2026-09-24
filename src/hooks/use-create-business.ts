@@ -3,14 +3,13 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { businessSchema } from '@/validators'
 import { businessService } from '@/services/business.service'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useOptimisticMutation } from './use-optimistic-mutation'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 
 export function useCreateBusiness() {
   const [step, setStep] = useState(1)
   const router = useRouter()
-  const queryClient = useQueryClient()
   const { setActiveBusiness } = useBusiness()
 
   const form = useForm({
@@ -26,30 +25,20 @@ export function useCreateBusiness() {
 
   const { trigger } = form
 
-  const mutation = useMutation({
+  const mutation = useOptimisticMutation<any[], any, any>({
+    queryKey: ['businesses'],
     mutationFn: (data: any) => businessService.create(data),
-    onMutate: async (newBusiness: any) => {
-      await queryClient.cancelQueries({ queryKey: ['businesses'] })
-      const previousBusinesses = queryClient.getQueryData(['businesses'])
-      queryClient.setQueryData(['businesses'], (old: any[]) => {
-        const optimisticBusiness = {
-          ...newBusiness,
-          id: 'temp-' + Date.now(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }
-        return old ? [...old, optimisticBusiness] : [optimisticBusiness]
-      })
-      return { previousBusinesses }
-    },
-    onError: (err, newBusiness, context: any) => {
-      queryClient.setQueryData(['businesses'], context?.previousBusinesses)
-    },
-    onSettled: (newBusiness) => {
-      queryClient.invalidateQueries({ queryKey: ['businesses'] })
-      if (newBusiness) {
-        setActiveBusiness(newBusiness)
-      }
+    update: (current, newBusiness) => [
+      ...(current || []),
+      {
+        ...newBusiness,
+        id: 'temp-' + Date.now(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ],
+    onSuccess: (newBusiness) => {
+      if (newBusiness) setActiveBusiness(newBusiness)
     },
   })
 
