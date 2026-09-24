@@ -1,14 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { PartyService } from '@/services/party.service'
 import { chequeService } from '@/services/cheque.service'
 import { ChequeStatus, Cheque } from '@/types'
 import { useMemo, useState } from 'react'
+import { useOptimisticMutation } from './use-optimistic-mutation'
 
 export type SortBy = 'date' | 'amount'
 export type SortOrder = 'asc' | 'desc'
 
 export function usePartyDetail(id: string, businessId: string | undefined) {
-  const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'All' | ChequeStatus>('All')
   const [sortBy, setSortBy] = useState<SortBy>('date')
@@ -29,11 +29,18 @@ export function usePartyDetail(id: string, businessId: string | undefined) {
     enabled: !!businessId,
   })
 
-  const mutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: ChequeStatus }) =>
-      chequeService.updateStatus(id, status),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
+  const mutation = useOptimisticMutation<
+    Cheque[],
+    { id: string; status: ChequeStatus },
+    Cheque
+  >({
+    queryKey: ['cheques', businessId],
+    mutationFn: ({ id, status }) => chequeService.updateStatus(id, status),
+    update: (current, { id, status }) => {
+      if (!current) return current
+      return current.map((cheque) =>
+        cheque.id === id ? { ...cheque, status } : cheque,
+      )
     },
   })
 
