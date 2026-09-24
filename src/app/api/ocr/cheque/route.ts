@@ -128,6 +128,17 @@ class OcrController {
 
   async handleRequest(req: Request): Promise<Response> {
     try {
+      let requestBody: unknown
+      try {
+        requestBody = await req.json()
+      } catch {
+        return this.respondWithError('Invalid JSON body.', 400)
+      }
+      const requestResult = OcrRequestSchema.safeParse(requestBody)
+      if (!requestResult.success) {
+        return this.respondWithError('A valid image URL is required.', 400)
+      }
+
       const cookieStore = await cookies()
       const supabaseUrl = publicEnv.NEXT_PUBLIC_SUPABASE_URL
       const supabaseKey = publicEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -142,32 +153,23 @@ class OcrController {
         return this.respondWithError('Unauthorized', 401)
       }
 
-      // Check Quota
-      const { data: quota, error: quotaError } = await supabase
-        .from('user_quotas')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('feature_id', 'ai_scan')
-        .single()
-
-      if (quotaError || !quota) {
+      const { data: rateAllowed, error: rateError } = await supabase.rpc(
+        'consume_api_rate_limit',
+        {
+          requested_endpoint: 'ocr-cheque',
+          request_limit: 10,
+          window_seconds: 60,
+        },
+      )
+      if (rateError) throw rateError
+      if (!rateAllowed) {
         return this.respondWithError(
-          'No AI scan quota found. Please subscribe to use this feature.',
-          402,
+          'Too many scan requests. Please try again shortly.',
+          429,
+          { 'Retry-After': '60' },
         )
       }
 
-      if (quota.used >= quota.limit) {
-        return this.respondWithError(
-          'AI scan quota exhausted. Please top-up to continue.',
-          402,
-        )
-      }
-
-      const requestResult = OcrRequestSchema.safeParse(await req.json())
-      if (!requestResult.success) {
-        return this.respondWithError('A valid image URL is required.', 400)
-      }
       const { imageUrl } = requestResult.data
       let providerImageUrl = imageUrl
       const privateMedia = parsePrivateMediaUrl(imageUrl)
@@ -191,28 +193,30 @@ class OcrController {
         providerImageUrl = signedImage.signedUrl
       }
 
+      getOpenAiEnv()
+      const { data: quotaConsumed, error: quotaError } = await supabase.rpc(
+        'consume_user_quota',
+        { requested_feature: 'ai_scan' },
+      )
+      if (quotaError) throw quotaError
+      if (!quotaConsumed) {
+        return this.respondWithError(
+          'AI scan quota exhausted. Please subscribe or top-up to continue.',
+          402,
+        )
+      }
+
       logger.info(`[OcrController] Processing request for user ${user.id}`)
 
       const result = await this.ocrProvider.processImage(providerImageUrl)
 
-      // Increment usage
-      await supabase
-        .from('user_quotas')
-        .update({ used: quota.used + 1 })
-        .eq('id', quota.id)
-
       return this.respondWithSuccess(result)
     } catch (error: unknown) {
       logger.error('[OcrController Error]', error)
-
-      const status =
-        error instanceof Error && error.message.includes('OpenAI') ? 500 : 400
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'An unexpected error occurred during image processing.'
-
-      return this.respondWithError(message, status)
+      return this.respondWithError(
+        'An unexpected error occurred during image processing.',
+        500,
+      )
     }
   }
 
@@ -223,10 +227,14 @@ class OcrController {
     })
   }
 
-  private respondWithError(message: string, status: number): Response {
+  private respondWithError(
+    message: string,
+    status: number,
+    headers: Record<string, string> = {},
+  ): Response {
     return new Response(JSON.stringify({ error: message }), {
       status,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...headers },
     })
   }
 }

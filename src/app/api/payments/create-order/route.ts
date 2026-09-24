@@ -53,6 +53,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { data: rateAllowed, error: rateError } = await supabase.rpc(
+      'consume_api_rate_limit',
+      {
+        requested_endpoint: 'payment-order',
+        request_limit: 5,
+        window_seconds: 60,
+      },
+    )
+    if (rateError) throw rateError
+    if (!rateAllowed) {
+      return NextResponse.json(
+        { error: 'Too many payment requests. Please try again shortly.' },
+        { status: 429, headers: { 'Retry-After': '60' } },
+      )
+    }
+
     const adminEnv = getSupabaseAdminEnv()
     const admin = createSupabaseAdmin(
       publicEnv.NEXT_PUBLIC_SUPABASE_URL,
