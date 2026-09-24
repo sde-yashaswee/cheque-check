@@ -53,6 +53,7 @@ export class ChequeService {
         Cheque,
         | 'id'
         | 'business_id'
+        | 'status'
         | 'created_at'
         | 'updated_at'
         | 'voice_call_sent'

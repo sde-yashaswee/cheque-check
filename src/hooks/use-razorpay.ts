@@ -1,74 +1,82 @@
 import { useState } from 'react'
 import { getRazorpayPublicKey } from '@/lib/env/client'
+import { PaymentOrderSchema, type PaymentProductId } from '@/lib/payments'
+
+type RazorpaySuccess = {
+  razorpay_payment_id: string
+  razorpay_order_id: string
+  razorpay_signature: string
+}
+
+type RazorpayCheckout = new (options: {
+  key: string
+  amount: number
+  currency: string
+  name: string
+  description: string
+  order_id: string
+  handler: (response: RazorpaySuccess) => void
+  theme: { color: string }
+}) => { open: () => void }
 
 declare global {
   interface Window {
-    Razorpay: any
+    Razorpay: RazorpayCheckout
   }
+}
+
+async function createOrder(productId: PaymentProductId) {
+  const response = await fetch('/api/payments/create-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ productId }),
+  })
+  const body: unknown = await response.json()
+
+  if (!response.ok) {
+    const message =
+      typeof body === 'object' && body && 'error' in body
+        ? String(body.error)
+        : 'Unable to create payment order'
+    throw new Error(message)
+  }
+
+  return PaymentOrderSchema.parse(body)
 }
 
 export function useRazorpay() {
   const [isProcessing, setIsProcessing] = useState(false)
 
-  const createOrder = async (type: string, featureId: string) => {
-    const res = await fetch('/api/payments/create-order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, featureId }),
-    })
-    return res.json()
-  }
-
   const processPayment = async ({
-    type,
-    featureId,
+    productId,
     onSuccess,
   }: {
-    type: string
-    featureId: string
+    productId: PaymentProductId
     onSuccess?: () => void
   }) => {
     setIsProcessing(true)
     try {
-      const order = await createOrder(type, featureId)
-
-      if (order.error) {
-        throw new Error(order.error)
-      }
-
-      const options = {
+      const order = await createOrder(productId)
+      const checkout = new window.Razorpay({
         key: getRazorpayPublicKey(),
         amount: order.amount,
         currency: order.currency,
         name: 'Cheque Check',
-        description: `Purchase ${featureId}`,
+        description: order.name,
         order_id: order.id,
-        handler: function (response: any) {
-          // Razorpay returns razorpay_payment_id, razorpay_order_id, razorpay_signature
-          // Our webhook will handle the DB update, but we can refresh UI here
-          if (onSuccess) onSuccess()
-        },
-        prefill: {
-          name: '', // Can be filled from profile
-          email: '', // Can be filled from profile
-        },
-        theme: {
-          color: '#000000',
-        },
-      }
-
-      const rzp = new window.Razorpay(options)
-      rzp.open()
+        handler: () => onSuccess?.(),
+        theme: { color: '#000000' },
+      })
+      checkout.open()
     } catch (error) {
       console.error('Payment error:', error)
-      alert('Failed to initiate payment. Please try again.')
+      alert(
+        error instanceof Error ? error.message : 'Failed to initiate payment',
+      )
     } finally {
       setIsProcessing(false)
     }
   }
 
-  return {
-    processPayment,
-    isProcessing,
-  }
+  return { processPayment, isProcessing }
 }

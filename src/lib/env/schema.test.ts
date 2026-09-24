@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { openAiEnvSchema, publicEnvSchema, razorpayEnvSchema } from './schema'
+import {
+  openAiEnvSchema,
+  publicEnvSchema,
+  razorpayEnvSchema,
+  supabaseAdminEnvSchema,
+} from './schema'
 
 describe('publicEnvSchema', () => {
   it('accepts the required Supabase configuration', () => {
@@ -45,6 +50,13 @@ describe('feature environment schemas', () => {
         RAZORPAY_KEY_ID: 'key',
         RAZORPAY_KEY_SECRET: '',
       }).success,
+    ).toBe(false)
+  })
+
+  it('requires the Supabase service-role key for admin operations', () => {
+    expect(
+      supabaseAdminEnvSchema.safeParse({ SUPABASE_SERVICE_ROLE_KEY: '' })
+        .success,
     ).toBe(false)
   })
 })

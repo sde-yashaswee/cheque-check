@@ -1,6 +1,11 @@
 import 'server-only'
 
-import { envError, openAiEnvSchema, razorpayEnvSchema } from './schema'
+import {
+  envError,
+  openAiEnvSchema,
+  razorpayEnvSchema,
+  supabaseAdminEnvSchema,
+} from './schema'
 
 export function getOpenAiEnv() {
   const result = openAiEnvSchema.safeParse({
@@ -19,6 +24,16 @@ export function getRazorpayEnv() {
   })
   if (!result.success) {
     throw envError('Razorpay', result.error)
+  }
+  return result.data
+}
+
+export function getSupabaseAdminEnv() {
+  const result = supabaseAdminEnvSchema.safeParse({
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  })
+  if (!result.success) {
+    throw envError('Supabase admin', result.error)
   }
   return result.data
 }
