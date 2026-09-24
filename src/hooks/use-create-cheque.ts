@@ -5,7 +5,7 @@ import { chequeSchema } from '@/validators'
 import { chequeService } from '@/services/cheque.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { StorageService } from '@/services/storage.service'
+import { storageService } from '@/services/storage.service'
 import { z } from 'zod'
 import { toast } from '@/components/ui/toast'
 import { useTranslations } from 'next-intl'
@@ -143,7 +143,7 @@ export function useCreateCheque(
   const handleImageUpload = async (file: File) => {
     setIsUploading(true)
     try {
-      const url = await StorageService.uploadChequeImage(file)
+      const url = await storageService.uploadChequeImage(file)
       setValue('image_url', url)
       return url
     } catch (error) {
