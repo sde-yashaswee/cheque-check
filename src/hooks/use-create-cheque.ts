@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { chequeSchema } from '@/validators'
 import { chequeService } from '@/services/cheque.service'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { storageService } from '@/services/storage.service'
 import { z } from 'zod'
@@ -13,6 +12,8 @@ import { ChequeWithRelations, Party } from '@/types'
 import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useProfile } from './use-profile'
 import { ConflictError } from '@/lib/errors'
+import { useOptimisticMutation } from './use-optimistic-mutation'
+import { useQueryClient } from '@tanstack/react-query'
 
 type ChequeFormValues = z.infer<typeof chequeSchema>
 
@@ -51,7 +52,12 @@ export function useCreateCheque(
     }
   }, [initialType, setValue])
 
-  const mutation = useMutation({
+  const mutation = useOptimisticMutation<
+    ChequeWithRelations[],
+    ChequeFormValues,
+    unknown
+  >({
+    queryKey: businessId ? ['cheques', businessId] : ['cheques'],
     mutationFn: (data: ChequeFormValues) => {
       if (!businessId)
         throw new Error('Select a business before creating a cheque')
@@ -65,45 +71,26 @@ export function useCreateCheque(
         status: ChequeEntity.initialStatusFor(data.type),
       })
     },
-    onMutate: async (newCheque) => {
-      if (!businessId)
-        throw new Error('Select a business before creating a cheque')
+    update: (current, newCheque) => {
+      if (!businessId) return current
 
-      // Stop any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-
-      // Snapshot the previous value
-      const prev = queryClient.getQueryData<ChequeWithRelations[]>([
-        'cheques',
-        businessId,
-      ])
-
-      // Optimistically update to the new value
-      queryClient.setQueryData<ChequeWithRelations[]>(
-        ['cheques', businessId],
-        (old) => {
-          const optimisticCheque: ChequeWithRelations = {
-            ...newCheque,
-            id: 'temp-' + Date.now(),
-            business_id: businessId,
-            image_url: newCheque.image_url ?? null,
-            notes: newCheque.notes || null,
-            remind_before_days: profile?.default_reminder_days ?? null,
-            status: ChequeEntity.initialStatusFor(newCheque.type),
-            voice_call_sent: false,
-            last_call_at: null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            party: queryClient
-              .getQueryData<Party[]>(['parties', businessId])
-              ?.find((party) => party.id === newCheque.party_id),
-          }
-          return old ? [optimisticCheque, ...old] : [optimisticCheque]
-        },
-      )
-
-      // Return a context object with the snapshotted value
-      return { previousCheques: prev }
+      const optimisticCheque: ChequeWithRelations = {
+        ...newCheque,
+        id: 'temp-' + Date.now(),
+        business_id: businessId,
+        image_url: newCheque.image_url ?? null,
+        notes: newCheque.notes || null,
+        remind_before_days: profile?.default_reminder_days ?? null,
+        status: ChequeEntity.initialStatusFor(newCheque.type),
+        voice_call_sent: false,
+        last_call_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        party: queryClient
+          .getQueryData<Party[]>(['parties', businessId])
+          ?.find((party) => party.id === newCheque.party_id),
+      }
+      return current ? [optimisticCheque, ...current] : [optimisticCheque]
     },
     onSuccess: () => {
       toast.add({
@@ -113,12 +100,7 @@ export function useCreateCheque(
       })
       router.push('/cheques')
     },
-    onError: (error, _newCheque, context) => {
-      queryClient.setQueryData(
-        ['cheques', businessId],
-        context?.previousCheques,
-      )
-
+    onError: (error) => {
       const errorMessage = error instanceof Error ? error.message : tc('error')
 
       if (error instanceof ConflictError) {
@@ -134,9 +116,6 @@ export function useCreateCheque(
           type: 'error',
         })
       }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
     },
   })
 

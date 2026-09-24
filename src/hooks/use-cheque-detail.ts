@@ -1,10 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { chequeService } from '@/services/cheque.service'
 import { ChequeStatus, ChequeWithRelations } from '@/types'
+import { useOptimisticMutation } from './use-optimistic-mutation'
 
 export function useChequeDetail(id: string) {
-  const queryClient = useQueryClient()
-
   const {
     data: cheque,
     isLoading,
@@ -14,49 +13,20 @@ export function useChequeDetail(id: string) {
     queryFn: () => chequeService.getById(id),
   })
 
-  const mutation = useMutation({
+  const mutation = useOptimisticMutation<
+    ChequeWithRelations,
+    ChequeStatus,
+    ChequeWithRelations
+  >({
+    queryKey: ['cheque', id],
+    additionalQueryKeys: cheque?.business_id
+      ? [['cheques', cheque.business_id]]
+      : [],
     mutationFn: (status: ChequeStatus) =>
       chequeService.updateStatus(id, status),
-    onMutate: async (status) => {
-      await queryClient.cancelQueries({ queryKey: ['cheque', id] })
-      const previousCheque = queryClient.getQueryData<ChequeWithRelations>([
-        'cheque',
-        id,
-      ])
-      queryClient.setQueryData<ChequeWithRelations>(['cheque', id], (old) => {
-        if (!old) return old
-        return { ...old, status }
-      })
-
-      if (cheque?.business_id) {
-        await queryClient.cancelQueries({
-          queryKey: ['cheques', cheque.business_id],
-        })
-        queryClient.setQueryData<ChequeWithRelations[]>(
-          ['cheques', cheque.business_id],
-          (old) => {
-            if (!old) return old
-            return old.map((cachedCheque) =>
-              cachedCheque.id === id
-                ? { ...cachedCheque, status }
-                : cachedCheque,
-            )
-          },
-        )
-      }
-
-      return { previousCheque }
-    },
-    onError: (err, variables, context) => {
-      queryClient.setQueryData(['cheque', id], context?.previousCheque)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['cheque', id] })
-      if (cheque?.business_id) {
-        queryClient.invalidateQueries({
-          queryKey: ['cheques', cheque.business_id],
-        })
-      }
+    update: (current, status) => {
+      if (!current) return current
+      return { ...current, status }
     },
   })
 
