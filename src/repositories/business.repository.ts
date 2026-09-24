@@ -28,25 +28,19 @@ export class SupabaseBusinessRepository
   implements IBusinessRepository
 {
   async getAll(): Promise<Business[]> {
-    const { data, error } = await this.supabase
-      .from('businesses')
-      .select('*')
-      .is('deleted_at', null)
-      .order('created_at', { ascending: false })
-
-    if (error) throw error
-    return (data ?? []) as Business[]
+    return this.handle(
+      this.supabase
+        .from('businesses')
+        .select('*')
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false }),
+    ) as Promise<Business[]>
   }
 
   async getById(id: string): Promise<Business> {
-    const { data, error } = await this.supabase
-      .from('businesses')
-      .select('*')
-      .eq('id', id)
-      .single()
-
-    if (error) throw error
-    return data as Business
+    return this.handle(
+      this.supabase.from('businesses').select('*').eq('id', id).single(),
+    ) as Promise<Business>
   }
 
   async create(
@@ -61,14 +55,13 @@ export class SupabaseBusinessRepository
       throw new ValidationError('User not authenticated')
     }
 
-    const { data, error } = await this.supabase
-      .from('businesses')
-      .insert([{ ...input, user_id: user.id }])
-      .select()
-      .single()
-
-    if (error) throw error
-    return data as Business
+    return this.handle(
+      this.supabase
+        .from('businesses')
+        .insert([{ ...input, user_id: user.id }])
+        .select()
+        .single(),
+    ) as Promise<Business>
   }
 
   async update(
@@ -80,23 +73,22 @@ export class SupabaseBusinessRepository
       >
     >,
   ): Promise<Business> {
-    const { data, error } = await this.supabase
-      .from('businesses')
-      .update(input)
-      .eq('id', id)
-      .select()
-      .single()
-
-    if (error) throw error
-    return data as Business
+    return this.handle(
+      this.supabase
+        .from('businesses')
+        .update(input)
+        .eq('id', id)
+        .select()
+        .single(),
+    ) as Promise<Business>
   }
 
   async delete(id: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('businesses')
-      .update({ deleted_at: new Date().toISOString() })
-      .eq('id', id)
-
-    if (error) throw error
+    await this.handleVoid(
+      this.supabase
+        .from('businesses')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id),
+    )
   }
 }

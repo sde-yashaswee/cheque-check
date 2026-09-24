@@ -1,4 +1,5 @@
 import { SupabaseRepository } from './base.repository'
+import { mapSupabaseError } from '@/lib/errors'
 
 export interface Entitlement {
   id: string
@@ -51,7 +52,7 @@ export class SupabaseMonetizationRepository
       .select('*')
       .eq('user_id', user.id)
 
-    if (error) throw error
+    if (error) throw mapSupabaseError(error)
     return (data ?? []) as Entitlement[]
   }
 
@@ -65,7 +66,7 @@ export class SupabaseMonetizationRepository
       .select('*')
       .eq('user_id', user.id)
 
-    if (error) throw error
+    if (error) throw mapSupabaseError(error)
     return (data ?? []) as Quota[]
   }
 
@@ -80,7 +81,7 @@ export class SupabaseMonetizationRepository
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
-    if (error) throw error
+    if (error) throw mapSupabaseError(error)
     return (data ?? []) as Transaction[]
   }
 }

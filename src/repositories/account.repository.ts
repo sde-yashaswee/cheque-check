@@ -32,26 +32,24 @@ export class SupabaseAccountRepository
   implements IAccountRepository
 {
   async getAll(businessId: string): Promise<Account[]> {
-    const { data, error } = await this.supabase
-      .from('accounts')
-      .select('*, bank:banks(name, logo_url)')
-      .eq('business_id', businessId)
-      .is('deleted_at', null)
-      .order('account_name', { ascending: true })
-
-    if (error) throw error
-    return (data ?? []) as Account[]
+    return this.handle(
+      this.supabase
+        .from('accounts')
+        .select('*, bank:banks(name, logo_url)')
+        .eq('business_id', businessId)
+        .is('deleted_at', null)
+        .order('account_name', { ascending: true }),
+    ) as Promise<Account[]>
   }
 
   async getById(id: string): Promise<Account> {
-    const { data, error } = await this.supabase
-      .from('accounts')
-      .select('*, bank:banks(name, logo_url)')
-      .eq('id', id)
-      .single()
-
-    if (error) throw error
-    return data as Account
+    return this.handle(
+      this.supabase
+        .from('accounts')
+        .select('*, bank:banks(name, logo_url)')
+        .eq('id', id)
+        .single(),
+    ) as Promise<Account>
   }
 
   async create(
@@ -60,14 +58,9 @@ export class SupabaseAccountRepository
       'id' | 'created_at' | 'updated_at' | 'bank' | 'deleted_at'
     >,
   ): Promise<Account> {
-    const { data, error } = await this.supabase
-      .from('accounts')
-      .insert([input])
-      .select()
-      .single()
-
-    if (error) throw error
-    return data as Account
+    return this.handle(
+      this.supabase.from('accounts').insert([input]).select().single(),
+    ) as Promise<Account>
   }
 
   async update(
@@ -84,23 +77,22 @@ export class SupabaseAccountRepository
       >
     >,
   ): Promise<Account> {
-    const { data, error } = await this.supabase
-      .from('accounts')
-      .update(input)
-      .eq('id', id)
-      .select()
-      .single()
-
-    if (error) throw error
-    return data as Account
+    return this.handle(
+      this.supabase
+        .from('accounts')
+        .update(input)
+        .eq('id', id)
+        .select()
+        .single(),
+    ) as Promise<Account>
   }
 
   async delete(id: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('accounts')
-      .update({ deleted_at: new Date().toISOString() })
-      .eq('id', id)
-
-    if (error) throw error
+    await this.handleVoid(
+      this.supabase
+        .from('accounts')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id),
+    )
   }
 }

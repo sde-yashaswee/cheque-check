@@ -10,12 +10,11 @@ export class SupabaseBankRepository
   implements IBankRepository
 {
   async getAll(): Promise<Bank[]> {
-    const { data, error } = await this.supabase
-      .from('banks')
-      .select('*')
-      .order('name', { ascending: true })
-
-    if (error) throw error
-    return (data ?? []) as Bank[]
+    return this.handle(
+      this.supabase
+        .from('banks')
+        .select('*')
+        .order('name', { ascending: true }),
+    ) as Promise<Bank[]>
   }
 }

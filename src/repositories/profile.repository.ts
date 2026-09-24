@@ -1,4 +1,5 @@
 import { Profile } from '@/types'
+import { mapSupabaseError } from '@/lib/errors'
 import { SupabaseRepository } from './base.repository'
 
 export interface IProfileRepository {
@@ -23,7 +24,7 @@ export class SupabaseProfileRepository
       .is('deleted_at', null)
       .maybeSingle()
 
-    if (error) throw error
+    if (error) throw mapSupabaseError(error)
 
     if (data) {
       return data as Profile
@@ -35,7 +36,7 @@ export class SupabaseProfileRepository
       .eq('user_id', user.id)
       .maybeSingle()
 
-    if (lookupError) throw lookupError
+    if (lookupError) throw mapSupabaseError(lookupError)
 
     if (existing && existing.deleted_at) {
       const { data: reactivated, error: reactError } = await this.supabase
@@ -45,7 +46,7 @@ export class SupabaseProfileRepository
         .select()
         .single()
 
-      if (reactError) throw reactError
+      if (reactError) throw mapSupabaseError(reactError)
       return reactivated as Profile
     }
 
@@ -62,7 +63,7 @@ export class SupabaseProfileRepository
         .select()
         .single()
 
-      if (createError) throw createError
+      if (createError) throw mapSupabaseError(createError)
       return newProfile as Profile
     }
 
@@ -81,7 +82,7 @@ export class SupabaseProfileRepository
       .select()
       .single()
 
-    if (error) throw error
+    if (error) throw mapSupabaseError(error)
     return data as Profile
   }
 
@@ -95,7 +96,7 @@ export class SupabaseProfileRepository
       .update({ deleted_at: new Date().toISOString() })
       .eq('user_id', user.id)
 
-    if (error) throw error
+    if (error) throw mapSupabaseError(error)
 
     await this.supabase.auth.signOut()
   }
