@@ -2,10 +2,11 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { accountSchema } from '@/validators'
-import { accountService } from '@/services/account.service'
+import { AccountService, accountService } from '@/services/account.service'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { useOptimisticMutation } from './use-optimistic-mutation'
+import { useEntityMutations } from './use-entity-mutations'
+import type { Account } from '@/types'
 
 export function useEditAccount(id: string, businessId: string | undefined) {
   const router = useRouter()
@@ -44,20 +45,24 @@ export function useEditAccount(id: string, businessId: string | undefined) {
     }
   }, [account, reset])
 
-  const updateMutation = useOptimisticMutation<any[], any, any>({
-    queryKey: ['accounts', businessId],
-    additionalQueryKeys: [['account', id]],
-    mutationFn: (data: any) => accountService.update(id, data),
-    update: (current, newAccount) =>
-      current?.map((account) =>
-        account.id === id ? { ...account, ...newAccount } : account,
-      ),
-  })
-
-  const deleteMutation = useOptimisticMutation<any[], void, void>({
-    queryKey: ['accounts', businessId],
-    mutationFn: () => accountService.delete(id),
-    update: (current) => current?.filter((account) => account.id !== id),
+  const { updateMutation, deleteMutation } = useEntityMutations<
+    Account,
+    Parameters<AccountService['update']>[1],
+    Account
+  >({
+    listQueryKey: ['accounts', businessId],
+    detailQueryKey: ['account', id],
+    update: {
+      mutationFn: (data) => accountService.update(id, data),
+      updateList: (current, newAccount) =>
+        current?.map((account) =>
+          account.id === id ? { ...account, ...newAccount } : account,
+        ),
+    },
+    remove: {
+      mutationFn: () => accountService.delete(id),
+      updateList: (current) => current?.filter((account) => account.id !== id),
+    },
   })
 
   return {

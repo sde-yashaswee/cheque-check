@@ -6,7 +6,8 @@ import { businessSchema } from '@/validators'
 import { businessService } from '@/services/business.service'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { useOptimisticMutation } from './use-optimistic-mutation'
+import { useEntityMutations } from './use-entity-mutations'
+import type { Business } from '@/types'
 
 export function useEditBusiness(id: string) {
   const router = useRouter()
@@ -49,21 +50,25 @@ export function useEditBusiness(id: string) {
     }
   }, [business, reset])
 
-  const updateMutation = useOptimisticMutation<any[], any, any>({
-    queryKey: ['businesses'],
-    additionalQueryKeys: [['business', id]],
-    mutationFn: (data: z.infer<typeof businessSchema>) =>
-      businessService.update(id, data),
-    update: (current, newBusiness) =>
-      current?.map((business) =>
-        business.id === id ? { ...business, ...newBusiness } : business,
-      ),
-  })
-
-  const deleteMutation = useOptimisticMutation<any[], void, void>({
-    queryKey: ['businesses'],
-    mutationFn: () => businessService.delete(id),
-    update: (current) => current?.filter((business) => business.id !== id),
+  const { updateMutation, deleteMutation } = useEntityMutations<
+    Business,
+    z.infer<typeof businessSchema>,
+    Business
+  >({
+    listQueryKey: ['businesses'],
+    detailQueryKey: ['business', id],
+    update: {
+      mutationFn: (data) => businessService.update(id, data),
+      updateList: (current, newBusiness) =>
+        current?.map((business) =>
+          business.id === id ? { ...business, ...newBusiness } : business,
+        ),
+    },
+    remove: {
+      mutationFn: () => businessService.delete(id),
+      updateList: (current) =>
+        current?.filter((business) => business.id !== id),
+    },
   })
 
   return {

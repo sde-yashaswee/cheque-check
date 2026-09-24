@@ -2,11 +2,11 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { partySchema } from '@/validators'
-import { partyService } from '@/services/party.service'
+import { PartyService, partyService } from '@/services/party.service'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { Party } from '@/types'
-import { useOptimisticMutation } from './use-optimistic-mutation'
+import { useEntityMutations } from './use-entity-mutations'
 
 export function useEditParty(id: string, businessId: string | undefined) {
   const router = useRouter()
@@ -49,20 +49,24 @@ export function useEditParty(id: string, businessId: string | undefined) {
     }
   }, [party, reset])
 
-  const updateMutation = useOptimisticMutation<any[], any, any>({
-    queryKey: ['parties', businessId],
-    additionalQueryKeys: [['party', id]],
-    mutationFn: (data: any) => partyService.update(id, data),
-    update: (current, newParty) =>
-      current?.map((party) =>
-        party.id === id ? { ...party, ...newParty } : party,
-      ),
-  })
-
-  const deleteMutation = useOptimisticMutation<any[], void, void>({
-    queryKey: ['parties', businessId],
-    mutationFn: () => partyService.delete(id),
-    update: (current) => current?.filter((party) => party.id !== id),
+  const { updateMutation, deleteMutation } = useEntityMutations<
+    Party,
+    Parameters<PartyService['update']>[1],
+    Party
+  >({
+    listQueryKey: ['parties', businessId],
+    detailQueryKey: ['party', id],
+    update: {
+      mutationFn: (data) => partyService.update(id, data),
+      updateList: (current, newParty) =>
+        current?.map((party) =>
+          party.id === id ? { ...party, ...newParty } : party,
+        ),
+    },
+    remove: {
+      mutationFn: () => partyService.delete(id),
+      updateList: (current) => current?.filter((party) => party.id !== id),
+    },
   })
 
   return {
