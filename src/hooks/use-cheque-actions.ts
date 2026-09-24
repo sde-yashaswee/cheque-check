@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChequeService } from '@/services/cheque.service'
-import { ChequeStatus, Cheque } from '@/types'
+import { ChequeStatus, ChequeWithRelations } from '@/types'
 import { useBusiness } from './use-business'
 
 export function useChequeActions() {
@@ -8,24 +8,36 @@ export function useChequeActions() {
   const { activeBusiness } = useBusiness()
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string, status: ChequeStatus }) => 
+    mutationFn: ({ id, status }: { id: string; status: ChequeStatus }) =>
       ChequeService.updateStatus(id, status),
     onMutate: async ({ id, status }) => {
       // Invalidate/Update list cache
-      let previousCheques: any[] = []
+      let previousCheques: ChequeWithRelations[] = []
       if (activeBusiness?.id) {
-        await queryClient.cancelQueries({ queryKey: ['cheques', activeBusiness.id] })
-        previousCheques = queryClient.getQueryData(['cheques', activeBusiness.id]) || []
-        queryClient.setQueryData(['cheques', activeBusiness.id], (old: any[]) => {
-          if (!old) return old
-          return old.map((c) => c.id === id ? { ...c, status } : c)
+        await queryClient.cancelQueries({
+          queryKey: ['cheques', activeBusiness.id],
         })
+        previousCheques =
+          queryClient.getQueryData<ChequeWithRelations[]>([
+            'cheques',
+            activeBusiness.id,
+          ]) || []
+        queryClient.setQueryData<ChequeWithRelations[]>(
+          ['cheques', activeBusiness.id],
+          (old) => {
+            if (!old) return old
+            return old.map((c) => (c.id === id ? { ...c, status } : c))
+          },
+        )
       }
 
       // Invalidate/Update detail cache
       await queryClient.cancelQueries({ queryKey: ['cheque', id] })
-      const previousCheque = queryClient.getQueryData(['cheque', id])
-      queryClient.setQueryData(['cheque', id], (old: any) => {
+      const previousCheque = queryClient.getQueryData<ChequeWithRelations>([
+        'cheque',
+        id,
+      ])
+      queryClient.setQueryData<ChequeWithRelations>(['cheque', id], (old) => {
         if (!old) return old
         return { ...old, status }
       })
@@ -34,31 +46,44 @@ export function useChequeActions() {
     },
     onSettled: (data, error, { id }) => {
       if (activeBusiness?.id) {
-        queryClient.invalidateQueries({ queryKey: ['cheques', activeBusiness.id] })
+        queryClient.invalidateQueries({
+          queryKey: ['cheques', activeBusiness.id],
+        })
       }
       queryClient.invalidateQueries({ queryKey: ['cheque', id] })
-    }
+    },
   })
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => ChequeService.delete(id),
     onMutate: async (id) => {
-      let previousCheques: any[] = []
+      let previousCheques: ChequeWithRelations[] = []
       if (activeBusiness?.id) {
-        await queryClient.cancelQueries({ queryKey: ['cheques', activeBusiness.id] })
-        previousCheques = queryClient.getQueryData(['cheques', activeBusiness.id]) || []
-        queryClient.setQueryData(['cheques', activeBusiness.id], (old: any[]) => {
-          if (!old) return old
-          return old.filter((c) => c.id !== id)
+        await queryClient.cancelQueries({
+          queryKey: ['cheques', activeBusiness.id],
         })
+        previousCheques =
+          queryClient.getQueryData<ChequeWithRelations[]>([
+            'cheques',
+            activeBusiness.id,
+          ]) || []
+        queryClient.setQueryData<ChequeWithRelations[]>(
+          ['cheques', activeBusiness.id],
+          (old) => {
+            if (!old) return old
+            return old.filter((c) => c.id !== id)
+          },
+        )
       }
       return { previousCheques }
     },
     onSettled: () => {
       if (activeBusiness?.id) {
-        queryClient.invalidateQueries({ queryKey: ['cheques', activeBusiness.id] })
+        queryClient.invalidateQueries({
+          queryKey: ['cheques', activeBusiness.id],
+        })
       }
-    }
+    },
   })
 
   const updateStatus = (id: string, status: ChequeStatus) => {

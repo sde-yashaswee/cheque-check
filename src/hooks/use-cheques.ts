@@ -15,54 +15,78 @@ export function useCheques(businessId: string | undefined) {
   const queryClient = useQueryClient()
   const { profile } = useProfile()
 
-  const { data: cheques, isLoading, error } = useQuery<ChequeWithRelations[]>({
+  const {
+    data: cheques,
+    isLoading,
+    error,
+  } = useQuery<ChequeWithRelations[]>({
     queryKey: ['cheques', businessId],
-    queryFn: () => ChequeService.getAll(businessId!) as Promise<ChequeWithRelations[]>,
+    queryFn: () => ChequeService.getAll(businessId!),
     enabled: !!businessId,
   })
 
   const mutation = useMutation({
-    mutationFn: ({ id, status }: { id: string, status: ChequeStatus }) => 
+    mutationFn: ({ id, status }: { id: string; status: ChequeStatus }) =>
       ChequeService.updateStatus(id, status),
     onMutate: async ({ id, status }) => {
       await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-      const prev = queryClient.getQueryData(['cheques', businessId])
-      queryClient.setQueryData(['cheques', businessId], (old: any[]) => {
-        if (!old) return old
-        return old.map((c: any) => c.id === id ? { ...c, status } : c)
-      })
+      const prev = queryClient.getQueryData<ChequeWithRelations[]>([
+        'cheques',
+        businessId,
+      ])
+      queryClient.setQueryData<ChequeWithRelations[]>(
+        ['cheques', businessId],
+        (old) => {
+          if (!old) return old
+          return old.map((cheque) =>
+            cheque.id === id ? { ...cheque, status } : cheque,
+          )
+        },
+      )
       return { previousCheques: prev }
     },
     onError: (err, variables, context) => {
-      queryClient.setQueryData(['cheques', businessId], context?.previousCheques)
+      queryClient.setQueryData(
+        ['cheques', businessId],
+        context?.previousCheques,
+      )
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
-    }
+    },
   })
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => ChequeService.delete(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ['cheques', businessId] })
-      const prev = queryClient.getQueryData(['cheques', businessId])
-      queryClient.setQueryData(['cheques', businessId], (old: any[]) => {
-        if (!old) return old
-        return old.filter((c: any) => c.id !== id)
-      })
+      const prev = queryClient.getQueryData<ChequeWithRelations[]>([
+        'cheques',
+        businessId,
+      ])
+      queryClient.setQueryData<ChequeWithRelations[]>(
+        ['cheques', businessId],
+        (old) => {
+          if (!old) return old
+          return old.filter((cheque) => cheque.id !== id)
+        },
+      )
       return { previousCheques: prev }
     },
     onError: (err, variables, context) => {
-      queryClient.setQueryData(['cheques', businessId], context?.previousCheques)
+      queryClient.setQueryData(
+        ['cheques', businessId],
+        context?.previousCheques,
+      )
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
-    }
+    },
   })
 
   const processedCheques = useMemo(() => {
     if (!cheques) return []
-    return cheques.filter(c => {
+    return cheques.filter((c) => {
       if (profile?.received_cheques_enabled === false && c.type === 'Inward') {
         return false
       }
@@ -72,9 +96,10 @@ export function useCheques(businessId: string | undefined) {
 
   const filteredCheques = useMemo(() => {
     const result = [...processedCheques].filter((c) => {
-      const matchesSearch = c.cheque_number.includes(search) || 
-                           c.party?.name?.toLowerCase().includes(search.toLowerCase()) ||
-                           c.amount.toString().includes(search)
+      const matchesSearch =
+        c.cheque_number.includes(search) ||
+        c.party?.name?.toLowerCase().includes(search.toLowerCase()) ||
+        c.amount.toString().includes(search)
       const matchesFilter = filter === 'All' || c.status === filter
       return matchesSearch && matchesFilter
     })
