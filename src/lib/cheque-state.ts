@@ -1,5 +1,6 @@
 import { ChequeStatus, ChequeType } from '@/types'
+import { Cheque } from '@/domain/cheque.entity'
 
 export function getInitialChequeStatus(type: ChequeType): ChequeStatus {
-  return type === 'Inward' ? 'Received' : 'Issued'
+  return Cheque.initialStatusFor(type)
 }
