@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { getRazorpayPublicKey } from '@/lib/env/client'
-import { PaymentOrderSchema, type PaymentProductId } from '@/lib/payments'
+import { type PaymentProductId } from '@/lib/payments'
+import { paymentService } from '@/services/payment.service'
 
 type RazorpaySuccess = {
   razorpay_payment_id: string
@@ -25,25 +26,6 @@ declare global {
   }
 }
 
-async function createOrder(productId: PaymentProductId) {
-  const response = await fetch('/api/payments/create-order', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ productId }),
-  })
-  const body: unknown = await response.json()
-
-  if (!response.ok) {
-    const message =
-      typeof body === 'object' && body && 'error' in body
-        ? String(body.error)
-        : 'Unable to create payment order'
-    throw new Error(message)
-  }
-
-  return PaymentOrderSchema.parse(body)
-}
-
 export function useRazorpay() {
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -56,7 +38,7 @@ export function useRazorpay() {
   }) => {
     setIsProcessing(true)
     try {
-      const order = await createOrder(productId)
+      const order = await paymentService.createOrder(productId)
       const checkout = new window.Razorpay({
         key: getRazorpayPublicKey(),
         amount: order.amount,
