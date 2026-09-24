@@ -1,11 +1,10 @@
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { authService } from '@/services/auth.service'
 import { reportService } from '@/services/report.service'
 import { ProfileService } from '@/services/profile.service'
 import { ChequeWithRelations } from '@/types'
 
 export function useSettings() {
-  const supabase = createClient()
   const router = useRouter()
 
   const handleExport = (
@@ -23,7 +22,7 @@ export function useSettings() {
   }
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    await authService.signOut()
     router.push('/login')
   }
 
