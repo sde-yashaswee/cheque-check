@@ -1,92 +1,83 @@
-import { createClient } from '@/lib/supabase/client'
 import { Provider } from '@supabase/supabase-js'
+import {
+  IAuthRepository,
+  SupabaseAuthRepository,
+} from '@/repositories/auth.repository'
 
 let defaultAuthService: AuthService | undefined
 
 function getDefaultAuthService(): AuthService {
-  if (!defaultAuthService) {
-    defaultAuthService = new AuthService()
-  }
-
+  if (!defaultAuthService) defaultAuthService = new AuthService()
   return defaultAuthService
 }
 
 export class AuthService {
-  private readonly supabase = createClient()
+  constructor(
+    private readonly repository: IAuthRepository = new SupabaseAuthRepository(),
+  ) {}
 
-  static async loginWithPassword(email: string, password: string) {
+  static loginWithPassword(email: string, password: string) {
     return getDefaultAuthService().loginWithPassword(email, password)
   }
 
-  static async signupWithPassword(
-    email: string,
-    password: string,
-    name: string,
-  ) {
+  static signupWithPassword(email: string, password: string, name: string) {
     return getDefaultAuthService().signupWithPassword(email, password, name)
   }
 
-  static async loginWithOAuth(provider: Provider) {
+  static loginWithOAuth(provider: Provider) {
     return getDefaultAuthService().loginWithOAuth(provider)
   }
 
-  static async signOut() {
+  static signOut() {
     return getDefaultAuthService().signOut()
   }
 
-  static async resetPassword(email: string) {
+  static resetPassword(email: string) {
     return getDefaultAuthService().resetPassword(email)
   }
 
-  static async getSession() {
+  static getSession() {
     return getDefaultAuthService().getSession()
   }
 
-  static async getUser() {
+  static getUser() {
     return getDefaultAuthService().getUser()
   }
 
-  async loginWithPassword(email: string, password: string) {
-    return await this.supabase.auth.signInWithPassword({ email, password })
+  loginWithPassword(email: string, password: string) {
+    return this.repository.loginWithPassword(email, password)
   }
 
-  async signupWithPassword(email: string, password: string, name: string) {
-    return await this.supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { name },
-      },
-    })
+  signupWithPassword(email: string, password: string, name: string) {
+    return this.repository.signupWithPassword(email, password, name)
   }
 
-  async loginWithOAuth(provider: Provider) {
-    return await this.supabase.auth.signInWithOAuth({
+  loginWithOAuth(provider: Provider) {
+    return this.repository.loginWithOAuth(
       provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
+      `${window.location.origin}/auth/callback`,
+    )
   }
 
-  async signOut() {
-    return await this.supabase.auth.signOut()
+  signOut() {
+    return this.repository.signOut()
   }
 
-  async resetPassword(email: string) {
-    return await this.supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/settings/password`,
-    })
+  resetPassword(email: string) {
+    return this.repository.resetPassword(
+      email,
+      `${window.location.origin}/auth/callback?next=/settings/password`,
+    )
   }
 
-  async getSession() {
-    return await this.supabase.auth.getSession()
+  getSession() {
+    return this.repository.getSession()
   }
 
   async getUser() {
     const {
       data: { user },
-    } = await this.supabase.auth.getUser()
+    } = await this.repository.getUser()
     return user
   }
 }
