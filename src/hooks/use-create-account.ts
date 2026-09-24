@@ -1,16 +1,20 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { accountSchema } from '@/validators'
 import { accountService } from '@/services/account.service'
 import { useOptimisticMutation } from './use-optimistic-mutation'
 import { useRouter } from 'next/navigation'
+import type { Account } from '@/types'
+
+type AccountFormData = z.infer<typeof accountSchema>
 
 export function useCreateAccount(businessId: string | undefined) {
   const [step, setStep] = useState(1)
   const router = useRouter()
 
-  const form = useForm({
+  const form = useForm<AccountFormData>({
     resolver: zodResolver(accountSchema),
     defaultValues: {
       bank_id: '',
@@ -24,16 +28,21 @@ export function useCreateAccount(businessId: string | undefined) {
 
   const { trigger } = form
 
-  const mutation = useOptimisticMutation<any[], any, any>({
+  const mutation = useOptimisticMutation<Account[], AccountFormData, Account>({
     queryKey: ['accounts', businessId],
-    mutationFn: (data: any) =>
-      accountService.create({ ...data, business_id: businessId! }),
+    mutationFn: (data) =>
+      accountService.create({
+        ...data,
+        business_id: businessId!,
+        ifsc_code: data.ifsc_code || null,
+      }),
     update: (current, newAccount) => [
       ...(current || []),
       {
         ...newAccount,
+        ifsc_code: newAccount.ifsc_code || null,
         id: 'temp-' + Date.now(),
-        business_id: businessId,
+        business_id: businessId!,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },

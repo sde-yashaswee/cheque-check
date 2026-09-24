@@ -1,16 +1,20 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { partySchema } from '@/validators'
 import { partyService } from '@/services/party.service'
 import { useOptimisticMutation } from './use-optimistic-mutation'
 import { useRouter } from 'next/navigation'
+import type { Party } from '@/types'
+
+type PartyFormData = z.infer<typeof partySchema>
 
 export function useCreateParty(businessId: string | undefined) {
   const [step, setStep] = useState(1)
   const router = useRouter()
 
-  const form = useForm({
+  const form = useForm<PartyFormData>({
     resolver: zodResolver(partySchema),
     defaultValues: {
       name: '',
@@ -24,16 +28,27 @@ export function useCreateParty(businessId: string | undefined) {
 
   const { trigger } = form
 
-  const mutation = useOptimisticMutation<any[], any, any>({
+  const mutation = useOptimisticMutation<Party[], PartyFormData, Party>({
     queryKey: ['parties', businessId],
-    mutationFn: (data: any) =>
-      partyService.create({ ...data, business_id: businessId! }),
+    mutationFn: (data) =>
+      partyService.create({
+        ...data,
+        business_id: businessId!,
+        email: data.email || null,
+        address: data.address || null,
+        notes: data.notes || null,
+        avatar_url: data.avatar_url || null,
+      }),
     update: (current, newParty) => [
       ...(current || []),
       {
         ...newParty,
+        email: newParty.email || null,
+        address: newParty.address || null,
+        notes: newParty.notes || null,
+        avatar_url: newParty.avatar_url || null,
         id: 'temp-' + Date.now(),
-        business_id: businessId,
+        business_id: businessId!,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
