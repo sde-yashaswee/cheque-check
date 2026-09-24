@@ -27,8 +27,10 @@ import { useRazorpay } from '@/hooks/use-razorpay'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
+import { useTranslations } from 'next-intl'
 
 export default function FeaturesPage() {
+  const t = useTranslations('Features')
   const { profile, updateProfile } = useProfile()
   const {
     isLifetimePremium,
@@ -44,41 +46,38 @@ export default function FeaturesPage() {
   const lifetimeFeatures = [
     {
       id: 'receiving_mode',
-      name: 'Receiving Cheques Mode',
-      description:
-        'Enable this if your business also receives cheques from parties. Adds "Inward" cheque support throughout the app.',
+      name: t('receivingMode'),
+      description: t('receivingModeDesc'),
       icon: CheckCircle2,
       checked: !!profile?.received_cheques_enabled,
       onChange: (val: boolean) =>
         updateProfile({ received_cheques_enabled: val }),
-      price: '₹300 One-time',
+      price: t('receivingPrice'),
     },
   ]
 
   const addonFeatures = [
     {
       id: 'ai_scanner',
-      name: 'AI Cheque Scanner',
-      description:
-        'Use AI to scan cheques and automatically extract details like amount, date, and party name. High accuracy scanning.',
+      name: t('aiScanner'),
+      description: t('aiScannerDesc'),
       icon: AiIcon,
       subscriptionId: 'ai_scanner_sub',
       quotaId: 'ai_scan',
       quota: aiQuota,
-      price: '₹50/month (250 scans)',
+      price: t('addonPrice', { count: 250, unit: t('scans') }),
       onUnlock: () => processPayment({ productId: 'ai_scanner_30d' }),
       onTopUp: () => processPayment({ productId: 'ai_scan_250' }),
     },
     {
       id: 'voice_calls',
-      name: 'Daily Automated Voice Reminder',
-      description:
-        'Receive a daily automated voice call at 9 AM IST with a summary of cheques hitting your bank accounts today.',
+      name: t('voiceReminder'),
+      description: t('voiceReminderDesc'),
       icon: Phone,
       subscriptionId: 'voice_reminder_sub',
       quotaId: 'voice_reminder',
       quota: voiceQuota,
-      price: '₹50/month (100 calls)',
+      price: t('addonPrice', { count: 100, unit: t('calls') }),
       checked: !!profile?.voice_call_enabled,
       onChange: (val: boolean) => updateProfile({ voice_call_enabled: val }),
       onUnlock: () => processPayment({ productId: 'voice_reminder_30d' }),
@@ -86,7 +85,7 @@ export default function FeaturesPage() {
       extra: (
         <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
           <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Your Phone Number
+            {t('yourPhoneNumber')}
           </label>
           <Input
             leftIcon={TextIcon}
@@ -96,7 +95,7 @@ export default function FeaturesPage() {
             className="h-11 rounded-lg"
           />
           <p className="text-[10px] text-muted-foreground font-medium italic">
-            Make sure to include country code (e.g. +91)
+            {t('countryCodeHelp')}
           </p>
         </div>
       ),
@@ -104,7 +103,7 @@ export default function FeaturesPage() {
   ]
 
   if (isLoadingMonetization) {
-    return <div className="p-8">Loading features...</div>
+    return <div className="p-8">{t('loading')}</div>
   }
 
   return (
@@ -114,19 +113,19 @@ export default function FeaturesPage() {
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <h2 className="text-xl font-bold tracking-tight">
-              Lifetime Premium
+              {t('lifetimePremium')}
             </h2>
             <p className="text-sm text-muted-foreground">
-              One-time purchase for foundational features.
+              {t('oneTimePurchase')}
             </p>
           </div>
           {isLifetimePremium ? (
             <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-none px-3 py-1">
-              Active
+              {t('activeSubscription')}
             </Badge>
           ) : (
             <span className="text-sm font-semibold text-primary">
-              ₹300 One-time
+              {t('receivingPrice')}
             </span>
           )}
         </div>
@@ -134,9 +133,9 @@ export default function FeaturesPage() {
         {!isLifetimePremium && (
           <div className="bg-primary/5 border border-primary/10 rounded-xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="space-y-1">
-              <h3 className="font-bold">Upgrade Now</h3>
+              <h3 className="font-bold">{t('upgradeNow')}</h3>
               <p className="text-sm text-muted-foreground">
-                Get lifetime access to all base features.
+                {t('lifetimeAccess')}
               </p>
             </div>
             <Button
@@ -145,7 +144,7 @@ export default function FeaturesPage() {
               className="w-full sm:w-auto"
             >
               <HugeiconsIcon icon={ZapIcon} className="w-4 h-4 mr-2" />
-              Get Lifetime Premium
+              {t('getLifetimePremium')}
             </Button>
           </div>
         )}
@@ -165,7 +164,7 @@ export default function FeaturesPage() {
                     variant="secondary"
                     className="bg-yellow-100 text-yellow-800 border-none"
                   >
-                    Locked
+                    {t('locked')}
                   </Badge>
                 )}
               </div>
@@ -180,7 +179,7 @@ export default function FeaturesPage() {
               {isLifetimePremium && (
                 <div className="mt-2 flex items-center justify-between border-t pt-4 border-primary/5">
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Enable Feature
+                    {t('enableFeature')}
                   </span>
                   <Switch
                     checked={feature.checked}
@@ -196,7 +195,9 @@ export default function FeaturesPage() {
       {/* Add-on Services Section */}
       <section className="space-y-6">
         <div className="space-y-1">
-          <h2 className="text-xl font-bold tracking-tight">Add-on Services</h2>
+          <h2 className="text-xl font-bold tracking-tight">
+            {t('addOnServices')}
+          </h2>
           <p className="text-sm text-muted-foreground">
             Monthly subscriptions for high-value services.
           </p>
@@ -219,21 +220,21 @@ export default function FeaturesPage() {
                   </div>
                   {isSubscribed ? (
                     <Badge className="bg-primary/10 text-primary border-none">
-                      Active Subscription
+                      {t('activeSubscription')}
                     </Badge>
                   ) : isLocked ? (
                     <Badge
                       variant="secondary"
                       className="bg-yellow-100 text-yellow-800 border-none"
                     >
-                      Locked
+                      {t('locked')}
                     </Badge>
                   ) : (
                     <Badge
                       variant="secondary"
                       className="bg-blue-100 text-blue-800 border-none"
                     >
-                      Trial Access
+                      {t('trialAccess')}
                     </Badge>
                   )}
                 </div>
@@ -258,7 +259,7 @@ export default function FeaturesPage() {
                     <div className="space-y-2 rounded-lg bg-primary/5 p-4">
                       <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
                         <span className="text-muted-foreground">
-                          Current Usage
+                          {t('currentUsage')}
                         </span>
                         <span className="text-primary">
                           {addon.quota.used} / {addon.quota.limit}
@@ -278,7 +279,7 @@ export default function FeaturesPage() {
                               icon={ZapIcon}
                               className="w-3 h-3 mr-1"
                             />
-                            Buy Top-up
+                            {t('buyTopUp')}
                           </button>
                         </div>
                       )}
@@ -290,7 +291,7 @@ export default function FeaturesPage() {
                     <div className="space-y-4 border-t pt-4 border-primary/5">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                          Enable Service
+                          {t('enableService')}
                         </span>
                         <Switch
                           checked={addon.checked}
@@ -313,8 +314,8 @@ export default function FeaturesPage() {
                         className="w-4 h-4 mr-2"
                       />
                       {isLocked
-                        ? `Subscribe for ${addon.price}`
-                        : 'Upgrade Subscription'}
+                        ? t('subscribeFor', { price: addon.price })
+                        : t('upgradeSubscription')}
                     </Button>
                   )}
                 </div>

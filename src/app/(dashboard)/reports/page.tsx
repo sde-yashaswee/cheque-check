@@ -40,6 +40,7 @@ const ChequeStatsChart = dynamic(
 
 export default function ReportsPage() {
   const t = useTranslations('Dashboard')
+  const tr = useTranslations('Reports')
   const tc = useTranslations('Common')
   const router = useRouter()
 
@@ -88,27 +89,25 @@ export default function ReportsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-display-sm font-semibold tracking-tight">
-              Reports
+              {tr('title')}
             </h1>
-            <p className="text-body text-muted-foreground">
-              Financial summary and exports
-            </p>
+            <p className="text-body text-muted-foreground">{tr('subtitle')}</p>
           </div>
         </div>
         <EmptyState
           icon={LockPasswordIcon}
-          title="Premium Feature"
-          description="Reports and Data Exports are only available on the Lifetime Premium plan."
+          title={tc('premiumFeature')}
+          description={tr('premiumDescription')}
           action={{
-            label: 'View Features',
+            label: tr('viewFeatures'),
             onClick: () => router.push('/features'),
           }}
         />
         <PremiumModal
           open={!isLoadingMonetization && !isLifetimePremium}
           onOpenChange={() => {}}
-          featureName="Reports & Data Export"
-          description="You need to purchase the Lifetime Premium plan to access detailed financial reports and data exports."
+          featureName={tr('premiumFeatureName')}
+          description={tr('premiumAccessDescription')}
           onCloseRedirect="/settings"
         />
       </div>
@@ -120,18 +119,16 @@ export default function ReportsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-display-sm font-semibold tracking-tight">
-            Reports
+            {tr('title')}
           </h1>
-          <p className="text-body text-muted-foreground">
-            Financial summary and exports
-          </p>
+          <p className="text-body text-muted-foreground">{tr('subtitle')}</p>
         </div>
         <Button
           onClick={handleExport}
           className="rounded-full gap-2"
           disabled={!cheques || cheques.length === 0}
         >
-          <HugeiconsIcon icon={Download} className="h-4 w-4" /> Export
+          <HugeiconsIcon icon={Download} className="h-4 w-4" /> {tr('export')}
         </Button>
       </div>
 
@@ -179,7 +176,7 @@ export default function ReportsPage() {
             </div>
             <div className="rounded-lg bg-canvas-parchment p-6 dark:bg-surface-tile-1">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                Total Cheques
+                {tc('totalCheques')}
               </p>
               <p className="mt-1 text-2xl font-semibold">
                 {cheques?.length || 0}
@@ -195,14 +192,14 @@ export default function ReportsPage() {
                 className="h-3 w-3 text-muted-foreground opacity-80"
               />
               <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                Distribution
+                {tr('distribution')}
               </h2>
             </div>
             <div className="rounded-lg border bg-card p-6 h-[300px] relative">
               {cheques?.length === 0 ? (
                 <div className="flex items-center justify-center h-full">
                   <p className="text-sm text-muted-foreground">
-                    No data for chart
+                    {tr('noDataForChart')}
                   </p>
                 </div>
               ) : (
@@ -223,7 +220,7 @@ export default function ReportsPage() {
                   className="h-3 w-3 text-muted-foreground opacity-80"
                 />
                 <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                  Recent Cheques
+                  {tr('recentCheques')}
                 </h2>
               </div>
             </div>
@@ -231,8 +228,8 @@ export default function ReportsPage() {
             {cheques?.length === 0 ? (
               <EmptyState
                 icon={FileText}
-                title="No cheques yet"
-                description="You don't have any cheques to report on."
+                title={tr('noChequesYet')}
+                description={tr('noChequesToReport')}
                 className="py-10 bg-canvas-parchment/30"
               />
             ) : (
@@ -268,8 +265,7 @@ export default function ReportsPage() {
                 {(cheques?.length || 0) > 10 && (
                   <div className="p-3 text-center bg-muted/20">
                     <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                      Showing 10 of {cheques?.length} cheques. Export to see
-                      all.
+                      {tr('showingCheques', { count: cheques?.length ?? 0 })}
                     </p>
                   </div>
                 )}

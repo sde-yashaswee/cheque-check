@@ -172,7 +172,7 @@ export default function OnboardingPage() {
 
       setStep(5)
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'An error occurred')
+      alert(error instanceof Error ? error.message : tc('error'))
     } finally {
       setLoading(false)
     }

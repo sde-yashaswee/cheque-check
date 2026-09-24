@@ -238,7 +238,7 @@ export default function CreateChequePage() {
       if (toastId) toast.close(toastId)
       toast.add({
         title: tCommon('success'),
-        description: 'Cheque details extracted successfully',
+        description: t('extractionSuccess'),
         type: 'success',
       })
     } catch (error) {
@@ -246,7 +246,7 @@ export default function CreateChequePage() {
       if (toastId) toast.close(toastId)
       toast.add({
         title: tCommon('error'),
-        description: 'Failed to extract cheque details',
+        description: t('extractionFailed'),
         type: 'error',
       })
     } finally {
@@ -300,7 +300,7 @@ export default function CreateChequePage() {
         if (!unmatchedEntities.bank_id) {
           toast.add({
             title: tCommon('error'),
-            description: 'Please select a bank for the new account',
+            description: t('selectBankForAccount'),
             type: 'error',
           })
           setIsCreatingInline(false)
@@ -326,14 +326,14 @@ export default function CreateChequePage() {
       setUnmatchedEntities(null)
       toast.add({
         title: tCommon('success'),
-        description: 'Entities created and selected',
+        description: t('entitiesCreated'),
         type: 'success',
       })
     } catch (error) {
       logger.error('Inline creation error', error)
       toast.add({
         title: tCommon('error'),
-        description: 'Failed to create entities',
+        description: t('entitiesCreateFailed'),
         type: 'error',
       })
     } finally {
@@ -352,7 +352,7 @@ export default function CreateChequePage() {
 
   const accountOptions =
     accounts?.map((b: Account) => ({
-      label: `${(b as any).bank?.name || 'Bank'} (${b.account_number.slice(-4)})`,
+      label: `${(b as any).bank?.name || tCommon('bank')} (${b.account_number.slice(-4)})`,
       value: b.id,
       color: (b as any).color,
       icon: (b as any).icon,
@@ -390,15 +390,15 @@ export default function CreateChequePage() {
             <StepperNav className="gap-3 flex-1">
               {[
                 {
-                  title: 'Scan & Details',
+                  title: t('scanDetails'),
                   icon: <HugeiconsIcon icon={Camera} className="size-4" />,
                 },
                 {
-                  title: 'Entities',
+                  title: t('entities'),
                   icon: <HugeiconsIcon icon={User} className="size-4" />,
                 },
                 {
-                  title: 'Dates & Review',
+                  title: t('datesReview'),
                   icon: <HugeiconsIcon icon={ReceiptText} className="size-4" />,
                 },
               ].map((s, index) => (
@@ -818,12 +818,14 @@ export default function CreateChequePage() {
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">
                     {selectedAccount
-                      ? `${(selectedAccount as any).bank?.name || 'Bank'} (${selectedAccount.account_number.slice(-4)})`
+                      ? `${(selectedAccount as any).bank?.name || tCommon('bank')} (${selectedAccount.account_number.slice(-4)})`
                       : '-'}
                   </span>
                   {selectedAccount && (
                     <EntityAvatar
-                      name={(selectedAccount as any).bank?.name || 'Bank'}
+                      name={
+                        (selectedAccount as any).bank?.name || tCommon('bank')
+                      }
                       color={(selectedAccount as any).color}
                       icon={(selectedAccount as any).icon}
                       imageUrl={(selectedAccount as any).bank?.logo_url}
@@ -852,7 +854,7 @@ export default function CreateChequePage() {
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>New Entities Found</DialogTitle>
+            <DialogTitle>{t('newEntitiesFound')}</DialogTitle>
             <DialogDescription>
               We found a party and/or account on the cheque that aren&apos;t in
               your business. Would you like to create them?

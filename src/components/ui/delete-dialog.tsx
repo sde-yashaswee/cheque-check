@@ -1,12 +1,37 @@
 'use client'
 
 import { useState } from 'react'
-import { UserIcon as User, Mail01Icon as Mail, LockPasswordIcon as Lock, CallIcon as Phone, Calendar03Icon as Calendar, HashtagIcon as Hash, Note01Icon as Note, Building03Icon as Building, Wallet01Icon as Wallet, Search01Icon as Search, Location01Icon as Location, TextFontIcon as TextIcon, Alert02Icon as AlertTriangle, Delete02Icon as Trash2 } from '@hugeicons/core-free-icons';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog'
+import {
+  UserIcon as User,
+  Mail01Icon as Mail,
+  LockPasswordIcon as Lock,
+  CallIcon as Phone,
+  Calendar03Icon as Calendar,
+  HashtagIcon as Hash,
+  Note01Icon as Note,
+  Building03Icon as Building,
+  Wallet01Icon as Wallet,
+  Search01Icon as Search,
+  Location01Icon as Location,
+  TextFontIcon as TextIcon,
+  Alert02Icon as AlertTriangle,
+  Delete02Icon as Trash2,
+} from '@hugeicons/core-free-icons'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { HugeiconsIcon } from '@hugeicons/react';
+import { HugeiconsIcon } from '@hugeicons/react'
+import { useTranslations } from 'next-intl'
 
 interface DeleteConfirmationDialogProps {
   title: string
@@ -21,11 +46,12 @@ export function DeleteConfirmationDialog({
   description,
   confirmName,
   onDelete,
-  trigger
+  trigger,
 }: DeleteConfirmationDialogProps) {
   const [open, setOpen] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [loading, setLoading] = useState(false)
+  const t = useTranslations('Common')
 
   const handleConfirm = async () => {
     if (inputValue !== confirmName) return
@@ -42,17 +68,21 @@ export function DeleteConfirmationDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={trigger || (
-          <Button variant="destructive"className="rounded-2xl h-12">
-            <HugeiconsIcon icon={Trash2} className="mr-2 h-4 w-4"/> Delete
-          </Button>
-        )}
+      <DialogTrigger
+        render={
+          trigger || (
+            <Button variant="destructive" className="rounded-2xl h-12">
+              <HugeiconsIcon icon={Trash2} className="mr-2 h-4 w-4" />{' '}
+              {t('delete')}
+            </Button>
+          )
+        }
       />
       <DialogContent className="rounded-3xl sm:max-w-[400px] border-none p-0 overflow-hidden">
         <div className="p-6 pb-0">
           <DialogHeader>
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-destructive/10 text-destructive mb-4">
-              <HugeiconsIcon icon={AlertTriangle} className="h-6 w-6"/>
+              <HugeiconsIcon icon={AlertTriangle} className="h-6 w-6" />
             </div>
             <DialogTitle className="text-xl font-bold">{title}</DialogTitle>
             <DialogDescription className="text-muted-foreground pt-2">
@@ -62,10 +92,14 @@ export function DeleteConfirmationDialog({
 
           <div className="space-y-4 py-6">
             <div className="space-y-3 text-center">
-              <Label htmlFor="confirm_name"className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block">
-                Type <span className="text-foreground font-mono font-black px-1.5 py-0.5 bg-muted rounded">{confirmName}</span> to confirm
+              <Label
+                htmlFor="confirm_name"
+                className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block"
+              >
+                {t('typeToConfirm', { name: confirmName })}
               </Label>
-              <Input leftIcon={TextIcon} 
+              <Input
+                leftIcon={TextIcon}
                 id="confirm_name"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
@@ -84,7 +118,7 @@ export function DeleteConfirmationDialog({
             disabled={inputValue !== confirmName || loading}
             className="w-full rounded-pill h-14 font-bold text-lg"
           >
-            {loading ? 'Deleting...' : 'Delete Permanently'}
+            {loading ? t('deleting') : t('deletePermanently')}
           </Button>
         </div>
       </DialogContent>

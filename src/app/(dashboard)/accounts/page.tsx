@@ -257,7 +257,7 @@ export default function AccountsPage() {
               <div className="group relative rounded-xl border bg-card p-5 transition-all active:scale-95 border-zinc-200 dark:border-zinc-800">
                 <div className="flex items-start gap-4">
                   <EntityAvatar
-                    name={account.bank?.name || 'Bank'}
+                    name={account.bank?.name || tc('bank')}
                     color={account.color}
                     icon={account.icon}
                     imageUrl={account.bank?.logo_url}

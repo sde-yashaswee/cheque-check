@@ -19,6 +19,7 @@ import {
 import { storageService } from '@/services/storage.service'
 import { toast } from './toast'
 import { logger } from '@/lib/logger'
+import { useTranslations } from 'next-intl'
 
 interface EditableAvatarProps {
   name: string
@@ -41,6 +42,7 @@ export function EditableAvatar({
   className,
   size = 'lg',
 }: EditableAvatarProps) {
+  const t = useTranslations('Common')
   const [isUploading, setIsUploading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -61,16 +63,16 @@ export function EditableAvatar({
       const publicUrl = await storageService.uploadAvatar(file)
       await onUpload(publicUrl)
       toast.add({
-        title: 'Success',
-        description: 'Avatar updated successfully',
+        title: t('success'),
+        description: t('avatarUpdated'),
         type: 'success',
       })
       setIsOpen(false)
     } catch (error) {
       logger.error('Error uploading avatar', error)
       toast.add({
-        title: 'Error',
-        description: 'Failed to upload avatar',
+        title: t('error'),
+        description: t('avatarUploadFailed'),
         type: 'error',
       })
     } finally {
@@ -84,16 +86,16 @@ export function EditableAvatar({
     try {
       await onDelete()
       toast.add({
-        title: 'Success',
-        description: 'Avatar removed successfully',
+        title: t('success'),
+        description: t('avatarRemoved'),
         type: 'success',
       })
       setIsOpen(false)
     } catch (error) {
       logger.error('Error deleting avatar', error)
       toast.add({
-        title: 'Error',
-        description: 'Failed to remove avatar',
+        title: t('error'),
+        description: t('avatarRemoveFailed'),
         type: 'error',
       })
     } finally {
@@ -138,7 +140,7 @@ export function EditableAvatar({
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Change Photo</DialogTitle>
+          <DialogTitle>{t('changePhoto')}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center gap-6 py-8">
           <div
@@ -171,7 +173,7 @@ export function EditableAvatar({
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
             >
-              {isUploading ? 'Uploading...' : 'Upload New'}
+              {isUploading ? t('uploadingShort') : t('uploadNew')}
             </Button>
             {imageUrl && onDelete && (
               <Button

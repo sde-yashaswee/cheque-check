@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
         setSent(true)
       }
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'An error occurred')
+      alert(error instanceof Error ? error.message : t('unknownError'))
     } finally {
       setLoading(false)
     }
@@ -82,7 +82,7 @@ export default function ForgotPasswordPage() {
                 render={<Link href="/login" />}
                 className="w-full rounded-full h-12"
               >
-                Back to Login
+                {t('backToLogin')}
               </Button>
             </div>
           ) : (
@@ -105,14 +105,14 @@ export default function ForgotPasswordPage() {
                 className="w-full rounded-full h-12 text-lg"
                 disabled={loading}
               >
-                {loading ? 'Sending...' : 'Send Reset Link'}
+                {loading ? t('sending') : t('sendResetLink')}
               </Button>
               <Link
                 href="/login"
                 className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mt-2"
               >
-                <HugeiconsIcon icon={ArrowLeft} className="h-4 w-4" /> Back to
-                Login
+                <HugeiconsIcon icon={ArrowLeft} className="h-4 w-4" />{' '}
+                {t('backToLogin')}
               </Link>
             </form>
           )}

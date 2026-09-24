@@ -29,6 +29,7 @@ import 'react-photo-view/dist/react-photo-view.css'
 
 export default function ChequeDetailPage() {
   const t = useTranslations('Cheques')
+  const tc = useTranslations('Common')
   const { id } = useParams() as { id: string }
   const { profile } = useProfile()
   const currency = profile?.currency || '₹'
@@ -136,7 +137,7 @@ export default function ChequeDetailPage() {
               </p>
               <div className="flex items-center gap-3">
                 <EntityAvatar
-                  name={cheque.account?.bank?.name || 'Bank'}
+                  name={cheque.account?.bank?.name || tc('bank')}
                   color={cheque.account?.color}
                   icon={cheque.account?.icon}
                   imageUrl={cheque.account?.bank?.logo_url}

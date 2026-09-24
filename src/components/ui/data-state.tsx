@@ -1,7 +1,12 @@
-import * as React from "react"
-import { Search01Icon as Search, Alert02Icon as ShieldAlert, Alert01Icon as AlertCircle } from '@hugeicons/core-free-icons';
-import { EmptyState } from "./empty-state"
-import { useRouter } from "next/navigation"
+import * as React from 'react'
+import {
+  Search01Icon as Search,
+  Alert02Icon as ShieldAlert,
+  Alert01Icon as AlertCircle,
+} from '@hugeicons/core-free-icons'
+import { EmptyState } from './empty-state'
+import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 interface DataStateProps {
   isLoading?: boolean
@@ -33,6 +38,7 @@ export function DataState({
   children,
 }: DataStateProps) {
   const router = useRouter()
+  const t = useTranslations('Common')
 
   // 1. Loading State
   if (isLoading) {
@@ -45,11 +51,11 @@ export function DataState({
       unauthorizedState || (
         <EmptyState
           icon={ShieldAlert}
-          title="Not Authorized"
-          description="You don't have permission to view this content. Please contact your administrator."
+          title={t('notAuthorized')}
+          description={t('notAuthorizedDesc')}
           action={{
-            label: "Back to Dashboard",
-            onClick: () => router.push("/"),
+            label: t('backToDashboard'),
+            onClick: () => router.push('/'),
           }}
         />
       )
@@ -62,10 +68,10 @@ export function DataState({
       errorState || (
         <EmptyState
           icon={AlertCircle}
-          title="Something went wrong"
-          description="We couldn't load the data. Please try again later."
+          title={t('error')}
+          description={t('loadDataError')}
           action={{
-            label: "Reload Page",
+            label: t('reloadPage'),
             onClick: () => window.location.reload(),
           }}
         />
@@ -84,12 +90,12 @@ export function DataState({
       noResultsState || (
         <EmptyState
           icon={Search}
-          title="No records found"
-          description="No results match your current filters. Try adjusting your search or filters."
+          title={t('noRecordsFound')}
+          description={t('noResultsMatch')}
           action={
             onClearFilters
               ? {
-                  label: "Clear all filters",
+                  label: t('clearAllFilters'),
                   onClick: onClearFilters,
                 }
               : undefined
