@@ -21,7 +21,8 @@
     "format": "node scripts/check-format.mjs --write",
     "format:check": "node scripts/check-format.mjs",
     "prepare": "husky",
-    "admin:monetization": "npx tsx scripts/admin-monetization.ts"
+    "admin:monetization": "tsx scripts/admin-monetization.ts",
+    "storage:migrate": "tsx scripts/migrate-private-storage.ts"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,mts}": [
@@ -87,6 +88,7 @@
     "lint-staged": "^17.5.1",
     "prettier": "^3.9.9",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.1"
   }
