@@ -1,4 +1,5 @@
 import { Cheque, ChequeStatus, ChequeWithRelations } from '@/types'
+import { TABLES } from '@/lib/supabase/tables'
 import { SupabaseRepository } from './base.repository'
 
 export interface IChequeRepository {
@@ -36,7 +37,7 @@ export class SupabaseChequeRepository
   async getAll(businessId: string): Promise<ChequeWithRelations[]> {
     return this.handle(
       this.supabase
-        .from('cheques')
+        .from(TABLES.CHEQUES)
         .select(
           '*, party:parties(name, color, icon, avatar_url), account:accounts(account_name, color, icon, bank:banks(name, logo_url))',
         )
@@ -48,7 +49,7 @@ export class SupabaseChequeRepository
   async getById(id: string): Promise<ChequeWithRelations> {
     return this.handle(
       this.supabase
-        .from('cheques')
+        .from(TABLES.CHEQUES)
         .select(
           '*, party:parties(name, color, icon, avatar_url), account:accounts(account_name, color, icon, bank:banks(name, logo_url))',
         )
@@ -64,7 +65,7 @@ export class SupabaseChequeRepository
     >,
   ): Promise<Cheque> {
     return this.handle(
-      this.supabase.from('cheques').insert([input]).select().single(),
+      this.supabase.from(TABLES.CHEQUES).insert([input]).select().single(),
     ) as Promise<Cheque>
   }
 
@@ -85,7 +86,7 @@ export class SupabaseChequeRepository
   ): Promise<Cheque> {
     return this.handle(
       this.supabase
-        .from('cheques')
+        .from(TABLES.CHEQUES)
         .update(input)
         .eq('id', id)
         .select()
@@ -96,7 +97,7 @@ export class SupabaseChequeRepository
   async updateStatus(id: string, status: ChequeStatus): Promise<Cheque> {
     return this.handle(
       this.supabase
-        .from('cheques')
+        .from(TABLES.CHEQUES)
         .update({ status, updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
@@ -105,6 +106,8 @@ export class SupabaseChequeRepository
   }
 
   async delete(id: string): Promise<void> {
-    await this.handleVoid(this.supabase.from('cheques').delete().eq('id', id))
+    await this.handleVoid(
+      this.supabase.from(TABLES.CHEQUES).delete().eq('id', id),
+    )
   }
 }

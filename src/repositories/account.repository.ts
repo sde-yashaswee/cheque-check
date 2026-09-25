@@ -1,4 +1,5 @@
 import { Account } from '@/types'
+import { TABLES } from '@/lib/supabase/tables'
 import { SupabaseRepository } from './base.repository'
 
 export interface IAccountRepository {
@@ -34,7 +35,7 @@ export class SupabaseAccountRepository
   async getAll(businessId: string): Promise<Account[]> {
     return this.handle(
       this.supabase
-        .from('accounts')
+        .from(TABLES.ACCOUNTS)
         .select('*, bank:banks(name, logo_url)')
         .eq('business_id', businessId)
         .is('deleted_at', null)
@@ -45,7 +46,7 @@ export class SupabaseAccountRepository
   async getById(id: string): Promise<Account> {
     return this.handle(
       this.supabase
-        .from('accounts')
+        .from(TABLES.ACCOUNTS)
         .select('*, bank:banks(name, logo_url)')
         .eq('id', id)
         .single(),
@@ -59,7 +60,7 @@ export class SupabaseAccountRepository
     >,
   ): Promise<Account> {
     return this.handle(
-      this.supabase.from('accounts').insert([input]).select().single(),
+      this.supabase.from(TABLES.ACCOUNTS).insert([input]).select().single(),
     ) as Promise<Account>
   }
 
@@ -79,7 +80,7 @@ export class SupabaseAccountRepository
   ): Promise<Account> {
     return this.handle(
       this.supabase
-        .from('accounts')
+        .from(TABLES.ACCOUNTS)
         .update(input)
         .eq('id', id)
         .select()
@@ -90,7 +91,7 @@ export class SupabaseAccountRepository
   async delete(id: string): Promise<void> {
     await this.handleVoid(
       this.supabase
-        .from('accounts')
+        .from(TABLES.ACCOUNTS)
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', id),
     )

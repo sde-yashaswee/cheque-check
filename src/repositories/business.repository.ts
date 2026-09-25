@@ -1,5 +1,6 @@
 import { Business } from '@/types'
 import { ValidationError } from '@/lib/errors'
+import { TABLES } from '@/lib/supabase/tables'
 import { SupabaseRepository } from './base.repository'
 
 export interface IBusinessRepository {
@@ -30,7 +31,7 @@ export class SupabaseBusinessRepository
   async getAll(): Promise<Business[]> {
     return this.handle(
       this.supabase
-        .from('businesses')
+        .from(TABLES.BUSINESSES)
         .select('*')
         .is('deleted_at', null)
         .order('created_at', { ascending: false }),
@@ -39,7 +40,7 @@ export class SupabaseBusinessRepository
 
   async getById(id: string): Promise<Business> {
     return this.handle(
-      this.supabase.from('businesses').select('*').eq('id', id).single(),
+      this.supabase.from(TABLES.BUSINESSES).select('*').eq('id', id).single(),
     ) as Promise<Business>
   }
 
@@ -57,7 +58,7 @@ export class SupabaseBusinessRepository
 
     return this.handle(
       this.supabase
-        .from('businesses')
+        .from(TABLES.BUSINESSES)
         .insert([{ ...input, user_id: user.id }])
         .select()
         .single(),
@@ -75,7 +76,7 @@ export class SupabaseBusinessRepository
   ): Promise<Business> {
     return this.handle(
       this.supabase
-        .from('businesses')
+        .from(TABLES.BUSINESSES)
         .update(input)
         .eq('id', id)
         .select()
@@ -86,7 +87,7 @@ export class SupabaseBusinessRepository
   async delete(id: string): Promise<void> {
     await this.handleVoid(
       this.supabase
-        .from('businesses')
+        .from(TABLES.BUSINESSES)
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', id),
     )

@@ -1,4 +1,5 @@
 import { Bank } from '@/types'
+import { TABLES } from '@/lib/supabase/tables'
 import { SupabaseRepository } from './base.repository'
 
 export interface IBankRepository {
@@ -12,7 +13,7 @@ export class SupabaseBankRepository
   async getAll(): Promise<Bank[]> {
     return this.handle(
       this.supabase
-        .from('banks')
+        .from(TABLES.BANKS)
         .select('*')
         .order('name', { ascending: true }),
     ) as Promise<Bank[]>

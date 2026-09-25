@@ -1,5 +1,6 @@
 import { SupabaseRepository } from './base.repository'
 import { mapSupabaseError } from '@/lib/errors'
+import { TABLES } from '@/lib/supabase/tables'
 
 export interface Entitlement {
   id: string
@@ -48,7 +49,7 @@ export class SupabaseMonetizationRepository
     if (!user) return []
 
     const { data, error } = await this.supabase
-      .from('user_entitlements')
+      .from(TABLES.USER_ENTITLEMENTS)
       .select('*')
       .eq('user_id', user.id)
 
@@ -62,7 +63,7 @@ export class SupabaseMonetizationRepository
     if (!user) return []
 
     const { data, error } = await this.supabase
-      .from('user_quotas')
+      .from(TABLES.USER_QUOTAS)
       .select('*')
       .eq('user_id', user.id)
 
@@ -76,7 +77,7 @@ export class SupabaseMonetizationRepository
     if (!user) return []
 
     const { data, error } = await this.supabase
-      .from('transactions')
+      .from(TABLES.TRANSACTIONS)
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })

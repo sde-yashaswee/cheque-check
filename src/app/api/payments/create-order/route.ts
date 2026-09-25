@@ -7,6 +7,7 @@ import { publicEnv } from '@/lib/env/client'
 import { getRazorpayEnv, getSupabaseAdminEnv } from '@/lib/env/server'
 import { CreatePaymentOrderSchema } from '@/lib/payments'
 import { logger } from '@/lib/logger'
+import { TABLES } from '@/lib/supabase/tables'
 
 type PaymentProduct = {
   id: string
@@ -76,7 +77,7 @@ export async function POST(request: Request) {
       { auth: { persistSession: false, autoRefreshToken: false } },
     )
     const { data: productData, error: productError } = await admin
-      .from('payment_products')
+      .from(TABLES.PAYMENT_PRODUCTS)
       .select(
         'id, name, transaction_type, feature_id, amount, currency, required_entitlement_id',
       )
@@ -93,7 +94,7 @@ export async function POST(request: Request) {
     const product = productData as PaymentProduct
 
     const { data: entitlements, error: entitlementError } = await admin
-      .from('user_entitlements')
+      .from(TABLES.USER_ENTITLEMENTS)
       .select('feature_id, status, valid_until')
       .eq('user_id', user.id)
       .eq('status', 'active')

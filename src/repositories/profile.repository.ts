@@ -1,5 +1,6 @@
 import { Profile } from '@/types'
 import { mapSupabaseError } from '@/lib/errors'
+import { TABLES } from '@/lib/supabase/tables'
 import { SupabaseRepository } from './base.repository'
 
 export interface IProfileRepository {
@@ -18,7 +19,7 @@ export class SupabaseProfileRepository
     if (!user) return null
 
     const { data, error } = await this.supabase
-      .from('profiles')
+      .from(TABLES.PROFILES)
       .select('*')
       .eq('user_id', user.id)
       .is('deleted_at', null)
@@ -31,7 +32,7 @@ export class SupabaseProfileRepository
     }
 
     const { data: existing, error: lookupError } = await this.supabase
-      .from('profiles')
+      .from(TABLES.PROFILES)
       .select('*')
       .eq('user_id', user.id)
       .maybeSingle()
@@ -40,7 +41,7 @@ export class SupabaseProfileRepository
 
     if (existing && existing.deleted_at) {
       const { data: reactivated, error: reactError } = await this.supabase
-        .from('profiles')
+        .from(TABLES.PROFILES)
         .update({ deleted_at: null })
         .eq('user_id', user.id)
         .select()
@@ -52,7 +53,7 @@ export class SupabaseProfileRepository
 
     if (!existing) {
       const { data: newProfile, error: createError } = await this.supabase
-        .from('profiles')
+        .from(TABLES.PROFILES)
         .insert([
           {
             user_id: user.id,
@@ -76,7 +77,7 @@ export class SupabaseProfileRepository
     if (!user) throw new Error('Not authenticated')
 
     const { data, error } = await this.supabase
-      .from('profiles')
+      .from(TABLES.PROFILES)
       .update(profile)
       .eq('user_id', user.id)
       .select()
@@ -92,7 +93,7 @@ export class SupabaseProfileRepository
     if (!user) throw new Error('Not authenticated')
 
     const { error } = await this.supabase
-      .from('profiles')
+      .from(TABLES.PROFILES)
       .update({ deleted_at: new Date().toISOString() })
       .eq('user_id', user.id)
 

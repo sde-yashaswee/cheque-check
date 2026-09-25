@@ -1,6 +1,7 @@
 import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Logger } from '../utils/logger.ts'
 import { ReminderCheque, ReminderProfile, ReminderQuota } from '../types.ts'
+import { TABLES } from '../../_shared/tables.ts'
 
 export class DatabaseService {
   constructor(private supabase: SupabaseClient) {}
@@ -8,7 +9,7 @@ export class DatabaseService {
   async fetchChequesDueToday(): Promise<ReminderCheque[]> {
     const today = new Date().toISOString().split('T')[0]
     const { data, error } = await this.supabase
-      .from('cheques')
+      .from(TABLES.CHEQUES)
       .select(
         `
         id,
@@ -30,7 +31,7 @@ export class DatabaseService {
   async fetchProfiles(userIds: string[]): Promise<ReminderProfile[]> {
     // Added 'language' to the select query
     const { data: profiles, error: profilesError } = await this.supabase
-      .from('profiles')
+      .from(TABLES.PROFILES)
       .select('user_id, name, phone, voice_call_enabled, language')
       .in('user_id', userIds)
       .eq('voice_call_enabled', true)
@@ -40,7 +41,7 @@ export class DatabaseService {
 
     // Fetch Quotas
     const { data: quotas, error: quotasError } = await this.supabase
-      .from('user_quotas')
+      .from(TABLES.USER_QUOTAS)
       .select('user_id, used, limit')
       .in('user_id', userIds)
       .eq('feature_id', 'voice_reminder')
@@ -61,7 +62,7 @@ export class DatabaseService {
     // or we can use a RPC or a raw SQL update.
     // Let's just do a simple update for now.
     const { data: quota } = await this.supabase
-      .from('user_quotas')
+      .from(TABLES.USER_QUOTAS)
       .select('id, used')
       .eq('user_id', userId)
       .eq('feature_id', 'voice_reminder')
@@ -69,7 +70,7 @@ export class DatabaseService {
 
     if (quota) {
       await this.supabase
-        .from('user_quotas')
+        .from(TABLES.USER_QUOTAS)
         .update({ used: (quota.used || 0) + 1 })
         .eq('id', quota.id)
     }
@@ -77,7 +78,7 @@ export class DatabaseService {
 
   async markCallSent(chequeIds: string[]) {
     const { error } = await this.supabase
-      .from('cheques')
+      .from(TABLES.CHEQUES)
       .update({
         voice_call_sent: true,
         last_call_at: new Date().toISOString(),

@@ -1,4 +1,5 @@
 import { Party } from '@/types'
+import { TABLES } from '@/lib/supabase/tables'
 import { SupabaseRepository } from './base.repository'
 
 export interface IPartyRepository {
@@ -26,7 +27,7 @@ export class SupabasePartyRepository
   async getAll(businessId: string): Promise<Party[]> {
     return this.handle(
       this.supabase
-        .from('parties')
+        .from(TABLES.PARTIES)
         .select('*')
         .eq('business_id', businessId)
         .is('deleted_at', null)
@@ -36,7 +37,7 @@ export class SupabasePartyRepository
 
   async getById(id: string): Promise<Party> {
     return this.handle(
-      this.supabase.from('parties').select('*').eq('id', id).single(),
+      this.supabase.from(TABLES.PARTIES).select('*').eq('id', id).single(),
     ) as Promise<Party>
   }
 
@@ -44,7 +45,7 @@ export class SupabasePartyRepository
     input: Omit<Party, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>,
   ): Promise<Party> {
     return this.handle(
-      this.supabase.from('parties').insert([input]).select().single(),
+      this.supabase.from(TABLES.PARTIES).insert([input]).select().single(),
     ) as Promise<Party>
   }
 
@@ -59,7 +60,7 @@ export class SupabasePartyRepository
   ): Promise<Party> {
     return this.handle(
       this.supabase
-        .from('parties')
+        .from(TABLES.PARTIES)
         .update(input)
         .eq('id', id)
         .select()
@@ -70,7 +71,7 @@ export class SupabasePartyRepository
   async delete(id: string): Promise<void> {
     await this.handleVoid(
       this.supabase
-        .from('parties')
+        .from(TABLES.PARTIES)
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', id),
     )
