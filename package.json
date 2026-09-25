@@ -22,7 +22,12 @@
     "format:check": "node scripts/check-format.mjs",
     "prepare": "husky",
     "admin:monetization": "tsx scripts/admin-monetization.ts",
-    "storage:migrate": "tsx scripts/migrate-private-storage.ts"
+    "storage:migrate": "tsx scripts/migrate-private-storage.ts",
+    "supabase:setup": "tsx scripts/supabase-setup.ts",
+    "supabase:reset": "tsx scripts/supabase-reset.ts",
+    "supabase:gen-types": "supabase gen types typescript --linked --schema public > src/types/database.types.ts",
+    "supabase:gen-types:local": "supabase gen types typescript --local --schema public > src/types/database.types.ts",
+    "supabase:functions:deploy": "supabase functions deploy send-reminders && supabase functions deploy razorpay-webhook"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,mts}": [
@@ -69,6 +74,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@inquirer/prompts": "^8.7.2",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^7.0.1",
@@ -87,6 +93,7 @@
     "jsdom": "^30.1.1",
     "lint-staged": "^17.5.1",
     "prettier": "^3.9.9",
+    "supabase": "^2.117.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5",

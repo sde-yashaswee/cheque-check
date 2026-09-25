@@ -40,6 +40,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local Supabase reset allowlist
+/supabase/.dev-projects.local.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
