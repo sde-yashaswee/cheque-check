@@ -33,18 +33,15 @@ if a newer Node version is installed globally.
    npm ci
    ```
 
-2. Create `.env.local` from `.env.example` and provide the two required
-   Supabase values:
+2. Run the interactive Supabase setup wizard. It links a hosted project,
+   applies migrations, writes `.env.local`, and optionally deploys Edge
+   Functions:
 
-   ```text
-   NEXT_PUBLIC_SUPABASE_URL
-   NEXT_PUBLIC_SUPABASE_ANON_KEY
+   ```bash
+   npm run supabase:setup
    ```
 
-3. Apply the migrations in `supabase/migrations` to the selected Supabase
-   project.
-
-4. Start the application:
+3. Start the application:
 
    ```bash
    npm run dev
@@ -77,19 +74,22 @@ through a `NEXT_PUBLIC_` variable.
 
 ## Commands
 
-| Command                    | Purpose                                 |
-| -------------------------- | --------------------------------------- |
-| `npm run dev`              | Start the Next.js development server    |
-| `npm run build`            | Create a production build               |
-| `npm run lint`             | Run ESLint                              |
-| `npm run type-check`       | Run strict TypeScript checks            |
-| `npm test`                 | Run the Vitest suite once               |
-| `npm run test:watch`       | Run Vitest in watch mode                |
-| `npm run test:coverage`    | Generate unit-test coverage             |
-| `npm run test:e2e:install` | Install Playwright Chromium             |
-| `npm run test:e2e`         | Run Playwright tests                    |
-| `npm run format`           | Format files changed from `origin/main` |
-| `npm run format:check`     | Check formatting for changed files      |
+| Command                      | Purpose                                         |
+| ---------------------------- | ----------------------------------------------- |
+| `npm run dev`                | Start the Next.js development server            |
+| `npm run build`              | Create a production build                       |
+| `npm run lint`               | Run ESLint                                      |
+| `npm run type-check`         | Run strict TypeScript checks                    |
+| `npm test`                   | Run the Vitest suite once                       |
+| `npm run test:watch`         | Run Vitest in watch mode                        |
+| `npm run test:coverage`      | Generate unit-test coverage                     |
+| `npm run test:e2e:install`   | Install Playwright Chromium                     |
+| `npm run test:e2e`           | Run Playwright tests                            |
+| `npm run format`             | Format files changed from `origin/main`         |
+| `npm run format:check`       | Check formatting for changed files              |
+| `npm run supabase:setup`     | Link a hosted project and apply setup           |
+| `npm run supabase:reset`     | Destructively reset an allowlisted test project |
+| `npm run supabase:gen-types` | Regenerate committed database types             |
 
 The E2E runner is scaffolded but intentionally has no external-service flows
 yet. See `e2e/README.md` before adding tests.
@@ -98,6 +98,7 @@ yet. See `e2e/README.md` before adding tests.
 
 ```text
 src/app/          Next.js routes, layouts, and API handlers
+src/features/     Feature-owned hooks, components, services, repositories, and entry points
 src/components/   Shared application and UI components
 src/hooks/        Query, mutation, form, and business-context hooks
 src/services/     Supabase data-access services
@@ -113,20 +114,30 @@ Components should not query Supabase directly. Keep database access in services
 and expose it through typed hooks. Server-only credentials belong in server
 modules or Edge Functions.
 
+Feature code belongs under `src/features/<feature>`. Current feature areas are
+`auth`, `onboarding`, `dashboard`, `businesses`, `accounts`, `parties`,
+`cheques`, `reports`, `monetization`, `profile`, and `settings`. Shared UI and
+cross-feature infrastructure remain in their existing top-level folders. The
+old hook, component, and repository paths are compatibility facades; new code
+should import from the relevant feature entry point.
+
 ## Database Workflow
 
 - Treat migrations as forward-only once shared or deployed.
 - Create a new timestamped migration for every schema, policy, function, or
   storage change.
 - Review Row Level Security for every new table and storage policy.
-- Generate and commit Supabase database types once type generation is added to
-  the repository.
+- Run `npm run supabase:gen-types` after every schema migration and commit the
+  resulting `src/types/database.types.ts` update.
+- Use `TABLES` from `src/lib/supabase/tables.ts` for every table reference so
+  editor completion and schema drift errors remain available.
 - Deploy `razorpay-webhook` and `send-reminders` Edge Functions separately from
   the Next.js application.
 
-The repository does not currently contain `supabase/seed.sql`, although local
-Supabase config references it. Add a deterministic seed before relying on
-`supabase db reset` in development or CI.
+`supabase/seed.sql` contains idempotent bank reference data. The reset command
+requires the linked project ref to be in `supabase/.dev-projects.json` or the
+local, ignored `supabase/.dev-projects.local.json`, then requires typing the
+ref to confirm the destructive operation. Edge Function secrets are not reset.
 
 ## Quality Gates
 
@@ -139,6 +150,9 @@ Every pull request and push to `main` runs `.github/workflows/quality.yml`:
 5. Unit tests
 6. High/critical production dependency audit
 7. Production build
+
+The workflow also starts Supabase and runs `supabase db reset` to verify that
+all migrations and seed data apply to a clean database.
 
 Husky and lint-staged apply ESLint and Prettier to staged files before each
 commit. The full repository is not mass-formatted; formatting is enforced

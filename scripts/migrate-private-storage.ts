@@ -1,5 +1,6 @@
 import { config } from 'dotenv'
 import { createClient } from '@supabase/supabase-js'
+import { TABLES } from '../src/lib/supabase/tables'
 import {
   buildPrivateMediaUrl,
   PRIVATE_AVATAR_BUCKET,
@@ -14,7 +15,11 @@ config({ path: '.env' })
 type SourceBucket = 'avatars' | 'cheque-images'
 
 type MigrationItem = {
-  table: 'profiles' | 'businesses' | 'parties' | 'cheques'
+  table:
+    | typeof TABLES.PROFILES
+    | typeof TABLES.BUSINESSES
+    | typeof TABLES.PARTIES
+    | typeof TABLES.CHEQUES
   column: 'avatar_url' | 'logo_url' | 'image_url'
   id: string
   userId: string
@@ -113,10 +118,10 @@ async function main() {
   }
 
   const [profiles, businesses, parties, cheques] = await Promise.all([
-    fetchRows<ProfileRow>('profiles', 'id, user_id, avatar_url'),
-    fetchRows<BusinessRow>('businesses', 'id, user_id, logo_url'),
-    fetchRows<PartyRow>('parties', 'id, business_id, avatar_url'),
-    fetchRows<ChequeRow>('cheques', 'id, business_id, image_url'),
+    fetchRows<ProfileRow>(TABLES.PROFILES, 'id, user_id, avatar_url'),
+    fetchRows<BusinessRow>(TABLES.BUSINESSES, 'id, user_id, logo_url'),
+    fetchRows<PartyRow>(TABLES.PARTIES, 'id, business_id, avatar_url'),
+    fetchRows<ChequeRow>(TABLES.CHEQUES, 'id, business_id, image_url'),
   ])
   const businessOwners = new Map(
     businesses.map((business) => [business.id, business.user_id]),
@@ -126,7 +131,7 @@ async function main() {
   for (const profile of profiles) {
     if (profile.avatar_url) {
       items.push({
-        table: 'profiles',
+        table: TABLES.PROFILES,
         column: 'avatar_url',
         id: profile.id,
         userId: profile.user_id,
@@ -139,7 +144,7 @@ async function main() {
   for (const business of businesses) {
     if (business.logo_url) {
       items.push({
-        table: 'businesses',
+        table: TABLES.BUSINESSES,
         column: 'logo_url',
         id: business.id,
         userId: business.user_id,
@@ -153,7 +158,7 @@ async function main() {
     const userId = businessOwners.get(party.business_id)
     if (party.avatar_url && userId) {
       items.push({
-        table: 'parties',
+        table: TABLES.PARTIES,
         column: 'avatar_url',
         id: party.id,
         userId,
@@ -167,7 +172,7 @@ async function main() {
     const userId = businessOwners.get(cheque.business_id)
     if (cheque.image_url && userId) {
       items.push({
-        table: 'cheques',
+        table: TABLES.CHEQUES,
         column: 'image_url',
         id: cheque.id,
         userId,
