@@ -98,6 +98,7 @@ yet. See `e2e/README.md` before adding tests.
 
 ```text
 src/app/          Next.js routes, layouts, and API handlers
+src/features/     Feature-owned hooks, components, repositories, and entry points
 src/components/   Shared application and UI components
 src/hooks/        Query, mutation, form, and business-context hooks
 src/services/     Supabase data-access services
@@ -112,6 +113,13 @@ docs/prd/         Product requirements and acceptance criteria
 Components should not query Supabase directly. Keep database access in services
 and expose it through typed hooks. Server-only credentials belong in server
 modules or Edge Functions.
+
+Feature code belongs under `src/features/<feature>`. Current feature areas are
+`auth`, `onboarding`, `dashboard`, `businesses`, `accounts`, `parties`,
+`cheques`, `reports`, `monetization`, `profile`, and `settings`. Shared UI and
+cross-feature infrastructure remain in their existing top-level folders. The
+old hook, component, and repository paths are compatibility facades; new code
+should import from the relevant feature entry point.
 
 ## Database Workflow
 
