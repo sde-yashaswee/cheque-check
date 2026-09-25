@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { execFileSync } from 'node:child_process'
 import { confirm, input, password } from '@inquirer/prompts'
@@ -71,15 +71,21 @@ async function main() {
     api_key?: string
   }>
   const anonKey = apiKeys.find((key) => key.name === 'anon')?.api_key ?? ''
+  const serviceRoleKey =
+    apiKeys.find((key) => key.name === 'service_role')?.api_key ?? ''
   const supabaseUrl = await input({
     message: 'Supabase URL',
     default: `https://${projectRef}.supabase.co`,
   })
   const enteredAnonKey =
     anonKey || (await password({ message: 'Supabase anon key' }))
+  const enteredServiceRoleKey =
+    serviceRoleKey ||
+    (await password({ message: 'Supabase service-role key (optional)' }))
   updateEnv({
     NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: enteredAnonKey,
+    SUPABASE_SERVICE_ROLE_KEY: enteredServiceRoleKey,
   })
 
   addLocalProjectRef(projectRef)
@@ -102,8 +108,31 @@ async function main() {
       default: false,
     })
   ) {
+    const secrets = {
+      SUPABASE_URL: supabaseUrl,
+      SUPABASE_SERVICE_ROLE_KEY: enteredServiceRoleKey,
+      RAZORPAY_WEBHOOK_SECRET: await password({
+        message: 'Razorpay webhook secret (leave blank to skip)',
+      }),
+      TWILIO_ACCOUNT_SID: await input({
+        message: 'Twilio account SID (leave blank to skip)',
+      }),
+      TWILIO_AUTH_TOKEN: await password({
+        message: 'Twilio auth token (leave blank to skip)',
+      }),
+      TWILIO_FROM_NUMBER: await input({
+        message: 'Twilio from number (leave blank to skip)',
+      }),
+    }
+    const secretsFile = resolve(root, '.supabase-secrets.tmp')
+    const secretLines = Object.entries(secrets)
+      .filter(([, value]) => value)
+      .map(([key, value]) => `${key}=${value}`)
+    writeFileSync(secretsFile, `${secretLines.join('\n')}\n`)
     runSupabase(['functions', 'deploy', 'send-reminders'], false)
     runSupabase(['functions', 'deploy', 'razorpay-webhook'], false)
+    runSupabase(['secrets', 'set', '--env-file', secretsFile], false)
+    unlinkSync(secretsFile)
   }
 
   console.log('\nSetup complete. Review .env.local, then run npm run dev.')
