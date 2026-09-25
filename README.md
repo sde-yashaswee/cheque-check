@@ -98,7 +98,7 @@ yet. See `e2e/README.md` before adding tests.
 
 ```text
 src/app/          Next.js routes, layouts, and API handlers
-src/features/     Feature-owned hooks, components, repositories, and entry points
+src/features/     Feature-owned hooks, components, services, repositories, and entry points
 src/components/   Shared application and UI components
 src/hooks/        Query, mutation, form, and business-context hooks
 src/services/     Supabase data-access services

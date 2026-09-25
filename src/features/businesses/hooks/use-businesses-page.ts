@@ -1,7 +1,7 @@
 import { useBusiness } from '@/hooks/use-business'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { chequeService } from '@/services/cheque.service'
-import { businessService } from '@/services/business.service'
+import { chequeService } from '@/features/cheques/services/cheque.service'
+import { businessService } from '@/features/businesses/services/business.service'
 import { useState, useMemo, useCallback } from 'react'
 
 export function useBusinesses() {

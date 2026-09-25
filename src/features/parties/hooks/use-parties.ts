@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { partyService } from '@/services/party.service'
-import { chequeService } from '@/services/cheque.service'
+import { partyService } from '@/features/parties/services/party.service'
+import { chequeService } from '@/features/cheques/services/cheque.service'
 import { useState, useMemo, useCallback } from 'react'
 import type { Party } from '@/types'
 

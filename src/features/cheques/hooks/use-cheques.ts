@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { chequeService } from '@/services/cheque.service'
+import { chequeService } from '@/features/cheques/services/cheque.service'
 import { useState, useMemo } from 'react'
 import { ChequeStatus, ChequeWithRelations } from '@/types'
 import { useProfile } from './use-profile'

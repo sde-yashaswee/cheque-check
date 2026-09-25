@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import {
   monetizationService,
   Transaction,
-} from '@/services/monetization.service'
+} from '@/features/monetization/services/monetization.service'
 
 export function useTransactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([])

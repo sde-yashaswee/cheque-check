@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { bankService } from '@/services/bank.service'
+import { bankService } from '@/features/accounts/services/bank.service'
 import { Bank } from '@/types'
 
 export function useBanks() {

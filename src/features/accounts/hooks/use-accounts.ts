@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { accountService } from '@/services/account.service'
+import { accountService } from '@/features/accounts/services/account.service'
 import { useState, useMemo } from 'react'
 import type { Account } from '@/types'
 

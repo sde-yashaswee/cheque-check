@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { getRazorpayPublicKey } from '@/lib/env/client'
 import { type PaymentProductId } from '@/lib/payments'
-import { paymentService } from '@/services/payment.service'
+import { paymentService } from '@/features/monetization/services/payment.service'
 
 type RazorpaySuccess = {
   razorpay_payment_id: string

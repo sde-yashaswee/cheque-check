@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react'
 import { Profile } from '@/types'
-import { profileService } from '@/services/profile.service'
+import { profileService } from '@/features/profile/services/profile.service'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 interface ProfileContextType {

@@ -1,4 +1,4 @@
-import { chequeService } from '@/services/cheque.service'
+import { chequeService } from '@/features/cheques/services/cheque.service'
 import { ChequeStatus, ChequeWithRelations } from '@/types'
 import { useBusiness } from './use-business'
 import { useOptimisticMutation } from './use-optimistic-mutation'

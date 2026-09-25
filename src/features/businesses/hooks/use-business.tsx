@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useMemo } from 'react'
 import { Business } from '@/types'
-import { businessService } from '@/services/business.service'
+import { businessService } from '@/features/businesses/services/business.service'
 import { useQuery } from '@tanstack/react-query'
 
 interface BusinessContextType {

@@ -2,7 +2,10 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { partySchema } from '@/validators'
-import { PartyService, partyService } from '@/services/party.service'
+import {
+  PartyService,
+  partyService,
+} from '@/features/parties/services/party.service'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { Party } from '@/types'

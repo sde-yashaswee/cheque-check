@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { accountService } from '@/services/account.service'
-import { chequeService } from '@/services/cheque.service'
+import { accountService } from '@/features/accounts/services/account.service'
+import { chequeService } from '@/features/cheques/services/cheque.service'
 import { ChequeStatus, Cheque } from '@/types'
 import { useMemo, useState } from 'react'
 import { useOptimisticMutation } from './use-optimistic-mutation'

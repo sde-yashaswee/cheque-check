@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { businessService } from '@/services/business.service'
-import { chequeService } from '@/services/cheque.service'
+import { businessService } from '@/features/businesses/services/business.service'
+import { chequeService } from '@/features/cheques/services/cheque.service'
 import { useMemo } from 'react'
 import type { Cheque } from '@/types'
 

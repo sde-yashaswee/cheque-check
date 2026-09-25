@@ -2,7 +2,10 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { accountSchema } from '@/validators'
-import { AccountService, accountService } from '@/services/account.service'
+import {
+  AccountService,
+  accountService,
+} from '@/features/accounts/services/account.service'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEntityMutations } from './use-entity-mutations'

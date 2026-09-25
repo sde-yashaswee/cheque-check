@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation'
-import { authService } from '@/services/auth.service'
-import { reportService } from '@/services/report.service'
-import { profileService } from '@/services/profile.service'
+import { authService } from '@/features/auth/services/auth.service'
+import { reportService } from '@/features/reports/services/report.service'
+import { profileService } from '@/features/profile/services/profile.service'
 import { ChequeWithRelations } from '@/types'
 
 export function useSettings() {
