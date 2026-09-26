@@ -8,7 +8,7 @@ import { storageService } from '@/services/storage.service'
 import { z } from 'zod'
 import { toast } from '@/components/ui/toast'
 import { useTranslations } from 'next-intl'
-import { ChequeWithRelations, Party } from '@/types'
+import { Party } from '@/types'
 import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useProfile } from './use-profile'
 import { ConflictError } from '@/lib/errors'
@@ -53,7 +53,7 @@ export function useCreateCheque(
   }, [initialType, setValue])
 
   const mutation = useEntityCreateMutation<
-    ChequeWithRelations,
+    ChequeEntity,
     ChequeFormValues,
     ChequeEntity
   >({
@@ -74,7 +74,7 @@ export function useCreateCheque(
     addToList: (current, newCheque) => {
       if (!businessId) return current
 
-      const optimisticCheque: ChequeWithRelations = {
+      const optimisticCheque = ChequeEntity.fromRow({
         ...newCheque,
         id: 'temp-' + Date.now(),
         business_id: businessId,
@@ -89,7 +89,7 @@ export function useCreateCheque(
         party: queryClient
           .getQueryData<Party[]>(['parties', businessId])
           ?.find((party) => party.id === newCheque.party_id),
-      }
+      })
       return current ? [optimisticCheque, ...current] : [optimisticCheque]
     },
     onSuccess: () => {

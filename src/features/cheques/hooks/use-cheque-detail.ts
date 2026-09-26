@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { chequeService } from '@/features/cheques/services/cheque.service'
-import { ChequeStatus, ChequeWithRelations } from '@/types'
+import { ChequeStatus } from '@/types'
+import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useOptimisticMutation } from './use-optimistic-mutation'
 
 export function useChequeDetail(id: string) {
@@ -14,9 +15,9 @@ export function useChequeDetail(id: string) {
   })
 
   const mutation = useOptimisticMutation<
-    ChequeWithRelations,
+    ChequeEntity,
     ChequeStatus,
-    ChequeWithRelations
+    ChequeEntity
   >({
     queryKey: ['cheque', id],
     additionalQueryKeys: cheque?.business_id
@@ -26,7 +27,7 @@ export function useChequeDetail(id: string) {
       chequeService.updateStatus(id, status),
     update: (current, status) => {
       if (!current) return current
-      return { ...current, status }
+      return ChequeEntity.fromRow({ ...current.toJSON(), status })
     },
   })
 
