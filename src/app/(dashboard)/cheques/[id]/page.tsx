@@ -215,6 +215,7 @@ export default function ChequeDetailPage() {
                         alt={t('scan')}
                         width={800}
                         height={400}
+                        priority
                         className="w-full h-auto object-cover transition-transform group-hover:scale-[1.02]"
                       />
                       <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
