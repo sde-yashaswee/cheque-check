@@ -33,6 +33,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import dynamic from 'next/dynamic'
 import { Party, AccountWithRelations } from '@/types'
 import { useTranslations } from 'next-intl'
+import { useProfile } from '@/hooks/use-profile'
 
 const DeleteConfirmationDialog = dynamic(
   () =>
@@ -51,6 +52,8 @@ export default function EditChequePage() {
   const { id } = useParams() as { id: string }
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
+  const { profile } = useProfile()
+  const currency = profile?.currency || '₹'
 
   const { form, cheque, isLoading, isSaving, onSubmit, onDelete } =
     useEditCheque(id)
@@ -177,14 +180,16 @@ export default function EditChequePage() {
               {t('amount')}
             </Label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-semibold opacity-30">
-                ₹
+              <span className="absolute left-3 top-1/2 z-10 -translate-y-1/2 text-base font-semibold text-muted-foreground pointer-events-none">
+                {currency}
               </span>
               <Input
                 id="amount"
                 type="number"
+                min={0}
+                step="any"
                 {...register('amount', { valueAsNumber: true })}
-                className="h-16 pl-10 text-3xl font-semibold border-none bg-canvas-parchment rounded-sm"
+                className="h-12 pl-10 font-semibold rounded-sm bg-canvas-parchment border-none"
               />
             </div>
             {errors.amount && (
@@ -205,6 +210,8 @@ export default function EditChequePage() {
               <Input
                 leftIcon={Hash}
                 id="cheque_number"
+                inputMode="numeric"
+                maxLength={6}
                 {...register('cheque_number')}
                 placeholder={t('chequeNumberPlaceholder')}
                 className="h-12 rounded-sm bg-canvas-parchment border-none"

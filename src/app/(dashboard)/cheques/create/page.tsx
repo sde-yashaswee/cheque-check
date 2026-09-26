@@ -58,6 +58,7 @@ import type { Account, Party } from '@/types'
 import { Checkbox } from '@/components/ui/checkbox'
 import { BankSelector } from '@/components/bank-selector'
 import { ScanStore } from '@/lib/scan-store'
+import { useProfile } from '@/hooks/use-profile'
 
 export default function CreateChequePage() {
   const t = useTranslations('Cheques')
@@ -67,6 +68,8 @@ export default function CreateChequePage() {
   const imageUrlParam = searchParams.get('imageUrl')
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
+  const { profile } = useProfile()
+  const currency = profile?.currency || '₹'
   const [isExtracting, setIsExtracting] = useState(false)
   const queryClient = useQueryClient()
   const { data: banks } = useBanks()
@@ -127,7 +130,12 @@ export default function CreateChequePage() {
         headers: { 'Content-Type': 'application/json' },
       })
 
-      if (!response.ok) throw new Error('Failed to extract data')
+      if (!response.ok) {
+        const body = await response.json().catch(() => null)
+        throw new Error(
+          body?.error || `Failed to extract data (${response.status})`,
+        )
+      }
 
       const data = await response.json()
 
@@ -364,7 +372,7 @@ export default function CreateChequePage() {
     (a: Account) => a.id === watch('account_id'),
   )
 
-  const amountInWords = numberToIndianWords(watch('amount') || 0)
+  const amountInWords = numberToIndianWords(watch('amount') || 0, currency)
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">
@@ -598,14 +606,16 @@ export default function CreateChequePage() {
                 {t('amount')}
               </Label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-semibold opacity-30">
-                  ₹
+                <span className="absolute left-3 top-1/2 z-10 -translate-y-1/2 text-base font-semibold text-muted-foreground pointer-events-none">
+                  {currency}
                 </span>
                 <Input
                   id="amount"
                   type="number"
+                  min={0}
+                  step="any"
                   {...register('amount', { valueAsNumber: true })}
-                  className="h-16 pl-10 text-3xl font-semibold border-none bg-canvas-parchment rounded-sm"
+                  className="h-12 pl-10 font-semibold rounded-sm"
                 />
               </div>
               <div className="flex flex-col gap-1 ml-1">
@@ -630,6 +640,8 @@ export default function CreateChequePage() {
               <Input
                 leftIcon={Hash}
                 id="cheque_number"
+                inputMode="numeric"
+                maxLength={6}
                 {...register('cheque_number')}
                 placeholder={t('chequeNumberPlaceholder')}
                 className="h-12 rounded-sm"
@@ -781,7 +793,8 @@ export default function CreateChequePage() {
                   {t('amount')}
                 </span>
                 <span className="text-xl font-semibold text-primary">
-                  ₹{Number(watch('amount') || 0).toLocaleString()}
+                  {currency}
+                  {Number(watch('amount') || 0).toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between items-center text-sm">
