@@ -283,6 +283,7 @@
     "sortByBalance": "Balance",
     "emailPlaceholder": "email@address.com",
     "basicDetails": "Basic Details",
+    "contactInfo": "Contact Info",
     "locationNotes": "Location & Notes"
   },
   "Accounts": {
