@@ -113,7 +113,11 @@
     "orContinueWith": "Or continue with",
     "noPhone": "No phone",
     "noEmail": "No email",
-    "cheques": "Cheques"
+    "cheques": "चेक",
+    "parties": "पार्टियाँ",
+    "accounts": "खाते",
+    "bank": "बैंक",
+    "searchEverything": "सब कुछ खोजें..."
   },
   "Parties": {
     "sortByName": "नाम",
