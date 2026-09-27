@@ -35,6 +35,7 @@ import {
   StepperTrigger,
 } from '@/components/reui/stepper'
 import { useTranslations } from 'next-intl'
+import { EditableAvatar } from '@/components/ui/editable-avatar'
 
 export default function CreateBusinessPage() {
   const t = useTranslations('Businesses')
@@ -154,6 +155,22 @@ export default function CreateBusinessPage() {
                     {errors.name.message as string}
                   </p>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex flex-col items-center gap-3 py-2">
+                  <EditableAvatar
+                    name={watch('name') || t('businessName')}
+                    color={watch('color')}
+                    imageUrl={watch('logo_url')}
+                    onUpload={async (url) => setValue('logo_url', url)}
+                    onDelete={async () => setValue('logo_url', null)}
+                    size="xl"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {t('businessLogo')}
+                  </p>
+                </div>
               </div>
 
               <div className="space-y-2">

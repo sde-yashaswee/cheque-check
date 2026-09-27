@@ -24,6 +24,7 @@ export function useCreateBusiness() {
       phone: '',
       address: '',
       color: '#007AFF',
+      logo_url: null,
     },
   })
 

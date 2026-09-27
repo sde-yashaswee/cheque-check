@@ -43,6 +43,7 @@ import {
   StepperTrigger,
 } from '@/components/reui/stepper'
 import { useTranslations } from 'next-intl'
+import { EditableAvatar } from '@/components/ui/editable-avatar'
 
 const COLORS = [
   '#0066cc',
@@ -114,6 +115,7 @@ export default function OnboardingPage() {
     businessPhone: '',
     businessAddress: '',
     businessColor: '#0066cc',
+    businessLogoUrl: null as string | null,
     currency: '₹',
     dateFormat: 'dd/MM/yyyy',
     timeFormat: '12h',
@@ -154,7 +156,7 @@ export default function OnboardingPage() {
         phone: formData.businessPhone || null,
         address: formData.businessAddress || null,
         color: formData.businessColor,
-        logo_url: null,
+        logo_url: formData.businessLogoUrl,
       })
       await queryClient.invalidateQueries({ queryKey: ['businesses'] })
       setActiveBusiness(business)
@@ -583,6 +585,29 @@ export default function OnboardingPage() {
                 className="space-y-8"
               >
                 <div className="space-y-6">
+                  <div className="flex flex-col items-center gap-3 py-2">
+                    <EditableAvatar
+                      name={formData.businessName || t('businessDetails')}
+                      color={formData.businessColor}
+                      imageUrl={formData.businessLogoUrl}
+                      onUpload={async (url) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          businessLogoUrl: url,
+                        }))
+                      }
+                      onDelete={async () =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          businessLogoUrl: null,
+                        }))
+                      }
+                      size="xl"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {t('businessLogo')}
+                    </p>
+                  </div>
                   <div className="space-y-2">
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
                       {t('dailyFrequency')}

@@ -45,6 +45,7 @@ export function useCreateAccount(
       ifsc_code: '',
       color: '#007AFF',
       notes: '',
+      opening_balance: 0,
     },
   })
 
@@ -68,6 +69,7 @@ export function useCreateAccount(
         ...data,
         business_id: businessId!,
         ifsc_code: data.ifsc_code || null,
+        opening_balance: data.opening_balance,
       }),
     addToList: (current, newAccount) => [
       ...(current || []),

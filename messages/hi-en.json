@@ -319,7 +319,10 @@
     "emailPlaceholder": "email@address.com",
     "basicDetails": "Basic Details",
     "contactInfo": "Contact ki Details",
-    "locationNotes": "Location aur Notes"
+    "locationNotes": "Location aur Notes",
+    "importFromContacts": "Contacts se import karein",
+    "contactImportFailed": "Contacts import nahi ho paaye. Aap details manually enter kar sakte hain.",
+    "contactPickerUnavailable": "Is browser mein contact access available nahi hai. Details manually enter karein ya supported mobile browser par ChequeCheck kholein."
   },
   "Accounts": {
     "title": "Accounts",
@@ -351,7 +354,8 @@
     "accountNamePlaceholder": "Jaise John Doe",
     "accountInfo": "Account ki Details",
     "bankDetails": "Bank ki Details",
-    "moreDetails": "Aur Details"
+    "moreDetails": "Aur Details",
+    "openingBalance": "Opening Balance"
   },
   "Businesses": {
     "title": "Businesses",
@@ -394,7 +398,8 @@
     "headquartersPlaceholder": "Headquarters ki location",
     "businessProfile": "Business Profile",
     "contactInfo": "Contact ki Details",
-    "location": "Location"
+    "location": "Location",
+    "businessLogo": "Business ka logo"
   },
   "Features": {
     "receivingMode": "Cheques Receive karne ka Mode",
@@ -515,6 +520,10 @@
     "refundPolicyDesc": "Refunds aur payments par hamari policy",
     "deleteMyAccount": "Mera Account Delete karein",
     "deleteMyAccountDesc": "Apna account aur data hamesha ke liye hatayein",
+    "clearCache": "App cache clear karein",
+    "clearCacheDesc": "Sign out kiye bina cached app files refresh karein",
+    "clearCacheTitle": "App cache clear karein?",
+    "clearCacheDescription": "Cached PWA files clear hongi aur app reload hoga. Aapka account aur session safe rahega.",
     "voiceCallSummary": "Voice Call Summary",
     "enableDailyCall": "Daily Call enable karein",
     "phoneNumber": "Phone Number",

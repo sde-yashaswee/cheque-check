@@ -8,6 +8,8 @@ import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEntityMutations } from './use-entity-mutations'
 import type { Business } from '@/types'
+import { storageService } from '@/services/storage.service'
+import { logger } from '@/lib/logger'
 
 export function useEditBusiness(id: string) {
   const router = useRouter()
@@ -78,8 +80,14 @@ export function useEditBusiness(id: string) {
     error,
     isSaving: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
-    onSubmit: form.handleSubmit((data) => {
-      updateMutation.mutate(data)
+    onSubmit: form.handleSubmit(async (data) => {
+      const previousLogoUrl = business?.logo_url
+      await updateMutation.mutateAsync(data)
+      if (previousLogoUrl && previousLogoUrl !== data.logo_url) {
+        await storageService.deleteAvatar(previousLogoUrl).catch((error) => {
+          logger.error('Failed to delete previous business logo', error)
+        })
+      }
       router.back()
     }),
     onDelete: () => {

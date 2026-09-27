@@ -277,6 +277,29 @@ export default function CreateAccountPage() {
               )}
             </div>
 
+            <div className="space-y-2">
+              <Label
+                htmlFor="opening_balance"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+              >
+                {t('openingBalance')}
+              </Label>
+              <Input
+                id="opening_balance"
+                type="number"
+                step="0.01"
+                inputMode="decimal"
+                {...register('opening_balance', { valueAsNumber: true })}
+                placeholder="0.00"
+                className="h-14 bg-canvas-parchment border-none rounded-sm"
+              />
+              {errors.opening_balance && (
+                <p className="text-xs text-destructive ml-1">
+                  {errors.opening_balance.message as string}
+                </p>
+              )}
+            </div>
+
             <Button
               type="button"
               className="w-full rounded-full h-14 text-lg"

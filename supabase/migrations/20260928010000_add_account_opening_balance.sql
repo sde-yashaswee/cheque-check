@@ -1,0 +1,2 @@
+ALTER TABLE accounts
+  ADD COLUMN opening_balance NUMERIC NOT NULL DEFAULT 0;

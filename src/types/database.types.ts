@@ -108,6 +108,7 @@ export interface Database {
           color: string | null
           icon: string | null
           notes: string | null
+          opening_balance: number
           is_draft: boolean
           deleted_at: string | null
           created_at: string | null

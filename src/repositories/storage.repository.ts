@@ -13,6 +13,7 @@ export interface IStorageRepository {
   uploadChequeImage(file: File): Promise<string>
   uploadAvatar(file: File): Promise<string>
   deleteChequeImage(url: string): Promise<void>
+  deleteAvatar(url: string): Promise<void>
 }
 
 export class SupabaseStorageRepository implements IStorageRepository {
@@ -31,8 +32,19 @@ export class SupabaseStorageRepository implements IStorageRepository {
   }
 
   async deleteChequeImage(url: string): Promise<void> {
+    await this.deletePrivateImage(url, PRIVATE_CHEQUE_BUCKET)
+  }
+
+  async deleteAvatar(url: string): Promise<void> {
+    await this.deletePrivateImage(url, PRIVATE_AVATAR_BUCKET)
+  }
+
+  private async deletePrivateImage(
+    url: string,
+    bucket: PrivateMediaBucket,
+  ): Promise<void> {
     const media = parsePrivateMediaUrl(url)
-    if (!media || media.bucket !== PRIVATE_CHEQUE_BUCKET) return
+    if (!media || media.bucket !== bucket) return
 
     const { error } = await this.supabase.storage
       .from(media.bucket)

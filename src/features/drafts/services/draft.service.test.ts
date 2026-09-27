@@ -173,6 +173,7 @@ describe('AccountDraftService', () => {
       account_number: '0001',
       ifsc_code: null,
       notes: null,
+      opening_balance: 0,
     })
   })
 })

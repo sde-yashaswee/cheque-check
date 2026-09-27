@@ -33,6 +33,10 @@
     "refundPolicy": "धनवापसी नीति",
     "refundPolicyDesc": "धनवापसी और भुगतान पर हमारी नीति",
     "dangerZone": "खतरे का क्षेत्र",
+    "clearCache": "ऐप कैश साफ़ करें",
+    "clearCacheDesc": "साइन आउट किए बिना कैश की गई ऐप फ़ाइलें रीफ़्रेश करें",
+    "clearCacheTitle": "ऐप कैश साफ़ करें?",
+    "clearCacheDescription": "कैश की गई PWA फ़ाइलें साफ़ होंगी और ऐप फिर से लोड होगा। आपका अकाउंट और सेशन सुरक्षित रहेगा।",
     "deleteMyAccount": "मेरा खाता हटाएं",
     "deleteMyAccountDesc": "अपना खाता और डेटा स्थायी रूप से हटा दें",
     "signOut": "साइन आउट",
@@ -154,14 +158,19 @@
   },
   "Parties": {
     "sortByName": "नाम",
-    "sortByBalance": "बकाया राशि"
+    "sortByBalance": "बकाया राशि",
+    "importFromContacts": "कॉन्टैक्ट से इम्पोर्ट करें",
+    "contactImportFailed": "कॉन्टैक्ट इम्पोर्ट नहीं हो सके। आप जानकारी मैन्युअल रूप से भर सकते हैं।",
+    "contactPickerUnavailable": "इस ब्राउज़र में कॉन्टैक्ट एक्सेस उपलब्ध नहीं है। जानकारी मैन्युअल रूप से भरें या ChequeCheck को सपोर्टेड मोबाइल ब्राउज़र में खोलें।"
   },
   "Businesses": {
     "sortByName": "नाम",
-    "sortByUpcoming": "आगामी कुल"
+    "sortByUpcoming": "आगामी कुल",
+    "businessLogo": "बिज़नेस लोगो"
   },
   "Accounts": {
     "sortByAccountName": "खाता नाम",
-    "sortByBankName": "बैंक का नाम"
+    "sortByBankName": "बैंक का नाम",
+    "openingBalance": "शुरुआती बैलेंस"
   }
 }

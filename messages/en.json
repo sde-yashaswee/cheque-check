@@ -319,7 +319,10 @@
     "emailPlaceholder": "email@address.com",
     "basicDetails": "Basic Details",
     "contactInfo": "Contact Info",
-    "locationNotes": "Location & Notes"
+    "locationNotes": "Location & Notes",
+    "importFromContacts": "Import from contacts",
+    "contactImportFailed": "Contacts could not be imported. You can enter the details manually.",
+    "contactPickerUnavailable": "Contact access is unavailable in this browser. Please enter the details manually or open ChequeCheck on a supported mobile browser."
   },
   "Accounts": {
     "title": "Accounts",
@@ -351,7 +354,8 @@
     "accountNamePlaceholder": "e.g. John Doe",
     "accountInfo": "Account Info",
     "bankDetails": "Bank Details",
-    "moreDetails": "More Details"
+    "moreDetails": "More Details",
+    "openingBalance": "Opening Balance"
   },
   "Businesses": {
     "title": "Businesses",
@@ -394,7 +398,8 @@
     "headquartersPlaceholder": "Headquarters location",
     "businessProfile": "Business Profile",
     "contactInfo": "Contact Info",
-    "location": "Location"
+    "location": "Location",
+    "businessLogo": "Business logo"
   },
   "Features": {
     "receivingMode": "Receiving Cheques Mode",
@@ -523,6 +528,10 @@
     "deleteProfileDescription": "This will permanently delete your account and all associated data.",
     "deleteMyAccount": "Delete My Account",
     "deleteMyAccountDesc": "Permanently remove your account and data",
+    "clearCache": "Clear app cache",
+    "clearCacheDesc": "Refresh cached app files without signing out",
+    "clearCacheTitle": "Clear app cache?",
+    "clearCacheDescription": "This will clear cached PWA files and reload the app. Your account and session will be preserved.",
     "version": "Version",
     "appTagline": "Never miss a cheque again.",
     "loadingPreferences": "Loading preferences...",
