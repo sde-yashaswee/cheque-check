@@ -30,6 +30,7 @@ import {
   StepperTrigger,
 } from '@/components/reui/stepper'
 import { useEffect } from 'react'
+import { getSafeChequeReturnTo } from '@/lib/cheque-draft'
 
 const BankSelector = dynamic(
   () => import('@/components/bank-selector').then((mod) => mod.BankSelector),
@@ -45,9 +46,10 @@ export default function CreateAccountPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { activeBusiness } = useBusiness()
+  const returnTo = getSafeChequeReturnTo(searchParams.get('returnTo'))
 
   const { form, step, nextStep, prevStep, isSaving, onSubmit } =
-    useCreateAccount(activeBusiness?.id)
+    useCreateAccount(activeBusiness?.id, returnTo)
 
   const {
     register,

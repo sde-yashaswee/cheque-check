@@ -1,8 +1,16 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
 
 @theme inline {
   --color-background: var(--background);
@@ -95,8 +103,9 @@
 
   --radius: 18px;
 
-  --font-sans: "SF Pro Text", "Inter", system-ui, -apple-system, sans-serif;
-  --font-heading: "SF Pro Display", "Inter", system-ui, -apple-system, sans-serif;
+  --font-sans: 'SF Pro Text', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading:
+    'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif;
   --success: var(--color-emerald-500);
   --success-foreground: var(--color-emerald-900);
   --info: var(--color-violet-500);
@@ -155,7 +164,12 @@
   body {
     @apply bg-background text-foreground antialiased;
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-heading tracking-tight;
   }
 }

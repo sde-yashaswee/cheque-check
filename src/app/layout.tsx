@@ -7,6 +7,7 @@ import { ProgressBar } from '@/components/progress-bar'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, getLocale, getTranslations } from 'next-intl/server'
 import Script from 'next/script'
+import { Suspense } from 'react'
 import { PwaRegistrar } from '@/components/pwa-registrar'
 
 const inter = Inter({
@@ -63,10 +64,12 @@ export default async function RootLayout({
             id="progress-bar-container"
             className="absolute top-0 left-0 right-0 z-[100]"
           />
-          <ProgressBar />
+          <Suspense fallback={null}>
+            <ProgressBar />
+          </Suspense>
           <NextIntlClientProvider messages={messages}>
             <Providers>
-              <div className="flex-1 overflow-y-auto overflow-x-hidden relative flex flex-col">
+              <div className="no-scrollbar flex-1 overflow-y-auto overflow-x-hidden overscroll-contain relative flex flex-col">
                 {children}
               </div>
               <Toaster />

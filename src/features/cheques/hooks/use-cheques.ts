@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { chequeService } from '@/features/cheques/services/cheque.service'
 import { useState, useMemo } from 'react'
 import { ChequeStatus, ChequeWithRelations } from '@/types'
+import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useProfile } from './use-profile'
 import { useOptimisticMutation } from './use-optimistic-mutation'
 
@@ -26,9 +27,9 @@ export function useCheques(businessId: string | undefined) {
   })
 
   const mutation = useOptimisticMutation<
-    ChequeWithRelations[],
+    ChequeEntity[],
     { id: string; status: ChequeStatus },
-    ChequeWithRelations
+    ChequeEntity
   >({
     queryKey: ['cheques', businessId],
     mutationFn: ({ id, status }: { id: string; status: ChequeStatus }) =>
@@ -36,7 +37,9 @@ export function useCheques(businessId: string | undefined) {
     update: (current, { id, status }) => {
       if (!current) return current
       return current.map((cheque) =>
-        cheque.id === id ? { ...cheque, status } : cheque,
+        cheque.id === id
+          ? ChequeEntity.fromRow({ ...cheque.toJSON(), status })
+          : cheque,
       )
     },
   })
@@ -65,11 +68,13 @@ export function useCheques(businessId: string | undefined) {
   }, [cheques, profile?.received_cheques_enabled])
 
   const filteredCheques = useMemo(() => {
+    const query = search.toLowerCase()
     const result = [...processedCheques].filter((c) => {
       const matchesSearch =
-        c.cheque_number.includes(search) ||
-        c.party?.name?.toLowerCase().includes(search.toLowerCase()) ||
-        c.amount.toString().includes(search)
+        !query ||
+        (c.cheque_number ?? '').toLowerCase().includes(query) ||
+        (c.party?.name ?? '').toLowerCase().includes(query) ||
+        String(c.amount ?? '').includes(query)
       const matchesFilter = filter === 'All' || c.status === filter
       return matchesSearch && matchesFilter
     })

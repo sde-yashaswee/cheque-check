@@ -7,12 +7,19 @@ import { accountService } from '@/features/accounts/services/account.service'
 import { useEntityCreateMutation } from './use-entity-mutations'
 import { useRouter } from 'next/navigation'
 import type { Account } from '@/types'
+import { toast } from '@/components/ui/toast'
+import { useTranslations } from 'next-intl'
+import { withSelectedEntity } from '@/lib/cheque-draft'
 
 type AccountFormData = z.infer<typeof accountSchema>
 
-export function useCreateAccount(businessId: string | undefined) {
+export function useCreateAccount(
+  businessId: string | undefined,
+  returnTo?: string | null,
+) {
   const [step, setStep] = useState(1)
   const router = useRouter()
+  const tc = useTranslations('Common')
 
   const form = useForm<AccountFormData>({
     resolver: zodResolver(accountSchema),
@@ -69,9 +76,23 @@ export function useCreateAccount(businessId: string | undefined) {
     nextStep,
     prevStep,
     isSaving: mutation.isPending,
-    onSubmit: form.handleSubmit((data) => {
-      mutation.mutate(data)
-      router.back()
+    onSubmit: form.handleSubmit(async (data) => {
+      if (!returnTo) {
+        mutation.mutate(data)
+        router.back()
+        return
+      }
+      // The cheque flow needs the real id, so wait for the server response.
+      try {
+        const created = await mutation.mutateAsync(data)
+        router.replace(withSelectedEntity(returnTo, 'account_id', created.id))
+      } catch (error) {
+        toast.add({
+          title: tc('error'),
+          description: error instanceof Error ? error.message : tc('error'),
+          type: 'error',
+        })
+      }
     }),
   }
 }

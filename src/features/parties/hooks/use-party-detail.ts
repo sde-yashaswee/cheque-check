@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { partyService } from '@/features/parties/services/party.service'
 import { chequeService } from '@/features/cheques/services/cheque.service'
 import { ChequeStatus, Cheque } from '@/types'
+import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useMemo, useState } from 'react'
 import { useOptimisticMutation } from './use-optimistic-mutation'
 
@@ -30,16 +31,18 @@ export function usePartyDetail(id: string, businessId: string | undefined) {
   })
 
   const mutation = useOptimisticMutation<
-    Cheque[],
+    ChequeEntity[],
     { id: string; status: ChequeStatus },
-    Cheque
+    ChequeEntity
   >({
     queryKey: ['cheques', businessId],
     mutationFn: ({ id, status }) => chequeService.updateStatus(id, status),
     update: (current, { id, status }) => {
       if (!current) return current
       return current.map((cheque) =>
-        cheque.id === id ? { ...cheque, status } : cheque,
+        cheque.id === id
+          ? ChequeEntity.fromRow({ ...cheque.toJSON(), status })
+          : cheque,
       )
     },
   })

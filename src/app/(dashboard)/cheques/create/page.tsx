@@ -40,7 +40,7 @@ import {
   StepperTrigger,
 } from '@/components/reui/stepper'
 import { useTranslations } from 'next-intl'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { toast } from '@/components/ui/toast'
 import { logger } from '@/lib/logger'
 import { useBanks } from '@/hooks/use-banks'
@@ -60,6 +60,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { BankSelector } from '@/components/bank-selector'
 import { ScanStore } from '@/lib/scan-store'
 import { useProfile } from '@/hooks/use-profile'
+import { buildChequeDraftUrl } from '@/lib/cheque-draft'
 
 export default function CreateChequePage() {
   const t = useTranslations('Cheques')
@@ -67,6 +68,9 @@ export default function CreateChequePage() {
   const searchParams = useSearchParams()
   const typeParam = searchParams.get('type')
   const imageUrlParam = searchParams.get('imageUrl')
+  const isDraftReturn = searchParams.get('draft') === '1'
+  const initialStep = isDraftReturn && searchParams.get('step') === '2' ? 2 : 1
+  const hasHydratedDraft = useRef(false)
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
   const { profile } = useProfile()
@@ -100,7 +104,7 @@ export default function CreateChequePage() {
     handleImageUpload,
     isSaving,
     onSubmit,
-  } = useCreateCheque(businessId, typeParam)
+  } = useCreateCheque(businessId, typeParam, initialStep)
 
   const {
     register,
@@ -108,6 +112,42 @@ export default function CreateChequePage() {
     watch,
     formState: { errors },
   } = form
+
+  useEffect(() => {
+    if (!isDraftReturn || hasHydratedDraft.current) return
+    hasHydratedDraft.current = true
+
+    const amount = Number(searchParams.get('amount'))
+    if (Number.isFinite(amount) && amount > 0) setValue('amount', amount)
+    for (const field of [
+      'cheque_number',
+      'cheque_date',
+      'deposit_date',
+      'notes',
+      'image_url',
+      'party_id',
+      'account_id',
+    ] as const) {
+      const value = searchParams.get(field)
+      if (value) setValue(field, value)
+    }
+  }, [isDraftReturn, searchParams, setValue])
+
+  const draftUrl = buildChequeDraftUrl(watch(), 2)
+  const saveDraftToHistory = () => {
+    // Lets the browser back button from the create page restore this draft too.
+    window.history.replaceState(null, '', draftUrl)
+  }
+  const partyCreateUrl = `/parties/create?${new URLSearchParams({
+    returnTo: draftUrl,
+  })}`
+  const accountCreateUrl = `/accounts/create?${new URLSearchParams({
+    name: unmatchedEntities?.account_name || '',
+    number: unmatchedEntities?.account_number || '',
+    ifsc: unmatchedEntities?.ifsc_code || '',
+    auto: 'true',
+    returnTo: draftUrl,
+  })}`
 
   const { parties } = useParties(businessId)
   const { accounts } = useAccounts(businessId)
@@ -677,7 +717,8 @@ export default function CreateChequePage() {
                 value={watch('party_id')}
                 onValueChange={(val) => setValue('party_id', val)}
                 placeholder={t('partyPlaceholder')}
-                createUrl="/parties/create"
+                createUrl={partyCreateUrl}
+                onCreateClick={saveDraftToHistory}
                 createLabel={t('addParty')}
                 className="h-14 bg-canvas-parchment border-none rounded-sm"
               />
@@ -697,7 +738,8 @@ export default function CreateChequePage() {
                 value={watch('account_id')}
                 onValueChange={(val) => setValue('account_id', val)}
                 placeholder={t('accountPlaceholder')}
-                createUrl={`/accounts/create?name=${encodeURIComponent(unmatchedEntities?.account_name || '')}&number=${unmatchedEntities?.account_number || ''}&ifsc=${unmatchedEntities?.ifsc_code || ''}&auto=true`}
+                createUrl={accountCreateUrl}
+                onCreateClick={saveDraftToHistory}
                 createLabel={t('addAccount')}
                 className="h-14 bg-canvas-parchment border-none rounded-sm"
               />

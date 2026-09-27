@@ -7,12 +7,19 @@ import { partyService } from '@/features/parties/services/party.service'
 import { useEntityCreateMutation } from './use-entity-mutations'
 import { useRouter } from 'next/navigation'
 import type { Party } from '@/types'
+import { toast } from '@/components/ui/toast'
+import { useTranslations } from 'next-intl'
+import { withSelectedEntity } from '@/lib/cheque-draft'
 
 type PartyFormData = z.infer<typeof partySchema>
 
-export function useCreateParty(businessId: string | undefined) {
+export function useCreateParty(
+  businessId: string | undefined,
+  returnTo?: string | null,
+) {
   const [step, setStep] = useState(1)
   const router = useRouter()
+  const tc = useTranslations('Common')
 
   const form = useForm<PartyFormData>({
     resolver: zodResolver(partySchema),
@@ -75,9 +82,23 @@ export function useCreateParty(businessId: string | undefined) {
     nextStep,
     prevStep,
     isSaving: mutation.isPending,
-    onSubmit: form.handleSubmit((data) => {
-      mutation.mutate(data)
-      router.back()
+    onSubmit: form.handleSubmit(async (data) => {
+      if (!returnTo) {
+        mutation.mutate(data)
+        router.back()
+        return
+      }
+      // The cheque flow needs the real id, so wait for the server response.
+      try {
+        const created = await mutation.mutateAsync(data)
+        router.replace(withSelectedEntity(returnTo, 'party_id', created.id))
+      } catch (error) {
+        toast.add({
+          title: tc('error'),
+          description: error instanceof Error ? error.message : tc('error'),
+          type: 'error',
+        })
+      }
     }),
   }
 }

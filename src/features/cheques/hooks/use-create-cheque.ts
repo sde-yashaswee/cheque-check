@@ -20,8 +20,9 @@ type ChequeFormValues = z.infer<typeof chequeSchema>
 export function useCreateCheque(
   businessId: string | undefined,
   initialType: string | null,
+  initialStep = 1,
 ) {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(initialStep)
   const [isUploading, setIsUploading] = useState(false)
   const router = useRouter()
   const queryClient = useQueryClient()

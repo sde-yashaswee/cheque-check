@@ -4,7 +4,7 @@ import { useCreateParty } from '@/hooks/use-create-party'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
@@ -28,15 +28,19 @@ import {
   StepperTrigger,
 } from '@/components/reui/stepper'
 import { useTranslations } from 'next-intl'
+import { getSafeChequeReturnTo } from '@/lib/cheque-draft'
 
 export default function CreatePartyPage() {
   const t = useTranslations('Parties')
   const tCommon = useTranslations('Common')
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const returnTo = getSafeChequeReturnTo(searchParams.get('returnTo'))
   const { activeBusiness } = useBusiness()
 
   const { form, step, nextStep, prevStep, isSaving, onSubmit } = useCreateParty(
     activeBusiness?.id,
+    returnTo,
   )
 
   const {
