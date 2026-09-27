@@ -134,16 +134,30 @@ export function Combobox({
               ))}
             </CommandGroup>
           </CommandList>
-          {createUrl && (
+          {(createUrl || onCreateClick) && (
             <>
               <CommandSeparator />
               <div className="p-1">
-                <Link href={createUrl} onClick={onCreateClick}>
-                  <div className="flex items-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors cursor-pointer">
+                {onCreateClick ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false)
+                      onCreateClick()
+                    }}
+                    className="flex w-full items-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors cursor-pointer"
+                  >
                     <HugeiconsIcon icon={PlusCircle} className="h-4 w-4" />
                     {createLabel}
-                  </div>
-                </Link>
+                  </button>
+                ) : (
+                  <Link href={createUrl!}>
+                    <div className="flex items-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors cursor-pointer">
+                      <HugeiconsIcon icon={PlusCircle} className="h-4 w-4" />
+                      {createLabel}
+                    </div>
+                  </Link>
+                )}
               </div>
             </>
           )}

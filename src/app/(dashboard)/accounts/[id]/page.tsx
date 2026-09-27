@@ -49,6 +49,7 @@ import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
 import { TextTruncate } from '@/components/ui/text-truncate'
 import { useTranslations } from 'next-intl'
+import { useRedirectIfDraft } from '@/features/drafts'
 import {
   Sheet,
   SheetContent,
@@ -119,7 +120,9 @@ export default function AccountDetailPage() {
     { label: tc('bounced'), value: 'Bounced', icon: BouncedIcon },
   ]
 
-  if (isLoading) {
+  const isDraft = useRedirectIfDraft('account', account)
+
+  if (isLoading || isDraft) {
     return (
       <div className="max-w-2xl space-y-8 pb-20">
         <Skeleton className="h-40 w-full rounded-lg" />

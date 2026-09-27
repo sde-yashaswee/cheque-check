@@ -115,6 +115,17 @@ export function TopNav() {
       }
     }
 
+    if (id === 'drafts') {
+      const draftKeys: Record<string, string> = {
+        accounts: 'Drafts.accountDrafts',
+        cheques: 'Drafts.chequeDrafts',
+        parties: 'Drafts.partyDrafts',
+      }
+      if (draftKeys[resource]) {
+        return { title: t(draftKeys[resource]), icon: feature.icon }
+      }
+    }
+
     if (id && !action) {
       const viewKeys: Record<string, string> = {
         accounts: 'Accounts.viewAccount',

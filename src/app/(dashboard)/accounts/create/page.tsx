@@ -29,8 +29,9 @@ import {
   StepperSeparator,
   StepperTrigger,
 } from '@/components/reui/stepper'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { getSafeChequeReturnTo } from '@/lib/cheque-draft'
+import { DraftLeaveDialog, DraftToolbar } from '@/features/drafts'
 
 const BankSelector = dynamic(
   () => import('@/components/bank-selector').then((mod) => mod.BankSelector),
@@ -47,9 +48,17 @@ export default function CreateAccountPage() {
   const searchParams = useSearchParams()
   const { activeBusiness } = useBusiness()
   const returnTo = getSafeChequeReturnTo(searchParams.get('returnTo'))
+  // Read once: autosave later writes a new draftId into the URL for the same form.
+  const [initialDraftId] = useState(() => searchParams.get('draftId'))
+  const [prefill] = useState(() => ({
+    name: searchParams.get('name'),
+    number: searchParams.get('number'),
+    ifsc: searchParams.get('ifsc'),
+    auto: searchParams.get('auto') === 'true',
+  }))
 
-  const { form, step, nextStep, prevStep, isSaving, onSubmit } =
-    useCreateAccount(activeBusiness?.id, returnTo)
+  const { form, step, nextStep, prevStep, isSaving, onSubmit, draft } =
+    useCreateAccount(activeBusiness?.id, { returnTo, draftId: initialDraftId })
 
   const {
     register,
@@ -57,19 +66,16 @@ export default function CreateAccountPage() {
     setValue,
     formState: { errors },
   } = form
+  const { setUserValue } = draft
 
   useEffect(() => {
-    const name = searchParams.get('name')
-    const number = searchParams.get('number')
-    const ifsc = searchParams.get('ifsc')
-    const auto = searchParams.get('auto')
-
-    if (name) setValue('account_name', name)
-    if (number) setValue('account_number', number)
-    if (ifsc) setValue('ifsc_code', ifsc)
-    if (auto === 'true')
+    if (initialDraftId) return
+    if (prefill.name) setValue('account_name', prefill.name)
+    if (prefill.number) setValue('account_number', prefill.number)
+    if (prefill.ifsc) setValue('ifsc_code', prefill.ifsc)
+    if (prefill.auto)
       setValue('notes', 'Automatically Generated from Cheque Scan')
-  }, [searchParams, setValue])
+  }, [initialDraftId, prefill, setValue])
 
   const colors = [
     '#007AFF',
@@ -83,7 +89,7 @@ export default function CreateAccountPage() {
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">
-      {searchParams.get('auto') === 'true' && (
+      {prefill.auto && !initialDraftId && (
         <div className="bg-primary/5 border border-primary/10 rounded-sm p-4 animate-in fade-in slide-in-from-top-2 duration-500">
           <p className="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-2">
             <HugeiconsIcon icon={ReceiptText} className="h-4 w-4" />
@@ -154,6 +160,12 @@ export default function CreateAccountPage() {
         </div>
       </Stepper>
 
+      <DraftToolbar
+        status={draft.status}
+        onSaveDraft={draft.saveDraftAndExit}
+      />
+      <DraftLeaveDialog {...draft.leaveDialogProps} />
+
       <form onSubmit={onSubmit} className="space-y-8">
         {step === 1 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
@@ -164,7 +176,7 @@ export default function CreateAccountPage() {
                 </Label>
                 <BankSelector
                   value={watch('bank_id')}
-                  onValueChange={(val) => setValue('bank_id', val)}
+                  onValueChange={(val) => setUserValue('bank_id', val)}
                   className="rounded-sm"
                 />
                 {errors.bank_id && (
@@ -183,7 +195,7 @@ export default function CreateAccountPage() {
                     <button
                       key={c}
                       type="button"
-                      onClick={() => setValue('color', c)}
+                      onClick={() => setUserValue('color', c)}
                       className={cn(
                         'h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2',
                         (watch as any)('color') === c

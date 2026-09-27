@@ -19,6 +19,7 @@ export class DatabaseService {
       `,
       )
       .eq('status', 'Issued')
+      .eq('is_draft', false)
       .eq('voice_call_sent', false)
       .or(
         `deposit_date.eq.${today},and(deposit_date.is.null,cheque_date.eq.${today})`,

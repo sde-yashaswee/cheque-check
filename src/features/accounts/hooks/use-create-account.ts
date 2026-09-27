@@ -2,23 +2,38 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { accountSchema } from '@/validators'
 import { accountService } from '@/features/accounts/services/account.service'
 import { useEntityCreateMutation } from './use-entity-mutations'
 import { useRouter } from 'next/navigation'
-import type { Account } from '@/types'
+import type { Account, AccountDraft } from '@/types'
 import { toast } from '@/components/ui/toast'
 import { useTranslations } from 'next-intl'
-import { withSelectedEntity } from '@/lib/cheque-draft'
+import { getChequeDraftIdFromReturnTo } from '@/lib/cheque-draft'
+import {
+  accountDraftService,
+  accountDraftToFormValues,
+  chequeDraftService,
+  draftKeys,
+  firstIncompleteAccountStep,
+  toAccountDraftFields,
+  useDraftController,
+} from '@/features/drafts'
 
 type AccountFormData = z.infer<typeof accountSchema>
 
 export function useCreateAccount(
   businessId: string | undefined,
-  returnTo?: string | null,
+  {
+    returnTo = null,
+    draftId = null,
+  }: { returnTo?: string | null; draftId?: string | null } = {},
 ) {
   const [step, setStep] = useState(1)
+  const [isPublishing, setIsPublishing] = useState(false)
   const router = useRouter()
+  const queryClient = useQueryClient()
   const tc = useTranslations('Common')
 
   const form = useForm<AccountFormData>({
@@ -34,6 +49,17 @@ export function useCreateAccount(
   })
 
   const { trigger } = form
+
+  const draft = useDraftController<AccountFormData, AccountDraft>({
+    entity: 'account',
+    businessId,
+    form,
+    initialDraftId: draftId,
+    toFields: toAccountDraftFields,
+    toFormValues: accountDraftToFormValues,
+    onHydrated: (loaded) => setStep(firstIncompleteAccountStep(loaded)),
+    draftsHref: '/accounts/drafts',
+  })
 
   const mutation = useEntityCreateMutation<Account, AccountFormData, Account>({
     queryKey: ['accounts', businessId],
@@ -75,23 +101,50 @@ export function useCreateAccount(
     setStep,
     nextStep,
     prevStep,
-    isSaving: mutation.isPending,
+    isSaving: mutation.isPending || isPublishing,
+    draft,
     onSubmit: form.handleSubmit(async (data) => {
-      if (!returnTo) {
+      const publishedDraftId = await draft.beginPublish()
+      if (!publishedDraftId && !returnTo) {
+        draft.finishPublish()
         mutation.mutate(data)
-        router.back()
+        draft.goBack()
         return
       }
-      // The cheque flow needs the real id, so wait for the server response.
+
+      setIsPublishing(true)
       try {
-        const created = await mutation.mutateAsync(data)
-        router.replace(withSelectedEntity(returnTo, 'account_id', created.id))
+        const created = publishedDraftId
+          ? await accountDraftService.publish(publishedDraftId, data)
+          : await mutation.mutateAsync(data)
+        draft.finishPublish()
+        if (publishedDraftId) {
+          queryClient.invalidateQueries({ queryKey: ['accounts', businessId] })
+          queryClient.invalidateQueries({
+            queryKey: draftKeys.list('account', businessId),
+          })
+        }
+
+        if (!returnTo) {
+          draft.goBack()
+          return
+        }
+        const chequeDraftId = getChequeDraftIdFromReturnTo(returnTo)
+        if (chequeDraftId) {
+          await chequeDraftService.update(chequeDraftId, {
+            account_id: created.id,
+          })
+        }
+        router.replace(returnTo)
       } catch (error) {
+        draft.failPublish()
         toast.add({
           title: tc('error'),
           description: error instanceof Error ? error.message : tc('error'),
           type: 'error',
         })
+      } finally {
+        setIsPublishing(false)
       }
     }),
   }

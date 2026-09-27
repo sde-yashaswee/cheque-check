@@ -39,6 +39,7 @@ import { cn } from '@/lib/utils'
 import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
 import { useTranslations } from 'next-intl'
+import { DraftsLink } from '@/features/drafts'
 import {
   Sheet,
   SheetContent,
@@ -226,6 +227,8 @@ export default function ChequesPage() {
           </SheetContent>
         </Sheet>
       </div>
+
+      <DraftsLink entity="cheque" />
 
       <div className="space-y-4">
         <DataState

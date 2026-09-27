@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client'
 import {
   buildPrivateMediaUrl,
+  parsePrivateMediaUrl,
   PRIVATE_AVATAR_BUCKET,
   PRIVATE_CHEQUE_BUCKET,
   type PrivateMediaBucket,
@@ -11,6 +12,7 @@ import { ValidationError, mapSupabaseError } from '@/lib/errors'
 export interface IStorageRepository {
   uploadChequeImage(file: File): Promise<string>
   uploadAvatar(file: File): Promise<string>
+  deleteChequeImage(url: string): Promise<void>
 }
 
 export class SupabaseStorageRepository implements IStorageRepository {
@@ -26,6 +28,16 @@ export class SupabaseStorageRepository implements IStorageRepository {
 
   async uploadAvatar(file: File): Promise<string> {
     return this.uploadPrivateImage(PRIVATE_AVATAR_BUCKET, file, 5 * 1024 * 1024)
+  }
+
+  async deleteChequeImage(url: string): Promise<void> {
+    const media = parsePrivateMediaUrl(url)
+    if (!media || media.bucket !== PRIVATE_CHEQUE_BUCKET) return
+
+    const { error } = await this.supabase.storage
+      .from(media.bucket)
+      .remove([media.path.join('/')])
+    if (error) throw mapSupabaseError(error)
   }
 
   private async uploadPrivateImage(

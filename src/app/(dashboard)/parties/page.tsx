@@ -25,6 +25,7 @@ import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
 import { TextTruncate } from '@/components/ui/text-truncate'
 import { useTranslations } from 'next-intl'
+import { DraftsLink } from '@/features/drafts'
 import {
   Sheet,
   SheetContent,
@@ -169,6 +170,8 @@ export default function PartiesPage() {
           </SheetContent>
         </Sheet>
       </div>
+
+      <DraftsLink entity="party" />
 
       <div className="space-y-4">
         <DataState

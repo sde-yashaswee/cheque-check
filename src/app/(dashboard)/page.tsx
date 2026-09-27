@@ -26,6 +26,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { logger } from '@/lib/logger'
+import { DraftsSummaryCard } from '@/features/drafts'
 
 const ChequeStatsChart = dynamic(
   () =>
@@ -128,6 +129,8 @@ export default function HomePage() {
               <HugeiconsIcon icon={FileText} size={200} />
             </div>
           </div>
+
+          <DraftsSummaryCard />
 
           {/* Quick Actions */}
           <div className="space-y-4">

@@ -8,22 +8,33 @@ import { storageService } from '@/services/storage.service'
 import { z } from 'zod'
 import { toast } from '@/components/ui/toast'
 import { useTranslations } from 'next-intl'
-import { Party } from '@/types'
+import { Party, type ChequeDraft } from '@/types'
 import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useProfile } from './use-profile'
 import { ConflictError } from '@/lib/errors'
 import { useEntityCreateMutation } from './use-entity-mutations'
 import { useQueryClient } from '@tanstack/react-query'
+import {
+  chequeDraftService,
+  chequeDraftToFormValues,
+  draftKeys,
+  firstIncompleteChequeStep,
+  toChequeDraftFields,
+  useDraftController,
+} from '@/features/drafts'
 
 type ChequeFormValues = z.infer<typeof chequeSchema>
+
+const optimisticId = () => `temp-${Date.now()}`
 
 export function useCreateCheque(
   businessId: string | undefined,
   initialType: string | null,
-  initialStep = 1,
+  { draftId = null }: { draftId?: string | null } = {},
 ) {
-  const [step, setStep] = useState(initialStep)
+  const [step, setStep] = useState(1)
   const [isUploading, setIsUploading] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(false)
   const router = useRouter()
   const queryClient = useQueryClient()
   const t = useTranslations('Cheques')
@@ -46,6 +57,17 @@ export function useCreateCheque(
   })
 
   const { setValue, trigger } = form
+
+  const draft = useDraftController<ChequeFormValues, ChequeDraft>({
+    entity: 'cheque',
+    businessId,
+    form,
+    initialDraftId: draftId,
+    toFields: toChequeDraftFields,
+    toFormValues: chequeDraftToFormValues,
+    onHydrated: (loaded) => setStep(firstIncompleteChequeStep(loaded)),
+    draftsHref: '/cheques/drafts',
+  })
 
   useEffect(() => {
     if (initialType === 'Inward' || initialType === 'Outward') {
@@ -77,7 +99,7 @@ export function useCreateCheque(
 
       const optimisticCheque = ChequeEntity.fromRow({
         ...newCheque,
-        id: 'temp-' + Date.now(),
+        id: optimisticId(),
         business_id: businessId,
         image_url: newCheque.image_url ?? null,
         notes: newCheque.notes || null,
@@ -102,23 +124,53 @@ export function useCreateCheque(
       router.push('/cheques')
     },
     onError: (error) => {
-      const errorMessage = error instanceof Error ? error.message : tc('error')
-
-      if (error instanceof ConflictError) {
-        toast.add({
-          title: tc('error'),
-          description: t('duplicateChequeError'),
-          type: 'error',
-        })
-      } else {
-        toast.add({
-          title: tc('error'),
-          description: errorMessage,
-          type: 'error',
-        })
-      }
+      draft.failPublish()
+      showCreateError(error)
     },
   })
+
+  function showCreateError(error: unknown) {
+    if (error instanceof ConflictError) {
+      toast.add({
+        title: tc('error'),
+        description: t('duplicateChequeError'),
+        type: 'error',
+      })
+      return
+    }
+    toast.add({
+      title: tc('error'),
+      description: error instanceof Error ? error.message : tc('error'),
+      type: 'error',
+    })
+  }
+
+  const publishDraft = async (id: string, data: ChequeFormValues) => {
+    setIsPublishing(true)
+    try {
+      await chequeDraftService.publish(
+        id,
+        data,
+        profile?.default_reminder_days ?? null,
+      )
+      draft.finishPublish()
+      queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
+      queryClient.invalidateQueries({
+        queryKey: draftKeys.list('cheque', businessId),
+      })
+      toast.add({
+        title: tc('success'),
+        description: t('chequeCreated'),
+        type: 'success',
+      })
+      router.replace('/cheques')
+    } catch (error) {
+      draft.failPublish()
+      showCreateError(error)
+    } finally {
+      setIsPublishing(false)
+    }
+  }
 
   const handleImageUpload = async (file: File) => {
     setIsUploading(true)
@@ -158,8 +210,15 @@ export function useCreateCheque(
     prevStep,
     isUploading,
     handleImageUpload,
-    isSaving: mutation.isPending,
-    onSubmit: form.handleSubmit((data) => {
+    isSaving: mutation.isPending || isPublishing,
+    draft,
+    onSubmit: form.handleSubmit(async (data) => {
+      const publishedDraftId = await draft.beginPublish()
+      if (publishedDraftId) {
+        await publishDraft(publishedDraftId, data)
+        return
+      }
+      draft.finishPublish()
       mutation.mutate(data)
     }),
   }
