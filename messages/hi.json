@@ -1,4 +1,22 @@
 {
+  "Feedback": {
+    "title": "क्या ChequeCheck पसंद आ रहा है?",
+    "question": "आप ChequeCheck को किसी मित्र या सहकर्मी को सुझाने की कितनी संभावना रखते हैं?",
+    "notLikely": "बिल्कुल नहीं",
+    "veryLikely": "ज़रूर",
+    "followUp": {
+      "detractor": "आपको क्या पसंद नहीं आया, और हम कैसे बेहतर करें?",
+      "passive": "इसे 10 बनाने के लिए क्या चाहिए?",
+      "promoter": "ChequeCheck में आपको सबसे ज़्यादा क्या पसंद है?"
+    },
+    "commentPlaceholder": "और बताएं (वैकल्पिक)",
+    "submit": "भेजें",
+    "submitting": "भेजा जा रहा है...",
+    "notNow": "अभी नहीं",
+    "thanksTitle": "धन्यवाद!",
+    "thanksDescription": "आपकी प्रतिक्रिया हमें ChequeCheck को बेहतर बनाने में मदद करती है।",
+    "submitFailed": "प्रतिक्रिया नहीं भेजी जा सकी। कृपया पुनः प्रयास करें।"
+  },
   "Dashboard": {
     "currentBalance": "वर्तमान शेष",
     "receivable": "प्राप्य",

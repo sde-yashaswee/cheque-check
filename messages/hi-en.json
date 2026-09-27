@@ -1,4 +1,22 @@
 {
+  "Feedback": {
+    "title": "ChequeCheck pasand aa raha hai?",
+    "question": "Aap ChequeCheck ko kisi dost ya colleague ko recommend karne ki kitni sambhavna rakhte hain?",
+    "notLikely": "Bilkul nahi",
+    "veryLikely": "Zaroor",
+    "followUp": {
+      "detractor": "Aapko kya pasand nahi aaya, aur hum kaise behtar karein?",
+      "passive": "Isse 10 banane ke liye kya chahiye?",
+      "promoter": "ChequeCheck mein aapko sabse zyada kya pasand hai?"
+    },
+    "commentPlaceholder": "Aur batayein (optional)",
+    "submit": "Submit karein",
+    "submitting": "Submit ho raha hai...",
+    "notNow": "Abhi nahi",
+    "thanksTitle": "Dhanyavaad!",
+    "thanksDescription": "Aapka feedback ChequeCheck ko behtar banane mein madad karta hai.",
+    "submitFailed": "Feedback nahi bhej paaye. Dobara try karein."
+  },
   "Common": {
     "save": "Save karein",
     "saving": "Save ho raha hai...",

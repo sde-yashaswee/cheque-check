@@ -1,4 +1,22 @@
 {
+  "Feedback": {
+    "title": "Enjoying ChequeCheck?",
+    "question": "How likely are you to recommend ChequeCheck to a friend or colleague?",
+    "notLikely": "Not likely",
+    "veryLikely": "Very likely",
+    "followUp": {
+      "detractor": "What disappointed you, and how can we improve?",
+      "passive": "What would make it a 10 for you?",
+      "promoter": "What do you love most about ChequeCheck?"
+    },
+    "commentPlaceholder": "Tell us more (optional)",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "notNow": "Not now",
+    "thanksTitle": "Thank you!",
+    "thanksDescription": "Your feedback helps us improve ChequeCheck.",
+    "submitFailed": "Could not send your feedback. Please try again."
+  },
   "Common": {
     "save": "Save",
     "saving": "Saving...",
