@@ -46,6 +46,7 @@ import { useTranslations } from 'next-intl'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { PhoneInput } from '@/components/ui/phone-input'
 import { isValidE164Phone } from '@/lib/phone'
+import { celebrate } from '@/lib/celebrate'
 
 const COLORS = [
   '#0066cc',
@@ -177,6 +178,7 @@ export default function OnboardingPage() {
       })
 
       setStep(5)
+      celebrate()
     } catch (error) {
       alert(error instanceof Error ? error.message : tc('error'))
     } finally {
