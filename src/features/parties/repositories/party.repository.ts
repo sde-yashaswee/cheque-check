@@ -30,6 +30,7 @@ export class SupabasePartyRepository
         .from(TABLES.PARTIES)
         .select('*')
         .eq('business_id', businessId)
+        .eq('is_draft', false)
         .is('deleted_at', null)
         .order('name', { ascending: true }),
     ) as Promise<Party[]>

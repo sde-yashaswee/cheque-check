@@ -137,11 +137,17 @@ export default function EditBusinessPage() {
               <Input
                 leftIcon={Phone}
                 id="phone"
+                type="tel"
                 {...register('phone')}
                 placeholder={t('businessPhonePlaceholder')}
                 className="h-14  bg-canvas-parchment border-none rounded-sm"
               />
             </div>
+            {errors.phone && (
+              <p className="text-xs text-destructive ml-1">
+                {errors.phone.message as string}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -159,11 +165,17 @@ export default function EditBusinessPage() {
               <Input
                 leftIcon={Mail}
                 id="email"
+                type="email"
                 {...register('email')}
                 placeholder={t('businessEmailPlaceholder')}
                 className="h-14  bg-canvas-parchment border-none rounded-sm"
               />
             </div>
+            {errors.email && (
+              <p className="text-xs text-destructive ml-1">
+                {errors.email.message as string}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">

@@ -24,6 +24,7 @@ import { ChequeStatus } from '@/types'
 import { StatusPill } from '@/components/ui/status-pill'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
+import { useRedirectIfDraft } from '@/features/drafts'
 
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import 'react-photo-view/dist/react-photo-view.css'
@@ -67,8 +68,9 @@ export default function ChequeDetailPage() {
   const currency = profile?.currency || '₹'
 
   const { cheque, isLoading, updateStatus, isUpdating } = useChequeDetail(id)
+  const isDraft = useRedirectIfDraft('cheque', cheque)
 
-  if (isLoading) {
+  if (isLoading || isDraft) {
     return (
       <div className="max-w-2xl space-y-8 pb-20">
         <Skeleton className="h-64 w-full rounded-lg" />

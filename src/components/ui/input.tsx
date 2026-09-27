@@ -16,6 +16,23 @@ export interface InputProps extends React.ComponentProps<'input'> {
   leftIcon?: any
 }
 
+// react-speech-recognition exposes a single global recognition session, so
+// track which input owns it to stop every mic toggling at once.
+let activeMicId: string | null = null
+const activeMicListeners = new Set<() => void>()
+
+function setActiveMicId(id: string | null) {
+  activeMicId = id
+  activeMicListeners.forEach((listener) => listener())
+}
+
+function subscribeActiveMic(listener: () => void) {
+  activeMicListeners.add(listener)
+  return () => {
+    activeMicListeners.delete(listener)
+  }
+}
+
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     { className, type, enableMic, leftIcon, onChange, value, ...props },
@@ -28,7 +45,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       browserSupportsSpeechRecognition,
     } = useSpeechRecognition()
 
-    const [isMicActive, setIsMicActive] = React.useState(false)
+    const micId = React.useId()
+    const currentMicId = React.useSyncExternalStore(
+      subscribeActiveMic,
+      () => activeMicId,
+      () => null,
+    )
+    const isListening = listening && currentMicId === micId
     const internalRef = React.useRef<HTMLInputElement>(null)
 
     // Speech recognition support is browser-only, so defer the mic UI until after hydration.
@@ -44,37 +67,42 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       browserSupportsSpeechRecognition
 
     React.useEffect(() => {
-      if (isMicActive && transcript) {
-        // Create a synthetic event to trigger onChange
-        if (internalRef.current) {
-          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-            window.HTMLInputElement.prototype,
-            'value',
-          )?.set
-          nativeInputValueSetter?.call(internalRef.current, transcript)
-          const ev2 = new Event('input', { bubbles: true })
-          internalRef.current.dispatchEvent(ev2)
+      if (isListening && transcript && internalRef.current) {
+        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+          window.HTMLInputElement.prototype,
+          'value',
+        )?.set
+        nativeInputValueSetter?.call(internalRef.current, transcript)
+        internalRef.current.dispatchEvent(new Event('input', { bubbles: true }))
+      }
+    }, [transcript, isListening])
+
+    React.useEffect(() => {
+      return () => {
+        if (activeMicId === micId) {
+          SpeechRecognition.stopListening()
+          setActiveMicId(null)
         }
       }
-    }, [transcript, isMicActive])
+    }, [micId])
 
     const toggleMic = (e: React.MouseEvent) => {
       e.preventDefault()
       e.stopPropagation()
-      if (listening) {
+      if (isListening) {
         SpeechRecognition.stopListening()
-        setIsMicActive(false)
+        setActiveMicId(null)
       } else {
         resetTranscript()
+        setActiveMicId(micId)
         SpeechRecognition.startListening({ continuous: true })
-        setIsMicActive(true)
       }
     }
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-      if (listening) {
+      if (isListening) {
         SpeechRecognition.stopListening()
-        setIsMicActive(false)
+        setActiveMicId(null)
       }
       props.onBlur?.(e)
     }
@@ -114,13 +142,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             onClick={toggleMic}
             className={cn(
               'absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full transition-colors',
-              listening
+              isListening
                 ? 'bg-red-100 text-red-500 animate-pulse'
                 : 'text-muted-foreground hover:bg-muted',
             )}
           >
             <HugeiconsIcon
-              icon={listening ? MicOffIcon : MicIcon}
+              icon={isListening ? MicOffIcon : MicIcon}
               className="h-4 w-4"
             />
           </button>

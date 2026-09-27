@@ -2,8 +2,19 @@ import { z } from 'zod'
 
 export const businessSchema = z.object({
   name: z.string().min(1, 'Business name is required'),
-  email: z.string().email().optional().or(z.literal('')),
-  phone: z.string().optional().or(z.literal('')),
+  email: z
+    .string()
+    .email('Enter a valid email address')
+    .optional()
+    .or(z.literal('')),
+  phone: z
+    .string()
+    .regex(
+      /^\+[1-9]\d{7,14}$/,
+      'Enter the country code followed by the number, e.g. +919876543210',
+    )
+    .optional()
+    .or(z.literal('')),
   address: z.string().optional().or(z.literal('')),
   color: z.string().optional(),
   icon: z.string().optional(),

@@ -51,7 +51,7 @@ describe('ChequeService', () => {
     expect(repo.updateStatus).toHaveBeenCalledWith('1', 'Cleared')
   })
 
-  it('throws when a terminal status is transitioned again', async () => {
+  it("throws when moving to the other cheque type's pending status", async () => {
     const repo = {
       getById: vi.fn().mockResolvedValue({
         id: '1',
@@ -77,7 +77,7 @@ describe('ChequeService', () => {
 
     const service = new ChequeService(repo as any)
 
-    await expect(service.updateStatus('1', 'Bounced')).rejects.toThrow(
+    await expect(service.updateStatus('1', 'Received')).rejects.toThrow(
       'Cannot transition',
     )
     expect(repo.updateStatus).not.toHaveBeenCalled()

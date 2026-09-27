@@ -38,6 +38,7 @@ export class SupabaseAccountRepository
         .from(TABLES.ACCOUNTS)
         .select('*, bank:banks(name, logo_url)')
         .eq('business_id', businessId)
+        .eq('is_draft', false)
         .is('deleted_at', null)
         .order('account_name', { ascending: true }),
     ) as Promise<Account[]>

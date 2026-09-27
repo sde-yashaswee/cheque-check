@@ -1,10 +1,14 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { HugeiconsIcon } from '@hugeicons/react';
-import { Tick02Icon as Check, ArrowUpDownIcon as ChevronsUpDown, PlusSignCircleIcon as PlusCircle } from '@hugeicons/core-free-icons';
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import * as React from 'react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Tick02Icon as Check,
+  ArrowUpDownIcon as ChevronsUpDown,
+  PlusSignCircleIcon as PlusCircle,
+} from '@hugeicons/core-free-icons'
+import { cn } from '@/lib/utils'
+import { buttonVariants } from '@/components/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -13,17 +17,23 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command"
+} from '@/components/ui/command'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { EntityAvatar } from "@/components/ui/entity-avatar"
-import Link from "next/link"
+} from '@/components/ui/popover'
+import { EntityAvatar } from '@/components/ui/entity-avatar'
+import Link from 'next/link'
 
 interface ComboboxProps {
-  options: { label: string; value: string; color?: string; icon?: string; imageUrl?: string | null }[]
+  options: {
+    label: string
+    value: string
+    color?: string
+    icon?: string
+    imageUrl?: string | null
+  }[]
   value?: string
   onValueChange: (value: string) => void
   placeholder?: string
@@ -31,17 +41,19 @@ interface ComboboxProps {
   className?: string
   createUrl?: string
   createLabel?: string
+  onCreateClick?: () => void
 }
 
 export function Combobox({
   options,
   value,
   onValueChange,
-  placeholder = "Select option...",
-  emptyMessage = "No option found.",
+  placeholder = 'Select option...',
+  emptyMessage = 'No option found.',
   className,
   createUrl,
-  createLabel = "Add new",
+  createLabel = 'Add new',
+  onCreateClick,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
 
@@ -51,18 +63,20 @@ export function Combobox({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         className={cn(
-          buttonVariants({ variant: className?.includes('bg-') ? "ghost" : "outline" }), 
-          "w-full justify-between h-12 rounded-sm",
-          !className?.includes('border-none') && "border-primary/10",
-          className
+          buttonVariants({
+            variant: className?.includes('bg-') ? 'ghost' : 'outline',
+          }),
+          'w-full justify-between h-12 rounded-sm',
+          !className?.includes('border-none') && 'border-primary/10',
+          className,
         )}
       >
         <div className="flex items-center gap-2 overflow-hidden">
           {selectedOption && (
-            <EntityAvatar 
-              name={selectedOption.label} 
-              color={selectedOption.color} 
-              icon={selectedOption.icon} 
+            <EntityAvatar
+              name={selectedOption.label}
+              color={selectedOption.color}
+              icon={selectedOption.icon}
               imageUrl={selectedOption.imageUrl}
               size="sm"
             />
@@ -71,14 +85,22 @@ export function Combobox({
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
-        <HugeiconsIcon icon={ChevronsUpDown} className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+        <HugeiconsIcon
+          icon={ChevronsUpDown}
+          className="ml-2 h-4 w-4 shrink-0 opacity-50"
+        />
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 rounded-lg overflow-hidden border border-primary/5"align="start">
+      <PopoverContent
+        className="w-full p-0 rounded-lg overflow-hidden border border-primary/5"
+        align="start"
+      >
         <Command className="rounded-none">
-          <CommandInput placeholder={placeholder} className="h-12"/>
+          <CommandInput placeholder={placeholder} className="h-12" />
           <CommandList className="max-h-[300px]">
             <CommandEmpty className="py-6 text-center text-sm">
-              <p className="text-muted-foreground font-semibold">{emptyMessage}</p>
+              <p className="text-muted-foreground font-semibold">
+                {emptyMessage}
+              </p>
             </CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
@@ -86,34 +108,56 @@ export function Combobox({
                   key={option.value}
                   value={option.label} // Command uses value for filtering
                   onSelect={() => {
-                    onValueChange(option.value === value ? "": option.value)
+                    onValueChange(option.value === value ? '' : option.value)
                     setOpen(false)
                   }}
                   className="flex items-center justify-between py-3 px-4"
                 >
                   <div className="flex items-center gap-2">
-                    <EntityAvatar name={option.label} color={option.color} icon={option.icon} imageUrl={option.imageUrl} size="sm"/>
+                    <EntityAvatar
+                      name={option.label}
+                      color={option.color}
+                      icon={option.icon}
+                      imageUrl={option.imageUrl}
+                      size="sm"
+                    />
                     <span className="font-semibold">{option.label}</span>
                   </div>
-                  <HugeiconsIcon icon={Check}                     className={cn(
-                      "h-4 w-4 text-primary",
-                      value === option.value ? "opacity-100": "opacity-0"
+                  <HugeiconsIcon
+                    icon={Check}
+                    className={cn(
+                      'h-4 w-4 text-primary',
+                      value === option.value ? 'opacity-100' : 'opacity-0',
                     )}
                   />
                 </CommandItem>
               ))}
             </CommandGroup>
           </CommandList>
-          {createUrl && (
+          {(createUrl || onCreateClick) && (
             <>
               <CommandSeparator />
               <div className="p-1">
-                <Link href={createUrl}>
-                  <div className="flex items-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors cursor-pointer">
-                    <HugeiconsIcon icon={PlusCircle} className="h-4 w-4"/>
+                {onCreateClick ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false)
+                      onCreateClick()
+                    }}
+                    className="flex w-full items-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors cursor-pointer"
+                  >
+                    <HugeiconsIcon icon={PlusCircle} className="h-4 w-4" />
                     {createLabel}
-                  </div>
-                </Link>
+                  </button>
+                ) : (
+                  <Link href={createUrl!}>
+                    <div className="flex items-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors cursor-pointer">
+                      <HugeiconsIcon icon={PlusCircle} className="h-4 w-4" />
+                      {createLabel}
+                    </div>
+                  </Link>
+                )}
               </div>
             </>
           )}
@@ -121,5 +165,4 @@ export function Combobox({
       </PopoverContent>
     </Popover>
   )
-
 }

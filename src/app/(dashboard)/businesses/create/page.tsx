@@ -208,6 +208,7 @@ export default function CreateBusinessPage() {
                 <Input
                   leftIcon={Mail}
                   id="email"
+                  type="email"
                   {...register('email')}
                   placeholder={t('contactEmailPlaceholder')}
                   className="h-14  bg-canvas-parchment border-none rounded-sm"
@@ -235,11 +236,17 @@ export default function CreateBusinessPage() {
                 <Input
                   leftIcon={Phone}
                   id="phone"
+                  type="tel"
                   {...register('phone')}
                   placeholder="+91 ..."
                   className="h-14  bg-canvas-parchment border-none rounded-sm"
                 />
               </div>
+              {errors.phone && (
+                <p className="text-xs text-destructive ml-1">
+                  {errors.phone.message as string}
+                </p>
+              )}
             </div>
 
             <Button

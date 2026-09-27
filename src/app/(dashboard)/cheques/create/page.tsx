@@ -44,7 +44,7 @@ import { useState, useEffect } from 'react'
 import { toast } from '@/components/ui/toast'
 import { logger } from '@/lib/logger'
 import { useBanks } from '@/hooks/use-banks'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { partyService } from '@/services/party.service'
 import { accountService } from '@/services/account.service'
 import {
@@ -60,13 +60,22 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { BankSelector } from '@/components/bank-selector'
 import { ScanStore } from '@/lib/scan-store'
 import { useProfile } from '@/hooks/use-profile'
+import { buildChequeReturnTo } from '@/lib/cheque-draft'
+import {
+  chequeDraftService,
+  DraftLeaveDialog,
+  DraftToolbar,
+} from '@/features/drafts'
 
 export default function CreateChequePage() {
   const t = useTranslations('Cheques')
   const tCommon = useTranslations('Common')
+  const tDrafts = useTranslations('Drafts')
   const searchParams = useSearchParams()
   const typeParam = searchParams.get('type')
   const imageUrlParam = searchParams.get('imageUrl')
+  // Read once: autosave later writes a new draftId into the URL for the same form.
+  const [initialDraftId] = useState(() => searchParams.get('draftId'))
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
   const { profile } = useProfile()
@@ -100,7 +109,8 @@ export default function CreateChequePage() {
     handleImageUpload,
     isSaving,
     onSubmit,
-  } = useCreateCheque(businessId, typeParam)
+    draft,
+  } = useCreateCheque(businessId, typeParam, { draftId: initialDraftId })
 
   const {
     register,
@@ -108,6 +118,35 @@ export default function CreateChequePage() {
     watch,
     formState: { errors },
   } = form
+  const { setUserValue } = draft
+
+  const openCreatePage = (path: string, params: Record<string, string> = {}) =>
+    draft.navigateAfterSave(
+      (id) =>
+        `${path}?${new URLSearchParams({ ...params, returnTo: buildChequeReturnTo(id) })}`,
+    )
+
+  const chequeNumber = watch('cheque_number') ?? ''
+  const selectedAccountId = watch('account_id')
+  const { data: hasNumberConflict } = useQuery({
+    queryKey: [
+      'cheque-number-conflict',
+      businessId,
+      selectedAccountId,
+      chequeNumber,
+    ],
+    queryFn: () =>
+      chequeDraftService.hasNumberConflict(
+        businessId!,
+        selectedAccountId,
+        chequeNumber,
+      ),
+    enabled:
+      !!businessId && !!selectedAccountId && /^\d{6}$/.test(chequeNumber),
+  })
+  const numberConflictWarning = hasNumberConflict ? (
+    <p className="text-xs text-amber-600 ml-1">{tDrafts('duplicateNumber')}</p>
+  ) : null
 
   const { parties } = useParties(businessId)
   const { accounts } = useAccounts(businessId)
@@ -445,6 +484,12 @@ export default function CreateChequePage() {
         </Stepper>
       </div>
 
+      <DraftToolbar
+        status={draft.status}
+        onSaveDraft={draft.saveDraftAndExit}
+      />
+      <DraftLeaveDialog {...draft.leaveDialogProps} />
+
       <form onSubmit={onSubmit} className="space-y-8">
         {step === 1 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
@@ -464,7 +509,7 @@ export default function CreateChequePage() {
                     />
                     <button
                       type="button"
-                      onClick={() => setValue('image_url', null)}
+                      onClick={() => setUserValue('image_url', null)}
                       className="absolute top-3 right-3 p-2 bg-black/60 text-white rounded-full hover:bg-black transition-colors z-20"
                     >
                       <HugeiconsIcon icon={X} className="h-4 w-4" />
@@ -536,7 +581,7 @@ export default function CreateChequePage() {
               <div className="grid grid-cols-2 gap-4">
                 <button
                   type="button"
-                  onClick={() => setValue('type', 'Outward')}
+                  onClick={() => setUserValue('type', 'Outward')}
                   className={cn(
                     'flex flex-col items-center justify-center gap-3 rounded-lg p-6 border transition-all active:scale-95',
                     watch('type') === 'Outward'
@@ -568,7 +613,7 @@ export default function CreateChequePage() {
 
                 <button
                   type="button"
-                  onClick={() => setValue('type', 'Inward')}
+                  onClick={() => setUserValue('type', 'Inward')}
                   className={cn(
                     'flex flex-col items-center justify-center gap-3 rounded-lg p-6 border transition-all active:scale-95',
                     watch('type') === 'Inward'
@@ -653,6 +698,7 @@ export default function CreateChequePage() {
                   {errors.cheque_number.message as string}
                 </p>
               )}
+              {numberConflictWarning}
             </div>
 
             <Button
@@ -675,10 +721,10 @@ export default function CreateChequePage() {
               <Combobox
                 options={partyOptions}
                 value={watch('party_id')}
-                onValueChange={(val) => setValue('party_id', val)}
+                onValueChange={(val) => setUserValue('party_id', val)}
                 placeholder={t('partyPlaceholder')}
-                createUrl="/parties/create"
                 createLabel={t('addParty')}
+                onCreateClick={() => openCreatePage('/parties/create')}
                 className="h-14 bg-canvas-parchment border-none rounded-sm"
               />
               {errors.party_id && (
@@ -695,10 +741,17 @@ export default function CreateChequePage() {
               <Combobox
                 options={accountOptions}
                 value={watch('account_id')}
-                onValueChange={(val) => setValue('account_id', val)}
+                onValueChange={(val) => setUserValue('account_id', val)}
                 placeholder={t('accountPlaceholder')}
-                createUrl={`/accounts/create?name=${encodeURIComponent(unmatchedEntities?.account_name || '')}&number=${unmatchedEntities?.account_number || ''}&ifsc=${unmatchedEntities?.ifsc_code || ''}&auto=true`}
                 createLabel={t('addAccount')}
+                onCreateClick={() =>
+                  openCreatePage('/accounts/create', {
+                    name: unmatchedEntities?.account_name || '',
+                    number: unmatchedEntities?.account_number || '',
+                    ifsc: unmatchedEntities?.ifsc_code || '',
+                    auto: 'true',
+                  })
+                }
                 className="h-14 bg-canvas-parchment border-none rounded-sm"
               />
               {errors.account_id && (
@@ -706,6 +759,7 @@ export default function CreateChequePage() {
                   {errors.account_id.message as string}
                 </p>
               )}
+              {numberConflictWarning}
             </div>
 
             <Button
@@ -851,6 +905,7 @@ export default function CreateChequePage() {
               </div>
             </div>
 
+            {numberConflictWarning}
             <Button
               type="submit"
               className="w-full rounded-full h-14 text-lg"

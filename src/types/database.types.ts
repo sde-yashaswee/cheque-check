@@ -64,22 +64,21 @@ export interface Database {
         Row: {
           id: string
           business_id: string
-          name: string
-          contact: string
+          name: string | null
+          contact: string | null
           email: string | null
           address: string | null
           notes: string | null
           color: string | null
           icon: string | null
           avatar_url: string | null
+          is_draft: boolean
           deleted_at: string | null
           created_at: string | null
           updated_at: string | null
         }
         Insert: Partial<Database['public']['Tables']['parties']['Row']> & {
           business_id: string
-          name: string
-          contact: string
         }
         Update: Partial<Database['public']['Tables']['parties']['Row']>
         Relationships: []
@@ -102,21 +101,20 @@ export interface Database {
         Row: {
           id: string
           business_id: string
-          account_name: string
-          account_number: string
+          account_name: string | null
+          account_number: string | null
           ifsc_code: string | null
           bank_id: string | null
           color: string | null
           icon: string | null
           notes: string | null
+          is_draft: boolean
           deleted_at: string | null
           created_at: string | null
           updated_at: string | null
         }
         Insert: Partial<Database['public']['Tables']['accounts']['Row']> & {
           business_id: string
-          account_name: string
-          account_number: string
         }
         Update: Partial<Database['public']['Tables']['accounts']['Row']>
         Relationships: [
@@ -133,30 +131,25 @@ export interface Database {
         Row: {
           id: string
           business_id: string
-          party_id: string
-          account_id: string
-          cheque_number: string
-          amount: number
-          cheque_date: string
+          party_id: string | null
+          account_id: string | null
+          cheque_number: string | null
+          amount: number | null
+          cheque_date: string | null
           deposit_date: string | null
           remind_before_days: number | null
-          status: Database['public']['Enums']['cheque_status']
-          type: Database['public']['Enums']['cheque_type']
+          status: Database['public']['Enums']['cheque_status'] | null
+          type: Database['public']['Enums']['cheque_type'] | null
           notes: string | null
           voice_call_sent: boolean | null
           last_call_at: string | null
           image_url: string | null
+          is_draft: boolean
           created_at: string | null
           updated_at: string | null
         }
         Insert: Partial<Database['public']['Tables']['cheques']['Row']> & {
           business_id: string
-          party_id: string
-          account_id: string
-          cheque_number: string
-          amount: number
-          cheque_date: string
-          type: Database['public']['Enums']['cheque_type']
         }
         Update: Partial<Database['public']['Tables']['cheques']['Row']>
         Relationships: [

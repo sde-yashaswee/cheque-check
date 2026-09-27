@@ -42,6 +42,7 @@ export class SupabaseChequeRepository
           '*, party:parties(name, color, icon, avatar_url), account:accounts(account_name, color, icon, bank:banks(name, logo_url))',
         )
         .eq('business_id', businessId)
+        .eq('is_draft', false)
         .order('cheque_date', { ascending: true }),
     ) as Promise<ChequeWithRelations[]>
   }

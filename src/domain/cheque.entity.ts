@@ -88,6 +88,10 @@ export class Cheque {
     return this.row.updated_at
   }
 
+  get is_draft(): boolean {
+    return this.row.is_draft ?? false
+  }
+
   get party(): ChequeWithRelations['party'] {
     return this.row.party
   }

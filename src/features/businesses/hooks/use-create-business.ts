@@ -67,7 +67,7 @@ export function useCreateBusiness() {
     if (step === 1) {
       isValid = await trigger(['name'])
     } else if (step === 2) {
-      isValid = await trigger(['email'])
+      isValid = await trigger(['email', 'phone'])
     }
 
     if (isValid) setStep((s) => Math.min(s + 1, 3))

@@ -4,7 +4,7 @@ import { useCreateParty } from '@/hooks/use-create-party'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
@@ -28,23 +28,29 @@ import {
   StepperTrigger,
 } from '@/components/reui/stepper'
 import { useTranslations } from 'next-intl'
+import { getSafeChequeReturnTo } from '@/lib/cheque-draft'
+import { useState } from 'react'
+import { DraftLeaveDialog, DraftToolbar } from '@/features/drafts'
 
 export default function CreatePartyPage() {
   const t = useTranslations('Parties')
   const tCommon = useTranslations('Common')
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const returnTo = getSafeChequeReturnTo(searchParams.get('returnTo'))
+  // Read once: autosave later writes a new draftId into the URL for the same form.
+  const [initialDraftId] = useState(() => searchParams.get('draftId'))
   const { activeBusiness } = useBusiness()
 
-  const { form, step, nextStep, prevStep, isSaving, onSubmit } = useCreateParty(
-    activeBusiness?.id,
-  )
+  const { form, step, nextStep, prevStep, isSaving, onSubmit, draft } =
+    useCreateParty(activeBusiness?.id, { returnTo, draftId: initialDraftId })
 
   const {
     register,
     watch,
-    setValue,
     formState: { errors },
   } = form
+  const { setUserValue } = draft
 
   const colors = [
     '#FF3B30',
@@ -120,6 +126,12 @@ export default function CreatePartyPage() {
         </div>
       </Stepper>
 
+      <DraftToolbar
+        status={draft.status}
+        onSaveDraft={draft.saveDraftAndExit}
+      />
+      <DraftLeaveDialog {...draft.leaveDialogProps} />
+
       <form onSubmit={onSubmit} className="space-y-8">
         {step === 1 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
@@ -160,7 +172,7 @@ export default function CreatePartyPage() {
                     <button
                       key={c}
                       type="button"
-                      onClick={() => setValue('color', c)}
+                      onClick={() => setUserValue('color', c)}
                       className={cn(
                         'h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2',
                         (watch as any)('color') === c
