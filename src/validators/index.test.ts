@@ -21,16 +21,32 @@ describe('businessSchema', () => {
   it('rejects a missing business name', () => {
     expect(businessSchema.safeParse({ name: '' }).success).toBe(false)
   })
+
+  it('accepts a valid E.164 phone and rejects an invalid one', () => {
+    expect(
+      businessSchema.safeParse({ name: 'Acme', phone: '+919876543210' })
+        .success,
+    ).toBe(true)
+    expect(
+      businessSchema.safeParse({ name: 'Acme', phone: '+91123' }).success,
+    ).toBe(false)
+  })
 })
 
 describe('partySchema', () => {
-  it('requires a contact number with at least ten characters', () => {
+  it('requires a valid contact number', () => {
     expect(
       partySchema.safeParse({
         name: 'Supplier',
         contact: '123456789',
       }).success,
     ).toBe(false)
+    expect(
+      partySchema.safeParse({
+        name: 'Supplier',
+        contact: '+14155552671',
+      }).success,
+    ).toBe(true)
   })
 })
 

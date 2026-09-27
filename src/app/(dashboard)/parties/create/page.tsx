@@ -32,6 +32,9 @@ import { getSafeChequeReturnTo } from '@/lib/cheque-draft'
 import { useState } from 'react'
 import { DraftLeaveDialog, DraftToolbar } from '@/features/drafts'
 import { toast } from '@/components/ui/toast'
+import { PhoneInput, useDefaultPhoneCountry } from '@/components/ui/phone-input'
+import { toE164 } from '@/lib/phone'
+import { Controller } from 'react-hook-form'
 
 export default function CreatePartyPage() {
   const t = useTranslations('Parties')
@@ -48,11 +51,13 @@ export default function CreatePartyPage() {
 
   const {
     register,
+    control,
     watch,
     setValue,
     formState: { errors },
   } = form
   const { setUserValue } = draft
+  const defaultPhoneCountry = useDefaultPhoneCountry()
   const importContact = async () => {
     const contacts = (
       navigator as Navigator & {
@@ -82,7 +87,8 @@ export default function CreatePartyPage() {
       const fullName = contact?.name?.[0]?.trim()
       const phone = contact?.tel?.[0]?.trim()
       if (fullName) setValue('name', fullName)
-      if (phone) setValue('contact', phone)
+      if (phone)
+        setValue('contact', toE164(phone, defaultPhoneCountry) ?? phone)
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return
       toast.add({
@@ -260,19 +266,20 @@ export default function CreatePartyPage() {
                   {t('importFromContacts')}
                 </Button>
               </div>
-              <div className="relative">
-                <HugeiconsIcon
-                  icon={Phone}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
-                />
-                <Input
-                  leftIcon={TextIcon}
-                  id="contact"
-                  {...register('contact')}
-                  placeholder={t('phoneNumber')}
-                  className="h-14  bg-canvas-parchment border-none rounded-sm"
-                />
-              </div>
+              <Controller
+                control={control}
+                name="contact"
+                render={({ field }) => (
+                  <PhoneInput
+                    id="contact"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    placeholder={t('phoneNumber')}
+                    aria-invalid={!!errors.contact}
+                  />
+                )}
+              />
               {errors.contact && (
                 <p className="text-xs text-destructive ml-1">
                   {errors.contact.message as string}

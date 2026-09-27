@@ -1,4 +1,7 @@
 import { z } from 'zod'
+import { isValidE164Phone } from '@/lib/phone'
+
+const PHONE_ERROR = 'Enter a valid phone number'
 
 export const businessSchema = z.object({
   name: z.string().min(1, 'Business name is required'),
@@ -9,10 +12,7 @@ export const businessSchema = z.object({
     .or(z.literal('')),
   phone: z
     .string()
-    .regex(
-      /^\+[1-9]\d{7,14}$/,
-      'Enter the country code followed by the number, e.g. +919876543210',
-    )
+    .refine(isValidE164Phone, PHONE_ERROR)
     .optional()
     .or(z.literal('')),
   address: z.string().optional().or(z.literal('')),
@@ -23,7 +23,10 @@ export const businessSchema = z.object({
 
 export const partySchema = z.object({
   name: z.string().min(1, 'Party name is required'),
-  contact: z.string().min(10, 'Valid contact number is required'),
+  contact: z
+    .string()
+    .min(1, 'Contact number is required')
+    .refine(isValidE164Phone, PHONE_ERROR),
   email: z.string().email().optional().or(z.literal('')),
   address: z.string().optional().or(z.literal('')),
   notes: z.string().optional().or(z.literal('')),

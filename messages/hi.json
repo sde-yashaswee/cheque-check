@@ -92,6 +92,10 @@
   },
   "Common": {
     "welcome": "स्वागत है",
+    "selectCountry": "देश चुनें",
+    "searchCountry": "देश या कोड खोजें...",
+    "noCountryFound": "कोई देश नहीं मिला।",
+    "invalidPhone": "सही फ़ोन नंबर दर्ज करें",
     "businesses": "व्यवसाय",
     "sortAndFilter": "क्रमबद्ध और फ़िल्टर करें",
     "sortBy": "क्रमबद्ध करें",
