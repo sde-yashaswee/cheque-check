@@ -90,7 +90,9 @@
     "avatarUpdated": "Avatar successfully update ho gaya",
     "avatarUploadFailed": "Avatar upload nahi ho saka",
     "avatarRemoved": "Avatar successfully remove ho gaya",
-    "avatarRemoveFailed": "Avatar remove nahi ho saka"
+    "avatarRemoveFailed": "Avatar remove nahi ho saka",
+    "welcome": "Swagat hai",
+    "businesses": "Businesses"
   },
   "Navigation": {
     "dashboard": "Dashboard",

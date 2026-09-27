@@ -90,7 +90,9 @@
     "avatarUpdated": "Avatar updated successfully",
     "avatarUploadFailed": "Failed to upload avatar",
     "avatarRemoved": "Avatar removed successfully",
-    "avatarRemoveFailed": "Failed to remove avatar"
+    "avatarRemoveFailed": "Failed to remove avatar",
+    "welcome": "Welcome",
+    "businesses": "Businesses"
   },
   "Navigation": {
     "dashboard": "Dashboard",

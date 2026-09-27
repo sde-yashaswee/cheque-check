@@ -56,6 +56,8 @@
     "sortAmount": "राशि"
   },
   "Common": {
+    "welcome": "स्वागत है",
+    "businesses": "व्यवसाय",
     "sortAndFilter": "क्रमबद्ध और फ़िल्टर करें",
     "sortBy": "क्रमबद्ध करें",
     "order": "क्रम",
