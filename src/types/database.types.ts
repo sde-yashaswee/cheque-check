@@ -309,6 +309,24 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['api_rate_limits']['Row']>
         Relationships: []
       }
+      nps_responses: {
+        Row: {
+          id: string
+          user_id: string
+          business_id: string | null
+          cheque_id: string | null
+          score: number
+          comment: string | null
+          created_at: string
+        }
+        Insert: Partial<
+          Database['public']['Tables']['nps_responses']['Row']
+        > & {
+          score: number
+        }
+        Update: Partial<Database['public']['Tables']['nps_responses']['Row']>
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
