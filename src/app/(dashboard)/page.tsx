@@ -17,7 +17,7 @@ import { useCheques } from '@/hooks/use-cheques'
 import { ChequeCard } from '@/components/cheque-card'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { useProfile } from '@/hooks/use-profile'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useChequeStats } from '@/hooks/use-cheque-stats'
@@ -28,6 +28,13 @@ import { useTranslations } from 'next-intl'
 import { logger } from '@/lib/logger'
 import { DraftsSummaryCard } from '@/features/drafts'
 import { cn } from '@/lib/utils'
+import type { DateRange } from 'react-day-picker'
+import { StatsDateFilter } from '@/features/cheques/components/stats-date-filter'
+import {
+  filterByChequeDate,
+  resolveDateRange,
+  type DateRangePreset,
+} from '@/features/cheques/lib/date-range'
 
 const ChequeStatsChart = dynamic(
   () =>
@@ -67,13 +74,22 @@ export default function HomePage() {
     payable,
     receivable,
     currentBalance,
-    issuedCount,
-    receivedCount,
-    clearedCount,
-    bouncedCount,
     upcomingCount,
     overdueCount,
   } = useChequeStats(cheques)
+
+  const [statsPreset, setStatsPreset] = useState<DateRangePreset>('all')
+  const [customRange, setCustomRange] = useState<DateRange>()
+  const statsCheques = useMemo(
+    () =>
+      filterByChequeDate(
+        cheques,
+        resolveDateRange(statsPreset, new Date(), customRange),
+      ),
+    [cheques, statsPreset, customRange],
+  )
+  const { issuedCount, receivedCount, clearedCount, bouncedCount } =
+    useChequeStats(statsCheques)
 
   const currency = profile?.currency || '₹'
   const formatAmount = (value: number) =>
@@ -288,11 +304,19 @@ export default function HomePage() {
               <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                 {tDashboard('statistics')}
               </h2>
+              <div className="ml-auto">
+                <StatsDateFilter
+                  preset={statsPreset}
+                  onPresetChange={setStatsPreset}
+                  customRange={customRange}
+                  onCustomRangeChange={setCustomRange}
+                />
+              </div>
             </div>
             <div className="rounded-lg border bg-card p-6 h-[300px] relative">
               <ChequeStatsChart
                 chartData={chartData}
-                totalCheques={cheques?.length || 0}
+                totalCheques={statsCheques?.length || 0}
               />
             </div>
           </div>

@@ -172,6 +172,16 @@
     "currentBalance": "Current Balance",
     "receivable": "Milne wala",
     "payable": "Dene wala",
+    "dateRange": {
+      "label": "Date range",
+      "all": "Sab time",
+      "thisWeek": "Is hafte",
+      "thisMonth": "Is mahine",
+      "lastMonth": "Pichhle mahine",
+      "thisYear": "Is saal",
+      "custom": "Custom range",
+      "pickDates": "Dates chunein"
+    },
     "quickActions": "Quick Actions",
     "scanCheque": "Scan Cheque",
     "issueCheque": "Cheque Issue karein",

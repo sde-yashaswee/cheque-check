@@ -2,7 +2,17 @@
   "Dashboard": {
     "currentBalance": "वर्तमान शेष",
     "receivable": "प्राप्य",
-    "payable": "देय"
+    "payable": "देय",
+    "dateRange": {
+      "label": "तारीख सीमा",
+      "all": "सभी समय",
+      "thisWeek": "इस सप्ताह",
+      "thisMonth": "इस महीने",
+      "lastMonth": "पिछले महीने",
+      "thisYear": "इस साल",
+      "custom": "कस्टम सीमा",
+      "pickDates": "तारीखें चुनें"
+    }
   },
   "Settings": {
     "general": "सामान्य",

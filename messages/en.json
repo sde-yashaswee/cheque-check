@@ -172,6 +172,16 @@
     "currentBalance": "Current Balance",
     "receivable": "Receivable",
     "payable": "Payable",
+    "dateRange": {
+      "label": "Date range",
+      "all": "All time",
+      "thisWeek": "This week",
+      "thisMonth": "This month",
+      "lastMonth": "Last month",
+      "thisYear": "This year",
+      "custom": "Custom range",
+      "pickDates": "Pick dates"
+    },
     "quickActions": "Quick Actions",
     "scanCheque": "Scan Cheque",
     "issueCheque": "Issue Cheque",
