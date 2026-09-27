@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useChequeDetail } from '@/hooks/use-cheque-detail'
 import { useParams } from 'next/navigation'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -26,6 +27,37 @@ import { useTranslations } from 'next-intl'
 
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import 'react-photo-view/dist/react-photo-view.css'
+
+function ChequeScanImage({ src, alt }: { src: string; alt: string }) {
+  const [loaded, setLoaded] = useState(false)
+  const [failed, setFailed] = useState(false)
+
+  return (
+    <div className="relative aspect-[2/1] w-full">
+      {!loaded && !failed && (
+        <Skeleton className="absolute inset-0 h-full w-full" />
+      )}
+      {failed && (
+        <span className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
+          {alt}
+        </span>
+      )}
+      <Image
+        src={src}
+        alt={alt}
+        width={800}
+        height={400}
+        priority
+        onLoad={() => setLoaded(true)}
+        onError={() => setFailed(true)}
+        className={cn(
+          'h-full w-full object-cover transition-transform group-hover:scale-[1.02]',
+          failed ? 'hidden' : !loaded && 'invisible',
+        )}
+      />
+    </div>
+  )
+}
 
 export default function ChequeDetailPage() {
   const t = useTranslations('Cheques')
@@ -210,12 +242,10 @@ export default function ChequeDetailPage() {
                 <div className="rounded-lg overflow-hidden border relative group">
                   <PhotoView src={cheque.image_url}>
                     <div className="cursor-zoom-in relative">
-                      <Image
+                      <ChequeScanImage
+                        key={cheque.image_url}
                         src={cheque.image_url}
                         alt={t('scan')}
-                        width={800}
-                        height={400}
-                        className="w-full h-auto object-cover transition-transform group-hover:scale-[1.02]"
                       />
                       <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                         <svg

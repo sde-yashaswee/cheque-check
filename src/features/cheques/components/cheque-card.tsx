@@ -16,6 +16,7 @@ import { useProfile } from '@/hooks/use-profile'
 import { format } from 'date-fns'
 import { StatusPill } from '@/components/ui/status-pill'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
+import { SkeletonImage } from '@/components/ui/skeleton-image'
 import { TextTruncate } from '@/components/ui/text-truncate'
 import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -170,10 +171,11 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
                       }
                     />
                     <DialogContent className="max-w-lg p-0 overflow-hidden bg-transparent border-none shadow-none">
-                      <img
+                      <SkeletonImage
                         src={cheque.image_url}
                         alt={t('scan')}
-                        className="w-full h-auto rounded-3xl"
+                        containerClassName="w-full aspect-[2/1] rounded-3xl"
+                        className="h-full w-full object-contain"
                       />
                     </DialogContent>
                   </Dialog>

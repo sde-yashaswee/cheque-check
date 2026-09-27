@@ -93,7 +93,10 @@ export default function AccountsPage() {
               <Button
                 variant={bankFilter !== 'All' ? 'default' : 'outline'}
                 size="icon"
-                className="rounded-full h-11 w-11 shrink-0 bg-white"
+                className={cn(
+                  'rounded-full h-11 w-11 shrink-0',
+                  bankFilter === 'All' && 'bg-white',
+                )}
               >
                 <HugeiconsIcon icon={Filter} className="h-5 w-5" />
               </Button>

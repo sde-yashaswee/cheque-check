@@ -97,15 +97,17 @@ export class Cheque {
   }
 
   canTransition(nextStatus: ChequeStatus): boolean {
-    if (this.status === 'Cleared' || this.status === 'Bounced') {
+    if (nextStatus === this.status) {
       return false
     }
 
-    if (nextStatus === 'Cleared' || nextStatus === 'Bounced') {
-      return true
-    }
-
-    return false
+    // Statuses are correctable, so the only invalid target is the pending
+    // status belonging to the opposite cheque type.
+    return (
+      nextStatus === 'Cleared' ||
+      nextStatus === 'Bounced' ||
+      nextStatus === Cheque.initialStatusFor(this.type)
+    )
   }
 
   isOverdue(asOf: Date | string = new Date()): boolean {

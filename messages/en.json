@@ -51,6 +51,8 @@
     "noPhone": "No phone",
     "noEmail": "No email",
     "cheques": "Cheques",
+    "parties": "Parties",
+    "accounts": "Accounts",
     "sortAndFilter": "Sort & Filter",
     "sortBy": "Sort By",
     "order": "Order",
@@ -88,7 +90,9 @@
     "avatarUpdated": "Avatar updated successfully",
     "avatarUploadFailed": "Failed to upload avatar",
     "avatarRemoved": "Avatar removed successfully",
-    "avatarRemoveFailed": "Failed to remove avatar"
+    "avatarRemoveFailed": "Failed to remove avatar",
+    "welcome": "Welcome",
+    "businesses": "Businesses"
   },
   "Navigation": {
     "dashboard": "Dashboard",
@@ -206,6 +210,8 @@
     "photo": "Cheque Photo",
     "uploading": "Uploading Cheque...",
     "scanUpload": "Scan / Upload Cheque",
+    "replacePhoto": "Replace photo",
+    "removePhoto": "Remove photo",
     "photoInstruction": "Take a photo of the physical cheque",
     "status": "Status",
     "history": "Cheque History",
@@ -283,6 +289,7 @@
     "sortByBalance": "Balance",
     "emailPlaceholder": "email@address.com",
     "basicDetails": "Basic Details",
+    "contactInfo": "Contact Info",
     "locationNotes": "Location & Notes"
   },
   "Accounts": {

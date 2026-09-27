@@ -133,16 +133,14 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
             <Link
               href="/businesses/create"
               onClick={() => setOpen(false)}
-              className="block"
+              className="flex items-center gap-3 px-4 py-4 text-primary hover:bg-primary/5 rounded-xl"
             >
-              <CommandItem className="flex items-center gap-3 px-4 py-4 cursor-pointer text-primary hover:bg-primary/5 rounded-xl">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <HugeiconsIcon icon={Plus} className="h-6 w-6" />
-                </div>
-                <span className="font-bold text-sm uppercase tracking-widest">
-                  {t('addNewBusiness')}
-                </span>
-              </CommandItem>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <HugeiconsIcon icon={Plus} className="h-6 w-6" />
+              </div>
+              <span className="font-bold text-sm uppercase tracking-widest">
+                {t('addNewBusiness')}
+              </span>
             </Link>
           </div>
         </Command>

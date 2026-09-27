@@ -1,23 +1,25 @@
 'use client'
 
-import { useBusiness } from "@/hooks/use-business";
-import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useBusiness } from '@/hooks/use-business'
+import { useRouter, usePathname } from 'next/navigation'
+import { useEffect } from 'react'
+import { AppShellSkeleton } from '@/components/app-shell-skeleton'
 
 export function OnboardingCheck({ children }: { children: React.ReactNode }) {
-  const { businesses, isLoading, isFetching } = useBusiness();
-  const router = useRouter();
-  const pathname = usePathname();
+  const { businesses, isLoading, isFetching } = useBusiness()
+  const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
-    const isReady = !isLoading && !isFetching;
-    
+    const isReady = !isLoading && !isFetching
+
     if (isReady && businesses.length === 0 && pathname !== '/onboarding') {
-      router.push('/onboarding');
+      router.push('/onboarding')
     }
-  }, [businesses, isLoading, isFetching, pathname, router]);
+  }, [businesses, isLoading, isFetching, pathname, router])
 
-  if (isLoading || (isFetching && businesses.length === 0)) return null;
+  if (isLoading || (isFetching && businesses.length === 0))
+    return <AppShellSkeleton />
 
-  return <>{children}</>;
+  return <>{children}</>
 }

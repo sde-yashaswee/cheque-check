@@ -253,7 +253,13 @@ export default function AccountDetailPage() {
                       : 'outline'
                   }
                   size="icon"
-                  className="rounded-full h-11 w-11 shrink-0 bg-white"
+                  className={cn(
+                    'rounded-full h-11 w-11 shrink-0',
+                    filter === 'All' &&
+                      sortBy === 'date' &&
+                      sortOrder === 'desc' &&
+                      'bg-white',
+                  )}
                 >
                   <HugeiconsIcon icon={Filter} className="h-5 w-5" />
                 </Button>

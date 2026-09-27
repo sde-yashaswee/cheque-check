@@ -1,9 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { chequeSchema } from '@/validators'
 import { chequeService } from '@/features/cheques/services/cheque.service'
+import { storageService } from '@/services/storage.service'
+import { toast } from '@/components/ui/toast'
+import { useTranslations } from 'next-intl'
 import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
@@ -13,6 +16,8 @@ type ChequeFormData = z.infer<typeof chequeSchema>
 
 export function useEditCheque(id: string) {
   const router = useRouter()
+  const [isUploading, setIsUploading] = useState(false)
+  const tCommon = useTranslations('Common')
 
   const {
     data: cheque,
@@ -86,9 +91,35 @@ export function useEditCheque(id: string) {
     },
   })
 
-  const onSubmit = form.handleSubmit((data) => {
-    updateMutation.mutate(data)
-    router.back()
+  const handleImageUpload = async (file: File) => {
+    setIsUploading(true)
+    try {
+      const url = await storageService.uploadChequeImage(file)
+      form.setValue('image_url', url, { shouldDirty: true })
+    } catch (error) {
+      toast.add({
+        title: tCommon('error'),
+        description: error instanceof Error ? error.message : tCommon('error'),
+        type: 'error',
+      })
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const onSubmit = form.handleSubmit(async (data) => {
+    if (isUploading) return
+
+    try {
+      await updateMutation.mutateAsync(data)
+      router.back()
+    } catch (error) {
+      toast.add({
+        title: tCommon('error'),
+        description: error instanceof Error ? error.message : tCommon('error'),
+        type: 'error',
+      })
+    }
   })
 
   return {
@@ -96,6 +127,8 @@ export function useEditCheque(id: string) {
     cheque,
     isLoading,
     error,
+    isUploading,
+    handleImageUpload,
     isSaving: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
     onSubmit,

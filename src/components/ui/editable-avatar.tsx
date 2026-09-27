@@ -8,6 +8,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
 import { EntityAvatar } from './entity-avatar'
+import { SkeletonImage } from './skeleton-image'
 import { Button } from './button'
 import {
   Dialog,
@@ -115,9 +116,10 @@ export function EditableAvatar({
             )}
           >
             {imageUrl ? (
-              <img
+              <SkeletonImage
                 src={imageUrl}
                 alt={name}
+                containerClassName="h-full w-full rounded-full"
                 className="h-full w-full object-cover"
               />
             ) : (
@@ -150,9 +152,10 @@ export function EditableAvatar({
             )}
           >
             {imageUrl ? (
-              <img
+              <SkeletonImage
                 src={imageUrl}
                 alt={name}
+                containerClassName="h-full w-full rounded-full"
                 className="h-full w-full object-cover"
               />
             ) : (

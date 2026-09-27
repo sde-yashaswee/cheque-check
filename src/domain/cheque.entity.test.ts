@@ -7,7 +7,7 @@ describe('Cheque entity', () => {
     expect(Cheque.initialStatusFor('Inward')).toBe('Received')
   })
 
-  it('allows valid status transitions and blocks terminal ones', () => {
+  it('allows status corrections and blocks no-op or wrong-type transitions', () => {
     const cheque = Cheque.fromRow({
       id: '1',
       business_id: 'b1',
@@ -31,13 +31,16 @@ describe('Cheque entity', () => {
     expect(cheque.canTransition('Cleared')).toBe(true)
     expect(cheque.canTransition('Bounced')).toBe(true)
     expect(cheque.canTransition('Issued')).toBe(false)
+    expect(cheque.canTransition('Received')).toBe(false)
 
-    const terminal = Cheque.fromRow({
+    const cleared = Cheque.fromRow({
       ...cheque.toJSON(),
       status: 'Cleared',
     })
 
-    expect(terminal.canTransition('Bounced')).toBe(false)
+    expect(cleared.canTransition('Bounced')).toBe(true)
+    expect(cleared.canTransition('Issued')).toBe(true)
+    expect(cleared.canTransition('Cleared')).toBe(false)
   })
 
   it('flags overdue cheques when expired and still active', () => {

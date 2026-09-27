@@ -51,6 +51,8 @@
     "noPhone": "Phone number nahi hai",
     "noEmail": "Email nahi hai",
     "cheques": "Cheques",
+    "parties": "Parties",
+    "accounts": "Accounts",
     "sortAndFilter": "Sort & Filter",
     "sortBy": "Sort Karein",
     "order": "Order",
@@ -88,7 +90,9 @@
     "avatarUpdated": "Avatar successfully update ho gaya",
     "avatarUploadFailed": "Avatar upload nahi ho saka",
     "avatarRemoved": "Avatar successfully remove ho gaya",
-    "avatarRemoveFailed": "Avatar remove nahi ho saka"
+    "avatarRemoveFailed": "Avatar remove nahi ho saka",
+    "welcome": "Swagat hai",
+    "businesses": "Businesses"
   },
   "Navigation": {
     "dashboard": "Dashboard",
@@ -206,6 +210,8 @@
     "photo": "Cheque Photo",
     "uploading": "Cheque upload ho raha hai...",
     "scanUpload": "Cheque Scan / Upload karein",
+    "replacePhoto": "Photo badlein",
+    "removePhoto": "Photo hatayein",
     "photoInstruction": "Physical cheque ki photo lein",
     "status": "Status",
     "history": "Cheque ki History",
@@ -283,6 +289,7 @@
     "sortByBalance": "Baki Rakam",
     "emailPlaceholder": "email@address.com",
     "basicDetails": "Basic Details",
+    "contactInfo": "Contact ki Details",
     "locationNotes": "Location aur Notes"
   },
   "Accounts": {
