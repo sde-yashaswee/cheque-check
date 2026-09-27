@@ -24,12 +24,15 @@ import {
   Delete02Icon as Trash2,
   ArrowUpRight01Icon as ArrowUpRight,
   ArrowDownLeft01Icon as ArrowDownLeft,
+  Camera01Icon as Camera,
+  Loading03Icon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { cn } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 import { Combobox } from '@/components/ui/combobox'
 import { Skeleton } from '@/components/ui/skeleton'
+import { SkeletonImage } from '@/components/ui/skeleton-image'
 import dynamic from 'next/dynamic'
 import { Party, AccountWithRelations } from '@/types'
 import { useTranslations } from 'next-intl'
@@ -55,8 +58,16 @@ export default function EditChequePage() {
   const { profile } = useProfile()
   const currency = profile?.currency || '₹'
 
-  const { form, cheque, isLoading, isSaving, onSubmit, onDelete } =
-    useEditCheque(id)
+  const {
+    form,
+    cheque,
+    isLoading,
+    isSaving,
+    isUploading,
+    handleImageUpload,
+    onSubmit,
+    onDelete,
+  } = useEditCheque(id)
 
   const {
     register,
@@ -101,6 +112,76 @@ export default function EditChequePage() {
     <div className="max-w-2xl space-y-8 pb-20">
       <form onSubmit={onSubmit} className="space-y-6">
         <div className="space-y-6">
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+              {t('photo')}
+            </Label>
+            {watch('image_url') ? (
+              <div className="space-y-3">
+                <div className="aspect-video overflow-hidden rounded-sm border">
+                  <SkeletonImage
+                    src={watch('image_url')!}
+                    alt={t('photo')}
+                    containerClassName="h-full w-full"
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <label
+                    htmlFor="cheque-image"
+                    className={cn(
+                      'flex h-10 items-center justify-center gap-2 rounded-sm border px-4 text-sm font-medium cursor-pointer',
+                      (isUploading || isSaving) &&
+                        'pointer-events-none opacity-50',
+                    )}
+                  >
+                    <HugeiconsIcon icon={Camera} className="size-4" />
+                    {t('replacePhoto')}
+                  </label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={isUploading || isSaving}
+                    onClick={() =>
+                      setValue('image_url', null, { shouldDirty: true })
+                    }
+                    className="rounded-sm text-destructive"
+                  >
+                    <HugeiconsIcon icon={Trash2} className="size-4" />
+                    {t('removePhoto')}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <label
+                htmlFor="cheque-image"
+                className={cn(
+                  'flex min-h-36 cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-primary/10 bg-canvas-parchment/30 text-primary',
+                  (isUploading || isSaving) && 'pointer-events-none opacity-50',
+                )}
+              >
+                <HugeiconsIcon
+                  icon={isUploading ? Loading03Icon : Camera}
+                  className={cn('size-7', isUploading && 'animate-spin')}
+                />
+                <span className="text-sm font-semibold">
+                  {isUploading ? t('uploading') : t('scanUpload')}
+                </span>
+              </label>
+            )}
+            <input
+              id="cheque-image"
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              disabled={isUploading || isSaving}
+              onChange={(event) => {
+                const file = event.target.files?.[0]
+                event.target.value = ''
+                if (file) void handleImageUpload(file)
+              }}
+            />
+          </div>
           <div className="space-y-2">
             <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
               {t('type')}
@@ -316,7 +397,7 @@ export default function EditChequePage() {
           <Button
             type="submit"
             className="w-full rounded-full h-14 text-lg"
-            disabled={isSaving}
+            disabled={isSaving || isUploading}
           >
             {isSaving ? tCommon('saving') : t('updateAction')}{' '}
             <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />

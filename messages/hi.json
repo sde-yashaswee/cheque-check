@@ -44,6 +44,8 @@
   "Cheques": {
     "scan": "चेक स्कैन",
     "loading": "विवरण निकाले जा रहे हैं...",
+    "replacePhoto": "फ़ोटो बदलें",
+    "removePhoto": "फ़ोटो हटाएं",
     "number": "नंबर",
     "sortBy": "क्रमबद्ध करें",
     "sortNewest": "सबसे नए पहले",

@@ -210,6 +210,8 @@
     "photo": "Cheque Photo",
     "uploading": "Cheque upload ho raha hai...",
     "scanUpload": "Cheque Scan / Upload karein",
+    "replacePhoto": "Photo badlein",
+    "removePhoto": "Photo hatayein",
     "photoInstruction": "Physical cheque ki photo lein",
     "status": "Status",
     "history": "Cheque ki History",
