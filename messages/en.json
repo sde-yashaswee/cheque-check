@@ -169,6 +169,9 @@
   },
   "Dashboard": {
     "totalOutstanding": "Total Outstanding",
+    "currentBalance": "Current Balance",
+    "receivable": "Receivable",
+    "payable": "Payable",
     "quickActions": "Quick Actions",
     "scanCheque": "Scan Cheque",
     "issueCheque": "Issue Cheque",

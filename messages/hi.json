@@ -1,4 +1,9 @@
 {
+  "Dashboard": {
+    "currentBalance": "वर्तमान शेष",
+    "receivable": "प्राप्य",
+    "payable": "देय"
+  },
   "Settings": {
     "general": "सामान्य",
     "management": "प्रबंधन",

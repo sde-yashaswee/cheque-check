@@ -169,6 +169,9 @@
   },
   "Dashboard": {
     "totalOutstanding": "Total Outstanding",
+    "currentBalance": "Current Balance",
+    "receivable": "Milne wala",
+    "payable": "Dene wala",
     "quickActions": "Quick Actions",
     "scanCheque": "Scan Cheque",
     "issueCheque": "Cheque Issue karein",
