@@ -24,6 +24,7 @@ import {
   PencilEdit01Icon as Edit,
 } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
+import { SkeletonImage } from '@/components/ui/skeleton-image'
 import { BusinessSwitcher } from '@/components/business-switcher'
 import { useState } from 'react'
 import Link from 'next/link'
@@ -175,10 +176,11 @@ export function TopNav() {
           )}
           <h1 className="text-lg font-semibold tracking-tight flex items-center gap-2 truncate">
             {isMainTab && pathname === '/' && (
-              <img
+              <SkeletonImage
                 src="/android-chrome-512x512.png"
                 alt="ChequeCheck Logo"
-                className="h-6 w-6 rounded-md shrink-0"
+                containerClassName="h-6 w-6 rounded-md shrink-0"
+                className="h-full w-full"
               />
             )}
             {TitleIcon && (
@@ -234,9 +236,10 @@ export function TopNav() {
               <Link href="/settings">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-all active:scale-95 overflow-hidden ring-2 ring-white shadow-sm">
                   {profile?.avatar_url ? (
-                    <img
+                    <SkeletonImage
                       src={profile.avatar_url}
                       alt={profile.name || 'User'}
+                      containerClassName="h-full w-full rounded-full"
                       className="h-full w-full object-cover"
                     />
                   ) : (
@@ -259,9 +262,10 @@ export function TopNav() {
               <div className="flex items-center gap-1.5 overflow-hidden">
                 <div className="h-4 w-4 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center shrink-0">
                   {activeBusiness.logo_url ? (
-                    <img
+                    <SkeletonImage
                       src={activeBusiness.logo_url}
                       alt={activeBusiness.name}
+                      containerClassName="h-full w-full rounded-full"
                       className="h-full w-full object-cover"
                     />
                   ) : (

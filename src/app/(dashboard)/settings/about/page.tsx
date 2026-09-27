@@ -6,6 +6,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import { SkeletonImage } from '@/components/ui/skeleton-image'
 
 export default function AboutPage() {
   const t = useTranslations('Settings')
@@ -15,9 +16,10 @@ export default function AboutPage() {
       <div className="w-full max-w-sm space-y-8">
         <div className="flex flex-col items-center text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white shadow-sm overflow-hidden">
-            <img
+            <SkeletonImage
               src="/android-chrome-512x512.png"
               alt="ChequeCheck Logo"
+              containerClassName="h-full w-full"
               className="h-full w-full object-contain p-2"
             />
           </div>
