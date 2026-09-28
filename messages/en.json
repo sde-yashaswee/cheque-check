@@ -1,4 +1,22 @@
 {
+  "Feedback": {
+    "title": "Enjoying ChequeCheck?",
+    "question": "How likely are you to recommend ChequeCheck to a friend or colleague?",
+    "notLikely": "Not likely",
+    "veryLikely": "Very likely",
+    "followUp": {
+      "detractor": "What disappointed you, and how can we improve?",
+      "passive": "What would make it a 10 for you?",
+      "promoter": "What do you love most about ChequeCheck?"
+    },
+    "commentPlaceholder": "Tell us more (optional)",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "notNow": "Not now",
+    "thanksTitle": "Thank you!",
+    "thanksDescription": "Your feedback helps us improve ChequeCheck.",
+    "submitFailed": "Could not send your feedback. Please try again."
+  },
   "Common": {
     "save": "Save",
     "saving": "Saving...",
@@ -83,6 +101,10 @@
     "maybeLater": "Maybe Later",
     "close": "Close",
     "addChequesForStats": "Add cheques to see your statistics.",
+    "selectCountry": "Select country",
+    "searchCountry": "Search country or code...",
+    "noCountryFound": "No country found.",
+    "invalidPhone": "Enter a valid phone number",
     "total": "Total",
     "notAuthorized": "Not Authorized",
     "notAuthorizedDesc": "You don't have permission to view this content. Please contact your administrator.",
@@ -165,6 +187,19 @@
   },
   "Dashboard": {
     "totalOutstanding": "Total Outstanding",
+    "currentBalance": "Current Balance",
+    "receivable": "Receivable",
+    "payable": "Payable",
+    "dateRange": {
+      "label": "Date range",
+      "all": "All time",
+      "thisWeek": "This week",
+      "thisMonth": "This month",
+      "lastMonth": "Last month",
+      "thisYear": "This year",
+      "custom": "Custom range",
+      "pickDates": "Pick dates"
+    },
     "quickActions": "Quick Actions",
     "scanCheque": "Scan Cheque",
     "issueCheque": "Issue Cheque",
@@ -319,7 +354,10 @@
     "emailPlaceholder": "email@address.com",
     "basicDetails": "Basic Details",
     "contactInfo": "Contact Info",
-    "locationNotes": "Location & Notes"
+    "locationNotes": "Location & Notes",
+    "importFromContacts": "Import from contacts",
+    "contactImportFailed": "Contacts could not be imported. You can enter the details manually.",
+    "contactPickerUnavailable": "Contact access is unavailable in this browser. Please enter the details manually or open ChequeCheck on a supported mobile browser."
   },
   "Accounts": {
     "title": "Accounts",
@@ -351,7 +389,8 @@
     "accountNamePlaceholder": "e.g. John Doe",
     "accountInfo": "Account Info",
     "bankDetails": "Bank Details",
-    "moreDetails": "More Details"
+    "moreDetails": "More Details",
+    "openingBalance": "Opening Balance"
   },
   "Businesses": {
     "title": "Businesses",
@@ -394,7 +433,8 @@
     "headquartersPlaceholder": "Headquarters location",
     "businessProfile": "Business Profile",
     "contactInfo": "Contact Info",
-    "location": "Location"
+    "location": "Location",
+    "businessLogo": "Business logo"
   },
   "Features": {
     "receivingMode": "Receiving Cheques Mode",
@@ -404,7 +444,7 @@
     "voiceReminder": "Daily Automated Voice Reminder",
     "voiceReminderDesc": "Receive a daily automated voice call at 9 AM IST with a summary of cheques hitting your bank accounts today.",
     "yourPhoneNumber": "Your Phone Number",
-    "countryCodeHelp": "Make sure to include country code (e.g. +91)",
+    "countryCodeHelp": "Pick your country, then enter your number. We'll call this number for voice reminders.",
     "lifetimePremium": "Lifetime Premium",
     "oneTimePurchase": "One-time purchase for foundational features.",
     "upgradeNow": "Upgrade Now",
@@ -523,6 +563,10 @@
     "deleteProfileDescription": "This will permanently delete your account and all associated data.",
     "deleteMyAccount": "Delete My Account",
     "deleteMyAccountDesc": "Permanently remove your account and data",
+    "clearCache": "Clear app cache",
+    "clearCacheDesc": "Refresh cached app files without signing out",
+    "clearCacheTitle": "Clear app cache?",
+    "clearCacheDescription": "This will clear cached PWA files and reload the app. Your account and session will be preserved.",
     "version": "Version",
     "appTagline": "Never miss a cheque again.",
     "loadingPreferences": "Loading preferences...",

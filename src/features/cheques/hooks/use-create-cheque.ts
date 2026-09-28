@@ -12,6 +12,7 @@ import { Party, type ChequeDraft } from '@/types'
 import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useProfile } from './use-profile'
 import { ConflictError } from '@/lib/errors'
+import { queueCelebration } from '@/lib/celebrate'
 import { useEntityCreateMutation } from './use-entity-mutations'
 import { useQueryClient } from '@tanstack/react-query'
 import {
@@ -115,12 +116,13 @@ export function useCreateCheque(
       })
       return current ? [optimisticCheque, ...current] : [optimisticCheque]
     },
-    onSuccess: () => {
+    onSuccess: (created) => {
       toast.add({
         title: tc('success'),
         description: t('chequeCreated'),
         type: 'success',
       })
+      celebrateCheque(created)
       router.push('/cheques')
     },
     onError: (error) => {
@@ -128,6 +130,13 @@ export function useCreateCheque(
       showCreateError(error)
     },
   })
+
+  function celebrateCheque(cheque: ChequeEntity | undefined) {
+    queueCelebration({
+      target: '/cheques',
+      cheque: cheque && businessId ? { id: cheque.id, businessId } : undefined,
+    })
+  }
 
   function showCreateError(error: unknown) {
     if (error instanceof ConflictError) {
@@ -148,7 +157,7 @@ export function useCreateCheque(
   const publishDraft = async (id: string, data: ChequeFormValues) => {
     setIsPublishing(true)
     try {
-      await chequeDraftService.publish(
+      const published = await chequeDraftService.publish(
         id,
         data,
         profile?.default_reminder_days ?? null,
@@ -163,6 +172,7 @@ export function useCreateCheque(
         description: t('chequeCreated'),
         type: 'success',
       })
+      celebrateCheque(published)
       router.replace('/cheques')
     } catch (error) {
       draft.failPublish()

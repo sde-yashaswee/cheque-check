@@ -70,6 +70,11 @@ export function toAccountDraftFields(
     ifsc_code: text(values.ifsc_code),
     color: text(values.color),
     notes: text(values.notes),
+    opening_balance:
+      typeof values.opening_balance === 'number' &&
+      Number.isFinite(values.opening_balance)
+        ? values.opening_balance
+        : 0,
   }
 }
 
@@ -107,6 +112,7 @@ export function accountDraftToFormValues(draft: AccountDraftFields) {
     ifsc_code: draft.ifsc_code ?? '',
     color: draft.color ?? '#007AFF',
     notes: draft.notes ?? '',
+    opening_balance: draft.opening_balance ?? 0,
   }
 }
 

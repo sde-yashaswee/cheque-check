@@ -4,13 +4,12 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 
 interface DraftLeaveDialogProps {
   open: boolean
@@ -38,13 +37,13 @@ export function DraftLeaveDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && !busy && onCancel()}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>{t('leaveTitle')}</DialogTitle>
-          <DialogDescription>{t('leaveDescription')}</DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="flex-col gap-2 sm:flex-col">
+    <Sheet open={open} onOpenChange={(next) => !next && !busy && onCancel()}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>{t('leaveTitle')}</SheetTitle>
+          <SheetDescription>{t('leaveDescription')}</SheetDescription>
+        </SheetHeader>
+        <div className="flex flex-col gap-2 pt-4">
           <Button
             className="w-full rounded-full"
             onClick={() => run('save')}
@@ -68,8 +67,8 @@ export function DraftLeaveDialog({
           >
             {t('keepEditing')}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </SheetContent>
+    </Sheet>
   )
 }

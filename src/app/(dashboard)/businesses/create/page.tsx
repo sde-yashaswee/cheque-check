@@ -35,6 +35,9 @@ import {
   StepperTrigger,
 } from '@/components/reui/stepper'
 import { useTranslations } from 'next-intl'
+import { EditableAvatar } from '@/components/ui/editable-avatar'
+import { PhoneInput } from '@/components/ui/phone-input'
+import { Controller } from 'react-hook-form'
 
 export default function CreateBusinessPage() {
   const t = useTranslations('Businesses')
@@ -46,6 +49,7 @@ export default function CreateBusinessPage() {
 
   const {
     register,
+    control,
     watch,
     setValue,
     formState: { errors },
@@ -157,6 +161,22 @@ export default function CreateBusinessPage() {
               </div>
 
               <div className="space-y-2">
+                <div className="flex flex-col items-center gap-3 py-2">
+                  <EditableAvatar
+                    name={watch('name') || t('businessName')}
+                    color={watch('color')}
+                    imageUrl={watch('logo_url')}
+                    onUpload={async (url) => setValue('logo_url', url)}
+                    onDelete={async () => setValue('logo_url', null)}
+                    size="xl"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {t('businessLogo')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
                 <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
                   {tc('themeColor')}
                 </Label>
@@ -228,20 +248,20 @@ export default function CreateBusinessPage() {
               >
                 {t('businessPhone')}
               </Label>
-              <div className="relative">
-                <HugeiconsIcon
-                  icon={Phone}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
-                />
-                <Input
-                  leftIcon={Phone}
-                  id="phone"
-                  type="tel"
-                  {...register('phone')}
-                  placeholder="+91 ..."
-                  className="h-14  bg-canvas-parchment border-none rounded-sm"
-                />
-              </div>
+              <Controller
+                control={control}
+                name="phone"
+                render={({ field }) => (
+                  <PhoneInput
+                    id="phone"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    placeholder={t('businessPhone')}
+                    aria-invalid={!!errors.phone}
+                  />
+                )}
+              />
               {errors.phone && (
                 <p className="text-xs text-destructive ml-1">
                   {errors.phone.message as string}

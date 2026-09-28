@@ -77,6 +77,7 @@ export interface Account {
   deleted_at?: string | null
   bank?: Bank
   notes?: string | null
+  opening_balance: number
   is_draft?: boolean
 }
 
@@ -163,6 +164,7 @@ export type AccountDraftFields = {
   ifsc_code: string | null
   color: string | null
   notes: string | null
+  opening_balance: number | null
 }
 
 export type AccountDraft = DraftBase & AccountDraftFields & { bank?: Bank }

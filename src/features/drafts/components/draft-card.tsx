@@ -11,13 +11,12 @@ import { Delete02Icon as Trash } from '@hugeicons/core-free-icons'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
 import { TextTruncate } from '@/components/ui/text-truncate'
 import { cn } from '@/lib/utils'
@@ -126,16 +125,16 @@ export function DraftCard({
         </button>
       </motion.div>
 
-      <Dialog
+      <Sheet
         open={confirmOpen}
         onOpenChange={(open) => !deleting && setConfirmOpen(open)}
       >
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>{t('deleteTitle')}</DialogTitle>
-            <DialogDescription>{t('deleteDescription')}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex-row gap-3">
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>{t('deleteTitle')}</SheetTitle>
+            <SheetDescription>{t('deleteDescription')}</SheetDescription>
+          </SheetHeader>
+          <div className="flex flex-row gap-3 pt-4">
             <Button
               variant="ghost"
               className="flex-1 rounded-full"
@@ -152,9 +151,9 @@ export function DraftCard({
             >
               {tc('delete')}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

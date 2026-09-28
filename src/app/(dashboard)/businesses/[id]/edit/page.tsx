@@ -28,6 +28,8 @@ import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import dynamic from 'next/dynamic'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
+import { PhoneInput } from '@/components/ui/phone-input'
+import { Controller } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
 
 const DeleteConfirmationDialog = dynamic(
@@ -51,6 +53,7 @@ export default function EditBusinessPage() {
 
   const {
     register,
+    control,
     watch,
     setValue,
     formState: { errors },
@@ -129,20 +132,20 @@ export default function EditBusinessPage() {
             >
               {t('phoneNumber')}
             </Label>
-            <div className="relative">
-              <HugeiconsIcon
-                icon={Phone}
-                className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
-              />
-              <Input
-                leftIcon={Phone}
-                id="phone"
-                type="tel"
-                {...register('phone')}
-                placeholder={t('businessPhonePlaceholder')}
-                className="h-14  bg-canvas-parchment border-none rounded-sm"
-              />
-            </div>
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field }) => (
+                <PhoneInput
+                  id="phone"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  placeholder={t('businessPhonePlaceholder')}
+                  aria-invalid={!!errors.phone}
+                />
+              )}
+            />
             {errors.phone && (
               <p className="text-xs text-destructive ml-1">
                 {errors.phone.message as string}

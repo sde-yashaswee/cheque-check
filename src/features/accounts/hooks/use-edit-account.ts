@@ -31,6 +31,8 @@ export function useEditAccount(id: string, businessId: string | undefined) {
       account_number: '',
       ifsc_code: '',
       color: '#007AFF',
+      notes: '',
+      opening_balance: 0,
     },
   })
 
@@ -44,6 +46,8 @@ export function useEditAccount(id: string, businessId: string | undefined) {
         account_number: account.account_number,
         ifsc_code: account.ifsc_code || '',
         color: account.color,
+        notes: account.notes || '',
+        opening_balance: account.opening_balance ?? 0,
       })
     }
   }, [account, reset])

@@ -154,11 +154,15 @@ export class AccountDraftService extends DraftService<
   }
 
   async publish(id: string, values: unknown): Promise<Account> {
-    const data = parseOrThrow(accountSchema, values)
+    const data = parseOrThrow(accountSchema, {
+      opening_balance: 0,
+      ...(values as Record<string, unknown>),
+    })
     return this.repository.publish<Account>(id, {
       ...data,
       ifsc_code: data.ifsc_code || null,
       notes: data.notes || null,
+      opening_balance: data.opening_balance,
     })
   }
 }

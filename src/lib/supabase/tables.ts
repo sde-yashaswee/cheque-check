@@ -17,6 +17,7 @@ export const TABLES = {
   TRANSACTIONS: 'transactions',
   PAYMENT_PRODUCTS: 'payment_products',
   API_RATE_LIMITS: 'api_rate_limits',
+  NPS_RESPONSES: 'nps_responses',
 } as const satisfies Record<string, PublicTableName>
 
 export type TableName = (typeof TABLES)[keyof typeof TABLES]

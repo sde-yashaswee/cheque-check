@@ -16,6 +16,10 @@ export class StorageService {
     return this.repository.uploadAvatar(file)
   }
 
+  async deleteAvatar(url: string): Promise<void> {
+    return this.repository.deleteAvatar(url)
+  }
+
   async deleteChequeImage(url: string): Promise<void> {
     return this.repository.deleteChequeImage(url)
   }

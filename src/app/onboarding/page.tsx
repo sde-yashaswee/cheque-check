@@ -43,6 +43,10 @@ import {
   StepperTrigger,
 } from '@/components/reui/stepper'
 import { useTranslations } from 'next-intl'
+import { EditableAvatar } from '@/components/ui/editable-avatar'
+import { PhoneInput } from '@/components/ui/phone-input'
+import { isValidE164Phone } from '@/lib/phone'
+import { celebrate } from '@/lib/celebrate'
 
 const COLORS = [
   '#0066cc',
@@ -114,6 +118,7 @@ export default function OnboardingPage() {
     businessPhone: '',
     businessAddress: '',
     businessColor: '#0066cc',
+    businessLogoUrl: null as string | null,
     currency: '₹',
     dateFormat: 'dd/MM/yyyy',
     timeFormat: '12h',
@@ -143,6 +148,8 @@ export default function OnboardingPage() {
 
   const nextStep = () => setStep((s) => Math.min(s + 1, 5))
   const prevStep = () => setStep((s) => Math.max(s - 1, 1))
+  const isBusinessPhoneValid =
+    !formData.businessPhone || isValidE164Phone(formData.businessPhone)
 
   const handleFinish = async () => {
     setLoading(true)
@@ -154,7 +161,7 @@ export default function OnboardingPage() {
         phone: formData.businessPhone || null,
         address: formData.businessAddress || null,
         color: formData.businessColor,
-        logo_url: null,
+        logo_url: formData.businessLogoUrl,
       })
       await queryClient.invalidateQueries({ queryKey: ['businesses'] })
       setActiveBusiness(business)
@@ -171,6 +178,7 @@ export default function OnboardingPage() {
       })
 
       setStep(5)
+      celebrate()
     } catch (error) {
       alert(error instanceof Error ? error.message : tc('error'))
     } finally {
@@ -427,24 +435,20 @@ export default function OnboardingPage() {
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
                       {t('businessPhone')}
                     </Label>
-                    <div className="relative group">
-                      <HugeiconsIcon
-                        icon={Phone}
-                        className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"
-                      />
-                      <Input
-                        leftIcon={TextIcon}
-                        placeholder={t('businessPhonePlaceholder')}
-                        value={formData.businessPhone}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            businessPhone: e.target.value,
-                          })
-                        }
-                        className="h-14 pl-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none text-lg rounded-sm"
-                      />
-                    </div>
+                    <PhoneInput
+                      placeholder={t('businessPhonePlaceholder')}
+                      value={formData.businessPhone}
+                      onChange={(businessPhone) =>
+                        setFormData((prev) => ({ ...prev, businessPhone }))
+                      }
+                      aria-invalid={!isBusinessPhoneValid}
+                      className="dark:bg-surface-tile-1 text-lg"
+                    />
+                    {!isBusinessPhoneValid && (
+                      <p className="text-xs text-destructive ml-1">
+                        {tc('invalidPhone')}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -475,6 +479,7 @@ export default function OnboardingPage() {
                 <Button
                   className="w-full rounded-pill h-14 text-lg font-medium active:scale-95 transition-transform"
                   onClick={nextStep}
+                  disabled={!isBusinessPhoneValid}
                 >
                   {tc('continue')}{' '}
                   <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
@@ -583,6 +588,29 @@ export default function OnboardingPage() {
                 className="space-y-8"
               >
                 <div className="space-y-6">
+                  <div className="flex flex-col items-center gap-3 py-2">
+                    <EditableAvatar
+                      name={formData.businessName || t('businessDetails')}
+                      color={formData.businessColor}
+                      imageUrl={formData.businessLogoUrl}
+                      onUpload={async (url) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          businessLogoUrl: url,
+                        }))
+                      }
+                      onDelete={async () =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          businessLogoUrl: null,
+                        }))
+                      }
+                      size="xl"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {t('businessLogo')}
+                    </p>
+                  </div>
                   <div className="space-y-2">
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
                       {t('dailyFrequency')}

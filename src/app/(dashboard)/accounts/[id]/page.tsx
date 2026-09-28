@@ -49,6 +49,7 @@ import { DataState } from '@/components/ui/data-state'
 import { EmptyState } from '@/components/ui/empty-state'
 import { TextTruncate } from '@/components/ui/text-truncate'
 import { useTranslations } from 'next-intl'
+import { useProfile } from '@/hooks/use-profile'
 import { useRedirectIfDraft } from '@/features/drafts'
 import {
   Sheet,
@@ -65,6 +66,7 @@ export default function AccountDetailPage() {
   const tc = useTranslations('Common')
   const { id } = useParams() as { id: string }
   const { activeBusiness } = useBusiness()
+  const { profile } = useProfile()
   const businessId = activeBusiness?.id
 
   const {
@@ -198,6 +200,18 @@ export default function AccountDetailPage() {
               {account.ifsc_code || tc('notAvailable')}
             </p>
           </div>
+        </div>
+
+        <div className="pt-4 border-t border-primary/5 relative z-10">
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+            {t('openingBalance')}
+          </p>
+          <p className="text-lg font-semibold">
+            {profile?.currency || '₹'}
+            {(account.opening_balance ?? 0).toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+            })}
+          </p>
         </div>
 
         {account.notes && (

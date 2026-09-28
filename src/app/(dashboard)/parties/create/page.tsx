@@ -31,6 +31,10 @@ import { useTranslations } from 'next-intl'
 import { getSafeChequeReturnTo } from '@/lib/cheque-draft'
 import { useState } from 'react'
 import { DraftLeaveDialog, DraftToolbar } from '@/features/drafts'
+import { toast } from '@/components/ui/toast'
+import { PhoneInput, useDefaultPhoneCountry } from '@/components/ui/phone-input'
+import { toE164 } from '@/lib/phone'
+import { Controller } from 'react-hook-form'
 
 export default function CreatePartyPage() {
   const t = useTranslations('Parties')
@@ -47,10 +51,53 @@ export default function CreatePartyPage() {
 
   const {
     register,
+    control,
     watch,
+    setValue,
     formState: { errors },
   } = form
   const { setUserValue } = draft
+  const defaultPhoneCountry = useDefaultPhoneCountry()
+  const importContact = async () => {
+    const contacts = (
+      navigator as Navigator & {
+        contacts?: {
+          select: (
+            properties: string[],
+            options: { multiple: boolean },
+          ) => Promise<Array<{ name?: string[]; tel?: string[] }>>
+        }
+      }
+    ).contacts
+
+    if (!contacts) {
+      toast.add({
+        title: tCommon('contactPickerUnavailable'),
+        description: t('contactPickerUnavailable'),
+        type: 'info',
+      })
+      return
+    }
+
+    try {
+      const contactList = await contacts.select(['name', 'tel'], {
+        multiple: false,
+      })
+      const contact = contactList[0]
+      const fullName = contact?.name?.[0]?.trim()
+      const phone = contact?.tel?.[0]?.trim()
+      if (fullName) setValue('name', fullName)
+      if (phone)
+        setValue('contact', toE164(phone, defaultPhoneCountry) ?? phone)
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return
+      toast.add({
+        title: tCommon('error'),
+        description: t('contactImportFailed'),
+        type: 'error',
+      })
+    }
+  }
 
   const colors = [
     '#FF3B30',
@@ -201,25 +248,38 @@ export default function CreatePartyPage() {
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <Label
-                htmlFor="contact"
-                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
-              >
-                {t('contactNumber')}
-              </Label>
-              <div className="relative">
-                <HugeiconsIcon
-                  icon={Phone}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
-                />
-                <Input
-                  leftIcon={TextIcon}
-                  id="contact"
-                  {...register('contact')}
-                  placeholder={t('phoneNumber')}
-                  className="h-14  bg-canvas-parchment border-none rounded-sm"
-                />
+              <div className="flex items-center justify-between gap-3">
+                <Label
+                  htmlFor="contact"
+                  className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+                >
+                  {t('contactNumber')}
+                </Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={importContact}
+                >
+                  <HugeiconsIcon icon={User} className="mr-2 h-4 w-4" />
+                  {t('importFromContacts')}
+                </Button>
               </div>
+              <Controller
+                control={control}
+                name="contact"
+                render={({ field }) => (
+                  <PhoneInput
+                    id="contact"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    placeholder={t('phoneNumber')}
+                    aria-invalid={!!errors.contact}
+                  />
+                )}
+              />
               {errors.contact && (
                 <p className="text-xs text-destructive ml-1">
                   {errors.contact.message as string}

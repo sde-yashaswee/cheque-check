@@ -8,6 +8,7 @@ import { useEntityCreateMutation } from './use-entity-mutations'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 import type { Business } from '@/types'
+import { queueCelebration } from '@/lib/celebrate'
 
 type BusinessFormData = z.infer<typeof businessSchema>
 
@@ -24,6 +25,7 @@ export function useCreateBusiness() {
       phone: '',
       address: '',
       color: '#007AFF',
+      logo_url: null,
     },
   })
 
@@ -59,6 +61,7 @@ export function useCreateBusiness() {
     ],
     onSuccess: (newBusiness) => {
       if (newBusiness) setActiveBusiness(newBusiness)
+      queueCelebration({ target: '/businesses' })
     },
   })
 

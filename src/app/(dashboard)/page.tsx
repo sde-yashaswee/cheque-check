@@ -17,7 +17,7 @@ import { useCheques } from '@/hooks/use-cheques'
 import { ChequeCard } from '@/components/cheque-card'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { useProfile } from '@/hooks/use-profile'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useChequeStats } from '@/hooks/use-cheque-stats'
@@ -27,6 +27,14 @@ import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { logger } from '@/lib/logger'
 import { DraftsSummaryCard } from '@/features/drafts'
+import { cn } from '@/lib/utils'
+import type { DateRange } from 'react-day-picker'
+import { StatsDateFilter } from '@/features/cheques/components/stats-date-filter'
+import {
+  filterByChequeDate,
+  resolveDateRange,
+  type DateRangePreset,
+} from '@/features/cheques/lib/date-range'
 
 const ChequeStatsChart = dynamic(
   () =>
@@ -63,16 +71,29 @@ export default function HomePage() {
 
   const {
     todayCheques,
-    outstanding,
-    issuedCount,
-    receivedCount,
-    clearedCount,
-    bouncedCount,
+    payable,
+    receivable,
+    currentBalance,
     upcomingCount,
     overdueCount,
   } = useChequeStats(cheques)
 
+  const [statsPreset, setStatsPreset] = useState<DateRangePreset>('all')
+  const [customRange, setCustomRange] = useState<DateRange>()
+  const statsCheques = useMemo(
+    () =>
+      filterByChequeDate(
+        cheques,
+        resolveDateRange(statsPreset, new Date(), customRange),
+      ),
+    [cheques, statsPreset, customRange],
+  )
+  const { issuedCount, receivedCount, clearedCount, bouncedCount } =
+    useChequeStats(statsCheques)
+
   const currency = profile?.currency || '₹'
+  const formatAmount = (value: number) =>
+    `${value < 0 ? '-' : ''}${currency}${Math.abs(value).toLocaleString()}`
 
   const chartData = [
     { name: tDashboard('issued'), value: issuedCount, color: '#0066cc' }, // Action Blue
@@ -114,16 +135,39 @@ export default function HomePage() {
         }
       >
         <>
-          {/* Outstanding Card */}
+          {/* Balance Card */}
           <div className="rounded-lg bg-primary p-8 text-primary-foreground relative overflow-hidden">
             <div className="relative z-10">
               <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">
-                {tDashboard('totalOutstanding')}
+                {tDashboard('currentBalance')}
               </p>
-              <p className="mt-2 text-4xl font-semibold">
-                {currency}
-                {outstanding.toLocaleString()}
+              <p
+                className={cn(
+                  'mt-2 text-4xl font-semibold',
+                  currentBalance > 0 && 'text-emerald-200',
+                  currentBalance < 0 && 'text-rose-200',
+                )}
+              >
+                {formatAmount(currentBalance)}
               </p>
+              <div className="mt-6 grid grid-cols-2 gap-3">
+                <div className="rounded-md bg-white/10 p-3">
+                  <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">
+                    {tDashboard('receivable')}
+                  </p>
+                  <p className="mt-1 text-lg font-semibold text-emerald-200">
+                    {formatAmount(receivable)}
+                  </p>
+                </div>
+                <div className="rounded-md bg-white/10 p-3">
+                  <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">
+                    {tDashboard('payable')}
+                  </p>
+                  <p className="mt-1 text-lg font-semibold text-rose-200">
+                    {formatAmount(payable)}
+                  </p>
+                </div>
+              </div>
             </div>
             <div className="absolute -right-10 -bottom-10 opacity-10 rotate-12">
               <HugeiconsIcon icon={FileText} size={200} />
@@ -260,11 +304,19 @@ export default function HomePage() {
               <h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                 {tDashboard('statistics')}
               </h2>
+              <div className="ml-auto">
+                <StatsDateFilter
+                  preset={statsPreset}
+                  onPresetChange={setStatsPreset}
+                  customRange={customRange}
+                  onCustomRangeChange={setCustomRange}
+                />
+              </div>
             </div>
             <div className="rounded-lg border bg-card p-6 h-[300px] relative">
               <ChequeStatsChart
                 chartData={chartData}
-                totalCheques={cheques?.length || 0}
+                totalCheques={statsCheques?.length || 0}
               />
             </div>
           </div>

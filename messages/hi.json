@@ -1,4 +1,56 @@
 {
+  "Feedback": {
+    "title": "क्या ChequeCheck पसंद आ रहा है?",
+    "question": "आप ChequeCheck को किसी मित्र या सहकर्मी को सुझाने की कितनी संभावना रखते हैं?",
+    "notLikely": "बिल्कुल नहीं",
+    "veryLikely": "ज़रूर",
+    "followUp": {
+      "detractor": "आपको क्या पसंद नहीं आया, और हम कैसे बेहतर करें?",
+      "passive": "इसे 10 बनाने के लिए क्या चाहिए?",
+      "promoter": "ChequeCheck में आपको सबसे ज़्यादा क्या पसंद है?"
+    },
+    "commentPlaceholder": "और बताएं (वैकल्पिक)",
+    "submit": "भेजें",
+    "submitting": "भेजा जा रहा है...",
+    "notNow": "अभी नहीं",
+    "thanksTitle": "धन्यवाद!",
+    "thanksDescription": "आपकी प्रतिक्रिया हमें ChequeCheck को बेहतर बनाने में मदद करती है।",
+    "submitFailed": "प्रतिक्रिया नहीं भेजी जा सकी। कृपया पुनः प्रयास करें।"
+  },
+  "Dashboard": {
+    "totalOutstanding": "कुल बकाया",
+    "quickActions": "त्वरित कार्य",
+    "scanCheque": "चेक स्कैन करें",
+    "issueCheque": "चेक जारी करें",
+    "receiveCheque": "चेक प्राप्त करें",
+    "todaysCheques": "आज के चेक",
+    "statistics": "आँकड़े",
+    "welcomeTitle": "Cheque Check में आपका स्वागत है",
+    "welcomeDescription": "चेक ट्रैक करने के लिए आपको एक व्यवसाय बनाना या चुनना होगा।",
+    "createBusiness": "व्यवसाय बनाएं",
+    "noChequesTodayTitle": "आज कोई चेक देय नहीं",
+    "noChequesTodayDescription": "आपका दिन शुभ हो! आज के लिए कोई चेक नहीं है।",
+    "today": "आज",
+    "upcoming": "आगामी",
+    "overdue": "अतिदेय",
+    "issued": "जारी",
+    "received": "प्राप्त",
+    "cleared": "क्लियर",
+    "bounced": "बाउंस",
+    "currentBalance": "वर्तमान शेष",
+    "receivable": "प्राप्य",
+    "payable": "देय",
+    "dateRange": {
+      "label": "तारीख सीमा",
+      "all": "सभी समय",
+      "thisWeek": "इस सप्ताह",
+      "thisMonth": "इस महीने",
+      "lastMonth": "पिछले महीने",
+      "thisYear": "इस साल",
+      "custom": "कस्टम सीमा",
+      "pickDates": "तारीखें चुनें"
+    }
+  },
   "Settings": {
     "general": "सामान्य",
     "management": "प्रबंधन",
@@ -33,6 +85,10 @@
     "refundPolicy": "धनवापसी नीति",
     "refundPolicyDesc": "धनवापसी और भुगतान पर हमारी नीति",
     "dangerZone": "खतरे का क्षेत्र",
+    "clearCache": "ऐप कैश साफ़ करें",
+    "clearCacheDesc": "साइन आउट किए बिना कैश की गई ऐप फ़ाइलें रीफ़्रेश करें",
+    "clearCacheTitle": "ऐप कैश साफ़ करें?",
+    "clearCacheDescription": "कैश की गई PWA फ़ाइलें साफ़ होंगी और ऐप फिर से लोड होगा। आपका अकाउंट और सेशन सुरक्षित रहेगा।",
     "deleteMyAccount": "मेरा खाता हटाएं",
     "deleteMyAccountDesc": "अपना खाता और डेटा स्थायी रूप से हटा दें",
     "signOut": "साइन आउट",
@@ -88,6 +144,10 @@
   },
   "Common": {
     "welcome": "स्वागत है",
+    "selectCountry": "देश चुनें",
+    "searchCountry": "देश या कोड खोजें...",
+    "noCountryFound": "कोई देश नहीं मिला।",
+    "invalidPhone": "सही फ़ोन नंबर दर्ज करें",
     "businesses": "व्यवसाय",
     "sortAndFilter": "क्रमबद्ध और फ़िल्टर करें",
     "sortBy": "क्रमबद्ध करें",
@@ -154,14 +214,19 @@
   },
   "Parties": {
     "sortByName": "नाम",
-    "sortByBalance": "बकाया राशि"
+    "sortByBalance": "बकाया राशि",
+    "importFromContacts": "कॉन्टैक्ट से इम्पोर्ट करें",
+    "contactImportFailed": "कॉन्टैक्ट इम्पोर्ट नहीं हो सके। आप जानकारी मैन्युअल रूप से भर सकते हैं।",
+    "contactPickerUnavailable": "इस ब्राउज़र में कॉन्टैक्ट एक्सेस उपलब्ध नहीं है। जानकारी मैन्युअल रूप से भरें या ChequeCheck को सपोर्टेड मोबाइल ब्राउज़र में खोलें।"
   },
   "Businesses": {
     "sortByName": "नाम",
-    "sortByUpcoming": "आगामी कुल"
+    "sortByUpcoming": "आगामी कुल",
+    "businessLogo": "बिज़नेस लोगो"
   },
   "Accounts": {
     "sortByAccountName": "खाता नाम",
-    "sortByBankName": "बैंक का नाम"
+    "sortByBankName": "बैंक का नाम",
+    "openingBalance": "शुरुआती बैलेंस"
   }
 }

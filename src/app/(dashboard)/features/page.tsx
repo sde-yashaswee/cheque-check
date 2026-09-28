@@ -28,6 +28,9 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
+import { PhoneInput } from '@/components/ui/phone-input'
+import { isValidE164Phone } from '@/lib/phone'
 
 export default function FeaturesPage() {
   const t = useTranslations('Features')
@@ -39,6 +42,7 @@ export default function FeaturesPage() {
     isLoading: isLoadingMonetization,
   } = useMonetization()
   const { processPayment, isProcessing } = useRazorpay()
+  const [profilePhone, setProfilePhone] = useState<string>()
 
   const aiQuota = getQuota('ai_scan')
   const voiceQuota = getQuota('voice_reminder')
@@ -87,11 +91,16 @@ export default function FeaturesPage() {
           <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             {t('yourPhoneNumber')}
           </label>
-          <Input
-            leftIcon={TextIcon}
-            placeholder="+91 00000 00000"
-            defaultValue={profile?.phone || ''}
-            onBlur={(e) => updateProfile({ phone: e.target.value })}
+          <PhoneInput
+            key={profile?.id}
+            value={profilePhone ?? profile?.phone ?? ''}
+            onChange={setProfilePhone}
+            onBlur={() => {
+              if (profilePhone === undefined) return
+              if (profilePhone && !isValidE164Phone(profilePhone)) return
+              updateProfile({ phone: profilePhone || null })
+            }}
+            aria-invalid={!!profilePhone && !isValidE164Phone(profilePhone)}
             className="h-11 rounded-lg"
           />
           <p className="text-[10px] text-muted-foreground font-medium italic">

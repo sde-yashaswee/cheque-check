@@ -1,4 +1,22 @@
 {
+  "Feedback": {
+    "title": "ChequeCheck pasand aa raha hai?",
+    "question": "Aap ChequeCheck ko kisi dost ya colleague ko recommend karne ki kitni sambhavna rakhte hain?",
+    "notLikely": "Bilkul nahi",
+    "veryLikely": "Zaroor",
+    "followUp": {
+      "detractor": "Aapko kya pasand nahi aaya, aur hum kaise behtar karein?",
+      "passive": "Isse 10 banane ke liye kya chahiye?",
+      "promoter": "ChequeCheck mein aapko sabse zyada kya pasand hai?"
+    },
+    "commentPlaceholder": "Aur batayein (optional)",
+    "submit": "Submit karein",
+    "submitting": "Submit ho raha hai...",
+    "notNow": "Abhi nahi",
+    "thanksTitle": "Dhanyavaad!",
+    "thanksDescription": "Aapka feedback ChequeCheck ko behtar banane mein madad karta hai.",
+    "submitFailed": "Feedback nahi bhej paaye. Dobara try karein."
+  },
   "Common": {
     "save": "Save karein",
     "saving": "Save ho raha hai...",
@@ -83,6 +101,10 @@
     "maybeLater": "Baad mein",
     "close": "Band karein",
     "addChequesForStats": "Apne statistics dekhne ke liye cheques add karein.",
+    "selectCountry": "Country chunein",
+    "searchCountry": "Country ya code search karein...",
+    "noCountryFound": "Koi country nahi mili.",
+    "invalidPhone": "Sahi phone number daalein",
     "total": "Total",
     "notAuthorized": "Permission nahi hai",
     "notAuthorizedDesc": "Aapko yeh content dekhne ki permission nahi hai. Administrator se contact karein.",
@@ -165,6 +187,19 @@
   },
   "Dashboard": {
     "totalOutstanding": "Total Outstanding",
+    "currentBalance": "Current Balance",
+    "receivable": "Milne wala",
+    "payable": "Dene wala",
+    "dateRange": {
+      "label": "Date range",
+      "all": "Sab time",
+      "thisWeek": "Is hafte",
+      "thisMonth": "Is mahine",
+      "lastMonth": "Pichhle mahine",
+      "thisYear": "Is saal",
+      "custom": "Custom range",
+      "pickDates": "Dates chunein"
+    },
     "quickActions": "Quick Actions",
     "scanCheque": "Scan Cheque",
     "issueCheque": "Cheque Issue karein",
@@ -319,7 +354,10 @@
     "emailPlaceholder": "email@address.com",
     "basicDetails": "Basic Details",
     "contactInfo": "Contact ki Details",
-    "locationNotes": "Location aur Notes"
+    "locationNotes": "Location aur Notes",
+    "importFromContacts": "Contacts se import karein",
+    "contactImportFailed": "Contacts import nahi ho paaye. Aap details manually enter kar sakte hain.",
+    "contactPickerUnavailable": "Is browser mein contact access available nahi hai. Details manually enter karein ya supported mobile browser par ChequeCheck kholein."
   },
   "Accounts": {
     "title": "Accounts",
@@ -351,7 +389,8 @@
     "accountNamePlaceholder": "Jaise John Doe",
     "accountInfo": "Account ki Details",
     "bankDetails": "Bank ki Details",
-    "moreDetails": "Aur Details"
+    "moreDetails": "Aur Details",
+    "openingBalance": "Opening Balance"
   },
   "Businesses": {
     "title": "Businesses",
@@ -394,7 +433,8 @@
     "headquartersPlaceholder": "Headquarters ki location",
     "businessProfile": "Business Profile",
     "contactInfo": "Contact ki Details",
-    "location": "Location"
+    "location": "Location",
+    "businessLogo": "Business ka logo"
   },
   "Features": {
     "receivingMode": "Cheques Receive karne ka Mode",
@@ -404,7 +444,7 @@
     "voiceReminder": "Daily Automated Voice Reminder",
     "voiceReminderDesc": "Aaj aapke bank accounts mein aane wale cheques ka summary paane ke liye subah 9 baje daily automated voice call receive karein.",
     "yourPhoneNumber": "Aapka Phone Number",
-    "countryCodeHelp": "Country code zaroor include karein (jaise +91)",
+    "countryCodeHelp": "Apna country chunein, phir number daalein. Voice reminders ke liye isi number par call aayega.",
     "lifetimePremium": "Lifetime Premium",
     "oneTimePurchase": "Foundational features ke liye one-time purchase.",
     "upgradeNow": "Abhi Upgrade karein",
@@ -515,6 +555,10 @@
     "refundPolicyDesc": "Refunds aur payments par hamari policy",
     "deleteMyAccount": "Mera Account Delete karein",
     "deleteMyAccountDesc": "Apna account aur data hamesha ke liye hatayein",
+    "clearCache": "App cache clear karein",
+    "clearCacheDesc": "Sign out kiye bina cached app files refresh karein",
+    "clearCacheTitle": "App cache clear karein?",
+    "clearCacheDescription": "Cached PWA files clear hongi aur app reload hoga. Aapka account aur session safe rahega.",
     "voiceCallSummary": "Voice Call Summary",
     "enableDailyCall": "Daily Call enable karein",
     "phoneNumber": "Phone Number",

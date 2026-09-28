@@ -22,6 +22,38 @@ import { toast } from './toast'
 import { logger } from '@/lib/logger'
 import { useTranslations } from 'next-intl'
 
+async function centerCropImage(file: File): Promise<File> {
+  const image = new Image()
+  const objectUrl = URL.createObjectURL(file)
+  try {
+    image.src = objectUrl
+    await image.decode()
+    const size = Math.min(image.naturalWidth, image.naturalHeight)
+    const canvas = document.createElement('canvas')
+    canvas.width = size
+    canvas.height = size
+    const context = canvas.getContext('2d')
+    if (!context) return file
+    context.drawImage(
+      image,
+      (image.naturalWidth - size) / 2,
+      (image.naturalHeight - size) / 2,
+      size,
+      size,
+      0,
+      0,
+      size,
+      size,
+    )
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, file.type, 0.9),
+    )
+    return blob ? new File([blob], file.name, { type: file.type }) : file
+  } finally {
+    URL.revokeObjectURL(objectUrl)
+  }
+}
+
 interface EditableAvatarProps {
   name: string
   color?: string
@@ -61,7 +93,8 @@ export function EditableAvatar({
 
     setIsUploading(true)
     try {
-      const publicUrl = await storageService.uploadAvatar(file)
+      const croppedFile = await centerCropImage(file)
+      const publicUrl = await storageService.uploadAvatar(croppedFile)
       await onUpload(publicUrl)
       toast.add({
         title: t('success'),

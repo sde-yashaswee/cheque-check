@@ -18,15 +18,13 @@ import {
   Delete02Icon as Trash2,
 } from '@hugeicons/core-free-icons'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from '@/components/ui/dialog'
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -67,8 +65,8 @@ export function DeleteConfirmationDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger
         render={
           trigger || (
             <Button variant="destructive" className="rounded-2xl h-12">
@@ -78,17 +76,17 @@ export function DeleteConfirmationDialog({
           )
         }
       />
-      <DialogContent className="rounded-3xl sm:max-w-[400px] border-none p-0 overflow-hidden">
+      <SheetContent className="border-none p-0 overflow-hidden">
         <div className="p-6 pb-0">
-          <DialogHeader>
+          <SheetHeader>
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-destructive/10 text-destructive mb-4">
               <HugeiconsIcon icon={AlertTriangle} className="h-6 w-6" />
             </div>
-            <DialogTitle className="text-xl font-bold">{title}</DialogTitle>
-            <DialogDescription className="text-muted-foreground pt-2">
+            <SheetTitle className="text-xl font-bold">{title}</SheetTitle>
+            <SheetDescription className="text-muted-foreground pt-2">
               {description}
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
 
           <div className="space-y-4 py-6">
             <div className="space-y-3 text-center">
@@ -121,7 +119,7 @@ export function DeleteConfirmationDialog({
             {loading ? t('deleting') : t('deletePermanently')}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   )
 }

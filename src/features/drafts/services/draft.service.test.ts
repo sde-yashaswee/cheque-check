@@ -127,7 +127,7 @@ describe('PartyDraftService', () => {
 
     await service.publish('p1', {
       name: 'Acme',
-      contact: '9876543210',
+      contact: '+919876543210',
       email: '',
       address: '',
       notes: '',
@@ -135,7 +135,7 @@ describe('PartyDraftService', () => {
 
     expect(repository.publish).toHaveBeenCalledWith('p1', {
       name: 'Acme',
-      contact: '9876543210',
+      contact: '+919876543210',
       email: null,
       address: null,
       notes: null,
@@ -173,6 +173,7 @@ describe('AccountDraftService', () => {
       account_number: '0001',
       ifsc_code: null,
       notes: null,
+      opening_balance: 0,
     })
   })
 })

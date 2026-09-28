@@ -7,6 +7,9 @@ export function useChequeStats(cheques: ChequeWithRelations[] | undefined) {
       return {
         todayCheques: [],
         outstanding: 0,
+        payable: 0,
+        receivable: 0,
+        currentBalance: 0,
         issuedCount: 0,
         receivedCount: 0,
         clearedCount: 0,
@@ -23,6 +26,15 @@ export function useChequeStats(cheques: ChequeWithRelations[] | undefined) {
       return curr.type === 'Outward' ? acc + curr.amount : acc - curr.amount
     }, 0)
 
+    const uncleared = cheques.filter((c) => c.status !== 'Cleared')
+    const payable = uncleared
+      .filter((c) => c.type === 'Outward')
+      .reduce((acc, c) => acc + c.amount, 0)
+    const receivable = uncleared
+      .filter((c) => c.type === 'Inward')
+      .reduce((acc, c) => acc + c.amount, 0)
+    const currentBalance = receivable - payable
+
     const issuedCount = cheques.filter((c) => c.type === 'Outward').length
     const receivedCount = cheques.filter((c) => c.type === 'Inward').length
     const clearedCount = cheques.filter((c) => c.status === 'Cleared').length
@@ -38,6 +50,9 @@ export function useChequeStats(cheques: ChequeWithRelations[] | undefined) {
     return {
       todayCheques,
       outstanding,
+      payable,
+      receivable,
+      currentBalance,
       issuedCount,
       receivedCount,
       clearedCount,
