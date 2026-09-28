@@ -444,7 +444,7 @@
     "voiceReminder": "Daily Automated Voice Reminder",
     "voiceReminderDesc": "Aaj aapke bank accounts mein aane wale cheques ka summary paane ke liye subah 9 baje daily automated voice call receive karein.",
     "yourPhoneNumber": "Aapka Phone Number",
-    "countryCodeHelp": "Country code zaroor include karein (jaise +91)",
+    "countryCodeHelp": "Apna country chunein, phir number daalein. Voice reminders ke liye isi number par call aayega.",
     "lifetimePremium": "Lifetime Premium",
     "oneTimePurchase": "Foundational features ke liye one-time purchase.",
     "upgradeNow": "Abhi Upgrade karein",

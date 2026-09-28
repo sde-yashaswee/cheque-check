@@ -444,7 +444,7 @@
     "voiceReminder": "Daily Automated Voice Reminder",
     "voiceReminderDesc": "Receive a daily automated voice call at 9 AM IST with a summary of cheques hitting your bank accounts today.",
     "yourPhoneNumber": "Your Phone Number",
-    "countryCodeHelp": "Make sure to include country code (e.g. +91)",
+    "countryCodeHelp": "Pick your country, then enter your number. We'll call this number for voice reminders.",
     "lifetimePremium": "Lifetime Premium",
     "oneTimePurchase": "One-time purchase for foundational features.",
     "upgradeNow": "Upgrade Now",
