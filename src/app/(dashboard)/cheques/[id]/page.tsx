@@ -34,6 +34,7 @@ import {
   openPartySms,
 } from '@/features/cheques/lib/notify-party'
 import { downloadChequePrintPdf } from '@/features/cheques/lib/print-cheque'
+import { PrintLayoutEditor } from '@/features/cheques/components/print-layout-editor'
 
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import 'react-photo-view/dist/react-photo-view.css'
@@ -353,6 +354,10 @@ export default function ChequeDetailPage() {
         <HugeiconsIcon icon={Download} className="mr-2 h-4 w-4" />
         {t('printCheque')}
       </Button>
+
+      <div className="flex justify-end">
+        <PrintLayoutEditor accountId={cheque.account_id} />
+      </div>
 
       <div className="pt-4 flex flex-col gap-3">
         <Link href={`/cheques/${id}/edit`} className="w-full">
