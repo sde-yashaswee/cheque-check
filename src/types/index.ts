@@ -111,6 +111,7 @@ export interface Cheque {
 export interface ChequeWithRelations extends Cheque {
   party?: {
     name: string
+    contact?: string
     color?: string
     icon?: string
     avatar_url?: string | null
