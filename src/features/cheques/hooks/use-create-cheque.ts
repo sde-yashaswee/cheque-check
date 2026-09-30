@@ -43,6 +43,7 @@ export function useCreateCheque(
   const [step, setStep] = useState(1)
   const [isUploading, setIsUploading] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
   const router = useRouter()
   const queryClient = useQueryClient()
   const t = useTranslations('Cheques')
@@ -137,7 +138,7 @@ export function useCreateCheque(
         actionProps,
       })
       celebrateCheque(created)
-      router.push('/cheques')
+      setIsSuccess(true)
     },
     onError: (error) => {
       draft.failPublish()
@@ -194,7 +195,7 @@ export function useCreateCheque(
         actionProps,
       })
       celebrateCheque(published)
-      router.replace('/cheques')
+      setIsSuccess(true)
     } catch (error) {
       draft.failPublish()
       showCreateError(error)
@@ -242,6 +243,8 @@ export function useCreateCheque(
     isUploading,
     handleImageUpload,
     isSaving: mutation.isPending || isPublishing,
+    isSuccess,
+    continueAfterSuccess: () => router.push('/cheques'),
     draft,
     onSubmit: form.handleSubmit(async (data) => {
       const publishedDraftId = await draft.beginPublish()

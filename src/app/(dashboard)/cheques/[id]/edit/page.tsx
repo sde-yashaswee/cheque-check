@@ -5,6 +5,7 @@ import { useParties } from '@/hooks/use-parties'
 import { useAccounts } from '@/hooks/use-accounts'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { CurrencyPrefixInput } from '@/components/ui/currency-prefix-input'
 import { Label } from '@/components/ui/label'
 import { useParams } from 'next/navigation'
 import {
@@ -260,24 +261,23 @@ export default function EditChequePage() {
             >
               {t('amount')}
             </Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 z-10 -translate-y-1/2 text-base font-semibold text-muted-foreground pointer-events-none">
-                {currency}
-              </span>
-              <Input
-                id="amount"
-                type="number"
-                min={0}
-                step="any"
-                {...register('amount', { valueAsNumber: true })}
-                className="h-12 pl-10 font-semibold rounded-sm bg-canvas-parchment border-none"
-              />
-            </div>
-            {errors.amount && (
-              <p className="text-xs text-destructive ml-1">
-                {errors.amount.message as string}
-              </p>
-            )}
+            <CurrencyPrefixInput
+              currency={currency}
+              id="amount"
+              type="number"
+              min={0}
+              step="any"
+              {...register('amount', { valueAsNumber: true })}
+              className="h-12 font-semibold rounded-sm bg-canvas-parchment border-none"
+            />
+            <p
+              className={cn(
+                'text-xs text-destructive ml-1 min-h-4',
+                !errors.amount && 'invisible',
+              )}
+            >
+              {(errors.amount?.message as string) || '\u00A0'}
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -297,11 +297,14 @@ export default function EditChequePage() {
                 placeholder={t('chequeNumberPlaceholder')}
                 className="h-12 rounded-sm bg-canvas-parchment border-none"
               />
-              {errors.cheque_number && (
-                <p className="text-xs text-destructive ml-1">
-                  {errors.cheque_number.message as string}
-                </p>
-              )}
+              <p
+                className={cn(
+                  'text-xs text-destructive ml-1 min-h-4',
+                  !errors.cheque_number && 'invisible',
+                )}
+              >
+                {(errors.cheque_number?.message as string) || '\u00A0'}
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -318,11 +321,14 @@ export default function EditChequePage() {
                 {...register('cheque_date')}
                 className="h-12 rounded-sm bg-canvas-parchment border-none"
               />
-              {errors.cheque_date && (
-                <p className="text-xs text-destructive ml-1">
-                  {errors.cheque_date.message as string}
-                </p>
-              )}
+              <p
+                className={cn(
+                  'text-xs text-destructive ml-1 min-h-4',
+                  !errors.cheque_date && 'invisible',
+                )}
+              >
+                {(errors.cheque_date?.message as string) || '\u00A0'}
+              </p>
             </div>
           </div>
 
@@ -336,11 +342,14 @@ export default function EditChequePage() {
               onValueChange={(val) => setValue('party_id', val)}
               placeholder={t('partyPlaceholder')}
             />
-            {errors.party_id && (
-              <p className="text-xs text-destructive ml-1">
-                {errors.party_id.message as string}
-              </p>
-            )}
+            <p
+              className={cn(
+                'text-xs text-destructive ml-1 min-h-4',
+                !errors.party_id && 'invisible',
+              )}
+            >
+              {(errors.party_id?.message as string) || '\u00A0'}
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -353,11 +362,14 @@ export default function EditChequePage() {
               onValueChange={(val) => setValue('account_id', val)}
               placeholder={t('accountPlaceholder')}
             />
-            {errors.account_id && (
-              <p className="text-xs text-destructive ml-1">
-                {errors.account_id.message as string}
-              </p>
-            )}
+            <p
+              className={cn(
+                'text-xs text-destructive ml-1 min-h-4',
+                !errors.account_id && 'invisible',
+              )}
+            >
+              {(errors.account_id?.message as string) || '\u00A0'}
+            </p>
           </div>
 
           <div className="space-y-2">
