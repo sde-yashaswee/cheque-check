@@ -22,6 +22,7 @@ import {
   HelpCircleIcon as Help,
   RocketIcon as Rocket,
   PencilEdit01Icon as Edit,
+  Calculator01Icon as CalculatorIcon,
 } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 import { SkeletonImage } from '@/components/ui/skeleton-image'
@@ -31,6 +32,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { getWhatsAppSupportLink } from '@/lib/whatsapp'
+import { Calculator } from '@/components/calculator'
 
 const GlobalSearch = dynamic(
   () => import('@/components/global-search').then((mod) => mod.GlobalSearch),
@@ -45,6 +47,7 @@ export function TopNav() {
   const { activeBusiness } = useBusiness()
   const { profile } = useProfile()
   const [searchOpen, setSearchOpen] = useState(false)
+  const [calculatorOpen, setCalculatorOpen] = useState(false)
   const t = useTranslations()
 
   const getNavInfo = (path: string) => {
@@ -208,6 +211,19 @@ export function TopNav() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCalculatorOpen(true)}
+            className="rounded-full h-9 w-9"
+            aria-label="Open calculator"
+          >
+            <HugeiconsIcon
+              icon={CalculatorIcon}
+              className="h-5 w-5 text-muted-foreground"
+            />
+          </Button>
+
           {pathname === '/features' && (
             <Link href="/settings/transactions">
               <Button
@@ -334,6 +350,9 @@ export function TopNav() {
       )}
 
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+      {calculatorOpen && (
+        <Calculator onClose={() => setCalculatorOpen(false)} />
+      )}
     </div>
   )
 }
