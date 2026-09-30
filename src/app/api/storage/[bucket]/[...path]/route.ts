@@ -12,10 +12,13 @@ const privateBuckets = new Set<PrivateMediaBucket>([
 ])
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ bucket: string; path: string[] }> },
 ) {
   const { bucket, path } = await params
+  // Client-side prefetch (e.g. before handing the URL to next/image) needs the
+  // signed URL as JSON, since next/image's own fetch can't carry our cookies.
+  const wantsJson = new URL(request.url).searchParams.get('format') === 'json'
   if (
     !privateBuckets.has(bucket as PrivateMediaBucket) ||
     path.some((segment) => !segment || segment === '.' || segment === '..')
@@ -40,6 +43,13 @@ export async function GET(
 
   if (error || !data?.signedUrl) {
     return NextResponse.json({ error: 'Media not found' }, { status: 404 })
+  }
+
+  if (wantsJson) {
+    return NextResponse.json(
+      { url: data.signedUrl },
+      { headers: { 'Cache-Control': 'private, no-store' } },
+    )
   }
 
   const response = NextResponse.redirect(data.signedUrl, 307)

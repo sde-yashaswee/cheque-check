@@ -21,6 +21,7 @@ import {
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useProfile } from '@/hooks/use-profile'
+import { useSignedMediaUrl } from '@/hooks/use-signed-media-url'
 import { TextTruncate } from '@/components/ui/text-truncate'
 import { cn } from '@/lib/utils'
 import { ChequeStatus } from '@/types'
@@ -42,30 +43,34 @@ import 'react-photo-view/dist/react-photo-view.css'
 function ChequeScanImage({ src, alt }: { src: string; alt: string }) {
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
+  const { url: resolvedSrc, failed: resolveFailed } = useSignedMediaUrl(src)
+  const showFailed = failed || resolveFailed
 
   return (
     <div className="relative aspect-[2/1] w-full">
-      {!loaded && !failed && (
+      {!loaded && !showFailed && (
         <Skeleton className="absolute inset-0 h-full w-full" />
       )}
-      {failed && (
+      {showFailed && (
         <span className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
           {alt}
         </span>
       )}
-      <Image
-        src={src}
-        alt={alt}
-        width={800}
-        height={400}
-        priority
-        onLoad={() => setLoaded(true)}
-        onError={() => setFailed(true)}
-        className={cn(
-          'h-full w-full object-cover transition-transform group-hover:scale-[1.02]',
-          failed ? 'hidden' : !loaded && 'invisible',
-        )}
-      />
+      {resolvedSrc && !showFailed && (
+        <Image
+          src={resolvedSrc}
+          alt={alt}
+          width={800}
+          height={400}
+          priority
+          onLoad={() => setLoaded(true)}
+          onError={() => setFailed(true)}
+          className={cn(
+            'h-full w-full object-cover transition-transform group-hover:scale-[1.02]',
+            !loaded && 'invisible',
+          )}
+        />
+      )}
     </div>
   )
 }
