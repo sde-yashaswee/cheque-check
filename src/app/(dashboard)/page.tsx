@@ -2,7 +2,6 @@
 
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  PlusSignIcon as Plus,
   File02Icon as FileText,
   FlashIcon as Zap,
   Calendar03Icon as Calendar,
@@ -136,34 +135,34 @@ export default function HomePage() {
       >
         <>
           {/* Balance Card */}
-          <div className="rounded-lg bg-primary p-8 text-primary-foreground relative overflow-hidden">
+          <div className="rounded-lg bg-primary p-5 text-primary-foreground relative overflow-hidden">
             <div className="relative z-10">
               <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">
                 {tDashboard('currentBalance')}
               </p>
               <p
                 className={cn(
-                  'mt-2 text-4xl font-semibold',
+                  'mt-1.5 text-3xl font-semibold',
                   currentBalance > 0 && 'text-emerald-200',
                   currentBalance < 0 && 'text-rose-200',
                 )}
               >
                 {formatAmount(currentBalance)}
               </p>
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                <div className="rounded-md bg-white/10 p-3">
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="rounded-md bg-white/10 p-2">
                   <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">
                     {tDashboard('receivable')}
                   </p>
-                  <p className="mt-1 text-lg font-semibold text-emerald-200">
+                  <p className="mt-0.5 text-base font-semibold text-emerald-200">
                     {formatAmount(receivable)}
                   </p>
                 </div>
-                <div className="rounded-md bg-white/10 p-3">
+                <div className="rounded-md bg-white/10 p-2">
                   <p className="text-[10px] font-semibold opacity-70 uppercase tracking-wider">
                     {tDashboard('payable')}
                   </p>
-                  <p className="mt-1 text-lg font-semibold text-rose-200">
+                  <p className="mt-0.5 text-base font-semibold text-rose-200">
                     {formatAmount(payable)}
                   </p>
                 </div>
@@ -173,8 +172,6 @@ export default function HomePage() {
               <HugeiconsIcon icon={FileText} size={200} />
             </div>
           </div>
-
-          <DraftsSummaryCard />
 
           {/* Quick Actions */}
           <div className="space-y-4">
@@ -231,6 +228,8 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
+
+          <DraftsSummaryCard />
 
           {/* Today's Cheques */}
           <div className="space-y-4">
@@ -322,15 +321,6 @@ export default function HomePage() {
           </div>
         </>
       </DataState>
-
-      <Link href="/cheques/create">
-        <Button
-          className="fixed bottom-24 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900"
-          size="icon"
-        >
-          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
-        </Button>
-      </Link>
     </div>
   )
 }

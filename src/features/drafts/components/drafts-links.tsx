@@ -48,30 +48,31 @@ export function DraftsSummaryCard() {
     { label: t('parties'), count: parties, href: DRAFT_LIST_PATHS.party },
     { label: t('accounts'), count: accounts, href: DRAFT_LIST_PATHS.account },
   ].filter((row) => row.count > 0)
+  const breakdown = rows.map((row) => `${row.count} ${row.label}`).join(' · ')
 
   return (
-    <div className="rounded-lg border border-dashed border-primary/30 bg-primary/5 p-5 space-y-3">
-      <div className="flex items-center gap-2">
-        <HugeiconsIcon icon={DraftIcon} className="h-4 w-4 text-primary" />
-        <h3 className="text-sm font-semibold text-primary">
-          {t('pendingSummary', { count: total })}
-        </h3>
+    <Link
+      href={rows[0]?.href ?? DRAFT_LIST_PATHS.cheque}
+      className="flex items-center justify-between gap-3 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-4 py-3"
+    >
+      <div className="flex min-w-0 items-center gap-2">
+        <HugeiconsIcon
+          icon={DraftIcon}
+          className="h-4 w-4 shrink-0 text-primary"
+        />
+        <div className="min-w-0">
+          <p className="truncate text-xs font-semibold text-primary">
+            {t('pendingSummary', { count: total })}
+          </p>
+          <p className="truncate text-[10px] text-muted-foreground">
+            {breakdown}
+          </p>
+        </div>
       </div>
-      <div className="grid gap-2">
-        {rows.map((row) => (
-          <Link
-            key={row.href}
-            href={row.href}
-            className="flex items-center justify-between rounded-sm bg-card px-4 py-3 text-sm font-semibold"
-          >
-            <span>{row.label}</span>
-            <span className="flex items-center gap-2 text-muted-foreground">
-              {row.count}
-              <HugeiconsIcon icon={ChevronRight} className="h-4 w-4" />
-            </span>
-          </Link>
-        ))}
-      </div>
-    </div>
+      <HugeiconsIcon
+        icon={ChevronRight}
+        className="h-4 w-4 shrink-0 text-primary/50"
+      />
+    </Link>
   )
 }
