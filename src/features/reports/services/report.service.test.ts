@@ -7,6 +7,8 @@ describe('ReportService', () => {
     const repository = {
       exportToCSV: vi.fn(),
       exportToJSON: vi.fn(),
+      exportToPDF: vi.fn(),
+      exportToExcel: vi.fn(),
     } as unknown as IReportRepository
     const service = new ReportService(repository)
 
@@ -25,5 +27,21 @@ describe('ReportService', () => {
     service.exportToJSON([], 'report.json')
 
     expect(repository.exportToJSON).toHaveBeenCalledWith([], 'report.json')
+  })
+
+  it('delegates PDF and Excel exports to the injected repository', () => {
+    const repository = {
+      exportToCSV: vi.fn(),
+      exportToJSON: vi.fn(),
+      exportToPDF: vi.fn(),
+      exportToExcel: vi.fn(),
+    } as unknown as IReportRepository
+    const service = new ReportService(repository)
+
+    service.exportToPDF([], 'report.pdf')
+    service.exportToExcel([], 'report.xlsx')
+
+    expect(repository.exportToPDF).toHaveBeenCalledWith([], 'report.pdf')
+    expect(repository.exportToExcel).toHaveBeenCalledWith([], 'report.xlsx')
   })
 })

@@ -148,7 +148,9 @@
   "Reports": {
     "exportFormat": "फ़ॉर्मेट चुनें",
     "csvFormat": "CSV स्प्रेडशीट",
-    "jsonFormat": "JSON डेटा"
+    "jsonFormat": "JSON डेटा",
+    "pdfFormat": "PDF दस्तावेज़",
+    "excelFormat": "Excel वर्कबुक"
   },
   "Common": {
     "welcome": "स्वागत है",

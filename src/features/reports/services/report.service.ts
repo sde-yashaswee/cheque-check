@@ -30,6 +30,20 @@ export class ReportService {
     return getDefaultReportService().exportToJSON(cheques, filename)
   }
 
+  static exportToPDF(
+    cheques: ChequeWithRelations[],
+    filename = 'cheques_report.pdf',
+  ) {
+    return getDefaultReportService().exportToPDF(cheques, filename)
+  }
+
+  static exportToExcel(
+    cheques: ChequeWithRelations[],
+    filename = 'cheques_report.xlsx',
+  ) {
+    return getDefaultReportService().exportToExcel(cheques, filename)
+  }
+
   exportToCSV(
     cheques: ChequeWithRelations[],
     filename = 'cheques_report.csv',
@@ -42,6 +56,20 @@ export class ReportService {
     filename = 'cheques_report.json',
   ): void {
     this.repository.exportToJSON(cheques, filename)
+  }
+
+  exportToPDF(
+    cheques: ChequeWithRelations[],
+    filename = 'cheques_report.pdf',
+  ): void {
+    this.repository.exportToPDF(cheques, filename)
+  }
+
+  exportToExcel(
+    cheques: ChequeWithRelations[],
+    filename = 'cheques_report.xlsx',
+  ): void {
+    this.repository.exportToExcel(cheques, filename)
   }
 }
 

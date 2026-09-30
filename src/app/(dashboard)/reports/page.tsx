@@ -81,11 +81,15 @@ export default function ReportsPage() {
     { name: t('bounced'), value: bouncedCount, color: '#FF3B30' },
   ].filter((d) => d.value > 0)
 
-  const handleExport = (format: 'csv' | 'json') => {
+  const handleExport = (format: 'csv' | 'json' | 'pdf' | 'excel') => {
     if (cheques && isLifetimePremium) {
       const baseName = `cheques_report_${activeBusiness?.name || 'export'}`
       if (format === 'json') {
         reportService.exportToJSON(cheques, `${baseName}.json`)
+      } else if (format === 'pdf') {
+        reportService.exportToPDF(cheques, `${baseName}.pdf`)
+      } else if (format === 'excel') {
+        reportService.exportToExcel(cheques, `${baseName}.xlsx`)
       } else {
         reportService.exportToCSV(cheques, `${baseName}.csv`)
       }
@@ -162,6 +166,20 @@ export default function ReportsPage() {
               onClick={() => handleExport('json')}
             >
               {tr('jsonFormat')}
+            </button>
+            <button
+              type="button"
+              className="w-full rounded-md px-2 py-2 text-left text-sm hover:bg-muted"
+              onClick={() => handleExport('pdf')}
+            >
+              {tr('pdfFormat')}
+            </button>
+            <button
+              type="button"
+              className="w-full rounded-md px-2 py-2 text-left text-sm hover:bg-muted"
+              onClick={() => handleExport('excel')}
+            >
+              {tr('excelFormat')}
             </button>
           </PopoverContent>
         </Popover>

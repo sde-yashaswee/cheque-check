@@ -481,6 +481,8 @@
     "exportFormat": "Format choose karein",
     "csvFormat": "CSV spreadsheet",
     "jsonFormat": "JSON data",
+    "pdfFormat": "PDF document",
+    "excelFormat": "Excel workbook",
     "distribution": "Distribution",
     "noDataForChart": "Chart ke liye data nahi hai",
     "recentCheques": "Recent Cheques",
