@@ -12,8 +12,13 @@ import { queueCelebration } from '@/lib/celebrate'
 
 type BusinessFormData = z.infer<typeof businessSchema>
 
-export function useCreateBusiness() {
+export function useCreateBusiness({
+  onCreated,
+}: {
+  onCreated?: (business: Business) => void | Promise<void>
+} = {}) {
   const [step, setStep] = useState(1)
+  const [isSuccess, setIsSuccess] = useState(false)
   const router = useRouter()
   const { setActiveBusiness } = useBusiness()
 
@@ -85,9 +90,12 @@ export function useCreateBusiness() {
     nextStep,
     prevStep,
     isSaving: mutation.isPending,
-    onSubmit: form.handleSubmit((data) => {
-      mutation.mutate(data)
-      router.push('/businesses')
+    isSuccess,
+    continueAfterSuccess: () => router.push('/businesses'),
+    onSubmit: form.handleSubmit(async (data) => {
+      const created = await mutation.mutateAsync(data)
+      await onCreated?.(created)
+      setIsSuccess(true)
     }),
   }
 }
