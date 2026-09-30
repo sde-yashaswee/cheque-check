@@ -28,10 +28,17 @@ export function useCreateParty(
   {
     returnTo = null,
     draftId = null,
-  }: { returnTo?: string | null; draftId?: string | null } = {},
+    onCreated,
+  }: {
+    returnTo?: string | null
+    draftId?: string | null
+    onCreated?: (party: Party) => void | Promise<void>
+  } = {},
 ) {
   const [step, setStep] = useState(1)
   const [isPublishing, setIsPublishing] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [successRedirect, setSuccessRedirect] = useState<string | null>(null)
   const router = useRouter()
   const queryClient = useQueryClient()
   const tc = useTranslations('Common')
@@ -109,12 +116,17 @@ export function useCreateParty(
     prevStep,
     isSaving: mutation.isPending || isPublishing,
     draft,
+    isSuccess,
+    continueAfterSuccess: () =>
+      successRedirect ? router.replace(successRedirect) : draft.goBack(),
     onSubmit: form.handleSubmit(async (data) => {
       const publishedDraftId = await draft.beginPublish()
       if (!publishedDraftId && !returnTo) {
         draft.finishPublish()
-        mutation.mutate(data)
-        draft.goBack()
+        const created = await mutation.mutateAsync(data)
+        await onCreated?.(created)
+        setSuccessRedirect(null)
+        setIsSuccess(true)
         return
       }
 
@@ -124,6 +136,7 @@ export function useCreateParty(
           ? await partyDraftService.publish(publishedDraftId, data)
           : await mutation.mutateAsync(data)
         draft.finishPublish()
+        await onCreated?.(created)
         if (publishedDraftId) {
           queryClient.invalidateQueries({ queryKey: ['parties', businessId] })
           queryClient.invalidateQueries({
@@ -132,7 +145,8 @@ export function useCreateParty(
         }
 
         if (!returnTo) {
-          draft.goBack()
+          setSuccessRedirect(null)
+          setIsSuccess(true)
           return
         }
         const chequeDraftId = getChequeDraftIdFromReturnTo(returnTo)
@@ -141,7 +155,8 @@ export function useCreateParty(
             party_id: created.id,
           })
         }
-        router.replace(returnTo)
+        setSuccessRedirect(returnTo)
+        setIsSuccess(true)
       } catch (error) {
         draft.failPublish()
         toast.add({

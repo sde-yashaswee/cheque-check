@@ -17,6 +17,7 @@ import {
   TextFontIcon as TextIcon,
   Mail01Icon as Mail,
   Note01Icon as Note,
+  Camera01Icon as Camera,
 } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
 import {
@@ -29,12 +30,17 @@ import {
 } from '@/components/reui/stepper'
 import { useTranslations } from 'next-intl'
 import { getSafeChequeReturnTo } from '@/lib/cheque-draft'
-import { useState } from 'react'
-import { DraftLeaveDialog, DraftToolbar } from '@/features/drafts'
+import { useEffect, useRef, useState } from 'react'
+import { DraftLeaveDialog, DraftSaveFab, DraftToolbar } from '@/features/drafts'
 import { toast } from '@/components/ui/toast'
 import { PhoneInput, useDefaultPhoneCountry } from '@/components/ui/phone-input'
 import { toE164 } from '@/lib/phone'
 import { Controller } from 'react-hook-form'
+import { TagSelector } from '@/features/tags/components/tag-selector'
+import { tagService } from '@/features/tags/services/tag.service'
+import { storageService } from '@/services/storage.service'
+import { validateImageFile } from '@/lib/storage'
+import { CreationSuccessScreen } from '@/components/ui/creation-success-screen'
 
 export default function CreatePartyPage() {
   const t = useTranslations('Parties')
@@ -44,10 +50,35 @@ export default function CreatePartyPage() {
   const returnTo = getSafeChequeReturnTo(searchParams.get('returnTo'))
   // Read once: autosave later writes a new draftId into the URL for the same form.
   const [initialDraftId] = useState(() => searchParams.get('draftId'))
+  const [prefill] = useState(() => ({ name: searchParams.get('name') }))
   const { activeBusiness } = useBusiness()
+  const [tagIds, setTagIds] = useState<string[]>([])
 
-  const { form, step, nextStep, prevStep, isSaving, onSubmit, draft } =
-    useCreateParty(activeBusiness?.id, { returnTo, draftId: initialDraftId })
+  const {
+    form,
+    step,
+    nextStep,
+    prevStep,
+    isSaving,
+    isSuccess,
+    continueAfterSuccess,
+    onSubmit,
+    draft,
+  } = useCreateParty(activeBusiness?.id, {
+    returnTo,
+    draftId: initialDraftId,
+    onCreated: async (party) => {
+      await Promise.all(
+        tagIds.map((tagId) =>
+          tagService.attach({
+            tag_id: tagId,
+            entity_type: 'party',
+            entity_id: party.id,
+          }),
+        ),
+      )
+    },
+  })
 
   const {
     register,
@@ -57,6 +88,11 @@ export default function CreatePartyPage() {
     formState: { errors },
   } = form
   const { setUserValue } = draft
+
+  useEffect(() => {
+    if (initialDraftId) return
+    if (prefill.name) setValue('name', prefill.name)
+  }, [initialDraftId, prefill, setValue])
   const defaultPhoneCountry = useDefaultPhoneCountry()
   const importContact = async () => {
     const contacts = (
@@ -99,6 +135,60 @@ export default function CreatePartyPage() {
     }
   }
 
+  const avatarInputRef = useRef<HTMLInputElement>(null)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [isAvatarUploading, setIsAvatarUploading] = useState(false)
+
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview)
+    }
+  }, [avatarPreview])
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    try {
+      await validateImageFile(file, 5 * 1024 * 1024)
+    } catch (error) {
+      toast.add({
+        title: tCommon('error'),
+        description: error instanceof Error ? error.message : tCommon('error'),
+        type: 'error',
+      })
+      return
+    }
+    setAvatarFile(file)
+    setAvatarPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev)
+      return URL.createObjectURL(file)
+    })
+  }
+
+  // Avatar is only uploaded to storage right before the party itself is created.
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (avatarFile) {
+      setIsAvatarUploading(true)
+      try {
+        const url = await storageService.uploadAvatar(avatarFile)
+        setValue('avatar_url', url)
+      } catch (error) {
+        setIsAvatarUploading(false)
+        toast.add({
+          title: tCommon('error'),
+          description: tCommon('avatarUploadFailed'),
+          type: 'error',
+        })
+        return
+      }
+      setIsAvatarUploading(false)
+    }
+    await onSubmit(e)
+  }
+
   const colors = [
     '#FF3B30',
     '#FF9500',
@@ -108,6 +198,19 @@ export default function CreatePartyPage() {
     '#5856D6',
     '#AF52DE',
   ]
+
+  if (isSuccess) {
+    return (
+      <div className="max-w-2xl">
+        <CreationSuccessScreen
+          title={t('successTitle')}
+          description={t('successDescription')}
+          ctaLabel={t('successCta')}
+          onContinue={continueAfterSuccess}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">
@@ -173,16 +276,48 @@ export default function CreatePartyPage() {
         </div>
       </Stepper>
 
-      <DraftToolbar
-        status={draft.status}
-        onSaveDraft={draft.saveDraftAndExit}
-      />
+      <DraftToolbar status={draft.status} />
       <DraftLeaveDialog {...draft.leaveDialogProps} />
+      <DraftSaveFab
+        status={draft.status}
+        hasUserChanges={draft.hasUserChanges}
+        onSave={() => void draft.saveDraft()}
+      />
 
-      <form onSubmit={onSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-8">
         {step === 1 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-4">
+              <div className="flex justify-center">
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => avatarInputRef.current?.click()}
+                    aria-label={t('addPhoto')}
+                    className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-primary ring-2 ring-white shadow-sm transition-transform active:scale-95"
+                  >
+                    {avatarPreview ? (
+                      <img
+                        src={avatarPreview}
+                        alt={t('partyAvatar')}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <HugeiconsIcon icon={User} className="h-8 w-8" />
+                    )}
+                  </button>
+                  <span className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white ring-2 ring-white">
+                    <HugeiconsIcon icon={Camera} className="h-3.5 w-3.5" />
+                  </span>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => void handleAvatarChange(e)}
+                  />
+                </div>
+              </div>
               <div className="space-y-2">
                 <Label
                   htmlFor="name"
@@ -200,8 +335,16 @@ export default function CreatePartyPage() {
                     id="name"
                     {...register('name')}
                     placeholder={t('enterFullName')}
-                    className="h-14  bg-canvas-parchment border-none text-lg font-semibold rounded-sm"
+                    className="h-14  bg-canvas-parchment border-none text-lg font-semibold rounded-sm pr-12"
                   />
+                  <button
+                    type="button"
+                    onClick={importContact}
+                    aria-label={t('importFromContacts')}
+                    className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-primary transition-colors hover:bg-primary/10"
+                  >
+                    <HugeiconsIcon icon={User} className="h-5 w-5" />
+                  </button>
                 </div>
                 {errors.name && (
                   <p className="text-xs text-destructive ml-1">
@@ -248,24 +391,12 @@ export default function CreatePartyPage() {
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-3">
-                <Label
-                  htmlFor="contact"
-                  className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
-                >
-                  {t('contactNumber')}
-                </Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="rounded-full"
-                  onClick={importContact}
-                >
-                  <HugeiconsIcon icon={User} className="mr-2 h-4 w-4" />
-                  {t('importFromContacts')}
-                </Button>
-              </div>
+              <Label
+                htmlFor="contact"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+              >
+                {t('contactNumber')}
+              </Label>
               <Controller
                 control={control}
                 name="contact"
@@ -355,6 +486,18 @@ export default function CreatePartyPage() {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+                {tCommon('tags')}
+              </Label>
+              <TagSelector
+                businessId={activeBusiness?.id}
+                value={tagIds}
+                onChange={setTagIds}
+                placeholder={tCommon('addTags')}
+              />
+            </div>
+
             <div className="rounded-lg bg-primary/5 p-6 space-y-4 border border-primary/10">
               <div className="flex items-center gap-2">
                 <HugeiconsIcon
@@ -384,9 +527,11 @@ export default function CreatePartyPage() {
             <Button
               type="submit"
               className="w-full rounded-full h-14 text-lg"
-              disabled={isSaving}
+              disabled={isSaving || isAvatarUploading}
             >
-              {isSaving ? tCommon('saving') : t('createParty')}{' '}
+              {isSaving || isAvatarUploading
+                ? tCommon('saving')
+                : t('createParty')}{' '}
               <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
             </Button>
           </div>
