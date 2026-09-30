@@ -60,6 +60,8 @@ import {
 } from '@/components/ui/sheet'
 
 import { type ChequeStatus, type ChequeWithRelations } from '@/types'
+import { EntityTagsSection } from '@/features/tags/components/tag-chips'
+import { useEntityTagMap } from '@/features/tags/hooks/use-entity-tags'
 
 export default function AccountDetailPage() {
   const t = useTranslations('Accounts')
@@ -84,6 +86,7 @@ export default function AccountDetailPage() {
     sortOrder,
     setSortOrder,
   } = useAccountDetail(id, businessId)
+  const chequeTagMap = useEntityTagMap(businessId, 'cheque')
 
   const clearFilters = () => {
     setSearch('')
@@ -230,6 +233,10 @@ export default function AccountDetailPage() {
             </p>
           </div>
         )}
+
+        <div className="relative z-10">
+          <EntityTagsSection entityType="account" entityId={account.id} />
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -409,6 +416,7 @@ export default function AccountDetailPage() {
                 key={cheque.id}
                 cheque={cheque}
                 onStatusUpdate={updateChequeStatus}
+                tags={chequeTagMap[cheque.id]}
               />
             ))}
           </div>

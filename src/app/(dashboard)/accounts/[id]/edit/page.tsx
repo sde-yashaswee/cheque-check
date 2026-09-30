@@ -21,6 +21,9 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useProfile } from '@/hooks/use-profile'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
+import { toast } from '@/components/ui/toast'
+import { TagSelector } from '@/features/tags/components/tag-selector'
+import { useEntityTagsDraft } from '@/features/tags/hooks/use-entity-tags'
 import { Checkbox } from '@/components/ui/checkbox'
 
 const DeleteConfirmationDialog = dynamic(
@@ -59,6 +62,20 @@ export default function EditAccountPage() {
     setValue,
     formState: { errors },
   } = form
+  const tagsDraft = useEntityTagsDraft('account', id)
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (await form.trigger()) {
+      try {
+        await tagsDraft.commit()
+      } catch {
+        toast.add({ title: tc('error'), type: 'error' })
+        return
+      }
+    }
+    await onSubmit(event)
+  }
 
   const colors = [
     '#007AFF',
@@ -84,7 +101,7 @@ export default function EditAccountPage() {
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">
-      <form onSubmit={onSubmit} className="space-y-10">
+      <form onSubmit={handleSubmit} className="space-y-10">
         <FormSection title={t('accountInfo')} icon={User}>
           <div className="space-y-2">
             <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
@@ -222,6 +239,18 @@ export default function EditAccountPage() {
               {...register('ifsc_code')}
               placeholder={t('ifscPlaceholder')}
               className="h-14 bg-canvas-parchment border-none uppercase rounded-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+              {tc('tags')}
+            </Label>
+            <TagSelector
+              businessId={activeBusiness?.id}
+              value={tagsDraft.tagIds}
+              onChange={tagsDraft.setTagIds}
+              placeholder={tc('addTags')}
             />
           </div>
         </FormSection>

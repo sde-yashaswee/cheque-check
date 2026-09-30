@@ -34,6 +34,9 @@ import dynamic from 'next/dynamic'
 import { Party, AccountWithRelations } from '@/types'
 import { useTranslations } from 'next-intl'
 import { useProfile } from '@/hooks/use-profile'
+import { toast } from '@/components/ui/toast'
+import { TagSelector } from '@/features/tags/components/tag-selector'
+import { useEntityTagsDraft } from '@/features/tags/hooks/use-entity-tags'
 
 const DeleteConfirmationDialog = dynamic(
   () =>
@@ -74,6 +77,20 @@ export default function EditChequePage() {
   } = form
 
   const { parties } = useParties(businessId)
+  const tagsDraft = useEntityTagsDraft('cheque', id)
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (await form.trigger()) {
+      try {
+        await tagsDraft.commit()
+      } catch {
+        toast.add({ title: tCommon('error'), type: 'error' })
+        return
+      }
+    }
+    await onSubmit(event)
+  }
 
   const { accounts } = useAccounts(businessId)
 
@@ -117,7 +134,7 @@ export default function EditChequePage() {
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">
-      <form onSubmit={onSubmit} className="space-y-10">
+      <form onSubmit={handleSubmit} className="space-y-10">
         <FormSection title={t('scanDetails')} icon={Camera}>
           <div className="space-y-2">
             <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
@@ -363,6 +380,18 @@ export default function EditChequePage() {
               {...register('notes')}
               placeholder={t('notesPlaceholder')}
               className="h-14 bg-canvas-parchment border-none rounded-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+              {t('tags')}
+            </Label>
+            <TagSelector
+              businessId={businessId}
+              value={tagsDraft.tagIds}
+              onChange={tagsDraft.setTagIds}
+              placeholder={t('addTags')}
             />
           </div>
         </FormSection>

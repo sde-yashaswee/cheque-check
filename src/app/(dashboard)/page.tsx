@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { useBusiness } from '@/hooks/use-business'
 import { useCheques } from '@/hooks/use-cheques'
+import { useEntityTagMap } from '@/features/tags/hooks/use-entity-tags'
 import { ChequeCard } from '@/components/cheque-card'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -56,6 +57,7 @@ export default function HomePage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { cheques, isLoading, updateStatus } = useCheques(activeBusiness?.id)
+  const tagMap = useEntityTagMap(activeBusiness?.id, 'cheque')
 
   const handleScan = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -256,6 +258,7 @@ export default function HomePage() {
                     key={cheque.id}
                     cheque={cheque}
                     onStatusUpdate={(id, status) => updateStatus(id, status)}
+                    tags={tagMap[cheque.id]}
                   />
                 ))}
               </div>

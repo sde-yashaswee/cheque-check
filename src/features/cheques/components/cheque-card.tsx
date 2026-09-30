@@ -1,7 +1,8 @@
 'use client'
 
 import { useSwipeable } from 'react-swipeable'
-import { ChequeStatus, ChequeWithRelations } from '@/types'
+import { ChequeStatus, ChequeWithRelations, type Tag } from '@/types'
+import { TagChips } from '@/features/tags/components/tag-chips'
 import { cn } from '@/lib/utils'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
@@ -46,9 +47,10 @@ import Link from 'next/link'
 interface ChequeCardProps {
   cheque: ChequeWithRelations
   onStatusUpdate?: (id: string, status: ChequeStatus) => void
+  tags?: Tag[]
 }
 
-export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
+export function ChequeCard({ cheque, onStatusUpdate, tags }: ChequeCardProps) {
   const t = useTranslations('Cheques')
   const tc = useTranslations('Common')
   const [offset, setOffset] = useState(0)
@@ -192,6 +194,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
                 maxLength={20}
                 className="text-body-strong block"
               />
+              <TagChips tags={tags} max={2} className="mt-1" />
             </div>
           </div>
           <div className="text-right">

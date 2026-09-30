@@ -13,6 +13,10 @@ export interface ITagRepository {
   getAllWithUsage(businessId: string): Promise<TagWithUsage[]>
   getById(id: string): Promise<Tag>
   getLinks(tagId: string): Promise<TagLink[]>
+  getTagsByEntity(
+    businessId: string | null,
+    entityType: TagEntityType,
+  ): Promise<Array<{ entity_id: string; tag: Tag }>>
   create(input: Pick<Tag, 'business_id' | 'name' | 'color'>): Promise<Tag>
   update(id: string, input: Partial<Pick<Tag, 'name' | 'color'>>): Promise<Tag>
   delete(id: string): Promise<void>
@@ -62,6 +66,20 @@ export class SupabaseTagRepository
         .select('tag_id, entity_type, entity_id')
         .eq('tag_id', tagId),
     ) as Promise<TagLink[]>
+  }
+
+  async getTagsByEntity(
+    businessId: string | null,
+    entityType: TagEntityType,
+  ): Promise<Array<{ entity_id: string; tag: Tag }>> {
+    let query = this.supabase
+      .from(TABLES.ENTITY_TAGS)
+      .select('entity_id, tag:tags!inner(*)')
+      .eq('entity_type', entityType)
+    if (businessId) query = query.eq('tag.business_id', businessId)
+    return this.handle(query) as unknown as Promise<
+      Array<{ entity_id: string; tag: Tag }>
+    >
   }
 
   async create(

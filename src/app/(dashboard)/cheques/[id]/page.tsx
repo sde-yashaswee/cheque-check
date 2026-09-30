@@ -37,6 +37,7 @@ import {
 } from '@/features/cheques/lib/notify-party'
 import { downloadChequePrintPdf } from '@/features/cheques/lib/print-cheque'
 import { PrintLayoutEditor } from '@/features/cheques/components/print-layout-editor'
+import { EntityTagsSection } from '@/features/tags/components/tag-chips'
 
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import 'react-photo-view/dist/react-photo-view.css'
@@ -255,6 +256,8 @@ export default function ChequeDetailPage() {
               </p>
             </div>
           )}
+
+          <EntityTagsSection entityType="cheque" entityId={cheque.id} />
 
           {cheque.image_url && (
             <div className="space-y-4 pt-4 border-t border-primary/5">

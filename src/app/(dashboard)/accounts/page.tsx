@@ -32,6 +32,8 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import type { Account } from '@/types'
+import { TagChips } from '@/features/tags/components/tag-chips'
+import { useEntityTagMap } from '@/features/tags/hooks/use-entity-tags'
 
 export default function AccountsPage() {
   const t = useTranslations('Accounts')
@@ -54,6 +56,7 @@ export default function AccountsPage() {
     bankFilter,
     setBankFilter,
   } = useAccounts(businessId)
+  const tagMap = useEntityTagMap(businessId, 'account')
 
   const clearFilters = () => {
     setSearch('')
@@ -284,6 +287,11 @@ export default function AccountsPage() {
                       text={account.bank?.name || ''}
                       maxLength={30}
                       className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mt-0.5 block"
+                    />
+                    <TagChips
+                      tags={tagMap[account.id]}
+                      max={2}
+                      className="mt-1"
                     />
 
                     <div className="mt-4 flex items-center justify-between border-t border-dashed border-zinc-100 dark:border-zinc-800 pt-4">

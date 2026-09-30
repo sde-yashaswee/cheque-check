@@ -22,6 +22,9 @@ import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { PhoneInput } from '@/components/ui/phone-input'
 import { Controller } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
+import { toast } from '@/components/ui/toast'
+import { TagSelector } from '@/features/tags/components/tag-selector'
+import { useEntityTagsDraft } from '@/features/tags/hooks/use-entity-tags'
 
 const DeleteConfirmationDialog = dynamic(
   () =>
@@ -49,6 +52,20 @@ export default function EditBusinessPage() {
     setValue,
     formState: { errors },
   } = form
+  const tagsDraft = useEntityTagsDraft('business', id)
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (await form.trigger()) {
+      try {
+        await tagsDraft.commit()
+      } catch {
+        toast.add({ title: tc('error'), type: 'error' })
+        return
+      }
+    }
+    await onSubmit(event)
+  }
 
   const colors = [
     '#007AFF',
@@ -76,7 +93,7 @@ export default function EditBusinessPage() {
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">
-      <form onSubmit={onSubmit} className="space-y-10">
+      <form onSubmit={handleSubmit} className="space-y-10">
         <FormSection title={t('businessProfile')} icon={Store}>
           <div className="space-y-2">
             <Label
@@ -206,6 +223,18 @@ export default function EditBusinessPage() {
               {...register('address')}
               placeholder={t('headquartersPlaceholder')}
               className="h-14 bg-canvas-parchment border-none rounded-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+              {tc('tags')}
+            </Label>
+            <TagSelector
+              businessId={id}
+              value={tagsDraft.tagIds}
+              onChange={tagsDraft.setTagIds}
+              placeholder={tc('addTags')}
             />
           </div>
         </FormSection>

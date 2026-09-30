@@ -21,6 +21,8 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useProfile } from '@/hooks/use-profile'
 import type { ChequeWithRelations } from '@/types'
+import { EntityTagsSection } from '@/features/tags/components/tag-chips'
+import { useEntityTagMap } from '@/features/tags/hooks/use-entity-tags'
 import { TextTruncate } from '@/components/ui/text-truncate'
 import { useTranslations } from 'next-intl'
 
@@ -48,6 +50,7 @@ export default function BusinessDetailPage() {
     setSortOrder,
     updateStatus,
   } = useBusinessDetail(id)
+  const chequeTagMap = useEntityTagMap(id, 'cheque')
 
   const clearFilters = () => {
     setSearch('')
@@ -187,6 +190,10 @@ export default function BusinessDetailPage() {
             <p className="text-sm font-semibold">{business.address}</p>
           </div>
         )}
+
+        <div className="relative z-10">
+          <EntityTagsSection entityType="business" entityId={business.id} />
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -231,6 +238,7 @@ export default function BusinessDetailPage() {
                 key={cheque.id}
                 cheque={cheque}
                 onStatusUpdate={updateStatus}
+                tags={chequeTagMap[cheque.id]}
               />
             ))}
           </div>

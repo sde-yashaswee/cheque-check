@@ -61,6 +61,15 @@ export class TagService {
     return this.repository.getLinks(tagId)
   }
 
+  async getTagMap(businessId: string | null, entityType: TagEntityType) {
+    const rows = await this.repository.getTagsByEntity(businessId, entityType)
+    const map: Record<string, Tag[]> = {}
+    for (const { entity_id, tag } of rows) (map[entity_id] ??= []).push(tag)
+    for (const tags of Object.values(map))
+      tags.sort((a, b) => a.name.localeCompare(b.name))
+    return map
+  }
+
   /** Attaches/detaches links so the entity ends up with exactly `tagIds`. */
   async syncForEntity(
     entityType: TagEntityType,
