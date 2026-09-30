@@ -55,6 +55,9 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { ChequeWithRelations } from '@/types'
+import { SpeedDialFab } from '@/components/speed-dial-fab'
+import { EntityTagsSection } from '@/features/tags/components/tag-chips'
+import { useEntityTagMap } from '@/features/tags/hooks/use-entity-tags'
 
 export default function PartyDetailPage() {
   const t = useTranslations('Parties')
@@ -82,6 +85,7 @@ export default function PartyDetailPage() {
     sortOrder,
     setSortOrder,
   } = usePartyDetail(id, businessId)
+  const chequeTagMap = useEntityTagMap(businessId, 'cheque')
 
   const clearFilters = () => {
     setSearch('')
@@ -159,7 +163,7 @@ export default function PartyDetailPage() {
     )
 
   return (
-    <div className="max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-28">
       <div className="rounded-lg border bg-card p-6 space-y-6 relative overflow-hidden border-primary/5">
         <div className="flex justify-between items-start relative z-10">
           <div className="flex items-center gap-4">
@@ -181,32 +185,6 @@ export default function PartyDetailPage() {
               </p>
             </div>
           </div>
-          <Link href={`/parties/${id}/edit`}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full bg-canvas-parchment/50"
-            >
-              <HugeiconsIcon icon={Pencil} className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
-
-        <div className="flex gap-3 relative z-10">
-          <a href={`tel:${party.contact}`} className="flex-1">
-            <Button className="w-full rounded-sm h-12" variant="outline">
-              <HugeiconsIcon icon={Phone} className="mr-2 h-4 w-4" />{' '}
-              {tCommon('contact')}
-            </Button>
-          </a>
-          {party.email && (
-            <a href={`mailto:${party.email}`} className="flex-1">
-              <Button className="w-full rounded-sm h-12" variant="outline">
-                <HugeiconsIcon icon={Mail} className="mr-2 h-4 w-4" />{' '}
-                {tCommon('email')}
-              </Button>
-            </a>
-          )}
         </div>
 
         <div className="grid grid-cols-2 gap-4 relative z-10">
@@ -235,6 +213,10 @@ export default function PartyDetailPage() {
             <p className="text-sm font-semibold">{party.address}</p>
           </div>
         )}
+
+        <div className="relative z-10">
+          <EntityTagsSection entityType="party" entityId={party.id} />
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -414,11 +396,33 @@ export default function PartyDetailPage() {
                 key={cheque.id}
                 cheque={cheque}
                 onStatusUpdate={updateChequeStatus}
+                tags={chequeTagMap[cheque.id]}
               />
             ))}
           </div>
         </DataState>
       </div>
+
+      <SpeedDialFab
+        editHref={`/parties/${id}/edit`}
+        editLabel={t('editParty')}
+        actions={[
+          {
+            label: tCommon('contact'),
+            icon: Phone,
+            onClick: () => window.open(`tel:${party.contact}`, '_self'),
+          },
+          ...(party.email
+            ? [
+                {
+                  label: tCommon('email'),
+                  icon: Mail,
+                  onClick: () => window.open(`mailto:${party.email}`, '_self'),
+                },
+              ]
+            : []),
+        ]}
+      />
     </div>
   )
 }

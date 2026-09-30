@@ -174,6 +174,48 @@
   }
 }
 
+@keyframes skeleton-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes skeleton-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton-stagger {
+  animation:
+    skeleton-in 360ms cubic-bezier(0.2, 0.7, 0.3, 1) var(--skeleton-delay, 0ms)
+      both,
+    skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1)
+      calc(var(--skeleton-delay, 0ms) + 360ms) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-stagger {
+    animation: none;
+  }
+}
+
 html[data-reduce-motion] *,
 html[data-reduce-motion] *::before,
 html[data-reduce-motion] *::after {

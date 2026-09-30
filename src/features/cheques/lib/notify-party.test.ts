@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { buildChequeUpdateMessage, buildSmsLink } from './notify-party'
+import {
+  buildChequeUpdateMessage,
+  buildNotifyPartyAction,
+  buildSmsLink,
+  isPartySmsEnabled,
+} from './notify-party'
 
 describe('notify-party', () => {
   const cheque = {
@@ -22,5 +27,21 @@ describe('notify-party', () => {
     expect(buildSmsLink('+919876543210', 'Cheque ready')).toBe(
       'sms:+919876543210?body=Cheque%20ready',
     )
+  })
+
+  it('treats the party SMS preference as on unless explicitly disabled', () => {
+    expect(isPartySmsEnabled(undefined)).toBe(true)
+    expect(isPartySmsEnabled({ party_sms_enabled: true })).toBe(true)
+    expect(isPartySmsEnabled({ party_sms_enabled: false })).toBe(false)
+  })
+
+  it('skips the notify action when party SMS is disabled', async () => {
+    await expect(
+      buildNotifyPartyAction(
+        { ...cheque, party_id: 'p1' },
+        { currency: '₹', party_sms_enabled: false },
+        'Notify',
+      ),
+    ).resolves.toBeUndefined()
   })
 })

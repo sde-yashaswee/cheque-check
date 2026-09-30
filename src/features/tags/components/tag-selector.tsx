@@ -9,12 +9,14 @@ import {
 } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { useTags } from '@/features/tags/hooks/use-tags'
+import { nextTagColor } from '@/features/tags/lib/tag-colors'
 import type { Tag } from '@/types'
 import { cn } from '@/lib/utils'
 
@@ -33,7 +35,7 @@ export function TagSelector({
 }: TagSelectorProps) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
-  const { tags, createTag, isCreating } = useTags(businessId)
+  const { tags, isLoading, createTag, isCreating } = useTags(businessId)
   const selected = tags.filter((tag) => value.includes(tag.id))
 
   const toggleTag = (tag: Tag) => {
@@ -50,7 +52,7 @@ export function TagSelector({
     const tag = await createTag({
       business_id: businessId,
       name: trimmedName,
-      color: '#0066cc',
+      color: nextTagColor(tags),
     })
     onChange([...value, tag.id])
     setName('')
@@ -63,18 +65,28 @@ export function TagSelector({
           <Button
             type="button"
             variant="outline"
-            className="h-auto min-h-12 w-full justify-between rounded-sm border-primary/10"
+            className="h-auto min-h-12 w-full justify-between gap-2 rounded-sm border-primary/10 py-2"
           />
         }
       >
-        <div className="flex flex-wrap items-center gap-1.5">
-          {selected.length === 0 ? (
+        <div className="flex min-h-6 flex-1 flex-wrap items-center gap-1.5">
+          {isLoading && value.length > 0 ? (
+            value
+              .slice(0, 3)
+              .map((id) => (
+                <Skeleton
+                  key={id}
+                  stagger={false}
+                  className="h-6 w-16 rounded-full"
+                />
+              ))
+          ) : selected.length === 0 ? (
             <span className="text-muted-foreground">{placeholder}</span>
           ) : (
             selected.map((tag) => (
               <span
                 key={tag.id}
-                className="rounded-full px-2 py-1 text-xs font-semibold text-white"
+                className="inline-flex h-6 items-center rounded-full px-2 text-xs font-semibold text-white"
                 style={{ backgroundColor: tag.color }}
               >
                 {tag.name}
@@ -114,7 +126,17 @@ export function TagSelector({
               <HugeiconsIcon icon={Plus} className="h-4 w-4" />
             </Button>
           </div>
-          <div className="max-h-48 space-y-1 overflow-y-auto">
+          <div className="h-48 space-y-1 overflow-y-auto">
+            {isLoading &&
+              Array.from({ length: 4 }, (_, index) => (
+                <div key={index} className="flex items-center gap-2 px-2 py-2">
+                  <Skeleton
+                    stagger={false}
+                    className="size-3 shrink-0 rounded-full"
+                  />
+                  <Skeleton stagger={false} className="h-4 w-24 rounded" />
+                </div>
+              ))}
             {tags.map((tag) => (
               <button
                 key={tag.id}
@@ -138,8 +160,8 @@ export function TagSelector({
                 />
               </button>
             ))}
-            {tags.length === 0 && (
-              <p className="py-3 text-center text-xs text-muted-foreground">
+            {!isLoading && tags.length === 0 && (
+              <p className="flex h-full items-center justify-center text-xs text-muted-foreground">
                 No tags yet
               </p>
             )}

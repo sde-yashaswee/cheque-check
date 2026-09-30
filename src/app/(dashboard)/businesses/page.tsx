@@ -46,6 +46,9 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 
+import { TagChips } from '@/features/tags/components/tag-chips'
+import { useEntityTagMap } from '@/features/tags/hooks/use-entity-tags'
+
 const DeleteConfirmationDialog = dynamic(
   () =>
     import('@/components/ui/delete-dialog').then(
@@ -78,6 +81,7 @@ export default function BusinessesPage() {
     getUpcomingTotal,
     deleteBusiness,
   } = useBusinesses()
+  const tagMap = useEntityTagMap(null, 'business')
 
   const clearFilters = () => {
     setSearch('')
@@ -245,6 +249,11 @@ export default function BusinessesPage() {
                     <p className="text-[10px] text-muted-foreground font-semibold truncate max-w-[150px]">
                       {business.email || tc('noEmail')}
                     </p>
+                    <TagChips
+                      tags={tagMap[business.id]}
+                      max={2}
+                      className="mt-1"
+                    />
                   </div>
                 </div>
 

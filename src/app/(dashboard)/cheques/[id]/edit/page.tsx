@@ -9,35 +9,34 @@ import { CurrencyPrefixInput } from '@/components/ui/currency-prefix-input'
 import { Label } from '@/components/ui/label'
 import { useParams } from 'next/navigation'
 import {
-  UserIcon as User,
-  Mail01Icon as Mail,
-  LockPasswordIcon as Lock,
-  CallIcon as Phone,
   Calendar03Icon as Calendar,
   HashtagIcon as Hash,
   Note01Icon as Note,
-  Building03Icon as Building,
-  Wallet01Icon as Wallet,
-  Search01Icon as Search,
-  Location01Icon as Location,
-  TextFontIcon as TextIcon,
   Tick02Icon as Check,
   Delete02Icon as Trash2,
   ArrowUpRight01Icon as ArrowUpRight,
   ArrowDownLeft01Icon as ArrowDownLeft,
   Camera01Icon as Camera,
+  Cancel01Icon as X,
+  Invoice01Icon as ReceiptText,
+  UserIcon as User,
   Loading03Icon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { cn } from '@/lib/utils'
+import { cn, numberToIndianWords } from '@/lib/utils'
 import { useBusiness } from '@/hooks/use-business'
 import { Combobox } from '@/components/ui/combobox'
+import { FormSection } from '@/components/ui/form-section'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SkeletonImage } from '@/components/ui/skeleton-image'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import dynamic from 'next/dynamic'
 import { Party, AccountWithRelations } from '@/types'
 import { useTranslations } from 'next-intl'
 import { useProfile } from '@/hooks/use-profile'
+import { toast } from '@/components/ui/toast'
+import { TagSelector } from '@/features/tags/components/tag-selector'
+import { useEntityTagsDraft } from '@/features/tags/hooks/use-entity-tags'
 
 const DeleteConfirmationDialog = dynamic(
   () =>
@@ -78,6 +77,20 @@ export default function EditChequePage() {
   } = form
 
   const { parties } = useParties(businessId)
+  const tagsDraft = useEntityTagsDraft('cheque', id)
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (await form.trigger()) {
+      try {
+        await tagsDraft.commit()
+      } catch {
+        toast.add({ title: tCommon('error'), type: 'error' })
+        return
+      }
+    }
+    await onSubmit(event)
+  }
 
   const { accounts } = useAccounts(businessId)
 
@@ -102,156 +115,115 @@ export default function EditChequePage() {
   if (isLoading) {
     return (
       <div className="max-w-2xl space-y-8 pb-20">
+        <Skeleton className="h-36 w-full rounded-lg" />
         <Skeleton className="h-14 w-full rounded-lg" />
-        <Skeleton className="h-14 w-full rounded-lg" />
-        <Skeleton className="h-14 w-full rounded-lg" />
+        <Skeleton className="h-12 w-full rounded-sm" />
+        <Skeleton className="h-12 w-full rounded-sm" />
+        <Skeleton className="h-14 w-full rounded-sm" />
+        <Skeleton className="h-14 w-full rounded-sm" />
       </div>
     )
   }
 
+  const setField = <K extends 'type' | 'party_id' | 'account_id'>(
+    field: K,
+    value: string,
+  ) => setValue(field, value as never, { shouldDirty: true })
+  const imageUrl = watch('image_url')
+  const isBusy = isUploading || isSaving
+
   return (
     <div className="max-w-2xl space-y-8 pb-20">
-      <form onSubmit={onSubmit} className="space-y-6">
-        <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-10">
+        <FormSection title={t('scanDetails')} icon={Camera}>
           <div className="space-y-2">
             <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
               {t('photo')}
             </Label>
-            {watch('image_url') ? (
-              <div className="space-y-3">
-                <div className="aspect-video overflow-hidden rounded-sm border">
+            <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-4 bg-canvas-parchment/30 min-h-[140px] transition-colors hover:bg-canvas-parchment/50 border-primary/10 relative overflow-hidden">
+              {imageUrl ? (
+                <div className="relative w-full aspect-video rounded-sm overflow-hidden border">
                   <SkeletonImage
-                    src={watch('image_url')!}
+                    src={imageUrl}
                     alt={t('photo')}
                     containerClassName="h-full w-full"
-                    className="h-full w-full object-contain"
+                    className="w-full h-full object-cover"
                   />
-                </div>
-                <div className="flex gap-3">
-                  <label
-                    htmlFor="cheque-image"
-                    className={cn(
-                      'flex h-10 items-center justify-center gap-2 rounded-sm border px-4 text-sm font-medium cursor-pointer',
-                      (isUploading || isSaving) &&
-                        'pointer-events-none opacity-50',
-                    )}
-                  >
-                    <HugeiconsIcon icon={Camera} className="size-4" />
-                    {t('replacePhoto')}
-                  </label>
-                  <Button
+                  <button
                     type="button"
-                    variant="ghost"
-                    disabled={isUploading || isSaving}
+                    disabled={isBusy}
+                    aria-label={t('removePhoto')}
                     onClick={() =>
                       setValue('image_url', null, { shouldDirty: true })
                     }
-                    className="rounded-sm text-destructive"
+                    className="absolute top-3 right-3 p-2 bg-black/60 text-white rounded-full hover:bg-black transition-colors z-20"
                   >
-                    <HugeiconsIcon icon={Trash2} className="size-4" />
-                    {t('removePhoto')}
-                  </Button>
+                    <HugeiconsIcon icon={X} className="h-4 w-4" />
+                  </button>
                 </div>
-              </div>
-            ) : (
-              <label
-                htmlFor="cheque-image"
-                className={cn(
-                  'flex min-h-36 cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-primary/10 bg-canvas-parchment/30 text-primary',
-                  (isUploading || isSaving) && 'pointer-events-none opacity-50',
-                )}
-              >
-                <HugeiconsIcon
-                  icon={isUploading ? Loading03Icon : Camera}
-                  className={cn('size-7', isUploading && 'animate-spin')}
-                />
-                <span className="text-sm font-semibold">
-                  {isUploading ? t('uploading') : t('scanUpload')}
-                </span>
-              </label>
-            )}
-            <input
-              id="cheque-image"
-              type="file"
-              accept="image/*"
-              className="sr-only"
-              disabled={isUploading || isSaving}
-              onChange={(event) => {
-                const file = event.target.files?.[0]
-                event.target.value = ''
-                if (file) void handleImageUpload(file)
-              }}
-            />
+              ) : (
+                <label
+                  className={cn(
+                    'flex flex-col items-center gap-3 cursor-pointer py-6 w-full relative',
+                    isBusy && 'pointer-events-none opacity-50',
+                  )}
+                >
+                  <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <HugeiconsIcon
+                      icon={isUploading ? Loading03Icon : Camera}
+                      className={cn('h-7 w-7', isUploading && 'animate-spin')}
+                    />
+                  </div>
+                  <div className="text-center">
+                    <span className="text-sm font-semibold text-primary block">
+                      {isUploading ? t('uploading') : t('scanUpload')}
+                    </span>
+                    <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">
+                      {t('photoInstruction')}
+                    </p>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                    disabled={isBusy}
+                    onChange={(event) => {
+                      const file = event.target.files?.[0]
+                      event.target.value = ''
+                      if (file) void handleImageUpload(file)
+                    }}
+                  />
+                </label>
+              )}
+            </div>
           </div>
+
           <div className="space-y-2">
             <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
               {t('type')}
             </Label>
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={() => setValue('type', 'Outward')}
-                className={cn(
-                  'flex flex-col items-center justify-center gap-3 rounded-lg p-6 border transition-all active:scale-95',
-                  watch('type') === 'Outward'
-                    ? 'bg-primary/5 border-primary'
-                    : 'bg-card border-primary/5',
-                )}
-              >
-                <div
-                  className={cn(
-                    'h-12 w-12 rounded-sm flex items-center justify-center transition-colors',
-                    watch('type') === 'Outward'
-                      ? 'bg-primary text-white'
-                      : 'bg-primary/10 text-primary',
-                  )}
+            <Tabs
+              value={watch('type')}
+              onValueChange={(value) => setField('type', value as string)}
+            >
+              <TabsList className="h-14 w-full rounded-lg bg-canvas-parchment p-1">
+                <TabsTrigger
+                  value="Outward"
+                  className="h-full flex-1 gap-2 rounded-md text-xs font-semibold uppercase tracking-wider data-active:bg-primary data-active:text-white"
                 >
-                  <HugeiconsIcon icon={ArrowUpRight} className="h-6 w-6" />
-                </div>
-                <span
-                  className={cn(
-                    'font-semibold text-xs uppercase tracking-wider',
-                    watch('type') === 'Outward'
-                      ? 'text-primary'
-                      : 'text-muted-foreground',
-                  )}
-                >
+                  <HugeiconsIcon icon={ArrowUpRight} className="h-4 w-4" />
                   {t('issued')}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setValue('type', 'Inward')}
-                className={cn(
-                  'flex flex-col items-center justify-center gap-3 rounded-lg p-6 border transition-all active:scale-95',
-                  watch('type') === 'Inward'
-                    ? 'bg-green-500/5 border-green-500'
-                    : 'bg-card border-primary/5',
-                )}
-              >
-                <div
-                  className={cn(
-                    'h-12 w-12 rounded-sm flex items-center justify-center transition-colors',
-                    watch('type') === 'Inward'
-                      ? 'bg-green-500 text-white'
-                      : 'bg-green-500/10 text-green-600',
-                  )}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="Inward"
+                  className="h-full flex-1 gap-2 rounded-md text-xs font-semibold uppercase tracking-wider data-active:bg-green-500 data-active:text-white"
                 >
-                  <HugeiconsIcon icon={ArrowDownLeft} className="h-6 w-6" />
-                </div>
-                <span
-                  className={cn(
-                    'font-semibold text-xs uppercase tracking-wider',
-                    watch('type') === 'Inward'
-                      ? 'text-green-600'
-                      : 'text-muted-foreground',
-                  )}
-                >
+                  <HugeiconsIcon icon={ArrowDownLeft} className="h-4 w-4" />
                   {t('received')}
-                </span>
-              </button>
-            </div>
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
 
           <div className="space-y-2">
@@ -268,8 +240,11 @@ export default function EditChequePage() {
               min={0}
               step="any"
               {...register('amount', { valueAsNumber: true })}
-              className="h-12 font-semibold rounded-sm bg-canvas-parchment border-none"
+              className="h-12 font-semibold rounded-sm"
             />
+            <p className="ml-1 text-[10px] text-muted-foreground uppercase tracking-widest">
+              {numberToIndianWords(watch('amount') || 0, currency)}
+            </p>
             <p
               className={cn(
                 'text-xs text-destructive ml-1 min-h-4',
@@ -280,58 +255,34 @@ export default function EditChequePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label
-                htmlFor="cheque_number"
-                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
-              >
-                {t('chequeNumber')}
-              </Label>
-              <Input
-                leftIcon={Hash}
-                id="cheque_number"
-                inputMode="numeric"
-                maxLength={6}
-                {...register('cheque_number')}
-                placeholder={t('chequeNumberPlaceholder')}
-                className="h-12 rounded-sm bg-canvas-parchment border-none"
-              />
-              <p
-                className={cn(
-                  'text-xs text-destructive ml-1 min-h-4',
-                  !errors.cheque_number && 'invisible',
-                )}
-              >
-                {(errors.cheque_number?.message as string) || '\u00A0'}
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label
-                htmlFor="cheque_date"
-                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
-              >
-                {t('chequeDate')}
-              </Label>
-              <Input
-                leftIcon={Calendar}
-                id="cheque_date"
-                type="date"
-                {...register('cheque_date')}
-                className="h-12 rounded-sm bg-canvas-parchment border-none"
-              />
-              <p
-                className={cn(
-                  'text-xs text-destructive ml-1 min-h-4',
-                  !errors.cheque_date && 'invisible',
-                )}
-              >
-                {(errors.cheque_date?.message as string) || '\u00A0'}
-              </p>
-            </div>
+          <div className="space-y-2">
+            <Label
+              htmlFor="cheque_number"
+              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+            >
+              {t('chequeNumber')}
+            </Label>
+            <Input
+              leftIcon={Hash}
+              id="cheque_number"
+              inputMode="numeric"
+              maxLength={6}
+              {...register('cheque_number')}
+              placeholder={t('chequeNumberPlaceholder')}
+              className="h-12 rounded-sm"
+            />
+            <p
+              className={cn(
+                'text-xs text-destructive ml-1 min-h-4',
+                !errors.cheque_number && 'invisible',
+              )}
+            >
+              {(errors.cheque_number?.message as string) || '\u00A0'}
+            </p>
           </div>
+        </FormSection>
 
+        <FormSection title={t('entities')} icon={User}>
           <div className="space-y-2">
             <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
               {t('party')}
@@ -339,8 +290,9 @@ export default function EditChequePage() {
             <Combobox
               options={partyOptions}
               value={watch('party_id')}
-              onValueChange={(val) => setValue('party_id', val)}
+              onValueChange={(val) => setField('party_id', val)}
               placeholder={t('partyPlaceholder')}
+              className="h-14 bg-canvas-parchment border-none rounded-sm"
             />
             <p
               className={cn(
@@ -359,8 +311,9 @@ export default function EditChequePage() {
             <Combobox
               options={accountOptions}
               value={watch('account_id')}
-              onValueChange={(val) => setValue('account_id', val)}
+              onValueChange={(val) => setField('account_id', val)}
               placeholder={t('accountPlaceholder')}
+              className="h-14 bg-canvas-parchment border-none rounded-sm"
             />
             <p
               className={cn(
@@ -371,21 +324,31 @@ export default function EditChequePage() {
               {(errors.account_id?.message as string) || '\u00A0'}
             </p>
           </div>
+        </FormSection>
 
+        <FormSection title={t('datesReview')} icon={ReceiptText}>
           <div className="space-y-2">
             <Label
-              htmlFor="notes"
+              htmlFor="cheque_date"
               className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
             >
-              {t('notes')}
+              {t('chequeDate')}
             </Label>
             <Input
-              leftIcon={Note}
-              id="notes"
-              {...register('notes')}
-              placeholder={t('notesPlaceholder')}
-              className="h-12 rounded-sm bg-canvas-parchment border-none"
+              leftIcon={Calendar}
+              id="cheque_date"
+              type="date"
+              {...register('cheque_date')}
+              className="h-12 rounded-sm"
             />
+            <p
+              className={cn(
+                'text-xs text-destructive ml-1 min-h-4',
+                !errors.cheque_date && 'invisible',
+              )}
+            >
+              {(errors.cheque_date?.message as string) || '\u00A0'}
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -400,16 +363,44 @@ export default function EditChequePage() {
               id="deposit_date"
               type="date"
               {...register('deposit_date')}
-              className="h-12 rounded-sm bg-canvas-parchment border-none"
+              className="h-14 bg-canvas-parchment border-none rounded-sm"
             />
           </div>
-        </div>
+
+          <div className="space-y-2">
+            <Label
+              htmlFor="notes"
+              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+            >
+              {t('notes')}
+            </Label>
+            <Input
+              leftIcon={Note}
+              id="notes"
+              {...register('notes')}
+              placeholder={t('notesPlaceholder')}
+              className="h-14 bg-canvas-parchment border-none rounded-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+              {t('tags')}
+            </Label>
+            <TagSelector
+              businessId={businessId}
+              value={tagsDraft.tagIds}
+              onChange={tagsDraft.setTagIds}
+              placeholder={t('addTags')}
+            />
+          </div>
+        </FormSection>
 
         <div className="pt-4 flex flex-col gap-3">
           <Button
             type="submit"
             className="w-full rounded-full h-14 text-lg"
-            disabled={isSaving || isUploading}
+            disabled={isBusy}
           >
             {isSaving ? tCommon('saving') : t('updateAction')}{' '}
             <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />

@@ -1,25 +1,16 @@
 'use client'
 
-import { useBusiness } from '@/hooks/use-business'
 import { useProfile } from '@/hooks/use-profile'
-import { useCheques } from '@/hooks/use-cheques'
 import { Button } from '@/components/ui/button'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   ArrowRight01Icon as ChevronRight,
   Logout01Icon as LogOut,
-  UserIcon as User,
-  Notification01Icon as Bell,
-  GlobalIcon as Globe,
-  CreditCardIcon as CreditCard,
   File01Icon as FileSpreadsheet,
   Building03Icon as Building2,
   LayoutGridIcon as LayoutGrid,
   FlashIcon as Zap,
-  TranslateIcon as Languages,
   Settings02Icon as Settings2,
-  Delete02Icon as Trash2,
-  Clock01Icon as Clock,
   MegaphoneIcon as Megaphone,
   HelpCircleIcon as Help,
   InformationCircleIcon as Info,
@@ -27,32 +18,15 @@ import {
   LicenseIcon as License,
   Money03Icon as Money,
 } from '@hugeicons/core-free-icons'
-import { useRouter } from 'next/navigation'
-import dynamic from 'next/dynamic'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
-import { Combobox } from '@/components/ui/combobox'
 import { format } from 'date-fns'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSettings } from '@/hooks/use-settings'
-import { EditableAvatar } from '@/components/ui/editable-avatar'
+import { EntityAvatar } from '@/components/ui/entity-avatar'
 import { useTranslations } from 'next-intl'
-import { Switch } from '@/components/ui/switch'
-import { useState } from 'react'
-import { IconType, ChequeWithRelations } from '@/types'
+import { IconType } from '@/types'
 import { useMonetization } from '@/hooks/use-monetization'
-import { Badge } from '@/components/ui/badge'
-
-const DeleteConfirmationDialog = dynamic(
-  () =>
-    import('@/components/ui/delete-dialog').then(
-      (mod) => mod.DeleteConfirmationDialog,
-    ),
-  {
-    loading: () => <Skeleton className="h-16 w-full rounded-lg" />,
-    ssr: false,
-  },
-)
 
 interface SettingsItem {
   name: string
@@ -72,28 +46,9 @@ interface SettingsSection {
 
 export default function SettingsPage() {
   const t = useTranslations('Settings')
-  const router = useRouter()
-  const { activeBusiness } = useBusiness()
-  const { profile, updateProfile, isLoading: profileLoading } = useProfile()
-  const { handleExport, handleLogout, handleDeleteProfile } = useSettings()
-  const { isLifetimePremium, isLoading: monetizationLoading } =
-    useMonetization()
-
-  const { cheques } = useCheques(activeBusiness?.id)
-
-  const clearPwaCache = async () => {
-    if ('caches' in window) {
-      await Promise.all((await caches.keys()).map((key) => caches.delete(key)))
-    }
-    if ('serviceWorker' in navigator) {
-      await Promise.all(
-        (await navigator.serviceWorker.getRegistrations()).map((registration) =>
-          registration.unregister(),
-        ),
-      )
-    }
-    window.location.reload()
-  }
+  const { profile, isLoading: profileLoading } = useProfile()
+  const { handleLogout } = useSettings()
+  const { isLoading: monetizationLoading } = useMonetization()
 
   if (profileLoading || monetizationLoading) {
     return (
@@ -162,7 +117,7 @@ export default function SettingsPage() {
           name: t('manageTags'),
           description: t('manageTagsDescShort'),
           icon: Settings2,
-          href: '/settings/tags',
+          href: '/tags',
         },
       ],
     },
@@ -219,17 +174,15 @@ export default function SettingsPage() {
   return (
     <div className="max-w-2xl space-y-8 pb-20">
       {/* Profile Section */}
-      <div className="flex items-center gap-4 rounded-lg bg-canvas-parchment p-5 dark:bg-surface-tile-1">
-        <EditableAvatar
+      <Link
+        href="/profile"
+        className="flex items-center gap-4 rounded-lg bg-canvas-parchment p-5 transition-colors hover:bg-muted/40 active:bg-muted/50 dark:bg-surface-tile-1"
+      >
+        <EntityAvatar
           name={profile?.name || t('user')}
           imageUrl={profile?.avatar_url}
-          size="md"
-          onUpload={async (url) => {
-            await updateProfile({ avatar_url: url })
-          }}
-          onDelete={async () => {
-            await updateProfile({ avatar_url: null })
-          }}
+          size="lg"
+          className="h-14 w-14"
         />
         <div className="flex-1">
           <p className="font-semibold text-lg leading-tight">
@@ -239,7 +192,11 @@ export default function SettingsPage() {
             {profile?.email}
           </p>
         </div>
-      </div>
+        <HugeiconsIcon
+          icon={ChevronRight}
+          className="h-4 w-4 text-muted-foreground opacity-30"
+        />
+      </Link>
 
       <div className="space-y-8">
         {sections.map((section: SettingsSection) => (
@@ -309,73 +266,6 @@ export default function SettingsPage() {
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 px-2">
-          <div className="flex h-5 w-5 items-center justify-center rounded-md bg-destructive/10 text-destructive">
-            <HugeiconsIcon icon={Trash2} className="h-3 w-3" />
-          </div>
-          <h3 className="text-[10px] font-semibold text-destructive uppercase tracking-wider">
-            {t('dangerZone')}
-          </h3>
-        </div>
-        <div className="divide-y rounded-lg border border-destructive/20 bg-destructive/5 overflow-hidden">
-          <DeleteConfirmationDialog
-            title={t('clearCacheTitle')}
-            description={t('clearCacheDescription')}
-            confirmName="CLEAR"
-            onDelete={clearPwaCache}
-            trigger={
-              <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-destructive/10 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-destructive text-destructive-foreground shadow-sm">
-                    <HugeiconsIcon icon={Settings2} className="h-4 w-4" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-destructive">
-                      {t('clearCache')}
-                    </span>
-                    <span className="text-[10px] text-destructive/70 font-medium leading-tight mt-0.5">
-                      {t('clearCacheDesc')}
-                    </span>
-                  </div>
-                </div>
-                <HugeiconsIcon
-                  icon={ChevronRight}
-                  className="h-4 w-4 text-destructive opacity-30"
-                />
-              </div>
-            }
-          />
-          <DeleteConfirmationDialog
-            title={t('deleteProfileTitle')}
-            description={t('deleteProfileDescription')}
-            confirmName={profile?.name || profile?.email || ''}
-            onDelete={handleDeleteProfile}
-            trigger={
-              <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-destructive/10 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-destructive text-destructive-foreground shadow-sm">
-                    <HugeiconsIcon icon={Trash2} className="h-4 w-4" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-destructive">
-                      {t('deleteMyAccount')}
-                    </span>
-                    <span className="text-[10px] text-destructive/70 font-medium leading-tight mt-0.5">
-                      {t('deleteMyAccountDesc')}
-                    </span>
-                  </div>
-                </div>
-                <HugeiconsIcon
-                  icon={ChevronRight}
-                  className="h-4 w-4 text-destructive opacity-30"
-                />
-              </div>
-            }
-          />
-        </div>
       </div>
 
       <Button

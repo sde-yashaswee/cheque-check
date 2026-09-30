@@ -18,6 +18,7 @@ export interface Profile {
   phone: string | null
   voice_call_enabled: boolean
   sms_enabled: boolean
+  party_sms_enabled: boolean
   push_enabled: boolean
   whatsapp_enabled: boolean
   reduce_motion: boolean
@@ -76,6 +77,10 @@ export interface Tag {
   color: string
   created_at: string
   updated_at: string
+}
+
+export interface TagWithUsage extends Tag {
+  usage_count: number
 }
 
 export interface Account {

@@ -60,6 +60,9 @@ import {
 } from '@/components/ui/sheet'
 
 import { type ChequeStatus, type ChequeWithRelations } from '@/types'
+import { SpeedDialFab } from '@/components/speed-dial-fab'
+import { EntityTagsSection } from '@/features/tags/components/tag-chips'
+import { useEntityTagMap } from '@/features/tags/hooks/use-entity-tags'
 
 export default function AccountDetailPage() {
   const t = useTranslations('Accounts')
@@ -84,6 +87,7 @@ export default function AccountDetailPage() {
     sortOrder,
     setSortOrder,
   } = useAccountDetail(id, businessId)
+  const chequeTagMap = useEntityTagMap(businessId, 'cheque')
 
   const clearFilters = () => {
     setSearch('')
@@ -145,7 +149,7 @@ export default function AccountDetailPage() {
     )
 
   return (
-    <div className="max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-28">
       <div className="rounded-lg border bg-card p-6 space-y-6 relative overflow-hidden border-primary/5">
         <div className="flex justify-between items-start relative z-10">
           <div className="flex items-center gap-4">
@@ -169,15 +173,6 @@ export default function AccountDetailPage() {
               />
             </div>
           </div>
-          <Link href={`/accounts/${id}/edit`}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full bg-canvas-parchment/50"
-            >
-              <HugeiconsIcon icon={Pencil} className="h-4 w-4" />
-            </Button>
-          </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-4 relative z-10">
@@ -230,6 +225,10 @@ export default function AccountDetailPage() {
             </p>
           </div>
         )}
+
+        <div className="relative z-10">
+          <EntityTagsSection entityType="account" entityId={account.id} />
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -409,11 +408,17 @@ export default function AccountDetailPage() {
                 key={cheque.id}
                 cheque={cheque}
                 onStatusUpdate={updateChequeStatus}
+                tags={chequeTagMap[cheque.id]}
               />
             ))}
           </div>
         </DataState>
       </div>
+
+      <SpeedDialFab
+        editHref={`/accounts/${id}/edit`}
+        editLabel={t('editAccount')}
+      />
     </div>
   )
 }

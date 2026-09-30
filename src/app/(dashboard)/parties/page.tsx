@@ -34,6 +34,8 @@ import {
 } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import type { Party } from '@/types'
+import { TagChips } from '@/features/tags/components/tag-chips'
+import { useEntityTagMap } from '@/features/tags/hooks/use-entity-tags'
 
 export default function PartiesPage() {
   const t = useTranslations('Parties')
@@ -57,6 +59,7 @@ export default function PartiesPage() {
     setSortBy,
     getBalance,
   } = useParties(businessId)
+  const tagMap = useEntityTagMap(businessId, 'party')
 
   const clearFilters = () => {
     setSearch('')
@@ -221,6 +224,7 @@ export default function PartiesPage() {
                   <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider truncate">
                     {party.contact}
                   </p>
+                  <TagChips tags={tagMap[party.id]} max={2} className="mt-1" />
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">

@@ -15,6 +15,11 @@ export default function NotificationsPage() {
 
   const channels = [
     {
+      key: 'party_sms_enabled' as const,
+      label: t('partySmsNotifications'),
+      description: t('partySmsNotificationsDesc'),
+    },
+    {
       key: 'voice_call_enabled' as const,
       label: t('voiceNotifications'),
       description: t('voiceNotificationsDesc'),

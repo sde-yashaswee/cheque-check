@@ -15,6 +15,7 @@ import { useTranslations } from 'next-intl'
 import { DraftsLink } from '@/features/drafts'
 
 import { ChequeWithRelations } from '@/types'
+import { useEntityTagMap } from '@/features/tags/hooks/use-entity-tags'
 
 export default function ChequesPage() {
   const t = useTranslations('Cheques')
@@ -36,6 +37,7 @@ export default function ChequesPage() {
     setSortOrder,
     updateStatus,
   } = useCheques(businessId)
+  const tagMap = useEntityTagMap(businessId, 'cheque')
 
   const clearFilters = () => {
     setSearch('')
@@ -90,6 +92,7 @@ export default function ChequesPage() {
               key={cheque.id}
               cheque={cheque}
               onStatusUpdate={updateStatus}
+              tags={tagMap[cheque.id]}
             />
           ))}
         </DataState>

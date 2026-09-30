@@ -13,12 +13,17 @@ import {
   CreditCardIcon as CreditCard,
   HashtagIcon as Hash,
   Delete02Icon as Trash2,
-  TextFontIcon as TextIcon,
 } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
+import { CurrencyPrefixInput } from '@/components/ui/currency-prefix-input'
+import { FormSection } from '@/components/ui/form-section'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useProfile } from '@/hooks/use-profile'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
+import { toast } from '@/components/ui/toast'
+import { TagSelector } from '@/features/tags/components/tag-selector'
+import { useEntityTagsDraft } from '@/features/tags/hooks/use-entity-tags'
 import { Checkbox } from '@/components/ui/checkbox'
 
 const DeleteConfirmationDialog = dynamic(
@@ -45,6 +50,8 @@ export default function EditAccountPage() {
   const tc = useTranslations('Common')
   const { id } = useParams() as { id: string }
   const { activeBusiness } = useBusiness()
+  const { profile } = useProfile()
+  const currency = profile?.currency || '₹'
 
   const { form, account, isLoading, isSaving, onSubmit, onDelete } =
     useEditAccount(id, activeBusiness?.id)
@@ -55,6 +62,20 @@ export default function EditAccountPage() {
     setValue,
     formState: { errors },
   } = form
+  const tagsDraft = useEntityTagsDraft('account', id)
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (await form.trigger()) {
+      try {
+        await tagsDraft.commit()
+      } catch {
+        toast.add({ title: tc('error'), type: 'error' })
+        return
+      }
+    }
+    await onSubmit(event)
+  }
 
   const colors = [
     '#007AFF',
@@ -69,24 +90,29 @@ export default function EditAccountPage() {
   if (isLoading) {
     return (
       <div className="max-w-2xl space-y-8 pb-20">
-        <Skeleton className="h-14 w-full rounded-lg" />
-        <Skeleton className="h-14 w-full rounded-lg" />
-        <Skeleton className="h-14 w-full rounded-lg" />
+        <Skeleton className="h-14 w-full rounded-sm" />
+        <Skeleton className="h-10 w-2/3 rounded-full" />
+        <Skeleton className="h-14 w-full rounded-sm" />
+        <Skeleton className="h-14 w-full rounded-sm" />
+        <Skeleton className="h-14 w-full rounded-sm" />
       </div>
     )
   }
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">
-      <form onSubmit={onSubmit} className="space-y-6">
-        <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-10">
+        <FormSection title={t('accountInfo')} icon={User}>
           <div className="space-y-2">
             <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
-              {t('bank')}
+              {t('selectBank')}
             </Label>
             <BankSelector
               value={watch('bank_id')}
-              onValueChange={(val) => setValue('bank_id', val)}
+              onValueChange={(val) =>
+                setValue('bank_id', val, { shouldDirty: true })
+              }
+              className="rounded-sm"
             />
             {errors.bank_id && (
               <p className="text-xs text-destructive ml-1">
@@ -96,37 +122,32 @@ export default function EditAccountPage() {
           </div>
 
           <div className="space-y-2">
-            <Label
-              htmlFor="opening_balance"
-              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
-            >
-              {t('openingBalance')}
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+              {tc('themeColor')}
             </Label>
-            <Input
-              id="opening_balance"
-              type="number"
-              step="0.01"
-              inputMode="decimal"
-              {...register('opening_balance', { valueAsNumber: true })}
-              placeholder="0.00"
-              className="h-14 bg-canvas-parchment border-none rounded-sm"
-            />
-            {errors.opening_balance && (
-              <p className="text-xs text-destructive ml-1">
-                {errors.opening_balance.message as string}
-              </p>
-            )}
+            <div className="flex flex-wrap gap-3 p-1">
+              {colors.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  aria-label={c}
+                  onClick={() =>
+                    (setValue as any)('color', c, { shouldDirty: true })
+                  }
+                  className={cn(
+                    'h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2',
+                    (watch as any)('color') === c
+                      ? 'ring-2 ring-primary scale-110'
+                      : 'hover:scale-105',
+                  )}
+                  style={{ backgroundColor: c }}
+                />
+              ))}
+            </div>
           </div>
-          <label className="flex items-center gap-3 rounded-sm border border-primary/10 bg-primary/5 p-4">
-            <Checkbox
-              checked={watch('is_default')}
-              onCheckedChange={(checked) =>
-                setValue('is_default', checked === true)
-              }
-            />
-            <span className="text-sm font-semibold">{t('setAsDefault')}</span>
-          </label>
+        </FormSection>
 
+        <FormSection title={t('bankDetails')} icon={CreditCard}>
           <div className="space-y-2">
             <Label
               htmlFor="account_name"
@@ -134,19 +155,13 @@ export default function EditAccountPage() {
             >
               {t('accountName')}
             </Label>
-            <div className="relative">
-              <HugeiconsIcon
-                icon={User}
-                className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
-              />
-              <Input
-                leftIcon={TextIcon}
-                id="account_name"
-                {...register('account_name')}
-                placeholder={t('accountNamePlaceholder')}
-                className="h-14  bg-canvas-parchment border-none rounded-sm"
-              />
-            </div>
+            <Input
+              leftIcon={User}
+              id="account_name"
+              {...register('account_name')}
+              placeholder={t('accountNamePlaceholder')}
+              className="h-14 bg-canvas-parchment border-none rounded-sm"
+            />
             {errors.account_name && (
               <p className="text-xs text-destructive ml-1">
                 {errors.account_name.message as string}
@@ -161,19 +176,13 @@ export default function EditAccountPage() {
             >
               {t('accountNumber')}
             </Label>
-            <div className="relative">
-              <HugeiconsIcon
-                icon={CreditCard}
-                className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
-              />
-              <Input
-                leftIcon={TextIcon}
-                id="account_number"
-                {...register('account_number')}
-                placeholder={t('accountNumberPlaceholder')}
-                className="h-14  bg-canvas-parchment border-none rounded-sm"
-              />
-            </div>
+            <Input
+              leftIcon={CreditCard}
+              id="account_number"
+              {...register('account_number')}
+              placeholder={t('accountNumberPlaceholder')}
+              className="h-14 bg-canvas-parchment border-none rounded-sm"
+            />
             {errors.account_number && (
               <p className="text-xs text-destructive ml-1">
                 {errors.account_number.message as string}
@@ -183,48 +192,68 @@ export default function EditAccountPage() {
 
           <div className="space-y-2">
             <Label
+              htmlFor="opening_balance"
+              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+            >
+              {t('openingBalance')}
+            </Label>
+            <CurrencyPrefixInput
+              currency={currency}
+              id="opening_balance"
+              type="number"
+              step="0.01"
+              inputMode="decimal"
+              {...register('opening_balance', { valueAsNumber: true })}
+              placeholder="0.00"
+              className="h-14 bg-canvas-parchment border-none rounded-sm"
+            />
+            {errors.opening_balance && (
+              <p className="text-xs text-destructive ml-1">
+                {errors.opening_balance.message as string}
+              </p>
+            )}
+          </div>
+
+          <label className="flex items-center gap-3 rounded-sm border border-primary/10 bg-primary/5 p-4">
+            <Checkbox
+              checked={watch('is_default')}
+              onCheckedChange={(checked) =>
+                setValue('is_default', checked === true, { shouldDirty: true })
+              }
+            />
+            <span className="text-sm font-semibold">{t('setAsDefault')}</span>
+          </label>
+        </FormSection>
+
+        <FormSection title={t('moreDetails')} icon={Hash}>
+          <div className="space-y-2">
+            <Label
               htmlFor="ifsc_code"
               className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
             >
               {t('ifscCode')}
             </Label>
-            <div className="relative">
-              <HugeiconsIcon
-                icon={Hash}
-                className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
-              />
-              <Input
-                leftIcon={TextIcon}
-                id="ifsc_code"
-                {...register('ifsc_code')}
-                placeholder={t('ifscPlaceholder')}
-                className="h-14  bg-canvas-parchment border-none uppercase rounded-sm"
-              />
-            </div>
+            <Input
+              leftIcon={Hash}
+              id="ifsc_code"
+              {...register('ifsc_code')}
+              placeholder={t('ifscPlaceholder')}
+              className="h-14 bg-canvas-parchment border-none uppercase rounded-sm"
+            />
           </div>
 
           <div className="space-y-2">
             <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
-              {tc('themeColor')}
+              {tc('tags')}
             </Label>
-            <div className="flex flex-wrap gap-3 p-1">
-              {colors.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => (setValue as any)('color', c)}
-                  className={cn(
-                    'h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2',
-                    (watch as any)('color') === c
-                      ? 'ring-2 ring-primary scale-110'
-                      : 'hover:scale-105',
-                  )}
-                  style={{ backgroundColor: c }}
-                />
-              ))}
-            </div>
+            <TagSelector
+              businessId={activeBusiness?.id}
+              value={tagsDraft.tagIds}
+              onChange={tagsDraft.setTagIds}
+              placeholder={tc('addTags')}
+            />
           </div>
-        </div>
+        </FormSection>
 
         <div className="pt-4 flex flex-col gap-3">
           <Button
