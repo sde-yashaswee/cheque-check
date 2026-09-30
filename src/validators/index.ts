@@ -44,6 +44,7 @@ export const accountSchema = z.object({
   icon: z.string().optional(),
   notes: z.string().optional().or(z.literal('')),
   opening_balance: z.number().finite('Enter a valid opening balance'),
+  is_default: z.boolean(),
 })
 
 export const chequeSchema = z.object({

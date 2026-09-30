@@ -390,7 +390,8 @@
     "accountInfo": "Account Info",
     "bankDetails": "Bank Details",
     "moreDetails": "More Details",
-    "openingBalance": "Opening Balance"
+    "openingBalance": "Opening Balance",
+    "setAsDefault": "Use as default account for new cheques"
   },
   "Businesses": {
     "title": "Businesses",

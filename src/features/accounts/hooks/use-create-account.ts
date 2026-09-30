@@ -46,6 +46,7 @@ export function useCreateAccount(
       color: '#007AFF',
       notes: '',
       opening_balance: 0,
+      is_default: false,
     },
   })
 

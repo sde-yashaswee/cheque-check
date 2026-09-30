@@ -390,7 +390,8 @@
     "accountInfo": "Account ki Details",
     "bankDetails": "Bank ki Details",
     "moreDetails": "Aur Details",
-    "openingBalance": "Opening Balance"
+    "openingBalance": "Opening Balance",
+    "setAsDefault": "Naye cheques ke liye default account banayein"
   },
   "Businesses": {
     "title": "Businesses",

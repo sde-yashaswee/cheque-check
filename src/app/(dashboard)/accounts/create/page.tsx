@@ -32,6 +32,7 @@ import {
 import { useEffect, useState } from 'react'
 import { getSafeChequeReturnTo } from '@/lib/cheque-draft'
 import { DraftLeaveDialog, DraftToolbar } from '@/features/drafts'
+import { Checkbox } from '@/components/ui/checkbox'
 
 const BankSelector = dynamic(
   () => import('@/components/bank-selector').then((mod) => mod.BankSelector),
@@ -299,6 +300,15 @@ export default function CreateAccountPage() {
                 </p>
               )}
             </div>
+            <label className="flex items-center gap-3 rounded-sm border border-primary/10 bg-primary/5 p-4">
+              <Checkbox
+                checked={watch('is_default')}
+                onCheckedChange={(checked) =>
+                  setUserValue('is_default', checked === true)
+                }
+              />
+              <span className="text-sm font-semibold">{t('setAsDefault')}</span>
+            </label>
 
             <Button
               type="button"

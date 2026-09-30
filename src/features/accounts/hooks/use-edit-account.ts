@@ -33,6 +33,7 @@ export function useEditAccount(id: string, businessId: string | undefined) {
       color: '#007AFF',
       notes: '',
       opening_balance: 0,
+      is_default: false,
     },
   })
 
@@ -48,6 +49,7 @@ export function useEditAccount(id: string, businessId: string | undefined) {
         color: account.color,
         notes: account.notes || '',
         opening_balance: account.opening_balance ?? 0,
+        is_default: account.is_default,
       })
     }
   }, [account, reset])

@@ -151,6 +151,13 @@ export default function CreateChequePage() {
   const { parties } = useParties(businessId)
   const { accounts } = useAccounts(businessId)
 
+  useEffect(() => {
+    if (!watch('account_id')) {
+      const defaultAccount = accounts?.find((account) => account.is_default)
+      if (defaultAccount) setValue('account_id', defaultAccount.id)
+    }
+  }, [accounts, setValue, watch])
+
   const extractData = async (url: string) => {
     if (!url || isExtracting) return
 

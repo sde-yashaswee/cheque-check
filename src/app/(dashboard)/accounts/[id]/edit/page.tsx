@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
+import { Checkbox } from '@/components/ui/checkbox'
 
 const DeleteConfirmationDialog = dynamic(
   () =>
@@ -116,6 +117,15 @@ export default function EditAccountPage() {
               </p>
             )}
           </div>
+          <label className="flex items-center gap-3 rounded-sm border border-primary/10 bg-primary/5 p-4">
+            <Checkbox
+              checked={watch('is_default')}
+              onCheckedChange={(checked) =>
+                setValue('is_default', checked === true)
+              }
+            />
+            <span className="text-sm font-semibold">{t('setAsDefault')}</span>
+          </label>
 
           <div className="space-y-2">
             <Label

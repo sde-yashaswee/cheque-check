@@ -78,6 +78,7 @@ export interface Account {
   bank?: Bank
   notes?: string | null
   opening_balance: number
+  is_default: boolean
   is_draft?: boolean
 }
 
@@ -165,6 +166,7 @@ export type AccountDraftFields = {
   color: string | null
   notes: string | null
   opening_balance: number | null
+  is_default: boolean
 }
 
 export type AccountDraft = DraftBase & AccountDraftFields & { bank?: Bank }
