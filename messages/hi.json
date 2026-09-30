@@ -145,6 +145,11 @@
     "sortAmount": "राशि",
     "notifyParty": "पार्टी को SMS भेजें"
   },
+  "Reports": {
+    "exportFormat": "फ़ॉर्मेट चुनें",
+    "csvFormat": "CSV स्प्रेडशीट",
+    "jsonFormat": "JSON डेटा"
+  },
   "Common": {
     "welcome": "स्वागत है",
     "selectCountry": "देश चुनें",

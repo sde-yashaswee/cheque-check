@@ -23,11 +23,25 @@ export class ReportService {
     return getDefaultReportService().exportToCSV(cheques, filename)
   }
 
+  static exportToJSON(
+    cheques: ChequeWithRelations[],
+    filename = 'cheques_report.json',
+  ) {
+    return getDefaultReportService().exportToJSON(cheques, filename)
+  }
+
   exportToCSV(
     cheques: ChequeWithRelations[],
     filename = 'cheques_report.csv',
   ): void {
     this.repository.exportToCSV(cheques, filename)
+  }
+
+  exportToJSON(
+    cheques: ChequeWithRelations[],
+    filename = 'cheques_report.json',
+  ): void {
+    this.repository.exportToJSON(cheques, filename)
   }
 }
 

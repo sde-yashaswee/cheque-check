@@ -26,6 +26,12 @@ import { useTranslations } from 'next-intl'
 import { useMonetization } from '@/hooks/use-monetization'
 import { PremiumModal } from '@/components/premium-modal'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 
 const ChequeStatsChart = dynamic(
   () =>
@@ -43,6 +49,7 @@ export default function ReportsPage() {
   const tr = useTranslations('Reports')
   const tc = useTranslations('Common')
   const router = useRouter()
+  const [exportOpen, setExportOpen] = useState(false)
 
   const { activeBusiness } = useBusiness()
   const { profile } = useProfile()
@@ -74,12 +81,15 @@ export default function ReportsPage() {
     { name: t('bounced'), value: bouncedCount, color: '#FF3B30' },
   ].filter((d) => d.value > 0)
 
-  const handleExport = () => {
+  const handleExport = (format: 'csv' | 'json') => {
     if (cheques && isLifetimePremium) {
-      reportService.exportToCSV(
-        cheques,
-        `cheques_report_${activeBusiness?.name || 'export'}.csv`,
-      )
+      const baseName = `cheques_report_${activeBusiness?.name || 'export'}`
+      if (format === 'json') {
+        reportService.exportToJSON(cheques, `${baseName}.json`)
+      } else {
+        reportService.exportToCSV(cheques, `${baseName}.csv`)
+      }
+      setExportOpen(false)
     }
   }
 
@@ -123,13 +133,38 @@ export default function ReportsPage() {
           </h1>
           <p className="text-body text-muted-foreground">{tr('subtitle')}</p>
         </div>
-        <Button
-          onClick={handleExport}
-          className="rounded-full gap-2"
-          disabled={!cheques || cheques.length === 0}
-        >
-          <HugeiconsIcon icon={Download} className="h-4 w-4" /> {tr('export')}
-        </Button>
+        <Popover open={exportOpen} onOpenChange={setExportOpen}>
+          <PopoverTrigger
+            render={
+              <Button
+                className="rounded-full gap-2"
+                disabled={!cheques || cheques.length === 0}
+              />
+            }
+          >
+            <HugeiconsIcon icon={Download} className="h-4 w-4" />
+            {tr('export')}
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-44">
+            <p className="px-2 pb-1 text-xs font-semibold text-muted-foreground">
+              {tr('exportFormat')}
+            </p>
+            <button
+              type="button"
+              className="w-full rounded-md px-2 py-2 text-left text-sm hover:bg-muted"
+              onClick={() => handleExport('csv')}
+            >
+              {tr('csvFormat')}
+            </button>
+            <button
+              type="button"
+              className="w-full rounded-md px-2 py-2 text-left text-sm hover:bg-muted"
+              onClick={() => handleExport('json')}
+            >
+              {tr('jsonFormat')}
+            </button>
+          </PopoverContent>
+        </Popover>
       </div>
 
       <DataState
