@@ -31,6 +31,7 @@ import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { PhoneInput } from '@/components/ui/phone-input'
 import { isValidE164Phone } from '@/lib/phone'
+import { getPaymentProductIcon } from '@/features/monetization/lib/payment-product-icons'
 
 export default function FeaturesPage() {
   const t = useTranslations('Features')
@@ -50,9 +51,10 @@ export default function FeaturesPage() {
   const lifetimeFeatures = [
     {
       id: 'receiving_mode',
+      productId: 'lifetime_premium',
       name: t('receivingMode'),
       description: t('receivingModeDesc'),
-      icon: CheckCircle2,
+      icon: getPaymentProductIcon('lifetime_premium'),
       checked: !!profile?.received_cheques_enabled,
       onChange: (val: boolean) =>
         updateProfile({ received_cheques_enabled: val }),
@@ -63,21 +65,28 @@ export default function FeaturesPage() {
   const addonFeatures = [
     {
       id: 'ai_scanner',
+      productId: 'ai_scanner_30d',
+      topUpProductId: 'ai_scan_250',
       name: t('aiScanner'),
       description: t('aiScannerDesc'),
-      icon: AiIcon,
+      icon: getPaymentProductIcon('ai_scanner_30d'),
       subscriptionId: 'ai_scanner_sub',
       quotaId: 'ai_scan',
       quota: aiQuota,
       price: t('addonPrice', { count: 250, unit: t('scans') }),
+      checked: undefined,
+      onChange: undefined,
+      extra: undefined,
       onUnlock: () => processPayment({ productId: 'ai_scanner_30d' }),
       onTopUp: () => processPayment({ productId: 'ai_scan_250' }),
     },
     {
       id: 'voice_calls',
+      productId: 'voice_reminder_30d',
+      topUpProductId: 'voice_reminder_100',
       name: t('voiceReminder'),
       description: t('voiceReminderDesc'),
-      icon: Phone,
+      icon: getPaymentProductIcon('voice_reminder_30d'),
       subscriptionId: 'voice_reminder_sub',
       quotaId: 'voice_reminder',
       quota: voiceQuota,
@@ -109,7 +118,7 @@ export default function FeaturesPage() {
         </div>
       ),
     },
-  ]
+  ] as const
 
   if (isLoadingMonetization) {
     return <div className="p-8">{t('loading')}</div>
@@ -285,7 +294,7 @@ export default function FeaturesPage() {
                             className="text-xs font-bold text-primary hover:underline flex items-center"
                           >
                             <HugeiconsIcon
-                              icon={ZapIcon}
+                              icon={getPaymentProductIcon(addon.topUpProductId)}
                               className="w-3 h-3 mr-1"
                             />
                             {t('buyTopUp')}
@@ -319,7 +328,7 @@ export default function FeaturesPage() {
                       disabled={isProcessing}
                     >
                       <HugeiconsIcon
-                        icon={PackageIcon}
+                        icon={getPaymentProductIcon(addon.productId)}
                         className="w-4 h-4 mr-2"
                       />
                       {isLocked

@@ -22,6 +22,7 @@ import {
   HelpCircleIcon as Help,
   RocketIcon as Rocket,
   PencilEdit01Icon as Edit,
+  Calculator01Icon as CalculatorIcon,
 } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 import { SkeletonImage } from '@/components/ui/skeleton-image'
@@ -30,6 +31,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
+import { getWhatsAppSupportLink } from '@/lib/whatsapp'
+import { Calculator } from '@/components/calculator'
 
 const GlobalSearch = dynamic(
   () => import('@/components/global-search').then((mod) => mod.GlobalSearch),
@@ -44,6 +47,7 @@ export function TopNav() {
   const { activeBusiness } = useBusiness()
   const { profile } = useProfile()
   const [searchOpen, setSearchOpen] = useState(false)
+  const [calculatorOpen, setCalculatorOpen] = useState(false)
   const t = useTranslations()
 
   const getNavInfo = (path: string) => {
@@ -66,6 +70,7 @@ export function TopNav() {
         'help-and-support': { title: t('Settings.helpAndSupport'), icon: Help },
         'whats-new': { title: t('Settings.whatsNew'), icon: Rocket },
         preferences: { title: t('Settings.preferences'), icon: Settings },
+        notifications: { title: t('Settings.notifications'), icon: Settings },
         transactions: { title: t('Settings.transactions'), icon: Pay },
       }
       if (subInfo[sub]) return subInfo[sub]
@@ -207,6 +212,51 @@ export function TopNav() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCalculatorOpen(true)}
+            className="rounded-full h-9 w-9"
+            aria-label="Open calculator"
+          >
+            <HugeiconsIcon
+              icon={CalculatorIcon}
+              className="h-5 w-5 text-muted-foreground"
+            />
+          </Button>
+
+          {pathname === '/features' && (
+            <Link href="/settings/transactions">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full h-9 w-9"
+              >
+                <HugeiconsIcon
+                  icon={Pay}
+                  className="h-5 w-5 text-muted-foreground"
+                />
+              </Button>
+            </Link>
+          )}
+
+          <a
+            href={getWhatsAppSupportLink()}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full h-9 w-9"
+            >
+              <HugeiconsIcon
+                icon={Help}
+                className="h-5 w-5 text-muted-foreground"
+              />
+            </Button>
+          </a>
+
           {!hideSettingsIcon && (
             <>
               <Button
@@ -267,8 +317,12 @@ export function TopNav() {
         <BusinessSwitcher
           trigger={
             <button className="flex h-8 w-full items-center bg-primary/5 px-4 text-[10px] font-semibold text-primary uppercase tracking-wider backdrop-blur-sm transition-colors hover:bg-primary/10 active:bg-primary/20 cursor-pointer border-b border-primary/5">
+              <span className="relative mr-1.5 flex h-2 w-2 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+              </span>
               <span className="opacity-60 mr-1.5 font-bold">
-                {t('Businesses.viewBusiness')}:
+                {t('Businesses.activeBusinessLabel')}:
               </span>
               <div className="flex items-center gap-1.5 overflow-hidden">
                 <div className="h-4 w-4 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center shrink-0">
@@ -297,6 +351,9 @@ export function TopNav() {
       )}
 
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+      {calculatorOpen && (
+        <Calculator onClose={() => setCalculatorOpen(false)} />
+      )}
     </div>
   )
 }

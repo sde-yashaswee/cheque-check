@@ -17,6 +17,10 @@ export interface Profile {
   received_cheques_enabled: boolean
   phone: string | null
   voice_call_enabled: boolean
+  sms_enabled: boolean
+  push_enabled: boolean
+  whatsapp_enabled: boolean
+  reduce_motion: boolean
   avatar_url?: string | null
   created_at: string
   updated_at: string
@@ -63,6 +67,17 @@ export interface Bank {
   updated_at: string
 }
 
+export type TagEntityType = 'cheque' | 'account' | 'party' | 'business'
+
+export interface Tag {
+  id: string
+  business_id: string
+  name: string
+  color: string
+  created_at: string
+  updated_at: string
+}
+
 export interface Account {
   id: string
   business_id: string
@@ -78,6 +93,7 @@ export interface Account {
   bank?: Bank
   notes?: string | null
   opening_balance: number
+  is_default: boolean
   is_draft?: boolean
 }
 
@@ -109,6 +125,7 @@ export interface Cheque {
 export interface ChequeWithRelations extends Cheque {
   party?: {
     name: string
+    contact?: string
     color?: string
     icon?: string
     avatar_url?: string | null
@@ -165,6 +182,7 @@ export type AccountDraftFields = {
   color: string | null
   notes: string | null
   opening_balance: number | null
+  is_default: boolean
 }
 
 export type AccountDraft = DraftBase & AccountDraftFields & { bank?: Bank }

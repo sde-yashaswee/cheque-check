@@ -75,6 +75,7 @@ export function toAccountDraftFields(
       Number.isFinite(values.opening_balance)
         ? values.opening_balance
         : 0,
+    is_default: values.is_default === true,
   }
 }
 
@@ -113,6 +114,7 @@ export function accountDraftToFormValues(draft: AccountDraftFields) {
     color: draft.color ?? '#007AFF',
     notes: draft.notes ?? '',
     opening_balance: draft.opening_balance ?? 0,
+    is_default: draft.is_default ?? false,
   }
 }
 

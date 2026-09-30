@@ -2,7 +2,11 @@ const BRAND_COLORS = ['#0066cc', '#2997ff', '#34C759', '#FFCC00', '#FF9500']
 
 export function celebrate() {
   if (typeof window === 'undefined') return
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  if (
+    document.documentElement.hasAttribute('data-reduce-motion') ||
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+    return
 
   import('canvas-confetti').then(({ default: confetti }) => {
     confetti({

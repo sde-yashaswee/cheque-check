@@ -9,6 +9,7 @@ import {
   Cancel01Icon as X,
   Delete02Icon as Trash2,
   Image01Icon as ImageIcon,
+  MessageQuestionIcon as Message,
 } from '@hugeicons/core-free-icons'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
@@ -22,6 +23,10 @@ import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTranslations } from 'next-intl'
 import { useChequeActions } from '@/hooks/use-cheque-actions'
+import {
+  buildChequeUpdateMessage,
+  openPartySms,
+} from '@/features/cheques/lib/notify-party'
 
 const DeleteConfirmationDialog = dynamic(
   () =>
@@ -231,6 +236,23 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
           </div>
           <StatusPill status={statusLabel as ChequeStatus} />
         </div>
+        {cheque.party?.contact && (
+          <button
+            type="button"
+            className="pointer-events-auto mt-3 flex items-center gap-1 text-xs font-semibold text-primary"
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              openPartySms(
+                cheque.party!.contact!,
+                buildChequeUpdateMessage(cheque, cheque.party!, currency),
+              )
+            }}
+          >
+            <HugeiconsIcon icon={Message} className="h-3.5 w-3.5" />
+            {t('notifyParty')}
+          </button>
+        )}
       </motion.div>
     </div>
   )

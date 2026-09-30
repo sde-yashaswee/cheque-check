@@ -21,7 +21,8 @@ import {
   useDraftController,
 } from '@/features/drafts'
 
-type AccountFormData = z.infer<typeof accountSchema>
+type AccountFormInput = z.input<typeof accountSchema>
+type AccountFormData = z.output<typeof accountSchema>
 
 export function useCreateAccount(
   businessId: string | undefined,
@@ -36,7 +37,7 @@ export function useCreateAccount(
   const queryClient = useQueryClient()
   const tc = useTranslations('Common')
 
-  const form = useForm<AccountFormData>({
+  const form = useForm<AccountFormInput, unknown, AccountFormData>({
     resolver: zodResolver(accountSchema),
     defaultValues: {
       bank_id: '',
@@ -46,12 +47,13 @@ export function useCreateAccount(
       color: '#007AFF',
       notes: '',
       opening_balance: 0,
+      is_default: false,
     },
   })
 
   const { trigger } = form
 
-  const draft = useDraftController<AccountFormData, AccountDraft>({
+  const draft = useDraftController<AccountFormInput, AccountDraft>({
     entity: 'account',
     businessId,
     form,

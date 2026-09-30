@@ -39,7 +39,7 @@ export class SupabaseChequeRepository
       this.supabase
         .from(TABLES.CHEQUES)
         .select(
-          '*, party:parties(name, color, icon, avatar_url), account:accounts(account_name, color, icon, bank:banks(name, logo_url))',
+          '*, party:parties(name, contact, color, icon, avatar_url), account:accounts(account_name, color, icon, bank:banks(name, logo_url))',
         )
         .eq('business_id', businessId)
         .eq('is_draft', false)
@@ -52,7 +52,7 @@ export class SupabaseChequeRepository
       this.supabase
         .from(TABLES.CHEQUES)
         .select(
-          '*, party:parties(name, color, icon, avatar_url), account:accounts(account_name, color, icon, bank:banks(name, logo_url))',
+          '*, party:parties(name, contact, color, icon, avatar_url), account:accounts(account_name, color, icon, bank:banks(name, logo_url))',
         )
         .eq('id', id)
         .single(),

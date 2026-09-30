@@ -68,6 +68,10 @@ describe('party and account draft fields', () => {
       toAccountDraftFields({ bank_id: 'b1', account_number: ' ' }),
     ).toMatchObject({ bank_id: 'b1', account_number: null })
   })
+
+  it('preserves the default-account setting', () => {
+    expect(toAccountDraftFields({ is_default: true }).is_default).toBe(true)
+  })
 })
 
 describe('chequeDraftToFormValues', () => {
