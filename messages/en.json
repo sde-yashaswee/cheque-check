@@ -292,6 +292,7 @@
     "bounce": "Bounce",
     "updateStatus": "Update Status",
     "notifyParty": "Notify Party via SMS",
+    "statusUpdated": "Cheque marked as {status}",
     "printCheque": "Print Cheque",
     "tags": "Tags",
     "addTags": "Add optional tags",

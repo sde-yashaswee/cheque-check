@@ -23,6 +23,7 @@ import {
   toChequeDraftFields,
   useDraftController,
 } from '@/features/drafts'
+import { buildNotifyPartyAction } from '@/features/cheques/lib/notify-party'
 
 type ChequeFormValues = z.infer<typeof chequeSchema>
 
@@ -124,10 +125,16 @@ export function useCreateCheque(
     },
     onSuccess: async (created) => {
       await onCreated?.(created)
+      const actionProps = await buildNotifyPartyAction(
+        created,
+        profile?.currency || '₹',
+        t('notifyParty'),
+      )
       toast.add({
         title: tc('success'),
         description: t('chequeCreated'),
         type: 'success',
+        actionProps,
       })
       celebrateCheque(created)
       router.push('/cheques')
@@ -175,10 +182,16 @@ export function useCreateCheque(
       queryClient.invalidateQueries({
         queryKey: draftKeys.list('cheque', businessId),
       })
+      const actionProps = await buildNotifyPartyAction(
+        published,
+        profile?.currency || '₹',
+        t('notifyParty'),
+      )
       toast.add({
         title: tc('success'),
         description: t('chequeCreated'),
         type: 'success',
+        actionProps,
       })
       celebrateCheque(published)
       router.replace('/cheques')

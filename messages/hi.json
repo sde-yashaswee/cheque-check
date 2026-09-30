@@ -166,6 +166,7 @@
     "sortDate": "तारीख",
     "sortAmount": "राशि",
     "notifyParty": "पार्टी को SMS भेजें",
+    "statusUpdated": "चेक {status} के रूप में चिह्नित किया गया",
     "printCheque": "चेक प्रिंट करें",
     "tags": "टैग",
     "addTags": "वैकल्पिक टैग जोड़ें",

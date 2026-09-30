@@ -292,6 +292,7 @@
     "bounce": "Bounce",
     "updateStatus": "Status Update karein",
     "notifyParty": "Party ko SMS karein",
+    "statusUpdated": "Cheque {status} mark ho gaya",
     "printCheque": "Cheque Print karein",
     "tags": "Tags",
     "addTags": "Optional tags add karein",
