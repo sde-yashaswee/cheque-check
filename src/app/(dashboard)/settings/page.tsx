@@ -123,6 +123,12 @@ export default function SettingsPage() {
           href: '/settings/preferences',
         },
         {
+          name: t('notifications'),
+          description: t('notificationsDesc'),
+          icon: Settings2,
+          href: '/settings/notifications',
+        },
+        {
           name: t('transactions'),
           description: t('transactionsDesc'),
           icon: Money,

@@ -28,6 +28,9 @@ export interface Database {
           avatar_url: string | null
           phone: string | null
           voice_call_enabled: boolean | null
+          sms_enabled: boolean
+          push_enabled: boolean
+          whatsapp_enabled: boolean
           reduce_motion: boolean
           deleted_at: string | null
           created_at: string | null
