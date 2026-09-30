@@ -581,6 +581,7 @@
     "whatsappNotifications": "WhatsApp reminders",
     "whatsappNotificationsDesc": "Business messaging configured hone par WhatsApp reminders enable karein.",
     "notificationsLeadTimeDesc": "Reminder schedule karte waqt yeh lead time use hoga.",
+    "advancedWarning": "Advanced Warning",
     "daysBefore": "{count, plural, one {# din pehle} other {# din pehle}}",
     "businesses": "Businesses",
     "businessesDesc": "Apne business profiles aur settings manage karein",

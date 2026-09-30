@@ -581,6 +581,7 @@
     "whatsappNotifications": "WhatsApp reminders",
     "whatsappNotificationsDesc": "Enable WhatsApp reminders when business messaging is configured.",
     "notificationsLeadTimeDesc": "This lead time is used when scheduling cheque reminders.",
+    "advancedWarning": "Advanced Warning",
     "daysBefore": "{count, plural, one {# day before} other {# days before}}",
     "businesses": "Businesses",
     "businessesDesc": "Manage your business profiles and settings",

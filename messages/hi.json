@@ -83,6 +83,7 @@
     "whatsappNotifications": "WhatsApp रिमाइंडर",
     "whatsappNotificationsDesc": "बिज़नेस मैसेजिंग कॉन्फ़िगर होने पर WhatsApp रिमाइंडर चालू करें।",
     "notificationsLeadTimeDesc": "चेक रिमाइंडर शेड्यूल करते समय यह समय इस्तेमाल होगा।",
+    "advancedWarning": "अग्रिम चेतावनी",
     "daysBefore": "{count} दिन पहले",
     "reduceMotion": "मोशन कम करें",
     "reduceMotionDesc": "ऐप में एनिमेशन और ट्रांज़िशन कम करें",
