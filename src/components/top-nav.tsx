@@ -57,6 +57,7 @@ export function TopNav() {
       return { title: t('Navigation.settings'), icon: Settings }
     if (path === '/features')
       return { title: t('Navigation.features'), icon: Star }
+    if (path === '/profile') return { title: t('Settings.profile'), icon: User }
 
     if (path.startsWith('/settings/')) {
       const sub = path.split('/')[2]
@@ -168,10 +169,13 @@ export function TopNav() {
   ].includes(pathname)
 
   const hideSettingsIcon =
-    pathname.startsWith('/settings') || pathname.startsWith('/features')
+    pathname.startsWith('/settings') ||
+    pathname.startsWith('/features') ||
+    pathname === '/profile'
   const hideBusinessSwitcher =
     pathname.startsWith('/settings') ||
     pathname.startsWith('/features') ||
+    pathname === '/profile' ||
     pathname === '/businesses/create'
 
   return (
