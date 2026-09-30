@@ -37,4 +37,27 @@ describe('Calculator', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Close calculator' }))
     expect(onClose).toHaveBeenCalledOnce()
   })
+
+  it('drags by the header and remembers the position', () => {
+    localStorage.clear()
+    render(<Calculator onClose={vi.fn()} />)
+    const header = screen.getByText('Calculator').parentElement!
+
+    fireEvent.pointerDown(header, {
+      pointerId: 1,
+      button: 0,
+      clientX: 100,
+      clientY: 100,
+    })
+    fireEvent.pointerMove(header, { pointerId: 1, clientX: 140, clientY: 130 })
+    fireEvent.pointerUp(header, { pointerId: 1, clientX: 140, clientY: 130 })
+
+    expect(JSON.parse(localStorage.getItem('calculator-position')!)).toEqual({
+      x: 56,
+      y: 102,
+    })
+    expect(screen.getByRole('dialog').style.transform).toBe(
+      'translate3d(56px, 102px, 0)',
+    )
+  })
 })

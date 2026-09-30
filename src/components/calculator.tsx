@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   Cancel01Icon as CloseIcon,
@@ -8,6 +8,14 @@ import {
 } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import {
+  clampPosition,
+  loadCalculatorPosition,
+  saveCalculatorPosition,
+  type Point,
+} from '@/lib/calculator-position'
+
+const DEFAULT_POSITION: Point = { x: 16, y: 72 }
 
 const buttonValues = [
   [7, 8, 9, 'DEL'],
@@ -32,35 +40,69 @@ export function Calculator({ onClose }: { onClose: () => void }) {
   const [storedValue, setStoredValue] = useState<number | null>(null)
   const [operator, setOperator] = useState<Operator | null>(null)
   const [waitingForOperand, setWaitingForOperand] = useState(false)
-  const [position, setPosition] = useState({ x: 16, y: 72 })
+  const panelRef = useRef<HTMLDivElement>(null)
+  const position = useRef<Point>(DEFAULT_POSITION)
   const dragState = useRef<{
+    pointerId: number
     startX: number
     startY: number
-    originX: number
-    originY: number
+    origin: Point
   } | null>(null)
+  const frame = useRef(0)
+  const pendingPosition = useRef<Point | null>(null)
 
-  useEffect(() => {
-    const handlePointerMove = (event: PointerEvent) => {
-      const drag = dragState.current
-      if (!drag) return
-      setPosition({
-        x: Math.max(8, drag.originX + event.clientX - drag.startX),
-        y: Math.max(8, drag.originY + event.clientY - drag.startY),
-      })
-    }
+  const applyPosition = (next: Point) => {
+    const panel = panelRef.current
+    if (!panel) return
+    position.current = clampPosition(
+      next,
+      { width: panel.offsetWidth, height: panel.offsetHeight },
+      { width: window.innerWidth, height: window.innerHeight },
+    )
+    panel.style.transform = `translate3d(${position.current.x}px, ${position.current.y}px, 0)`
+  }
 
-    const handlePointerUp = () => {
-      dragState.current = null
-    }
-
-    window.addEventListener('pointermove', handlePointerMove)
-    window.addEventListener('pointerup', handlePointerUp)
+  useLayoutEffect(() => {
+    applyPosition(loadCalculatorPosition(DEFAULT_POSITION))
+    const handleResize = () => applyPosition(position.current)
+    window.addEventListener('resize', handleResize)
     return () => {
-      window.removeEventListener('pointermove', handlePointerMove)
-      window.removeEventListener('pointerup', handlePointerUp)
+      window.removeEventListener('resize', handleResize)
+      cancelAnimationFrame(frame.current)
     }
   }, [])
+
+  const handleDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return
+    event.currentTarget.setPointerCapture?.(event.pointerId)
+    dragState.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      origin: position.current,
+    }
+  }
+
+  const handleDragMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const drag = dragState.current
+    if (!drag || drag.pointerId !== event.pointerId) return
+    const next = {
+      x: drag.origin.x + event.clientX - drag.startX,
+      y: drag.origin.y + event.clientY - drag.startY,
+    }
+    cancelAnimationFrame(frame.current)
+    pendingPosition.current = next
+    frame.current = requestAnimationFrame(() => applyPosition(next))
+  }
+
+  const handleDragEnd = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (dragState.current?.pointerId !== event.pointerId) return
+    dragState.current = null
+    cancelAnimationFrame(frame.current)
+    if (pendingPosition.current) applyPosition(pendingPosition.current)
+    pendingPosition.current = null
+    saveCalculatorPosition(position.current)
+  }
 
   const reset = () => {
     setResult('0')
@@ -122,21 +164,17 @@ export function Calculator({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed z-[90] w-[248px] rounded-2xl border border-primary/15 bg-background p-3 shadow-2xl"
-      style={{ left: position.x, top: position.y }}
+      ref={panelRef}
+      className="fixed left-0 top-0 z-[90] w-[248px] rounded-2xl border border-primary/15 bg-background p-3 shadow-2xl will-change-transform"
       role="dialog"
       aria-label="Calculator"
     >
       <div
-        className="flex cursor-move items-center justify-between border-b border-border/60 px-1 pb-2"
-        onPointerDown={(event) => {
-          dragState.current = {
-            startX: event.clientX,
-            startY: event.clientY,
-            originX: position.x,
-            originY: position.y,
-          }
-        }}
+        className="flex cursor-grab touch-none select-none items-center justify-between border-b border-border/60 px-1 pb-2 active:cursor-grabbing"
+        onPointerDown={handleDragStart}
+        onPointerMove={handleDragMove}
+        onPointerUp={handleDragEnd}
+        onPointerCancel={handleDragEnd}
       >
         <div className="flex items-center gap-2 text-sm font-semibold">
           <HugeiconsIcon
