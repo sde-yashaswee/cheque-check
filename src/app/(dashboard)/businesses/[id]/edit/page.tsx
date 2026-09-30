@@ -6,18 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useParams } from 'next/navigation'
 import {
-  UserIcon as User,
   Mail01Icon as Mail,
-  LockPasswordIcon as Lock,
   CallIcon as Phone,
-  Calendar03Icon as Calendar,
-  HashtagIcon as Hash,
-  Note01Icon as Note,
-  Building03Icon as Building,
-  Wallet01Icon as Wallet,
-  Search01Icon as Search,
-  Location01Icon as Location,
-  TextFontIcon as TextIcon,
   Tick02Icon as Check,
   Store01Icon as Store,
   Location01Icon as MapPin,
@@ -25,6 +15,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { cn } from '@/lib/utils'
+import { FormSection } from '@/components/ui/form-section'
 import { Skeleton } from '@/components/ui/skeleton'
 import dynamic from 'next/dynamic'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
@@ -61,43 +52,32 @@ export default function EditBusinessPage() {
 
   const colors = [
     '#007AFF',
-    '#5856D6',
-    '#AF52DE',
-    '#FF2D55',
-    '#FF3B30',
-    '#FF9500',
     '#34C759',
+    '#FF9500',
+    '#FF3B30',
+    '#AF52DE',
+    '#5856D6',
+    '#8E8E93',
   ]
 
   if (isLoading) {
     return (
       <div className="max-w-2xl space-y-8 pb-20">
-        <Skeleton className="h-14 w-full rounded-lg" />
-        <Skeleton className="h-14 w-full rounded-lg" />
-        <Skeleton className="h-14 w-full rounded-lg" />
+        <Skeleton className="h-14 w-full rounded-sm" />
+        <div className="flex justify-center">
+          <Skeleton className="h-24 w-24 rounded-full" />
+        </div>
+        <Skeleton className="h-10 w-2/3 rounded-full" />
+        <Skeleton className="h-14 w-full rounded-sm" />
+        <Skeleton className="h-14 w-full rounded-sm" />
       </div>
     )
   }
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">
-      <div className="flex flex-col items-center gap-4 py-4">
-        <EditableAvatar
-          name={watch('name')}
-          color={watch('color' as any)}
-          icon={watch('icon' as any)}
-          imageUrl={watch('logo_url' as any)}
-          onUpload={async (url) => {
-            ;(setValue as any)('logo_url', url)
-          }}
-          onDelete={async () => {
-            ;(setValue as any)('logo_url', null)
-          }}
-          size="xl"
-        />
-      </div>
-      <form onSubmit={onSubmit} className="space-y-6">
-        <div className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-10">
+        <FormSection title={t('businessProfile')} icon={Store}>
           <div className="space-y-2">
             <Label
               htmlFor="name"
@@ -105,19 +85,13 @@ export default function EditBusinessPage() {
             >
               {t('businessName')}
             </Label>
-            <div className="relative">
-              <HugeiconsIcon
-                icon={Store}
-                className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
-              />
-              <Input
-                leftIcon={User}
-                id="name"
-                {...register('name')}
-                placeholder={t('businessNamePlaceholder')}
-                className="h-14  bg-canvas-parchment border-none text-lg font-semibold rounded-sm"
-              />
-            </div>
+            <Input
+              leftIcon={Store}
+              id="name"
+              {...register('name')}
+              placeholder={t('businessNamePlaceholder')}
+              className="h-14 bg-canvas-parchment border-none text-lg font-semibold rounded-sm"
+            />
             {errors.name && (
               <p className="text-xs text-destructive ml-1">
                 {errors.name.message as string}
@@ -125,94 +99,34 @@ export default function EditBusinessPage() {
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label
-              htmlFor="phone"
-              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
-            >
-              {t('phoneNumber')}
-            </Label>
-            <Controller
-              control={control}
-              name="phone"
-              render={({ field }) => (
-                <PhoneInput
-                  id="phone"
-                  value={field.value}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  placeholder={t('businessPhonePlaceholder')}
-                  aria-invalid={!!errors.phone}
-                />
-              )}
+          <div className="flex flex-col items-center gap-3 py-2">
+            <EditableAvatar
+              name={watch('name') || t('businessName')}
+              color={watch('color' as any)}
+              icon={watch('icon' as any)}
+              imageUrl={watch('logo_url' as any)}
+              onUpload={async (url) => {
+                ;(setValue as any)('logo_url', url, { shouldDirty: true })
+              }}
+              onDelete={async () => {
+                ;(setValue as any)('logo_url', null, { shouldDirty: true })
+              }}
+              size="xl"
             />
-            {errors.phone && (
-              <p className="text-xs text-destructive ml-1">
-                {errors.phone.message as string}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label
-              htmlFor="email"
-              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
-            >
-              {tc('email')}
-            </Label>
-            <div className="relative">
-              <HugeiconsIcon
-                icon={Mail}
-                className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground opacity-50"
-              />
-              <Input
-                leftIcon={Mail}
-                id="email"
-                type="email"
-                {...register('email')}
-                placeholder={t('businessEmailPlaceholder')}
-                className="h-14  bg-canvas-parchment border-none rounded-sm"
-              />
-            </div>
-            {errors.email && (
-              <p className="text-xs text-destructive ml-1">
-                {errors.email.message as string}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label
-              htmlFor="address"
-              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
-            >
-              {tc('address')}
-            </Label>
-            <div className="relative">
-              <HugeiconsIcon
-                icon={MapPin}
-                className="absolute left-4 top-4 h-5 w-5 text-muted-foreground opacity-50"
-              />
-              <Input
-                leftIcon={MapPin}
-                id="address"
-                {...register('address')}
-                placeholder={t('businessLocationPlaceholder')}
-                className="h-14  bg-canvas-parchment border-none rounded-sm"
-              />
-            </div>
+            <p className="text-xs text-muted-foreground">{t('businessLogo')}</p>
           </div>
 
           <div className="space-y-2">
             <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
-              {t('businessColor')}
+              {tc('themeColor')}
             </Label>
             <div className="flex flex-wrap gap-3 p-1">
               {colors.map((c) => (
                 <button
                   key={c}
                   type="button"
-                  onClick={() => setValue('color', c)}
+                  aria-label={c}
+                  onClick={() => setValue('color', c, { shouldDirty: true })}
                   className={cn(
                     'h-10 w-10 rounded-full transition-all active:scale-95 ring-offset-2',
                     watch('color') === c
@@ -224,7 +138,77 @@ export default function EditBusinessPage() {
               ))}
             </div>
           </div>
-        </div>
+        </FormSection>
+
+        <FormSection title={t('contactInfo')} icon={Phone}>
+          <div className="space-y-2">
+            <Label
+              htmlFor="email"
+              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+            >
+              {t('businessEmail')}
+            </Label>
+            <Input
+              leftIcon={Mail}
+              id="email"
+              type="email"
+              {...register('email')}
+              placeholder={t('contactEmailPlaceholder')}
+              className="h-14 bg-canvas-parchment border-none rounded-sm"
+            />
+            {errors.email && (
+              <p className="text-xs text-destructive ml-1">
+                {errors.email.message as string}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label
+              htmlFor="phone"
+              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+            >
+              {t('businessPhone')}
+            </Label>
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field }) => (
+                <PhoneInput
+                  id="phone"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  placeholder={t('businessPhone')}
+                  aria-invalid={!!errors.phone}
+                />
+              )}
+            />
+            {errors.phone && (
+              <p className="text-xs text-destructive ml-1">
+                {errors.phone.message as string}
+              </p>
+            )}
+          </div>
+        </FormSection>
+
+        <FormSection title={t('location')} icon={MapPin}>
+          <div className="space-y-2">
+            <Label
+              htmlFor="address"
+              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1"
+            >
+              {t('businessAddress')}
+            </Label>
+            <Input
+              leftIcon={MapPin}
+              id="address"
+              {...register('address')}
+              placeholder={t('headquartersPlaceholder')}
+              className="h-14 bg-canvas-parchment border-none rounded-sm"
+            />
+          </div>
+        </FormSection>
 
         <div className="pt-4 flex flex-col gap-3">
           <Button
