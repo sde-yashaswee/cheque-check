@@ -41,7 +41,7 @@ interface ComboboxProps {
   className?: string
   createUrl?: string
   createLabel?: string
-  onCreateClick?: () => void
+  onCreateClick?: (query: string) => void
 }
 
 export function Combobox({
@@ -56,11 +56,27 @@ export function Combobox({
   onCreateClick,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
+  const [query, setQuery] = React.useState('')
 
   const selectedOption = options.find((option) => option.value === value)
+  const trimmedQuery = query.trim()
+  const hasExactMatch = options.some(
+    (option) => option.label.toLowerCase() === trimmedQuery.toLowerCase(),
+  )
+  const showCreateRow =
+    !!(createUrl || onCreateClick) && trimmedQuery.length > 0 && !hasExactMatch
+  const resolvedCreateLabel = trimmedQuery
+    ? `${createLabel} "${trimmedQuery}"`
+    : createLabel
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next)
+        if (!next) setQuery('')
+      }}
+    >
       <PopoverTrigger
         className={cn(
           buttonVariants({
@@ -95,7 +111,12 @@ export function Combobox({
         align="start"
       >
         <Command className="rounded-none">
-          <CommandInput placeholder={placeholder} className="h-12" />
+          <CommandInput
+            placeholder={placeholder}
+            className="h-12"
+            value={query}
+            onValueChange={setQuery}
+          />
           <CommandList className="max-h-[300px]">
             <CommandEmpty className="py-6 text-center text-sm">
               <p className="text-muted-foreground font-semibold">
@@ -134,7 +155,7 @@ export function Combobox({
               ))}
             </CommandGroup>
           </CommandList>
-          {(createUrl || onCreateClick) && (
+          {showCreateRow && (
             <>
               <CommandSeparator />
               <div className="p-1">
@@ -143,18 +164,20 @@ export function Combobox({
                     type="button"
                     onClick={() => {
                       setOpen(false)
-                      onCreateClick()
+                      onCreateClick(trimmedQuery)
                     }}
                     className="flex w-full items-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors cursor-pointer"
                   >
                     <HugeiconsIcon icon={PlusCircle} className="h-4 w-4" />
-                    {createLabel}
+                    {resolvedCreateLabel}
                   </button>
                 ) : (
-                  <Link href={createUrl!}>
+                  <Link
+                    href={`${createUrl}${createUrl!.includes('?') ? '&' : '?'}name=${encodeURIComponent(trimmedQuery)}`}
+                  >
                     <div className="flex items-center gap-2 rounded-sm px-3 py-3 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors cursor-pointer">
                       <HugeiconsIcon icon={PlusCircle} className="h-4 w-4" />
-                      {createLabel}
+                      {resolvedCreateLabel}
                     </div>
                   </Link>
                 )}
