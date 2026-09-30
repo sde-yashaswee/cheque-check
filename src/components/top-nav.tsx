@@ -23,6 +23,7 @@ import {
   RocketIcon as Rocket,
   PencilEdit01Icon as Edit,
   Calculator01Icon as CalculatorIcon,
+  Tag01Icon as TagIcon,
 } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 import { SkeletonImage } from '@/components/ui/skeleton-image'
@@ -73,7 +74,6 @@ export function TopNav() {
         'whats-new': { title: t('Settings.whatsNew'), icon: Rocket },
         preferences: { title: t('Settings.preferences'), icon: Settings },
         notifications: { title: t('Settings.notifications'), icon: Settings },
-        tags: { title: t('Settings.manageTags'), icon: Settings },
         transactions: { title: t('Settings.transactions'), icon: Pay },
       }
       if (subInfo[sub]) return subInfo[sub]
@@ -91,6 +91,7 @@ export function TopNav() {
       parties: { key: 'Parties', icon: Party },
       accounts: { key: 'Accounts', icon: Pay },
       businesses: { key: 'Businesses', icon: User },
+      tags: { key: 'Tags', icon: TagIcon },
     }
 
     const feature = featureMap[resource]
@@ -116,6 +117,7 @@ export function TopNav() {
         cheques: 'Cheques.newCheque',
         parties: 'Parties.newParty',
         businesses: 'Businesses.newBusiness',
+        tags: 'Tags.newTag',
       }
       return {
         title: t(createKeys[resource]),
@@ -140,6 +142,7 @@ export function TopNav() {
         cheques: 'Cheques.viewCheque',
         parties: 'Parties.viewParty',
         businesses: 'Businesses.viewBusiness',
+        tags: 'Tags.viewTag',
       }
       return { title: t(viewKeys[resource]), icon: View }
     }
@@ -150,6 +153,7 @@ export function TopNav() {
         cheques: 'Cheques.editCheque',
         parties: 'Parties.editParty',
         businesses: 'Businesses.editBusiness',
+        tags: 'Tags.editTag',
       }
       return { title: t(editKeys[resource]), icon: Edit }
     }

@@ -1,6 +1,7 @@
 export * from './repositories/tag.repository'
 export * from './services/tag.service'
 export * from './hooks/use-tags'
+export * from './hooks/use-tag-list'
 export * from './components/tag-selector'
 export * from './components/tag-color-picker'
 export * from './lib/tag-colors'

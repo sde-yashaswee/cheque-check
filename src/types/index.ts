@@ -79,6 +79,10 @@ export interface Tag {
   updated_at: string
 }
 
+export interface TagWithUsage extends Tag {
+  usage_count: number
+}
+
 export interface Account {
   id: string
   business_id: string

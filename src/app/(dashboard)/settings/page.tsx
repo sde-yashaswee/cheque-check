@@ -117,7 +117,7 @@ export default function SettingsPage() {
           name: t('manageTags'),
           description: t('manageTagsDescShort'),
           icon: Settings2,
-          href: '/settings/tags',
+          href: '/tags',
         },
       ],
     },

@@ -49,6 +49,45 @@ export class TagService {
     return this.repository.getAll(businessId)
   }
 
+  getAllWithUsage(businessId: string) {
+    return this.repository.getAllWithUsage(businessId)
+  }
+
+  getById(id: string) {
+    return this.repository.getById(id)
+  }
+
+  getLinks(tagId: string) {
+    return this.repository.getLinks(tagId)
+  }
+
+  /** Attaches/detaches links so the entity ends up with exactly `tagIds`. */
+  async syncForEntity(
+    entityType: TagEntityType,
+    entityId: string,
+    currentIds: readonly string[],
+    tagIds: readonly string[],
+  ) {
+    const added = tagIds.filter((id) => !currentIds.includes(id))
+    const removed = currentIds.filter((id) => !tagIds.includes(id))
+    await Promise.all([
+      ...added.map((tag_id) =>
+        this.repository.attach({
+          tag_id,
+          entity_type: entityType,
+          entity_id: entityId,
+        }),
+      ),
+      ...removed.map((tag_id) =>
+        this.repository.detach({
+          tag_id,
+          entity_type: entityType,
+          entity_id: entityId,
+        }),
+      ),
+    ])
+  }
+
   create(input: Pick<Tag, 'business_id' | 'name' | 'color'>) {
     return this.repository.create(input)
   }

@@ -1,4 +1,4 @@
-import type { Tag, TagEntityType } from '@/types'
+import type { Tag, TagEntityType, TagWithUsage } from '@/types'
 import { TABLES } from '@/lib/supabase/tables'
 import { SupabaseRepository } from '@/repositories/base.repository'
 
@@ -10,6 +10,9 @@ export interface TagLink {
 
 export interface ITagRepository {
   getAll(businessId: string): Promise<Tag[]>
+  getAllWithUsage(businessId: string): Promise<TagWithUsage[]>
+  getById(id: string): Promise<Tag>
+  getLinks(tagId: string): Promise<TagLink[]>
   create(input: Pick<Tag, 'business_id' | 'name' | 'color'>): Promise<Tag>
   update(id: string, input: Partial<Pick<Tag, 'name' | 'color'>>): Promise<Tag>
   delete(id: string): Promise<void>
@@ -30,6 +33,35 @@ export class SupabaseTagRepository
         .eq('business_id', businessId)
         .order('name', { ascending: true }),
     ) as Promise<Tag[]>
+  }
+
+  async getAllWithUsage(businessId: string): Promise<TagWithUsage[]> {
+    const rows = (await this.handle(
+      this.supabase
+        .from(TABLES.TAGS)
+        .select('*, entity_tags(entity_type)')
+        .eq('business_id', businessId)
+        .order('name', { ascending: true }),
+    )) as unknown as Array<Tag & { entity_tags: unknown[] | null }>
+    return rows.map(({ entity_tags, ...tag }) => ({
+      ...tag,
+      usage_count: entity_tags?.length ?? 0,
+    }))
+  }
+
+  async getById(id: string): Promise<Tag> {
+    return this.handle(
+      this.supabase.from(TABLES.TAGS).select('*').eq('id', id).single(),
+    ) as Promise<Tag>
+  }
+
+  async getLinks(tagId: string): Promise<TagLink[]> {
+    return this.handle(
+      this.supabase
+        .from(TABLES.ENTITY_TAGS)
+        .select('tag_id, entity_type, entity_id')
+        .eq('tag_id', tagId),
+    ) as Promise<TagLink[]>
   }
 
   async create(

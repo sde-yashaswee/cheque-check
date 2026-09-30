@@ -31,15 +31,18 @@ export function useTags(businessId: string | undefined) {
     { id: string; input: Partial<Pick<Tag, 'name' | 'color'>> }
   >({
     mutationFn: ({ id, input }) => tagService.update(id, input),
-    onSuccess: () => {
+    onSuccess: (tag) => {
       queryClient.invalidateQueries({ queryKey })
+      queryClient.setQueryData(['tag', tag.id], tag)
     },
   })
 
   const deleteMutation = useMutation<void, Error, string>({
     mutationFn: (id) => tagService.delete(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey })
+      queryClient.removeQueries({ queryKey: ['tag', id] })
+      queryClient.invalidateQueries({ queryKey: ['entity-tags'] })
     },
   })
 
