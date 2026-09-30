@@ -16,6 +16,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { useTags } from '@/features/tags/hooks/use-tags'
+import { nextTagColor } from '@/features/tags/lib/tag-colors'
 import type { Tag } from '@/types'
 import { cn } from '@/lib/utils'
 
@@ -51,7 +52,7 @@ export function TagSelector({
     const tag = await createTag({
       business_id: businessId,
       name: trimmedName,
-      color: '#0066cc',
+      color: nextTagColor(tags),
     })
     onChange([...value, tag.id])
     setName('')

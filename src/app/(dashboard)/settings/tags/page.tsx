@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useBusiness } from '@/hooks/use-business'
 import { useTags } from '@/features/tags/hooks/use-tags'
+import { TagColorPicker } from '@/features/tags/components/tag-color-picker'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -67,30 +68,30 @@ export default function TagsPage() {
             editingId === tag.id ? (
               <div
                 key={tag.id}
-                className="flex items-center gap-2 rounded-lg border bg-card p-3"
+                className="space-y-3 rounded-lg border bg-card p-3"
               >
-                <input
-                  type="color"
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={draftName}
+                    onChange={(event) => setDraftName(event.target.value)}
+                    className="h-9"
+                    aria-label={t('tagName')}
+                  />
+                  <Button
+                    type="button"
+                    size="icon"
+                    onClick={() => void save()}
+                    disabled={isUpdating || !draftName.trim()}
+                    aria-label={t('saveTag')}
+                  >
+                    <HugeiconsIcon icon={Save} className="h-4 w-4" />
+                  </Button>
+                </div>
+                <TagColorPicker
                   value={draftColor}
-                  onChange={(event) => setDraftColor(event.target.value)}
-                  className="h-9 w-9 rounded border p-0.5"
-                  aria-label={t('tagColor')}
+                  onChange={setDraftColor}
+                  label={t('tagColor')}
                 />
-                <Input
-                  value={draftName}
-                  onChange={(event) => setDraftName(event.target.value)}
-                  className="h-9"
-                  aria-label={t('tagName')}
-                />
-                <Button
-                  type="button"
-                  size="icon"
-                  onClick={() => void save()}
-                  disabled={isUpdating || !draftName.trim()}
-                  aria-label={t('saveTag')}
-                >
-                  <HugeiconsIcon icon={Save} className="h-4 w-4" />
-                </Button>
               </div>
             ) : (
               <div
