@@ -32,6 +32,7 @@ import { useRedirectIfDraft } from '@/features/drafts'
 import { partyService } from '@/features/parties/services/party.service'
 import {
   buildChequeUpdateMessage,
+  isPartySmsEnabled,
   openPartySms,
 } from '@/features/cheques/lib/notify-party'
 import { downloadChequePrintPdf } from '@/features/cheques/lib/print-cheque'
@@ -335,7 +336,7 @@ export default function ChequeDetailPage() {
         </div>
       </div>
 
-      {party?.contact && (
+      {party?.contact && isPartySmsEnabled(profile) && (
         <Button
           variant="outline"
           className="w-full rounded-full h-12"

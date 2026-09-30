@@ -25,6 +25,7 @@ import { useTranslations } from 'next-intl'
 import { useChequeActions } from '@/hooks/use-cheque-actions'
 import {
   buildChequeUpdateMessage,
+  isPartySmsEnabled,
   openPartySms,
 } from '@/features/cheques/lib/notify-party'
 
@@ -236,7 +237,7 @@ export function ChequeCard({ cheque, onStatusUpdate }: ChequeCardProps) {
           </div>
           <StatusPill status={statusLabel as ChequeStatus} />
         </div>
-        {cheque.party?.contact && (
+        {cheque.party?.contact && isPartySmsEnabled(profile) && (
           <button
             type="button"
             className="pointer-events-auto mt-3 flex items-center gap-1 text-xs font-semibold text-primary"

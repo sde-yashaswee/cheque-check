@@ -1,0 +1,2 @@
+ALTER TABLE profiles
+ADD COLUMN party_sms_enabled BOOLEAN NOT NULL DEFAULT TRUE;

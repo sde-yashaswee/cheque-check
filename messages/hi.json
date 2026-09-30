@@ -76,6 +76,8 @@
     "voiceNotificationsDesc": "निर्धारित रिमाइंडर कॉल प्राप्त करें।",
     "smsNotifications": "SMS रिमाइंडर",
     "smsNotificationsDesc": "SMS डिलीवरी कॉन्फ़िगर होने पर SMS रिमाइंडर चालू करें।",
+    "partySmsNotifications": "पार्टी को SMS से सूचित करें",
+    "partySmsNotificationsDesc": "चेक बनने या स्थिति बदलने पर फ़ोन से पार्टी को SMS भेजने का विकल्प दिखाएँ।",
     "pushNotifications": "पुश सूचनाएं",
     "pushNotificationsDesc": "आगामी चेक के लिए ब्राउज़र सूचनाएं चालू करें।",
     "whatsappNotifications": "WhatsApp रिमाइंडर",

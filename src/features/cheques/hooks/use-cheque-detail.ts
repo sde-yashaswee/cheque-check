@@ -40,7 +40,7 @@ export function useChequeDetail(id: string) {
     onSuccess: async (updated) => {
       const actionProps = await buildNotifyPartyAction(
         updated,
-        profile?.currency || '₹',
+        profile,
         t('notifyParty'),
       )
       toast.add({

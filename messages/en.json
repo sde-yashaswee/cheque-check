@@ -574,6 +574,8 @@
     "voiceNotificationsDesc": "Receive scheduled reminder calls.",
     "smsNotifications": "SMS reminders",
     "smsNotificationsDesc": "Enable SMS reminders when SMS delivery is configured.",
+    "partySmsNotifications": "Notify parties via SMS",
+    "partySmsNotificationsDesc": "Offer to text the party from your phone when a cheque is created or its status changes.",
     "pushNotifications": "Push notifications",
     "pushNotificationsDesc": "Enable browser notifications for upcoming cheques.",
     "whatsappNotifications": "WhatsApp reminders",

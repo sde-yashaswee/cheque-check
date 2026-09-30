@@ -574,6 +574,8 @@
     "voiceNotificationsDesc": "Scheduled reminder calls receive karein.",
     "smsNotifications": "SMS reminders",
     "smsNotificationsDesc": "SMS delivery configured hone par SMS reminders enable karein.",
+    "partySmsNotifications": "Party ko SMS se notify karein",
+    "partySmsNotificationsDesc": "Cheque banne ya status badalne par phone se party ko SMS bhejne ka option dikhayein.",
     "pushNotifications": "Push notifications",
     "pushNotificationsDesc": "Upcoming cheques ke browser notifications enable karein.",
     "whatsappNotifications": "WhatsApp reminders",

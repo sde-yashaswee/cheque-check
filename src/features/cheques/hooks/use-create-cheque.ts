@@ -128,7 +128,7 @@ export function useCreateCheque(
       await onCreated?.(created)
       const actionProps = await buildNotifyPartyAction(
         created,
-        profile?.currency || '₹',
+        profile,
         t('notifyParty'),
       )
       toast.add({
@@ -185,7 +185,7 @@ export function useCreateCheque(
       })
       const actionProps = await buildNotifyPartyAction(
         published,
-        profile?.currency || '₹',
+        profile,
         t('notifyParty'),
       )
       toast.add({

@@ -29,6 +29,7 @@ export interface Database {
           phone: string | null
           voice_call_enabled: boolean | null
           sms_enabled: boolean
+          party_sms_enabled: boolean
           push_enabled: boolean
           whatsapp_enabled: boolean
           reduce_motion: boolean
