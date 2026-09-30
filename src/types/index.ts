@@ -67,6 +67,17 @@ export interface Bank {
   updated_at: string
 }
 
+export type TagEntityType = 'cheque' | 'account' | 'party' | 'business'
+
+export interface Tag {
+  id: string
+  business_id: string
+  name: string
+  color: string
+  created_at: string
+  updated_at: string
+}
+
 export interface Account {
   id: string
   business_id: string

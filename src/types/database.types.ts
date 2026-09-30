@@ -42,6 +42,53 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['profiles']['Row']>
         Relationships: []
       }
+      tags: {
+        Row: {
+          id: string
+          business_id: string
+          name: string
+          color: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: Partial<Database['public']['Tables']['tags']['Row']> & {
+          business_id: string
+          name: string
+        }
+        Update: Partial<Database['public']['Tables']['tags']['Row']>
+        Relationships: [
+          {
+            foreignKeyName: 'tags_business_id_fkey'
+            columns: ['business_id']
+            isOneToOne: false
+            referencedRelation: 'businesses'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      entity_tags: {
+        Row: {
+          tag_id: string
+          entity_type: string
+          entity_id: string
+          created_at: string
+        }
+        Insert: Partial<Database['public']['Tables']['entity_tags']['Row']> & {
+          tag_id: string
+          entity_type: string
+          entity_id: string
+        }
+        Update: Partial<Database['public']['Tables']['entity_tags']['Row']>
+        Relationships: [
+          {
+            foreignKeyName: 'entity_tags_tag_id_fkey'
+            columns: ['tag_id']
+            isOneToOne: false
+            referencedRelation: 'tags'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       businesses: {
         Row: {
           id: string
