@@ -573,6 +573,8 @@
     "version": "Version",
     "appTagline": "Never miss a cheque again.",
     "loadingPreferences": "Loading preferences...",
+    "reduceMotion": "Reduce Motion",
+    "reduceMotionDesc": "Minimize animations and transitions throughout the app",
     "emailUs": "Email Us",
     "getHelpViaEmail": "Get help via email",
     "chatOnWhatsApp": "Chat on WhatsApp",

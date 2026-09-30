@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext } from 'react'
+import { useEffect } from 'react'
 import { Profile } from '@/types'
 import { profileService } from '@/features/profile/services/profile.service'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -20,6 +21,13 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     queryKey: ['profile'],
     queryFn: () => profileService.get(),
   })
+
+  useEffect(() => {
+    document.documentElement.toggleAttribute(
+      'data-reduce-motion',
+      profile?.reduce_motion === true,
+    )
+  }, [profile?.reduce_motion])
 
   const mutation = useMutation({
     mutationFn: (newProfile: Partial<Profile>) =>

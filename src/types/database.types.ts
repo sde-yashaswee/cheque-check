@@ -28,6 +28,7 @@ export interface Database {
           avatar_url: string | null
           phone: string | null
           voice_call_enabled: boolean | null
+          reduce_motion: boolean
           deleted_at: string | null
           created_at: string | null
           updated_at: string | null

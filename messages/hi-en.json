@@ -573,6 +573,8 @@
     "days": "{count} din",
     "appTagline": "Ab koi cheque miss nahi hoga.",
     "loadingPreferences": "Preferences load ho rahi hain...",
+    "reduceMotion": "Motion kam karein",
+    "reduceMotionDesc": "App mein animations aur transitions ko minimize karein",
     "emailUs": "Hamein Email karein",
     "getHelpViaEmail": "Email ke zariye help lein",
     "chatOnWhatsApp": "WhatsApp par chat karein",

@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Combobox } from '@/components/ui/combobox'
 import { useTranslations } from 'next-intl'
 import { useProfile } from '@/hooks/use-profile'
+import { Switch } from '@/components/ui/switch'
 
 const CURRENCY_OPTIONS = [
   { label: '₹ (INR)', value: '₹' },
@@ -167,6 +168,24 @@ export default function PreferencesPage() {
             </p>
           </div>
         </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-4 border-t border-border/50 pt-6">
+        <div className="space-y-1">
+          <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+            {ts('reduceMotion')}
+          </Label>
+          <p className="text-[11px] text-muted-foreground">
+            {ts('reduceMotionDesc')}
+          </p>
+        </div>
+        <Switch
+          checked={profile.reduce_motion}
+          onCheckedChange={(checked) =>
+            updateProfile({ reduce_motion: checked })
+          }
+          aria-label={ts('reduceMotion')}
+        />
       </div>
     </div>
   )

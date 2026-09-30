@@ -17,6 +17,7 @@ export interface Profile {
   received_cheques_enabled: boolean
   phone: string | null
   voice_call_enabled: boolean
+  reduce_motion: boolean
   avatar_url?: string | null
   created_at: string
   updated_at: string

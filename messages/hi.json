@@ -60,6 +60,8 @@
     "legal": "कानूनी",
     "preferences": "पसंद",
     "preferencesDesc": "मुद्रा, दिनांक प्रारूप और भाषा कॉन्फ़िगर करें",
+    "reduceMotion": "मोशन कम करें",
+    "reduceMotionDesc": "ऐप में एनिमेशन और ट्रांज़िशन कम करें",
     "businesses": "व्यवसाय",
     "businessesDesc": "अपने व्यवसाय प्रोफाइल और सेटिंग्स प्रबंधित करें",
     "reports": "रिपोर्ट",
