@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  Cancel02Icon as XIcon,
+  Cancel01Icon as XIcon,
   CheckmarkCircle02Icon as CircleCheckIcon,
   InformationCircleIcon as InfoIcon,
   Alert01Icon as TriangleAlertIcon,

@@ -23,6 +23,7 @@ import {
   toChequeDraftFields,
   useDraftController,
 } from '@/features/drafts'
+import { buildNotifyPartyAction } from '@/features/cheques/lib/notify-party'
 
 type ChequeFormValues = z.infer<typeof chequeSchema>
 
@@ -31,11 +32,18 @@ const optimisticId = () => `temp-${Date.now()}`
 export function useCreateCheque(
   businessId: string | undefined,
   initialType: string | null,
-  { draftId = null }: { draftId?: string | null } = {},
+  {
+    draftId = null,
+    onCreated,
+  }: {
+    draftId?: string | null
+    onCreated?: (cheque: ChequeEntity) => void | Promise<void>
+  } = {},
 ) {
   const [step, setStep] = useState(1)
   const [isUploading, setIsUploading] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
   const router = useRouter()
   const queryClient = useQueryClient()
   const t = useTranslations('Cheques')
@@ -116,14 +124,21 @@ export function useCreateCheque(
       })
       return current ? [optimisticCheque, ...current] : [optimisticCheque]
     },
-    onSuccess: (created) => {
+    onSuccess: async (created) => {
+      await onCreated?.(created)
+      const actionProps = await buildNotifyPartyAction(
+        created,
+        profile?.currency || '₹',
+        t('notifyParty'),
+      )
       toast.add({
         title: tc('success'),
         description: t('chequeCreated'),
         type: 'success',
+        actionProps,
       })
       celebrateCheque(created)
-      router.push('/cheques')
+      setIsSuccess(true)
     },
     onError: (error) => {
       draft.failPublish()
@@ -163,17 +178,24 @@ export function useCreateCheque(
         profile?.default_reminder_days ?? null,
       )
       draft.finishPublish()
+      await onCreated?.(published)
       queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
       queryClient.invalidateQueries({
         queryKey: draftKeys.list('cheque', businessId),
       })
+      const actionProps = await buildNotifyPartyAction(
+        published,
+        profile?.currency || '₹',
+        t('notifyParty'),
+      )
       toast.add({
         title: tc('success'),
         description: t('chequeCreated'),
         type: 'success',
+        actionProps,
       })
       celebrateCheque(published)
-      router.replace('/cheques')
+      setIsSuccess(true)
     } catch (error) {
       draft.failPublish()
       showCreateError(error)
@@ -221,6 +243,8 @@ export function useCreateCheque(
     isUploading,
     handleImageUpload,
     isSaving: mutation.isPending || isPublishing,
+    isSuccess,
+    continueAfterSuccess: () => router.push('/cheques'),
     draft,
     onSubmit: form.handleSubmit(async (data) => {
       const publishedDraftId = await draft.beginPublish()
@@ -229,7 +253,7 @@ export function useCreateCheque(
         return
       }
       draft.finishPublish()
-      mutation.mutate(data)
+      await mutation.mutateAsync(data)
     }),
   }
 }

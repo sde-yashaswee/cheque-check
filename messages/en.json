@@ -49,6 +49,8 @@
     "address": "Address",
     "email": "Email",
     "notes": "Notes",
+    "tags": "Tags",
+    "addTags": "Add optional tags",
     "outstanding": "Outstanding",
     "totalCheques": "Total Cheques",
     "chequeHistory": "Cheque History",
@@ -292,7 +294,10 @@
     "bounce": "Bounce",
     "updateStatus": "Update Status",
     "notifyParty": "Notify Party via SMS",
+    "statusUpdated": "Cheque marked as {status}",
     "printCheque": "Print Cheque",
+    "tags": "Tags",
+    "addTags": "Add optional tags",
     "configurePrint": "Configure print layout",
     "printCoordinatesHelp": "Set field positions in millimetres from the top-left of the A4 page.",
     "resetPrintLayout": "Reset defaults",
@@ -323,7 +328,10 @@
     "entitiesCreateFailed": "Failed to create entities",
     "scanDetails": "Scan & Details",
     "entities": "Entities",
-    "datesReview": "Dates & Review"
+    "datesReview": "Dates & Review",
+    "successTitle": "Cheque Saved!",
+    "successDescription": "Your cheque has been recorded successfully.",
+    "successCta": "View Cheques"
   },
   "Parties": {
     "title": "Parties",
@@ -363,7 +371,12 @@
     "locationNotes": "Location & Notes",
     "importFromContacts": "Import from contacts",
     "contactImportFailed": "Contacts could not be imported. You can enter the details manually.",
-    "contactPickerUnavailable": "Contact access is unavailable in this browser. Please enter the details manually or open ChequeCheck on a supported mobile browser."
+    "contactPickerUnavailable": "Contact access is unavailable in this browser. Please enter the details manually or open ChequeCheck on a supported mobile browser.",
+    "addPhoto": "Add photo",
+    "partyAvatar": "Party photo",
+    "successTitle": "Party Added!",
+    "successDescription": "The party has been added to your business.",
+    "successCta": "Continue"
   },
   "Accounts": {
     "title": "Accounts",
@@ -397,7 +410,10 @@
     "bankDetails": "Bank Details",
     "moreDetails": "More Details",
     "openingBalance": "Opening Balance",
-    "setAsDefault": "Use as default account for new cheques"
+    "setAsDefault": "Use as default account for new cheques",
+    "successTitle": "Account Added!",
+    "successDescription": "The account has been added to your business.",
+    "successCta": "Continue"
   },
   "Businesses": {
     "title": "Businesses",
@@ -443,7 +459,10 @@
     "businessProfile": "Business Profile",
     "contactInfo": "Contact Info",
     "location": "Location",
-    "businessLogo": "Business logo"
+    "businessLogo": "Business logo",
+    "successTitle": "Business Created!",
+    "successDescription": "Your new business profile is ready to use.",
+    "successCta": "Continue"
   },
   "Features": {
     "receivingMode": "Receiving Cheques Mode",
@@ -541,6 +560,15 @@
     "preferencesDesc": "Configure currency, date format, and language",
     "notifications": "Notifications",
     "notificationsDesc": "Choose notification channels and reminder timing",
+    "manageTags": "Manage Tags",
+    "manageTagsDescShort": "Create and organize shared business tags",
+    "manageTagsDesc": "Create and organize tags for {business}.",
+    "noTagsYet": "No tags created yet.",
+    "tagName": "Tag name",
+    "tagColor": "Tag color",
+    "editTag": "Edit tag",
+    "deleteTag": "Delete tag",
+    "saveTag": "Save tag",
     "notificationsPageDesc": "Control how ChequeCheck reminds you about upcoming cheques.",
     "voiceNotifications": "Voice calls",
     "voiceNotificationsDesc": "Receive scheduled reminder calls.",

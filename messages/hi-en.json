@@ -48,6 +48,8 @@
     "balance": "Balance",
     "address": "Pata",
     "email": "Email",
+    "tags": "Tags",
+    "addTags": "Optional tags add karein",
     "notes": "Notes",
     "outstanding": "Outstanding",
     "totalCheques": "Total Cheques",
@@ -292,7 +294,10 @@
     "bounce": "Bounce",
     "updateStatus": "Status Update karein",
     "notifyParty": "Party ko SMS karein",
+    "statusUpdated": "Cheque {status} mark ho gaya",
     "printCheque": "Cheque Print karein",
+    "tags": "Tags",
+    "addTags": "Optional tags add karein",
     "configurePrint": "Print layout configure karein",
     "printCoordinatesHelp": "A4 page ke top-left se fields ki position millimetres mein set karein.",
     "resetPrintLayout": "Defaults reset karein",
@@ -323,7 +328,10 @@
     "entitiesCreateFailed": "Entities create nahi ho paayi",
     "scanDetails": "Scan aur Details",
     "entities": "Entities",
-    "datesReview": "Dates aur Review"
+    "datesReview": "Dates aur Review",
+    "successTitle": "Cheque Save ho gaya!",
+    "successDescription": "Aapka cheque successfully record ho gaya hai.",
+    "successCta": "Cheques Dekhein"
   },
   "Parties": {
     "title": "Parties",
@@ -363,7 +371,12 @@
     "locationNotes": "Location aur Notes",
     "importFromContacts": "Contacts se import karein",
     "contactImportFailed": "Contacts import nahi ho paaye. Aap details manually enter kar sakte hain.",
-    "contactPickerUnavailable": "Is browser mein contact access available nahi hai. Details manually enter karein ya supported mobile browser par ChequeCheck kholein."
+    "contactPickerUnavailable": "Is browser mein contact access available nahi hai. Details manually enter karein ya supported mobile browser par ChequeCheck kholein.",
+    "addPhoto": "Photo add karein",
+    "partyAvatar": "Party photo",
+    "successTitle": "Party Add ho gayi!",
+    "successDescription": "Party aapke business mein add kar di gayi hai.",
+    "successCta": "Continue"
   },
   "Accounts": {
     "title": "Accounts",
@@ -397,7 +410,10 @@
     "bankDetails": "Bank ki Details",
     "moreDetails": "Aur Details",
     "openingBalance": "Opening Balance",
-    "setAsDefault": "Naye cheques ke liye default account banayein"
+    "setAsDefault": "Naye cheques ke liye default account banayein",
+    "successTitle": "Account Add ho gaya!",
+    "successDescription": "Account aapke business mein add kar diya gaya hai.",
+    "successCta": "Continue"
   },
   "Businesses": {
     "title": "Businesses",
@@ -443,7 +459,10 @@
     "businessProfile": "Business Profile",
     "contactInfo": "Contact ki Details",
     "location": "Location",
-    "businessLogo": "Business ka logo"
+    "businessLogo": "Business ka logo",
+    "successTitle": "Business Ban gaya!",
+    "successDescription": "Aapki nayi business profile ready hai.",
+    "successCta": "Continue"
   },
   "Features": {
     "receivingMode": "Cheques Receive karne ka Mode",
@@ -541,6 +560,15 @@
     "preferencesDesc": "Currency, date format, aur language set karein",
     "notifications": "Notifications",
     "notificationsDesc": "Notification channels aur reminder timing choose karein",
+    "manageTags": "Tags manage karein",
+    "manageTagsDescShort": "Business tags create aur organize karein",
+    "manageTagsDesc": "{business} ke tags create aur organize karein.",
+    "noTagsYet": "Abhi koi tag create nahi hua.",
+    "tagName": "Tag name",
+    "tagColor": "Tag color",
+    "editTag": "Tag edit karein",
+    "deleteTag": "Tag delete karein",
+    "saveTag": "Tag save karein",
     "notificationsPageDesc": "Upcoming cheques ke reminders kaise milenge, control karein.",
     "voiceNotifications": "Voice calls",
     "voiceNotificationsDesc": "Scheduled reminder calls receive karein.",

@@ -6,7 +6,7 @@ import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Cancel02Icon as XIcon } from '@hugeicons/core-free-icons'
+import { Cancel01Icon as XIcon } from '@hugeicons/core-free-icons'
 import { useTranslations } from 'next-intl'
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
@@ -102,12 +102,12 @@ function DialogContent({
             render={
               <Button
                 variant="ghost"
-                className="absolute top-2 right-2"
+                className="absolute top-2 right-2 rounded-full"
                 size="icon-sm"
               />
             }
           >
-            <HugeiconsIcon icon={XIcon} />
+            <HugeiconsIcon icon={XIcon} className="h-4 w-4" />
             <span className="sr-only">{t('close')}</span>
           </DialogClose>
         )}

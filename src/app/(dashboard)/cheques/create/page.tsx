@@ -5,6 +5,7 @@ import { useParties } from '@/hooks/use-parties'
 import { useAccounts } from '@/hooks/use-accounts'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { CurrencyPrefixInput } from '@/components/ui/currency-prefix-input'
 import { Label } from '@/components/ui/label'
 import { useSearchParams } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -39,6 +40,8 @@ import {
   StepperSeparator,
   StepperTrigger,
 } from '@/components/reui/stepper'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { CreationSuccessScreen } from '@/components/ui/creation-success-screen'
 import { useTranslations } from 'next-intl'
 import { useState, useEffect } from 'react'
 import { toast } from '@/components/ui/toast'
@@ -61,9 +64,12 @@ import { BankSelector } from '@/components/bank-selector'
 import { ScanStore } from '@/lib/scan-store'
 import { useProfile } from '@/hooks/use-profile'
 import { buildChequeReturnTo } from '@/lib/cheque-draft'
+import { TagSelector } from '@/features/tags/components/tag-selector'
+import { tagService } from '@/features/tags/services/tag.service'
 import {
   chequeDraftService,
   DraftLeaveDialog,
+  DraftSaveFab,
   DraftToolbar,
 } from '@/features/drafts'
 
@@ -74,6 +80,9 @@ export default function CreateChequePage() {
   const searchParams = useSearchParams()
   const typeParam = searchParams.get('type')
   const imageUrlParam = searchParams.get('imageUrl')
+  // Computed once at mount: whether the user arrived here from scanning/OCR,
+  // so the photo widget can be shown first instead of buried at the bottom.
+  const [cameFromScan] = useState(() => !!imageUrlParam || ScanStore.hasFile())
   // Read once: autosave later writes a new draftId into the URL for the same form.
   const [initialDraftId] = useState(() => searchParams.get('draftId'))
   const { activeBusiness } = useBusiness()
@@ -81,6 +90,7 @@ export default function CreateChequePage() {
   const { profile } = useProfile()
   const currency = profile?.currency || '₹'
   const [isExtracting, setIsExtracting] = useState(false)
+  const [tagIds, setTagIds] = useState<string[]>([])
   const queryClient = useQueryClient()
   const { data: banks } = useBanks()
 
@@ -108,9 +118,24 @@ export default function CreateChequePage() {
     isUploading,
     handleImageUpload,
     isSaving,
+    isSuccess,
+    continueAfterSuccess,
     onSubmit,
     draft,
-  } = useCreateCheque(businessId, typeParam, { draftId: initialDraftId })
+  } = useCreateCheque(businessId, typeParam, {
+    draftId: initialDraftId,
+    onCreated: async (cheque) => {
+      await Promise.all(
+        tagIds.map((tagId) =>
+          tagService.attach({
+            tag_id: tagId,
+            entity_type: 'cheque',
+            entity_id: cheque.id,
+          }),
+        ),
+      )
+    },
+  })
 
   const {
     register,
@@ -144,9 +169,16 @@ export default function CreateChequePage() {
     enabled:
       !!businessId && !!selectedAccountId && /^\d{6}$/.test(chequeNumber),
   })
-  const numberConflictWarning = hasNumberConflict ? (
-    <p className="text-xs text-amber-600 ml-1">{tDrafts('duplicateNumber')}</p>
-  ) : null
+  const numberConflictWarning = (
+    <p
+      className={cn(
+        'text-xs text-amber-600 ml-1 min-h-4',
+        !hasNumberConflict && 'invisible',
+      )}
+    >
+      {hasNumberConflict ? tDrafts('duplicateNumber') : '\u00A0'}
+    </p>
+  )
 
   const { parties } = useParties(businessId)
   const { accounts } = useAccounts(businessId)
@@ -421,6 +453,99 @@ export default function CreateChequePage() {
 
   const amountInWords = numberToIndianWords(watch('amount') || 0, currency)
 
+  const photoWidget = (
+    <div className="space-y-2">
+      <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+        {t('photo')}
+      </Label>
+      <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-4 bg-canvas-parchment/30 min-h-[140px] transition-colors hover:bg-canvas-parchment/50 border-primary/10 relative overflow-hidden">
+        {watch('image_url' as any) ? (
+          <div className="relative w-full aspect-video rounded-sm overflow-hidden border">
+            <SkeletonImage
+              src={watch('image_url' as any)}
+              alt="Cheque"
+              containerClassName="h-full w-full"
+              className="w-full h-full object-cover"
+            />
+            <button
+              type="button"
+              onClick={() => setUserValue('image_url', null)}
+              className="absolute top-3 right-3 p-2 bg-black/60 text-white rounded-full hover:bg-black transition-colors z-20"
+            >
+              <HugeiconsIcon icon={X} className="h-4 w-4" />
+            </button>
+            {isExtracting && (
+              <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 z-10 animate-in fade-in duration-300">
+                <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <HugeiconsIcon
+                    icon={Loading03Icon}
+                    className="h-7 w-7 animate-spin"
+                  />
+                </div>
+                <div className="text-center">
+                  <span className="text-sm font-semibold text-primary block">
+                    {t('loading')}
+                  </span>
+                  <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">
+                    {t('photoInstruction')}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <label className="flex flex-col items-center gap-3 cursor-pointer py-6 w-full relative">
+            <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+              {isUploading || isExtracting ? (
+                <HugeiconsIcon
+                  icon={Loading03Icon}
+                  className="h-7 w-7 animate-spin"
+                />
+              ) : (
+                <HugeiconsIcon icon={Camera} className="h-7 w-7" />
+              )}
+            </div>
+            <div className="text-center">
+              <span className="text-sm font-semibold text-primary block">
+                {isUploading || isExtracting ? t('loading') : t('scanUpload')}
+              </span>
+              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">
+                {t('photoInstruction')}
+              </p>
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0]
+                if (file) {
+                  const url = await handleImageUpload(file)
+                  if (url) extractData(url)
+                }
+              }}
+              disabled={isUploading || isExtracting}
+            />
+          </label>
+        )}
+      </div>
+    </div>
+  )
+
+  if (isSuccess) {
+    return (
+      <div className="max-w-2xl">
+        <CreationSuccessScreen
+          title={t('successTitle')}
+          description={t('successDescription')}
+          ctaLabel={t('successCta')}
+          onContinue={continueAfterSuccess}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-2xl space-y-8 pb-20">
       <div className="flex flex-col gap-4">
@@ -491,165 +616,52 @@ export default function CreateChequePage() {
         </Stepper>
       </div>
 
-      <DraftToolbar
-        status={draft.status}
-        onSaveDraft={draft.saveDraftAndExit}
-      />
+      <DraftToolbar status={draft.status} />
       <DraftLeaveDialog {...draft.leaveDialogProps} />
+      <DraftSaveFab
+        status={draft.status}
+        hasUserChanges={draft.hasUserChanges}
+        onSave={() => void draft.saveDraft()}
+      />
 
       <form onSubmit={onSubmit} className="space-y-8">
         {step === 1 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-            {/* Cheque Photo Widget */}
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
-                {t('photo')}
-              </Label>
-              <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-4 bg-canvas-parchment/30 min-h-[140px] transition-colors hover:bg-canvas-parchment/50 border-primary/10 relative overflow-hidden">
-                {watch('image_url' as any) ? (
-                  <div className="relative w-full aspect-video rounded-sm overflow-hidden border">
-                    <SkeletonImage
-                      src={watch('image_url' as any)}
-                      alt="Cheque"
-                      containerClassName="h-full w-full"
-                      className="w-full h-full object-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setUserValue('image_url', null)}
-                      className="absolute top-3 right-3 p-2 bg-black/60 text-white rounded-full hover:bg-black transition-colors z-20"
-                    >
-                      <HugeiconsIcon icon={X} className="h-4 w-4" />
-                    </button>
-                    {isExtracting && (
-                      <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 z-10 animate-in fade-in duration-300">
-                        <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                          <HugeiconsIcon
-                            icon={Loading03Icon}
-                            className="h-7 w-7 animate-spin"
-                          />
-                        </div>
-                        <div className="text-center">
-                          <span className="text-sm font-semibold text-primary block">
-                            {t('loading')}
-                          </span>
-                          <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">
-                            {t('photoInstruction')}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <label className="flex flex-col items-center gap-3 cursor-pointer py-6 w-full relative">
-                    <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      {isUploading || isExtracting ? (
-                        <HugeiconsIcon
-                          icon={Loading03Icon}
-                          className="h-7 w-7 animate-spin"
-                        />
-                      ) : (
-                        <HugeiconsIcon icon={Camera} className="h-7 w-7" />
-                      )}
-                    </div>
-                    <div className="text-center">
-                      <span className="text-sm font-semibold text-primary block">
-                        {isUploading || isExtracting
-                          ? t('loading')
-                          : t('scanUpload')}
-                      </span>
-                      <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">
-                        {t('photoInstruction')}
-                      </p>
-                    </div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      className="hidden"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0]
-                        if (file) {
-                          const url = await handleImageUpload(file)
-                          if (url) extractData(url)
-                        }
-                      }}
-                      disabled={isUploading || isExtracting}
-                    />
-                  </label>
-                )}
-              </div>
-            </div>
+            {cameFromScan && photoWidget}
 
             <div className="space-y-2">
               <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
                 {t('type')}
               </Label>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => setUserValue('type', 'Outward')}
-                  className={cn(
-                    'flex flex-col items-center justify-center gap-3 rounded-lg p-6 border transition-all active:scale-95',
-                    watch('type') === 'Outward'
-                      ? 'bg-primary/5 border-primary'
-                      : 'bg-card border-primary/5',
-                  )}
-                >
-                  <div
+              <Tabs
+                value={watch('type')}
+                onValueChange={(value) =>
+                  setUserValue('type', value as 'Outward' | 'Inward')
+                }
+              >
+                <TabsList className="h-14 w-full rounded-lg bg-canvas-parchment p-1">
+                  <TabsTrigger
+                    value="Outward"
                     className={cn(
-                      'h-12 w-12 rounded-sm flex items-center justify-center transition-colors',
-                      watch('type') === 'Outward'
-                        ? 'bg-primary text-white'
-                        : 'bg-primary/10 text-primary',
+                      'h-full flex-1 gap-2 rounded-md text-xs font-semibold uppercase tracking-wider',
+                      'data-active:bg-primary data-active:text-white',
                     )}
                   >
-                    <HugeiconsIcon icon={ArrowUpRight} className="h-6 w-6" />
-                  </div>
-                  <span
-                    className={cn(
-                      'font-semibold text-xs uppercase tracking-wider',
-                      watch('type') === 'Outward'
-                        ? 'text-primary'
-                        : 'text-muted-foreground',
-                    )}
-                  >
+                    <HugeiconsIcon icon={ArrowUpRight} className="h-4 w-4" />
                     {t('issued')}
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setUserValue('type', 'Inward')}
-                  className={cn(
-                    'flex flex-col items-center justify-center gap-3 rounded-lg p-6 border transition-all active:scale-95',
-                    watch('type') === 'Inward'
-                      ? 'bg-green-500/5 border-green-500'
-                      : 'bg-card border-primary/5',
-                  )}
-                >
-                  <div
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="Inward"
                     className={cn(
-                      'h-12 w-12 rounded-sm flex items-center justify-center transition-colors',
-                      watch('type') === 'Inward'
-                        ? 'bg-green-500 text-white'
-                        : 'bg-green-500/10 text-green-600',
+                      'h-full flex-1 gap-2 rounded-md text-xs font-semibold uppercase tracking-wider',
+                      'data-active:bg-green-500 data-active:text-white',
                     )}
                   >
-                    <HugeiconsIcon icon={ArrowDownLeft} className="h-6 w-6" />
-                  </div>
-                  <span
-                    className={cn(
-                      'font-semibold text-xs uppercase tracking-wider',
-                      watch('type') === 'Inward'
-                        ? 'text-green-600'
-                        : 'text-muted-foreground',
-                    )}
-                  >
+                    <HugeiconsIcon icon={ArrowDownLeft} className="h-4 w-4" />
                     {t('received')}
-                  </span>
-                </button>
-              </div>
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
 
             <div className="space-y-2">
@@ -659,29 +671,28 @@ export default function CreateChequePage() {
               >
                 {t('amount')}
               </Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 z-10 -translate-y-1/2 text-base font-semibold text-muted-foreground pointer-events-none">
-                  {currency}
-                </span>
-                <Input
-                  id="amount"
-                  type="number"
-                  min={0}
-                  step="any"
-                  {...register('amount', { valueAsNumber: true })}
-                  className="h-12 pl-10 font-semibold rounded-sm"
-                />
-              </div>
+              <CurrencyPrefixInput
+                currency={currency}
+                id="amount"
+                type="number"
+                min={0}
+                step="any"
+                {...register('amount', { valueAsNumber: true })}
+                className="h-12 font-semibold rounded-sm"
+              />
               <div className="flex flex-col gap-1 ml-1">
                 <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
                   {amountInWords}
                 </p>
               </div>
-              {errors.amount && (
-                <p className="text-xs text-destructive ml-1">
-                  {errors.amount.message as string}
-                </p>
-              )}
+              <p
+                className={cn(
+                  'text-xs text-destructive ml-1 min-h-4',
+                  !errors.amount && 'invisible',
+                )}
+              >
+                {(errors.amount?.message as string) || '\u00A0'}
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -700,13 +711,18 @@ export default function CreateChequePage() {
                 placeholder={t('chequeNumberPlaceholder')}
                 className="h-12 rounded-sm"
               />
-              {errors.cheque_number && (
-                <p className="text-xs text-destructive ml-1">
-                  {errors.cheque_number.message as string}
-                </p>
-              )}
+              <p
+                className={cn(
+                  'text-xs text-destructive ml-1 min-h-4',
+                  !errors.cheque_number && 'invisible',
+                )}
+              >
+                {(errors.cheque_number?.message as string) || '\u00A0'}
+              </p>
               {numberConflictWarning}
             </div>
+
+            {!cameFromScan && photoWidget}
 
             <Button
               type="button"
@@ -731,14 +747,19 @@ export default function CreateChequePage() {
                 onValueChange={(val) => setUserValue('party_id', val)}
                 placeholder={t('partyPlaceholder')}
                 createLabel={t('addParty')}
-                onCreateClick={() => openCreatePage('/parties/create')}
+                onCreateClick={(query) =>
+                  openCreatePage('/parties/create', { name: query })
+                }
                 className="h-14 bg-canvas-parchment border-none rounded-sm"
               />
-              {errors.party_id && (
-                <p className="text-xs text-destructive ml-1">
-                  {errors.party_id.message as string}
-                </p>
-              )}
+              <p
+                className={cn(
+                  'text-xs text-destructive ml-1 min-h-4',
+                  !errors.party_id && 'invisible',
+                )}
+              >
+                {(errors.party_id?.message as string) || '\u00A0'}
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -751,21 +772,24 @@ export default function CreateChequePage() {
                 onValueChange={(val) => setUserValue('account_id', val)}
                 placeholder={t('accountPlaceholder')}
                 createLabel={t('addAccount')}
-                onCreateClick={() =>
+                onCreateClick={(query) =>
                   openCreatePage('/accounts/create', {
-                    name: unmatchedEntities?.account_name || '',
+                    name: unmatchedEntities?.account_name || query,
                     number: unmatchedEntities?.account_number || '',
                     ifsc: unmatchedEntities?.ifsc_code || '',
-                    auto: 'true',
+                    auto: unmatchedEntities?.account_name ? 'true' : 'false',
                   })
                 }
                 className="h-14 bg-canvas-parchment border-none rounded-sm"
               />
-              {errors.account_id && (
-                <p className="text-xs text-destructive ml-1">
-                  {errors.account_id.message as string}
-                </p>
-              )}
+              <p
+                className={cn(
+                  'text-xs text-destructive ml-1 min-h-4',
+                  !errors.account_id && 'invisible',
+                )}
+              >
+                {(errors.account_id?.message as string) || '\u00A0'}
+              </p>
               {numberConflictWarning}
             </div>
 
@@ -838,6 +862,18 @@ export default function CreateChequePage() {
                 {...register('notes')}
                 placeholder={t('notesPlaceholder')}
                 className="h-14 bg-canvas-parchment border-none rounded-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+                {t('tags')}
+              </Label>
+              <TagSelector
+                businessId={businessId}
+                value={tagIds}
+                onChange={setTagIds}
+                placeholder={t('addTags')}
               />
             </div>
 

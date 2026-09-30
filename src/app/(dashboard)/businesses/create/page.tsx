@@ -38,14 +38,23 @@ import { useTranslations } from 'next-intl'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { PhoneInput } from '@/components/ui/phone-input'
 import { Controller } from 'react-hook-form'
+import { CreationSuccessScreen } from '@/components/ui/creation-success-screen'
 
 export default function CreateBusinessPage() {
   const t = useTranslations('Businesses')
   const tc = useTranslations('Common')
   const router = useRouter()
 
-  const { form, step, nextStep, prevStep, isSaving, onSubmit } =
-    useCreateBusiness()
+  const {
+    form,
+    step,
+    nextStep,
+    prevStep,
+    isSaving,
+    isSuccess,
+    continueAfterSuccess,
+    onSubmit,
+  } = useCreateBusiness()
 
   const {
     register,
@@ -64,6 +73,19 @@ export default function CreateBusinessPage() {
     '#5856D6',
     '#8E8E93',
   ]
+
+  if (isSuccess) {
+    return (
+      <div className="max-w-2xl">
+        <CreationSuccessScreen
+          title={t('successTitle')}
+          description={t('successDescription')}
+          ctaLabel={t('successCta')}
+          onContinue={continueAfterSuccess}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">

@@ -1,13 +1,14 @@
-import { BottomNav } from "@/components/bottom-nav";
-import { TopNav } from "@/components/top-nav";
-import { ScrollToTop } from "@/components/scroll-to-top";
-import { OnboardingCheck } from "@/components/onboarding-check";
-import { PageTransition } from "@/components/ui/page-transition";
+import { BottomNav } from '@/components/bottom-nav'
+import { TopNav } from '@/components/top-nav'
+import { ScrollToTop } from '@/components/scroll-to-top'
+import { OnboardingCheck } from '@/components/onboarding-check'
+import { PageTransition } from '@/components/ui/page-transition'
+import { AppFab } from '@/components/app-fab'
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <OnboardingCheck>
@@ -15,12 +16,11 @@ export default function DashboardLayout({
         <ScrollToTop />
         <TopNav />
         <main className="flex-1 px-4 pt-6 flex flex-col">
-          <PageTransition>
-            {children}
-          </PageTransition>
+          <PageTransition>{children}</PageTransition>
         </main>
+        <AppFab />
         <BottomNav />
       </div>
     </OnboardingCheck>
-  );
+  )
 }
