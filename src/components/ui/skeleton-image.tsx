@@ -31,7 +31,10 @@ function ImageContent({
   return (
     <span className={cn('relative block overflow-hidden', containerClassName)}>
       {!loaded && !failed && (
-        <Skeleton className="absolute inset-0 h-full w-full rounded-[inherit]" />
+        <Skeleton
+          stagger={false}
+          className="absolute inset-0 h-full w-full rounded-[inherit]"
+        />
       )}
       {failed && (
         <span className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
