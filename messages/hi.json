@@ -173,6 +173,9 @@
     "configurePrint": "प्रिंट लेआउट कॉन्फ़िगर करें",
     "printCoordinatesHelp": "A4 पेज के ऊपर-बाएं से फ़ील्ड की स्थिति मिलीमीटर में सेट करें।",
     "resetPrintLayout": "डिफ़ॉल्ट रीसेट करें",
+    "successTitle": "चेक सेव हो गया!",
+    "successDescription": "आपका चेक सफलतापूर्वक रिकॉर्ड किया गया है।",
+    "successCta": "चेक देखें",
     "savePrintLayout": "लेआउट सेव करें"
   },
   "Reports": {
@@ -204,6 +207,8 @@
     "issued": "Issued",
     "noData": "No data found",
     "notes": "Notes",
+    "tags": "टैग",
+    "addTags": "वैकल्पिक टैग जोड़ें",
     "received": "Received",
     "recordNewCheque": "Record new cheque",
     "save": "Save",
@@ -257,16 +262,27 @@
     "sortByBalance": "बकाया राशि",
     "importFromContacts": "कॉन्टैक्ट से इम्पोर्ट करें",
     "contactImportFailed": "कॉन्टैक्ट इम्पोर्ट नहीं हो सके। आप जानकारी मैन्युअल रूप से भर सकते हैं।",
-    "contactPickerUnavailable": "इस ब्राउज़र में कॉन्टैक्ट एक्सेस उपलब्ध नहीं है। जानकारी मैन्युअल रूप से भरें या ChequeCheck को सपोर्टेड मोबाइल ब्राउज़र में खोलें।"
+    "contactPickerUnavailable": "इस ब्राउज़र में कॉन्टैक्ट एक्सेस उपलब्ध नहीं है। जानकारी मैन्युअल रूप से भरें या ChequeCheck को सपोर्टेड मोबाइल ब्राउज़र में खोलें।",
+    "addPhoto": "फ़ोटो जोड़ें",
+    "partyAvatar": "पार्टी फ़ोटो",
+    "successTitle": "पार्टी जोड़ी गई!",
+    "successDescription": "पार्टी को आपके बिज़नेस में जोड़ दिया गया है।",
+    "successCta": "जारी रखें"
   },
   "Businesses": {
     "sortByName": "नाम",
     "sortByUpcoming": "आगामी कुल",
-    "businessLogo": "बिज़नेस लोगो"
+    "businessLogo": "बिज़नेस लोगो",
+    "successTitle": "बिज़नेस बन गया!",
+    "successDescription": "आपकी नई बिज़नेस प्रोफ़ाइल तैयार है।",
+    "successCta": "जारी रखें"
   },
   "Accounts": {
     "sortByAccountName": "खाता नाम",
     "sortByBankName": "बैंक का नाम",
-    "openingBalance": "शुरुआती बैलेंस"
+    "openingBalance": "शुरुआती बैलेंस",
+    "successTitle": "खाता जोड़ा गया!",
+    "successDescription": "खाते को आपके बिज़नेस में जोड़ दिया गया है।",
+    "successCta": "जारी रखें"
   }
 }
