@@ -93,6 +93,15 @@ export function useDraftController<TValues extends FieldValues, TDraft>({
     guard.bypass(() => router.push(draftsHref))
   }, [autosave, draftsHref, guard, notifySaveFailed, router, t])
 
+  // Saves in place without leaving the page (used by the draft-save FAB).
+  const saveDraft = useCallback(async () => {
+    try {
+      await autosave.save()
+    } catch {
+      notifySaveFailed()
+    }
+  }, [autosave, notifySaveFailed])
+
   const navigateAfterSave = useCallback(
     async (buildHref: (draftId: string | null) => string) => {
       let id: string | null
@@ -136,8 +145,10 @@ export function useDraftController<TValues extends FieldValues, TDraft>({
   return {
     draftId: autosave.draftId,
     status: autosave.status,
+    hasUserChanges: autosave.hasUserChanges,
     isLoadingDraft: !!initialDraftId && !loadFailed && draftQuery.isLoading,
     setUserValue: autosave.setUserValue,
+    saveDraft,
     saveDraftAndExit,
     navigateAfterSave,
     leaveDialogProps,
