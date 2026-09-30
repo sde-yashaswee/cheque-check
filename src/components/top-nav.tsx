@@ -30,6 +30,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
+import { getWhatsAppSupportLink } from '@/lib/whatsapp'
 
 const GlobalSearch = dynamic(
   () => import('@/components/global-search').then((mod) => mod.GlobalSearch),
@@ -207,6 +208,38 @@ export function TopNav() {
         </div>
 
         <div className="flex items-center gap-2">
+          {pathname === '/features' && (
+            <Link href="/settings/transactions">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full h-9 w-9"
+              >
+                <HugeiconsIcon
+                  icon={Pay}
+                  className="h-5 w-5 text-muted-foreground"
+                />
+              </Button>
+            </Link>
+          )}
+
+          <a
+            href={getWhatsAppSupportLink()}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full h-9 w-9"
+            >
+              <HugeiconsIcon
+                icon={Help}
+                className="h-5 w-5 text-muted-foreground"
+              />
+            </Button>
+          </a>
+
           {!hideSettingsIcon && (
             <>
               <Button
@@ -267,8 +300,12 @@ export function TopNav() {
         <BusinessSwitcher
           trigger={
             <button className="flex h-8 w-full items-center bg-primary/5 px-4 text-[10px] font-semibold text-primary uppercase tracking-wider backdrop-blur-sm transition-colors hover:bg-primary/10 active:bg-primary/20 cursor-pointer border-b border-primary/5">
+              <span className="relative mr-1.5 flex h-2 w-2 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+              </span>
               <span className="opacity-60 mr-1.5 font-bold">
-                {t('Businesses.viewBusiness')}:
+                {t('Businesses.activeBusinessLabel')}:
               </span>
               <div className="flex items-center gap-1.5 overflow-hidden">
                 <div className="h-4 w-4 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center shrink-0">

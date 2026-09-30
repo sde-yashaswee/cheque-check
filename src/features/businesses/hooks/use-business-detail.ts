@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { businessService } from '@/features/businesses/services/business.service'
-import { chequeService } from '@/features/cheques/services/cheque.service'
+import { useCheques } from '@/features/cheques/hooks/use-cheques'
 import { useMemo } from 'react'
 import type { Cheque } from '@/types'
 
@@ -14,11 +14,21 @@ export function useBusinessDetail(id: string) {
     queryFn: () => businessService.getById(id),
   })
 
-  const { data: cheques, isLoading: chequesLoading } = useQuery({
-    queryKey: ['cheques', id],
-    queryFn: () => chequeService.getAll(id),
-    enabled: !!id,
-  })
+  const {
+    cheques,
+    filteredCheques,
+    isLoading: chequesLoading,
+    error: chequesError,
+    search,
+    setSearch,
+    filter,
+    setFilter,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
+    updateStatus,
+  } = useCheques(id)
 
   const stats = useMemo(() => {
     if (!cheques)
@@ -40,8 +50,18 @@ export function useBusinessDetail(id: string) {
   return {
     business,
     cheques,
+    filteredCheques,
     stats,
+    search,
+    setSearch,
+    filter,
+    setFilter,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
+    updateStatus,
     isLoading: businessLoading || chequesLoading,
-    error: businessError,
+    error: businessError || chequesError,
   }
 }
