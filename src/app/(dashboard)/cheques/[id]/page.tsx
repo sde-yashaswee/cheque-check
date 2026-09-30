@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useChequeDetail } from '@/hooks/use-cheque-detail'
 import { useParams } from 'next/navigation'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -14,6 +15,7 @@ import {
   Tick02Icon as CheckCircle,
   Cancel01Icon as XCircle,
   HourglassIcon as Hourglass,
+  MessageQuestionIcon as Message,
 } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -25,6 +27,11 @@ import { StatusPill } from '@/components/ui/status-pill'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { useRedirectIfDraft } from '@/features/drafts'
+import { partyService } from '@/features/parties/services/party.service'
+import {
+  buildChequeUpdateMessage,
+  openPartySms,
+} from '@/features/cheques/lib/notify-party'
 
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import 'react-photo-view/dist/react-photo-view.css'
@@ -68,6 +75,11 @@ export default function ChequeDetailPage() {
   const currency = profile?.currency || '₹'
 
   const { cheque, isLoading, updateStatus, isUpdating } = useChequeDetail(id)
+  const { data: party } = useQuery({
+    queryKey: ['party', cheque?.party_id],
+    queryFn: () => partyService.getById(cheque!.party_id),
+    enabled: !!cheque?.party_id,
+  })
   const isDraft = useRedirectIfDraft('cheque', cheque)
 
   if (isLoading || isDraft) {
@@ -314,6 +326,22 @@ export default function ChequeDetailPage() {
           ))}
         </div>
       </div>
+
+      {party?.contact && (
+        <Button
+          variant="outline"
+          className="w-full rounded-full h-12"
+          onClick={() =>
+            openPartySms(
+              party.contact,
+              buildChequeUpdateMessage(cheque, party, currency),
+            )
+          }
+        >
+          <HugeiconsIcon icon={Message} className="mr-2 h-4 w-4" />
+          {t('notifyParty')}
+        </Button>
+      )}
 
       <div className="pt-4 flex flex-col gap-3">
         <Link href={`/cheques/${id}/edit`} className="w-full">

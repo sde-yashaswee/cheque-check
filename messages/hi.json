@@ -142,7 +142,8 @@
     "duplicateChequeError": "इस खाते के लिए इस नंबर का चेक पहले से मौजूद है",
     "sortAmountLow": "राशि (कम से अधिक)",
     "sortDate": "तारीख",
-    "sortAmount": "राशि"
+    "sortAmount": "राशि",
+    "notifyParty": "पार्टी को SMS भेजें"
   },
   "Common": {
     "welcome": "स्वागत है",

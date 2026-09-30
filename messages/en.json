@@ -291,6 +291,7 @@
     "clear": "Clear",
     "bounce": "Bounce",
     "updateStatus": "Update Status",
+    "notifyParty": "Notify Party via SMS",
     "editDetails": "Edit Cheque Details",
     "type": "Cheque Type",
     "summary": "Summary",
