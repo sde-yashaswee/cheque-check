@@ -6,7 +6,7 @@ import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Cancel02Icon as XIcon } from '@hugeicons/core-free-icons'
+import { Cancel01Icon as XIcon } from '@hugeicons/core-free-icons'
 import { useTranslations } from 'next-intl'
 
 function Sheet({ ...props }: DialogPrimitive.Root.Props) {
@@ -73,7 +73,7 @@ function SheetOverlay({ className, ...props }: DialogPrimitive.Backdrop.Props) {
 function SheetContent({
   className,
   children,
-  showCloseButton = false,
+  showCloseButton = true,
   ...props
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean
