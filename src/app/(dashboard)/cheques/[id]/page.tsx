@@ -16,6 +16,7 @@ import {
   Cancel01Icon as XCircle,
   HourglassIcon as Hourglass,
   MessageQuestionIcon as Message,
+  FileDownloadIcon as Download,
 } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -32,6 +33,7 @@ import {
   buildChequeUpdateMessage,
   openPartySms,
 } from '@/features/cheques/lib/notify-party'
+import { downloadChequePrintPdf } from '@/features/cheques/lib/print-cheque'
 
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import 'react-photo-view/dist/react-photo-view.css'
@@ -342,6 +344,15 @@ export default function ChequeDetailPage() {
           {t('notifyParty')}
         </Button>
       )}
+
+      <Button
+        variant="outline"
+        className="w-full rounded-full h-12"
+        onClick={() => downloadChequePrintPdf(cheque, currency)}
+      >
+        <HugeiconsIcon icon={Download} className="mr-2 h-4 w-4" />
+        {t('printCheque')}
+      </Button>
 
       <div className="pt-4 flex flex-col gap-3">
         <Link href={`/cheques/${id}/edit`} className="w-full">

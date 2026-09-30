@@ -143,7 +143,8 @@
     "sortAmountLow": "राशि (कम से अधिक)",
     "sortDate": "तारीख",
     "sortAmount": "राशि",
-    "notifyParty": "पार्टी को SMS भेजें"
+    "notifyParty": "पार्टी को SMS भेजें",
+    "printCheque": "चेक प्रिंट करें"
   },
   "Reports": {
     "exportFormat": "फ़ॉर्मेट चुनें",
