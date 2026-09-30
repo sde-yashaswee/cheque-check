@@ -2,13 +2,17 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   ArrowRight01Icon as ChevronRight,
+  Delete02Icon as Trash2,
   Tag01Icon as TagIcon,
 } from '@hugeicons/core-free-icons'
+import { SpeedDialFab } from '@/components/speed-dial-fab'
+import { useTags } from '@/features/tags/hooks/use-tags'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
 import { TextTruncate } from '@/components/ui/text-truncate'
@@ -20,6 +24,14 @@ import { useAccounts } from '@/hooks/use-accounts'
 import { useBusiness } from '@/hooks/use-business'
 import { useTagDetail } from '@/features/tags/hooks/use-tag-list'
 import type { TagEntityType } from '@/types'
+
+const DeleteConfirmationDialog = dynamic(
+  () =>
+    import('@/components/ui/delete-dialog').then(
+      (mod) => mod.DeleteConfirmationDialog,
+    ),
+  { ssr: false },
+)
 
 interface LinkedRow {
   id: string
@@ -73,6 +85,9 @@ export default function TagDetailPage() {
   const { accounts, isLoading: accountsLoading } = useAccounts(businessId)
   const { businesses } = useBusiness()
   const [tab, setTab] = useState<TagEntityType>('cheque')
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const { deleteTag } = useTags(businessId)
+  const router = useRouter()
 
   const idsByType = useMemo(() => {
     const map: Record<TagEntityType, Set<string>> = {
@@ -156,7 +171,7 @@ export default function TagDetailPage() {
     (tab === 'account' && accountsLoading)
 
   return (
-    <div className="max-w-2xl space-y-8 pb-24">
+    <div className="max-w-2xl space-y-8 pb-28">
       <div
         className="relative flex h-32 flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border border-primary/5"
         style={{ backgroundColor: `${tag.color}14` }}
@@ -208,6 +223,30 @@ export default function TagDetailPage() {
             </div>
           )}
       </div>
+
+      <DeleteConfirmationDialog
+        title={t('deleteConfirmTitle')}
+        description={t('deleteConfirmDesc')}
+        confirmName={tag.name}
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        onDelete={async () => {
+          await deleteTag(tag.id)
+          router.replace('/tags')
+        }}
+      />
+      <SpeedDialFab
+        editHref={`/tags/${tag.id}/edit`}
+        editLabel={t('editTag')}
+        actions={[
+          {
+            label: t('deleteTag'),
+            icon: Trash2,
+            destructive: true,
+            onClick: () => setDeleteOpen(true),
+          },
+        ]}
+      />
     </div>
   )
 }

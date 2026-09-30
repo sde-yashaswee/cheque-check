@@ -3,12 +3,11 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useChequeDetail } from '@/hooks/use-cheque-detail'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EntityAvatar } from '@/components/ui/entity-avatar'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  PencilEdit01Icon as Pencil,
   Calendar03Icon as Calendar,
   HashtagIcon as Hash,
   Note01Icon as Note,
@@ -17,9 +16,15 @@ import {
   HourglassIcon as Hourglass,
   MessageQuestionIcon as Message,
   FileDownloadIcon as Download,
+  Settings02Icon as PrintSettings,
+  Copy01Icon as Copy,
+  Delete02Icon as Trash2,
 } from '@hugeicons/core-free-icons'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+import dynamic from 'next/dynamic'
+import { toast } from '@/components/ui/toast'
+import { SpeedDialFab, type SpeedDialAction } from '@/components/speed-dial-fab'
+import { useChequeActions } from '@/hooks/use-cheque-actions'
+import { chequeDraftService } from '@/features/drafts'
 import { useProfile } from '@/hooks/use-profile'
 import { useSignedMediaUrl } from '@/hooks/use-signed-media-url'
 import { TextTruncate } from '@/components/ui/text-truncate'
@@ -41,6 +46,14 @@ import { EntityTagsSection } from '@/features/tags/components/tag-chips'
 
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import 'react-photo-view/dist/react-photo-view.css'
+
+const DeleteConfirmationDialog = dynamic(
+  () =>
+    import('@/components/ui/delete-dialog').then(
+      (mod) => mod.DeleteConfirmationDialog,
+    ),
+  { ssr: false },
+)
 
 function ChequeScanImage({ src, alt }: { src: string; alt: string }) {
   const [loaded, setLoaded] = useState(false)
@@ -85,6 +98,10 @@ export default function ChequeDetailPage() {
   const currency = profile?.currency || '₹'
 
   const { cheque, isLoading, updateStatus, isUpdating } = useChequeDetail(id)
+  const { deleteCheque } = useChequeActions()
+  const router = useRouter()
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [printLayoutOpen, setPrintLayoutOpen] = useState(false)
   const { data: party } = useQuery({
     queryKey: ['party', cheque?.party_id],
     queryFn: () => partyService.getById(cheque!.party_id),
@@ -108,31 +125,80 @@ export default function ChequeDetailPage() {
       </div>
     )
 
-  const statusActions = [
+  const pendingStatus: ChequeStatus =
+    cheque.type === 'Outward' ? 'Issued' : 'Received'
+  const statusActions: SpeedDialAction[] = (
+    [
+      { status: pendingStatus, icon: Hourglass },
+      { status: 'Cleared', icon: CheckCircle },
+      { status: 'Bounced', icon: XCircle },
+    ] as const
+  )
+    .filter(({ status }) => status !== cheque.status)
+    .map(({ status, icon }) => ({
+      label: t('markAs', { status }),
+      icon,
+      disabled: isUpdating,
+      onClick: () => updateStatus(status),
+    }))
+
+  const duplicateCheque = async () => {
+    try {
+      const draft = await chequeDraftService.create(cheque.business_id, {
+        party_id: cheque.party_id,
+        account_id: cheque.account_id,
+        amount: cheque.amount,
+        cheque_date: cheque.cheque_date,
+        deposit_date: cheque.deposit_date,
+        type: cheque.type,
+        notes: cheque.notes,
+      })
+      router.push(`/cheques/create?draftId=${draft.id}`)
+    } catch {
+      toast.add({ title: t('duplicateFailed'), type: 'error' })
+    }
+  }
+
+  const actions: SpeedDialAction[] = [
+    ...statusActions,
+    ...(party?.contact && isPartySmsEnabled(profile)
+      ? [
+          {
+            label: t('notifyParty'),
+            icon: Message,
+            onClick: () =>
+              openPartySms(
+                party.contact,
+                buildChequeUpdateMessage(cheque, party, currency),
+              ),
+          },
+        ]
+      : []),
     {
-      status: (cheque.type === 'Outward'
-        ? 'Issued'
-        : 'Received') as ChequeStatus,
-      icon: Hourglass,
-      label: cheque.type === 'Outward' ? t('issued') : t('received'),
-      color: 'orange',
+      label: t('printCheque'),
+      icon: Download,
+      onClick: () => void downloadChequePrintPdf(cheque, currency),
     },
     {
-      status: 'Cleared' as ChequeStatus,
-      icon: CheckCircle,
-      label: t('clear'),
-      color: 'green',
+      label: t('configurePrint'),
+      icon: PrintSettings,
+      onClick: () => setPrintLayoutOpen(true),
     },
     {
-      status: 'Bounced' as ChequeStatus,
-      icon: XCircle,
-      label: t('bounce'),
-      color: 'red',
+      label: t('duplicate'),
+      icon: Copy,
+      onClick: () => void duplicateCheque(),
+    },
+    {
+      label: t('deleteAction'),
+      icon: Trash2,
+      destructive: true,
+      onClick: () => setDeleteOpen(true),
     },
   ]
 
   return (
-    <div className="max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-28">
       <div className="rounded-lg border bg-card overflow-hidden relative border-primary/5">
         <div
           className={cn(
@@ -300,85 +366,27 @@ export default function ChequeDetailPage() {
         </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 px-1">
-          <HugeiconsIcon
-            icon={CheckCircle}
-            className="h-3 w-3 text-muted-foreground opacity-80"
-          />
-          <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-            {t('updateStatus')}
-          </h3>
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          {statusActions.map((action) => (
-            <Button
-              key={action.status}
-              variant={cheque.status === action.status ? 'default' : 'outline'}
-              className={cn(
-                'h-16 flex flex-col gap-1 rounded-sm transition-all active:scale-95',
-                cheque.status === action.status &&
-                  action.color === 'green' &&
-                  'bg-green-600 hover:bg-green-700',
-                cheque.status === action.status &&
-                  action.color === 'orange' &&
-                  'bg-orange-500 hover:bg-orange-600',
-                cheque.status === action.status &&
-                  action.color === 'red' &&
-                  'bg-red-600 hover:bg-red-700',
-              )}
-              onClick={() => updateStatus(action.status)}
-              disabled={isUpdating}
-            >
-              <HugeiconsIcon icon={action.icon as any} className="h-5 w-5" />
-              <span className="text-[10px] uppercase font-bold tracking-wider">
-                {action.label}
-              </span>
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      {party?.contact && isPartySmsEnabled(profile) && (
-        <Button
-          variant="outline"
-          className="w-full rounded-full h-12"
-          onClick={() =>
-            openPartySms(
-              party.contact,
-              buildChequeUpdateMessage(cheque, party, currency),
-            )
-          }
-        >
-          <HugeiconsIcon icon={Message} className="mr-2 h-4 w-4" />
-          {t('notifyParty')}
-        </Button>
-      )}
-
-      <Button
-        variant="outline"
-        className="w-full rounded-full h-12"
-        onClick={() => downloadChequePrintPdf(cheque, currency)}
-      >
-        <HugeiconsIcon icon={Download} className="mr-2 h-4 w-4" />
-        {t('printCheque')}
-      </Button>
-
-      <div className="flex justify-end">
-        <PrintLayoutEditor accountId={cheque.account_id} />
-      </div>
-
-      <div className="pt-4 flex flex-col gap-3">
-        <Link href={`/cheques/${id}/edit`} className="w-full">
-          <Button
-            className="w-full rounded-full h-14 text-lg"
-            variant="secondary"
-          >
-            <HugeiconsIcon icon={Pencil as any} className="mr-2 h-5 w-5" />{' '}
-            {t('editDetails')}
-          </Button>
-        </Link>
-      </div>
+      <PrintLayoutEditor
+        accountId={cheque.account_id}
+        open={printLayoutOpen}
+        onOpenChange={setPrintLayoutOpen}
+      />
+      <DeleteConfirmationDialog
+        title={t('deleteConfirmTitle')}
+        description={t('deleteConfirmDesc')}
+        confirmName={cheque.cheque_number}
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        onDelete={async () => {
+          deleteCheque(cheque.id)
+          router.replace('/cheques')
+        }}
+      />
+      <SpeedDialFab
+        editHref={`/cheques/${id}/edit`}
+        editLabel={t('editDetails')}
+        actions={actions}
+      />
     </div>
   )
 }

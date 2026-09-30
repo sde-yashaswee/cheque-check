@@ -29,9 +29,23 @@ const fields: Array<{ key: keyof PrintLayout; label: string }> = [
   { key: 'chequeNumberY', label: 'Cheque number Y' },
 ]
 
-export function PrintLayoutEditor({ accountId }: { accountId: string }) {
+export function PrintLayoutEditor({
+  accountId,
+  open: controlledOpen,
+  onOpenChange,
+}: {
+  accountId: string
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+}) {
   const t = useTranslations('Cheques')
-  const [open, setOpen] = useState(false)
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : uncontrolledOpen
+  const setOpen = (value: boolean) => {
+    if (!isControlled) setUncontrolledOpen(value)
+    onOpenChange?.(value)
+  }
   const [layout, setLayout] = useState<PrintLayout>(() =>
     getPrintLayout(accountId),
   )
@@ -49,11 +63,13 @@ export function PrintLayoutEditor({ accountId }: { accountId: string }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={<Button variant="ghost" className="rounded-full" />}
-      >
-        {t('configurePrint')}
-      </DialogTrigger>
+      {!isControlled && (
+        <DialogTrigger
+          render={<Button variant="ghost" className="rounded-full" />}
+        >
+          {t('configurePrint')}
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{t('configurePrint')}</DialogTitle>

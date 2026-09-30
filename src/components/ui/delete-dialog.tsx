@@ -37,6 +37,8 @@ interface DeleteConfirmationDialogProps {
   confirmName: string
   onDelete: () => Promise<void>
   trigger?: React.ReactElement
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export function DeleteConfirmationDialog({
@@ -45,8 +47,16 @@ export function DeleteConfirmationDialog({
   confirmName,
   onDelete,
   trigger,
+  open: controlledOpen,
+  onOpenChange,
 }: DeleteConfirmationDialogProps) {
-  const [open, setOpen] = useState(false)
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : uncontrolledOpen
+  const setOpen = (value: boolean) => {
+    if (!isControlled) setUncontrolledOpen(value)
+    onOpenChange?.(value)
+  }
   const [inputValue, setInputValue] = useState('')
   const [loading, setLoading] = useState(false)
   const t = useTranslations('Common')
@@ -66,16 +76,18 @@ export function DeleteConfirmationDialog({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger
-        render={
-          trigger || (
-            <Button variant="destructive" className="rounded-2xl h-12">
-              <HugeiconsIcon icon={Trash2} className="mr-2 h-4 w-4" />{' '}
-              {t('delete')}
-            </Button>
-          )
-        }
-      />
+      {!isControlled && (
+        <SheetTrigger
+          render={
+            trigger || (
+              <Button variant="destructive" className="rounded-2xl h-12">
+                <HugeiconsIcon icon={Trash2} className="mr-2 h-4 w-4" />{' '}
+                {t('delete')}
+              </Button>
+            )
+          }
+        />
+      )}
       <SheetContent className="border-none p-0 overflow-hidden">
         <div className="p-6 pb-0">
           <SheetHeader>

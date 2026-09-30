@@ -17,7 +17,7 @@ const LIST_FAB_TARGETS: Record<
   '/parties': { href: '/parties/create', bottomClassName: 'bottom-20' },
   '/accounts': { href: '/accounts/create', bottomClassName: 'bottom-20' },
   '/businesses': { href: '/businesses/create', bottomClassName: 'bottom-20' },
-  '/tags': { href: '/tags/create', bottomClassName: 'bottom-20' },
+  '/tags': { href: '/tags/create', bottomClassName: 'bottom-6' },
 }
 
 export function AppFab() {
