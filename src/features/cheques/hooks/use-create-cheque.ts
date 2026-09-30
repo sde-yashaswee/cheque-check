@@ -31,7 +31,13 @@ const optimisticId = () => `temp-${Date.now()}`
 export function useCreateCheque(
   businessId: string | undefined,
   initialType: string | null,
-  { draftId = null }: { draftId?: string | null } = {},
+  {
+    draftId = null,
+    onCreated,
+  }: {
+    draftId?: string | null
+    onCreated?: (cheque: ChequeEntity) => void | Promise<void>
+  } = {},
 ) {
   const [step, setStep] = useState(1)
   const [isUploading, setIsUploading] = useState(false)
@@ -116,7 +122,8 @@ export function useCreateCheque(
       })
       return current ? [optimisticCheque, ...current] : [optimisticCheque]
     },
-    onSuccess: (created) => {
+    onSuccess: async (created) => {
+      await onCreated?.(created)
       toast.add({
         title: tc('success'),
         description: t('chequeCreated'),
@@ -163,6 +170,7 @@ export function useCreateCheque(
         profile?.default_reminder_days ?? null,
       )
       draft.finishPublish()
+      await onCreated?.(published)
       queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
       queryClient.invalidateQueries({
         queryKey: draftKeys.list('cheque', businessId),
@@ -229,7 +237,7 @@ export function useCreateCheque(
         return
       }
       draft.finishPublish()
-      mutation.mutate(data)
+      await mutation.mutateAsync(data)
     }),
   }
 }

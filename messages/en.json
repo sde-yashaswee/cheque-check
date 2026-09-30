@@ -293,6 +293,8 @@
     "updateStatus": "Update Status",
     "notifyParty": "Notify Party via SMS",
     "printCheque": "Print Cheque",
+    "tags": "Tags",
+    "addTags": "Add optional tags",
     "configurePrint": "Configure print layout",
     "printCoordinatesHelp": "Set field positions in millimetres from the top-left of the A4 page.",
     "resetPrintLayout": "Reset defaults",

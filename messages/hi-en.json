@@ -293,6 +293,8 @@
     "updateStatus": "Status Update karein",
     "notifyParty": "Party ko SMS karein",
     "printCheque": "Cheque Print karein",
+    "tags": "Tags",
+    "addTags": "Optional tags add karein",
     "configurePrint": "Print layout configure karein",
     "printCoordinatesHelp": "A4 page ke top-left se fields ki position millimetres mein set karein.",
     "resetPrintLayout": "Defaults reset karein",

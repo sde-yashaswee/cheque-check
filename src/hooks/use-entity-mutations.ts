@@ -26,7 +26,7 @@ interface UseEntityCreateMutationOptions<TEntity, TCreate, TResult> {
     current: TEntity[] | undefined,
     variables: TCreate,
   ) => TEntity[] | undefined
-  onSuccess?: (data: TResult, variables: TCreate) => void
+  onSuccess?: (data: TResult, variables: TCreate) => void | Promise<void>
   onError?: (
     error: unknown,
     variables: TCreate,

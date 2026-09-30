@@ -29,7 +29,7 @@ interface UseOptimisticMutationOptions<TData, TVariables, TResult> {
     current: TData | undefined,
     variables: TVariables,
   ) => TData | undefined
-  onSuccess?: (data: TResult, variables: TVariables) => void
+  onSuccess?: (data: TResult, variables: TVariables) => void | Promise<void>
   onError?: (
     error: unknown,
     variables: TVariables,

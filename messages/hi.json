@@ -158,6 +158,8 @@
     "sortAmount": "राशि",
     "notifyParty": "पार्टी को SMS भेजें",
     "printCheque": "चेक प्रिंट करें",
+    "tags": "टैग",
+    "addTags": "वैकल्पिक टैग जोड़ें",
     "configurePrint": "प्रिंट लेआउट कॉन्फ़िगर करें",
     "printCoordinatesHelp": "A4 पेज के ऊपर-बाएं से फ़ील्ड की स्थिति मिलीमीटर में सेट करें।",
     "resetPrintLayout": "डिफ़ॉल्ट रीसेट करें",

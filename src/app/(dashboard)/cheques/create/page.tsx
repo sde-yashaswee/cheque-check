@@ -61,6 +61,8 @@ import { BankSelector } from '@/components/bank-selector'
 import { ScanStore } from '@/lib/scan-store'
 import { useProfile } from '@/hooks/use-profile'
 import { buildChequeReturnTo } from '@/lib/cheque-draft'
+import { TagSelector } from '@/features/tags/components/tag-selector'
+import { tagService } from '@/features/tags/services/tag.service'
 import {
   chequeDraftService,
   DraftLeaveDialog,
@@ -81,6 +83,7 @@ export default function CreateChequePage() {
   const { profile } = useProfile()
   const currency = profile?.currency || '₹'
   const [isExtracting, setIsExtracting] = useState(false)
+  const [tagIds, setTagIds] = useState<string[]>([])
   const queryClient = useQueryClient()
   const { data: banks } = useBanks()
 
@@ -110,7 +113,20 @@ export default function CreateChequePage() {
     isSaving,
     onSubmit,
     draft,
-  } = useCreateCheque(businessId, typeParam, { draftId: initialDraftId })
+  } = useCreateCheque(businessId, typeParam, {
+    draftId: initialDraftId,
+    onCreated: async (cheque) => {
+      await Promise.all(
+        tagIds.map((tagId) =>
+          tagService.attach({
+            tag_id: tagId,
+            entity_type: 'cheque',
+            entity_id: cheque.id,
+          }),
+        ),
+      )
+    },
+  })
 
   const {
     register,
@@ -838,6 +854,18 @@ export default function CreateChequePage() {
                 {...register('notes')}
                 placeholder={t('notesPlaceholder')}
                 className="h-14 bg-canvas-parchment border-none rounded-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+                {t('tags')}
+              </Label>
+              <TagSelector
+                businessId={businessId}
+                value={tagIds}
+                onChange={setTagIds}
+                placeholder={t('addTags')}
               />
             </div>
 
