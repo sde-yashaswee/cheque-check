@@ -3,7 +3,6 @@
 import { useParties } from '@/hooks/use-parties'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  PlusSignIcon as Plus,
   Search01Icon as Search,
   UserIcon as User,
   ArrowRight01Icon as ChevronRight,
@@ -241,15 +240,6 @@ export default function PartiesPage() {
           ))}
         </DataState>
       </div>
-
-      <Link href="/parties/create">
-        <Button
-          className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900"
-          size="icon"
-        >
-          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
-        </Button>
-      </Link>
     </div>
   )
 }

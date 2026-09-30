@@ -33,6 +33,7 @@ import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { getWhatsAppSupportLink } from '@/lib/whatsapp'
 import { Calculator } from '@/components/calculator'
+import { cn } from '@/lib/utils'
 
 const GlobalSearch = dynamic(
   () => import('@/components/global-search').then((mod) => mod.GlobalSearch),
@@ -294,23 +295,27 @@ export function TopNav() {
                   className="h-5 w-5 text-muted-foreground"
                 />
               </Button>
-
-              <Link href="/settings">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-all active:scale-95 overflow-hidden ring-2 ring-white shadow-sm">
-                  {profile?.avatar_url ? (
-                    <SkeletonImage
-                      src={profile.avatar_url}
-                      alt={profile.name || 'User'}
-                      containerClassName="h-full w-full rounded-full"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <HugeiconsIcon icon={User} className="h-4 w-4" />
-                  )}
-                </div>
-              </Link>
             </>
           )}
+
+          {/* Always mounted (never unmounted) so the avatar image doesn't re-flicker on nav */}
+          <Link
+            href="/settings"
+            className={cn(hideSettingsIcon && 'invisible pointer-events-none')}
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-all active:scale-95 overflow-hidden ring-2 ring-white shadow-sm">
+              {profile?.avatar_url ? (
+                <SkeletonImage
+                  src={profile.avatar_url}
+                  alt={profile.name || 'User'}
+                  containerClassName="h-full w-full rounded-full"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <HugeiconsIcon icon={User} className="h-4 w-4" />
+              )}
+            </div>
+          </Link>
         </div>
       </header>
 

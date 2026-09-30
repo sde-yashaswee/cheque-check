@@ -4,10 +4,7 @@ import { useCheques } from '@/hooks/use-cheques'
 import { ChequeCard } from '@/components/cheque-card'
 import { ChequeFilterBar } from '@/features/cheques/components/cheque-filter-bar'
 import { HugeiconsIcon } from '@hugeicons/react'
-import {
-  PlusSignIcon as Plus,
-  Invoice01Icon as ReceiptText,
-} from '@hugeicons/core-free-icons'
+import { Invoice01Icon as ReceiptText } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useBusiness } from '@/hooks/use-business'
@@ -97,15 +94,6 @@ export default function ChequesPage() {
           ))}
         </DataState>
       </div>
-
-      <Link href="/cheques/create">
-        <Button
-          className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900"
-          size="icon"
-        >
-          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
-        </Button>
-      </Link>
     </div>
   )
 }

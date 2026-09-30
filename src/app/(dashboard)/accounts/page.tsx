@@ -2,7 +2,6 @@
 
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  PlusSignIcon as Plus,
   ArrowRight01Icon as ChevronRight,
   Search01Icon as Search,
   BankIcon as Landmark,
@@ -302,15 +301,6 @@ export default function AccountsPage() {
           ))}
         </DataState>
       </div>
-
-      <Link href="/accounts/create">
-        <Button
-          className="fixed bottom-20 right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900"
-          size="icon"
-        >
-          <HugeiconsIcon icon={Plus} className="h-8 w-8" />
-        </Button>
-      </Link>
     </div>
   )
 }
