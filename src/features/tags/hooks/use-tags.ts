@@ -25,11 +25,33 @@ export function useTags(businessId: string | undefined) {
     },
   })
 
+  const updateMutation = useMutation<
+    Tag,
+    Error,
+    { id: string; input: Partial<Pick<Tag, 'name' | 'color'>> }
+  >({
+    mutationFn: ({ id, input }) => tagService.update(id, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey })
+    },
+  })
+
+  const deleteMutation = useMutation<void, Error, string>({
+    mutationFn: (id) => tagService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey })
+    },
+  })
+
   return {
     tags: query.data ?? [],
     isLoading: query.isLoading,
     error: query.error,
     createTag: createMutation.mutateAsync,
     isCreating: createMutation.isPending,
+    updateTag: updateMutation.mutateAsync,
+    isUpdating: updateMutation.isPending,
+    deleteTag: deleteMutation.mutateAsync,
+    isDeleting: deleteMutation.isPending,
   }
 }

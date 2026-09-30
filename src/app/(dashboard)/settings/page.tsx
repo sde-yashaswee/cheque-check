@@ -158,6 +158,12 @@ export default function SettingsPage() {
           icon: FileSpreadsheet,
           href: '/reports',
         },
+        {
+          name: t('manageTags'),
+          description: t('manageTagsDescShort'),
+          icon: Settings2,
+          href: '/settings/tags',
+        },
       ],
     },
     {
