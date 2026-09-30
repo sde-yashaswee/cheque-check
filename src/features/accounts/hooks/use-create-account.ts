@@ -29,10 +29,17 @@ export function useCreateAccount(
   {
     returnTo = null,
     draftId = null,
-  }: { returnTo?: string | null; draftId?: string | null } = {},
+    onCreated,
+  }: {
+    returnTo?: string | null
+    draftId?: string | null
+    onCreated?: (account: Account) => void | Promise<void>
+  } = {},
 ) {
   const [step, setStep] = useState(1)
   const [isPublishing, setIsPublishing] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [successRedirect, setSuccessRedirect] = useState<string | null>(null)
   const router = useRouter()
   const queryClient = useQueryClient()
   const tc = useTranslations('Common')
@@ -107,12 +114,17 @@ export function useCreateAccount(
     prevStep,
     isSaving: mutation.isPending || isPublishing,
     draft,
+    isSuccess,
+    continueAfterSuccess: () =>
+      successRedirect ? router.replace(successRedirect) : draft.goBack(),
     onSubmit: form.handleSubmit(async (data) => {
       const publishedDraftId = await draft.beginPublish()
       if (!publishedDraftId && !returnTo) {
         draft.finishPublish()
-        mutation.mutate(data)
-        draft.goBack()
+        const created = await mutation.mutateAsync(data)
+        await onCreated?.(created)
+        setSuccessRedirect(null)
+        setIsSuccess(true)
         return
       }
 
@@ -122,6 +134,7 @@ export function useCreateAccount(
           ? await accountDraftService.publish(publishedDraftId, data)
           : await mutation.mutateAsync(data)
         draft.finishPublish()
+        await onCreated?.(created)
         if (publishedDraftId) {
           queryClient.invalidateQueries({ queryKey: ['accounts', businessId] })
           queryClient.invalidateQueries({
@@ -130,7 +143,8 @@ export function useCreateAccount(
         }
 
         if (!returnTo) {
-          draft.goBack()
+          setSuccessRedirect(null)
+          setIsSuccess(true)
           return
         }
         const chequeDraftId = getChequeDraftIdFromReturnTo(returnTo)
@@ -139,7 +153,8 @@ export function useCreateAccount(
             account_id: created.id,
           })
         }
-        router.replace(returnTo)
+        setSuccessRedirect(returnTo)
+        setIsSuccess(true)
       } catch (error) {
         draft.failPublish()
         toast.add({

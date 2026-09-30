@@ -1,8 +1,10 @@
 'use client'
 
 import { useCreateAccount } from '@/hooks/use-create-account'
+import { useProfile } from '@/hooks/use-profile'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { CurrencyPrefixInput } from '@/components/ui/currency-prefix-input'
 import { Label } from '@/components/ui/label'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
@@ -31,8 +33,11 @@ import {
 } from '@/components/reui/stepper'
 import { useEffect, useState } from 'react'
 import { getSafeChequeReturnTo } from '@/lib/cheque-draft'
-import { DraftLeaveDialog, DraftToolbar } from '@/features/drafts'
+import { DraftLeaveDialog, DraftSaveFab, DraftToolbar } from '@/features/drafts'
 import { Checkbox } from '@/components/ui/checkbox'
+import { CreationSuccessScreen } from '@/components/ui/creation-success-screen'
+import { TagSelector } from '@/features/tags/components/tag-selector'
+import { tagService } from '@/features/tags/services/tag.service'
 
 const BankSelector = dynamic(
   () => import('@/components/bank-selector').then((mod) => mod.BankSelector),
@@ -48,6 +53,8 @@ export default function CreateAccountPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { activeBusiness } = useBusiness()
+  const { profile } = useProfile()
+  const currency = profile?.currency || '₹'
   const returnTo = getSafeChequeReturnTo(searchParams.get('returnTo'))
   // Read once: autosave later writes a new draftId into the URL for the same form.
   const [initialDraftId] = useState(() => searchParams.get('draftId'))
@@ -57,9 +64,33 @@ export default function CreateAccountPage() {
     ifsc: searchParams.get('ifsc'),
     auto: searchParams.get('auto') === 'true',
   }))
+  const [tagIds, setTagIds] = useState<string[]>([])
 
-  const { form, step, nextStep, prevStep, isSaving, onSubmit, draft } =
-    useCreateAccount(activeBusiness?.id, { returnTo, draftId: initialDraftId })
+  const {
+    form,
+    step,
+    nextStep,
+    prevStep,
+    isSaving,
+    isSuccess,
+    continueAfterSuccess,
+    onSubmit,
+    draft,
+  } = useCreateAccount(activeBusiness?.id, {
+    returnTo,
+    draftId: initialDraftId,
+    onCreated: async (account) => {
+      await Promise.all(
+        tagIds.map((tagId) =>
+          tagService.attach({
+            tag_id: tagId,
+            entity_type: 'account',
+            entity_id: account.id,
+          }),
+        ),
+      )
+    },
+  })
 
   const {
     register,
@@ -87,6 +118,19 @@ export default function CreateAccountPage() {
     '#FF9500',
     '#34C759',
   ]
+
+  if (isSuccess) {
+    return (
+      <div className="max-w-2xl">
+        <CreationSuccessScreen
+          title={t('successTitle')}
+          description={t('successDescription')}
+          ctaLabel={t('successCta')}
+          onContinue={continueAfterSuccess}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-2xl space-y-8 pb-20">
@@ -161,11 +205,13 @@ export default function CreateAccountPage() {
         </div>
       </Stepper>
 
-      <DraftToolbar
-        status={draft.status}
-        onSaveDraft={draft.saveDraftAndExit}
-      />
+      <DraftToolbar status={draft.status} />
       <DraftLeaveDialog {...draft.leaveDialogProps} />
+      <DraftSaveFab
+        status={draft.status}
+        hasUserChanges={draft.hasUserChanges}
+        onSave={() => void draft.saveDraft()}
+      />
 
       <form onSubmit={onSubmit} className="space-y-8">
         {step === 1 && (
@@ -285,7 +331,8 @@ export default function CreateAccountPage() {
               >
                 {t('openingBalance')}
               </Label>
-              <Input
+              <CurrencyPrefixInput
+                currency={currency}
                 id="opening_balance"
                 type="number"
                 step="0.01"
@@ -344,6 +391,18 @@ export default function CreateAccountPage() {
                   className="h-14  bg-canvas-parchment border-none uppercase rounded-sm"
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">
+                {tc('tags')}
+              </Label>
+              <TagSelector
+                businessId={activeBusiness?.id}
+                value={tagIds}
+                onChange={setTagIds}
+                placeholder={tc('addTags')}
+              />
             </div>
 
             <Button
