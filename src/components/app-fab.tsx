@@ -29,6 +29,7 @@ export function AppFab() {
   return (
     <Link href={target.href}>
       <Button
+        data-testid="app-fab-create"
         className={`fixed ${target.bottomClassName} right-6 h-16 w-16 rounded-full z-40 border-4 border-white dark:border-zinc-900`}
         size="icon"
       >

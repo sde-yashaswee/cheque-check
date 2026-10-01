@@ -49,6 +49,7 @@ export function BankSelector({
       <PopoverTrigger
         render={
           <div
+            data-testid="bank-selector-trigger"
             className={cn(
               buttonVariants({ variant: 'outline' }),
               'w-full justify-between h-14 rounded-2xl bg-canvas-parchment border-none px-4 text-lg font-medium cursor-pointer',
@@ -95,6 +96,7 @@ export function BankSelector({
                 <CommandItem
                   key={bank.id}
                   value={bank.name}
+                  data-testid="bank-option"
                   onSelect={() => {
                     onValueChange(bank.id)
                     setOpen(false)

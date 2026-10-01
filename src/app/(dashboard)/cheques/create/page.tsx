@@ -642,6 +642,7 @@ export default function CreateChequePage() {
                 <TabsList className="h-14 w-full rounded-lg bg-canvas-parchment p-1">
                   <TabsTrigger
                     value="Outward"
+                    data-testid="cheque-type-outward"
                     className={cn(
                       'h-full flex-1 gap-2 rounded-md text-xs font-semibold uppercase tracking-wider',
                       'data-active:bg-primary data-active:text-white',
@@ -652,6 +653,7 @@ export default function CreateChequePage() {
                   </TabsTrigger>
                   <TabsTrigger
                     value="Inward"
+                    data-testid="cheque-type-inward"
                     className={cn(
                       'h-full flex-1 gap-2 rounded-md text-xs font-semibold uppercase tracking-wider',
                       'data-active:bg-green-500 data-active:text-white',
@@ -677,6 +679,7 @@ export default function CreateChequePage() {
                 type="number"
                 min={0}
                 step="any"
+                data-testid="cheque-amount-input"
                 {...register('amount', { valueAsNumber: true })}
                 className="h-12 font-semibold rounded-sm"
               />
@@ -707,6 +710,7 @@ export default function CreateChequePage() {
                 id="cheque_number"
                 inputMode="numeric"
                 maxLength={6}
+                data-testid="cheque-number-input"
                 {...register('cheque_number')}
                 placeholder={t('chequeNumberPlaceholder')}
                 className="h-12 rounded-sm"
@@ -726,6 +730,7 @@ export default function CreateChequePage() {
 
             <Button
               type="button"
+              data-testid="cheque-step1-continue"
               className="w-full rounded-full h-14 text-lg"
               onClick={nextStep}
             >
@@ -747,6 +752,7 @@ export default function CreateChequePage() {
                 onValueChange={(val) => setUserValue('party_id', val)}
                 placeholder={t('partyPlaceholder')}
                 createLabel={t('addParty')}
+                testId="cheque-party-combobox"
                 onCreateClick={(query) =>
                   openCreatePage('/parties/create', { name: query })
                 }
@@ -772,6 +778,7 @@ export default function CreateChequePage() {
                 onValueChange={(val) => setUserValue('account_id', val)}
                 placeholder={t('accountPlaceholder')}
                 createLabel={t('addAccount')}
+                testId="cheque-account-combobox"
                 onCreateClick={(query) =>
                   openCreatePage('/accounts/create', {
                     name: unmatchedEntities?.account_name || query,
@@ -795,6 +802,7 @@ export default function CreateChequePage() {
 
             <Button
               type="button"
+              data-testid="cheque-step2-continue"
               className="w-full rounded-full h-14 text-lg"
               onClick={nextStep}
               disabled={!watch('party_id') || !watch('account_id')}
@@ -818,6 +826,7 @@ export default function CreateChequePage() {
                 leftIcon={Calendar}
                 id="cheque_date"
                 type="date"
+                data-testid="cheque-date-input"
                 {...register('cheque_date')}
                 className="h-12 rounded-sm"
               />
@@ -951,6 +960,7 @@ export default function CreateChequePage() {
             {numberConflictWarning}
             <Button
               type="submit"
+              data-testid="cheque-submit-button"
               className="w-full rounded-full h-14 text-lg"
               disabled={isSaving}
             >

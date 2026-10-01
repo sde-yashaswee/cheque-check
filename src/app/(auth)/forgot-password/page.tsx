@@ -72,7 +72,10 @@ export default function ForgotPasswordPage() {
 
         <div className="space-y-4 rounded-lg bg-white p-8 dark:bg-surface-tile-1 border border-primary/5">
           {sent ? (
-            <div className="space-y-6 text-center">
+            <div
+              className="space-y-6 text-center"
+              data-testid="forgot-password-sent-confirmation"
+            >
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10 text-green-600 mx-auto">
                 <HugeiconsIcon icon={Mail} className="h-6 w-6" />
               </div>
@@ -95,6 +98,7 @@ export default function ForgotPasswordPage() {
                   leftIcon={Mail}
                   id="email"
                   type="email"
+                  data-testid="forgot-password-email-input"
                   placeholder={t('emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -104,6 +108,7 @@ export default function ForgotPasswordPage() {
               </div>
               <Button
                 type="submit"
+                data-testid="forgot-password-submit-button"
                 className="w-full rounded-full h-12 text-lg"
                 disabled={loading}
               >

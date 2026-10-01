@@ -347,6 +347,7 @@ export default function OnboardingPage() {
                       />
                       <Input
                         leftIcon={TextIcon}
+                        data-testid="onboarding-business-name-input"
                         placeholder={t('businessNamePlaceholder')}
                         value={formData.businessName}
                         onChange={(e) =>
@@ -387,6 +388,7 @@ export default function OnboardingPage() {
 
                 <Button
                   className="w-full rounded-pill h-14 text-lg font-medium active:scale-95 transition-transform"
+                  data-testid="onboarding-step1-continue"
                   onClick={nextStep}
                   disabled={!formData.businessName}
                 >
@@ -478,6 +480,7 @@ export default function OnboardingPage() {
 
                 <Button
                   className="w-full rounded-pill h-14 text-lg font-medium active:scale-95 transition-transform"
+                  data-testid="onboarding-step2-continue"
                   onClick={nextStep}
                   disabled={!isBusinessPhoneValid}
                 >
@@ -570,6 +573,7 @@ export default function OnboardingPage() {
 
                 <Button
                   className="w-full rounded-pill h-14 text-lg font-medium active:scale-95 transition-transform"
+                  data-testid="onboarding-step3-continue"
                   onClick={nextStep}
                 >
                   {t('looksGood')}{' '}
@@ -667,6 +671,7 @@ export default function OnboardingPage() {
 
                 <Button
                   className="w-full rounded-pill h-14 text-lg font-medium active:scale-95 transition-transform"
+                  data-testid="onboarding-step4-finish"
                   onClick={handleFinish}
                   disabled={loading}
                 >
@@ -715,6 +720,7 @@ export default function OnboardingPage() {
 
                 <Button
                   onClick={() => router.push('/')}
+                  data-testid="onboarding-enter-dashboard"
                   className="w-full max-w-sm rounded-pill h-14 text-xl font-semibold hover:scale-105 active:scale-95 transition-all"
                 >
                   {t('enterDashboard')}{' '}

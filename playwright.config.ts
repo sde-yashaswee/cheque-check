@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { STORAGE_STATE_PATH } from './e2e/storage-state'
 
 const port = process.env.PORT ?? '3000'
 const localBaseUrl = `http://127.0.0.1:${port}`
@@ -18,8 +19,13 @@ export default defineConfig({
   },
   projects: [
     {
+      name: 'setup',
+      testMatch: /global\.setup\.ts/,
+    },
+    {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
+      use: { ...devices['Desktop Chrome'], storageState: STORAGE_STATE_PATH },
     },
   ],
   webServer: process.env.PLAYWRIGHT_BASE_URL

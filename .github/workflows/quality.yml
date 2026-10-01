@@ -82,3 +82,72 @@ jobs:
       - name: Stop local Supabase
         if: always()
         run: supabase stop --no-backup
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      # Serialize e2e runs: they share one staging Supabase project and
+      # overlapping runs could race each other's cleanup/data.
+      group: e2e-staging
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.E2E_SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_LOG_LEVEL: info
+      NEXT_PUBLIC_RAZORPAY_KEY_ID: rzp_test_ci
+      OPENAI_API_KEY: ci-openai-key
+      RAZORPAY_KEY_ID: rzp_test_ci
+      RAZORPAY_KEY_SECRET: ci-razorpay-secret
+      PORT: '3000'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Purge previous e2e-tagged data
+        run: npm run test:e2e:cleanup -- --confirm
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Start production server
+        run: |
+          nohup npm run start > server.log 2>&1 &
+          disown
+
+      - name: Wait for server
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:3000 > /dev/null; then exit 0; fi
+            sleep 2
+          done
+          echo "Server did not become ready in time" >&2
+          exit 1
+
+      - name: Run Playwright tests
+        run: npm run test:e2e
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+            server.log
+          retention-days: 14

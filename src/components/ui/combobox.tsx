@@ -42,6 +42,7 @@ interface ComboboxProps {
   createUrl?: string
   createLabel?: string
   onCreateClick?: (query: string) => void
+  testId?: string
 }
 
 export function Combobox({
@@ -54,6 +55,7 @@ export function Combobox({
   createUrl,
   createLabel = 'Add new',
   onCreateClick,
+  testId,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState('')
@@ -78,6 +80,7 @@ export function Combobox({
       }}
     >
       <PopoverTrigger
+        data-testid={testId}
         className={cn(
           buttonVariants({
             variant: className?.includes('bg-') ? 'ghost' : 'outline',
@@ -128,6 +131,9 @@ export function Combobox({
                 <CommandItem
                   key={option.value}
                   value={option.label} // Command uses value for filtering
+                  data-testid={
+                    testId ? `${testId}-option-${option.value}` : undefined
+                  }
                   onSelect={() => {
                     onValueChange(option.value === value ? '' : option.value)
                     setOpen(false)

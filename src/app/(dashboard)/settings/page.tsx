@@ -270,6 +270,7 @@ export default function SettingsPage() {
 
       <Button
         variant="destructive"
+        data-testid="settings-logout-button"
         className="w-full rounded-full h-14 text-lg font-semibold"
         onClick={handleLogout}
       >
