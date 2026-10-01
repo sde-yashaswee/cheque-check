@@ -1,30 +1,26 @@
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { businessSchema } from '@/validators'
 import { businessService } from '@/features/businesses/services/business.service'
-import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { useEntityEditor } from '@/hooks/use-entity-editor'
 import { useEntityMutations } from './use-entity-mutations'
 import type { Business } from '@/types'
 import { storageService } from '@/services/storage.service'
 import { logger } from '@/lib/logger'
+import { queryKeys } from '@/lib/query-keys'
 
 export function useEditBusiness(id: string) {
   const router = useRouter()
 
   const {
-    data: business,
+    entity: business,
     isLoading,
     error,
-  } = useQuery({
-    queryKey: ['business', id],
-    queryFn: () => businessService.getById(id),
-  })
-
-  const form = useForm<z.infer<typeof businessSchema>>({
-    resolver: zodResolver(businessSchema),
+    form,
+  } = useEntityEditor<Business, z.infer<typeof businessSchema>>({
+    queryKey: queryKeys.businesses.detail(id),
+    fetchFn: () => businessService.getById(id),
+    schema: businessSchema,
     defaultValues: {
       name: '',
       email: '',
@@ -34,31 +30,24 @@ export function useEditBusiness(id: string) {
       icon: 'Store',
       logo_url: null,
     },
+    toFormValues: (business) => ({
+      name: business.name,
+      email: business.email || '',
+      phone: business.phone || '',
+      address: business.address || '',
+      color: business.color || '#007AFF',
+      icon: business.icon || 'Store',
+      logo_url: business.logo_url || null,
+    }),
   })
-
-  const { reset } = form
-
-  useEffect(() => {
-    if (business) {
-      reset({
-        name: business.name,
-        email: business.email || '',
-        phone: business.phone || '',
-        address: business.address || '',
-        color: business.color || '#007AFF',
-        icon: business.icon || 'Store',
-        logo_url: business.logo_url || null,
-      })
-    }
-  }, [business, reset])
 
   const { updateMutation, deleteMutation } = useEntityMutations<
     Business,
     z.infer<typeof businessSchema>,
     Business
   >({
-    listQueryKey: ['businesses'],
-    detailQueryKey: ['business', id],
+    listQueryKey: queryKeys.businesses.all(),
+    detailQueryKey: queryKeys.businesses.detail(id),
     update: {
       mutationFn: (data) => businessService.update(id, data),
       updateList: (current, newBusiness) =>

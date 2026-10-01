@@ -1,30 +1,27 @@
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { accountSchema } from '@/validators'
 import {
   AccountService,
   accountService,
 } from '@/features/accounts/services/account.service'
-import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { useEntityEditor } from '@/hooks/use-entity-editor'
 import { useEntityMutations } from './use-entity-mutations'
 import type { Account } from '@/types'
+import { queryKeys } from '@/lib/query-keys'
 
 export function useEditAccount(id: string, businessId: string | undefined) {
   const router = useRouter()
 
   const {
-    data: account,
+    entity: account,
     isLoading,
     error,
-  } = useQuery({
-    queryKey: ['account', id],
-    queryFn: () => accountService.getById(id),
-  })
-
-  const form = useForm({
-    resolver: zodResolver(accountSchema),
+    form,
+  } = useEntityEditor<Account, z.infer<typeof accountSchema>>({
+    queryKey: queryKeys.accounts.detail(id),
+    fetchFn: () => accountService.getById(id),
+    schema: accountSchema,
     defaultValues: {
       bank_id: '',
       account_name: '',
@@ -35,32 +32,25 @@ export function useEditAccount(id: string, businessId: string | undefined) {
       opening_balance: 0,
       is_default: false,
     },
+    toFormValues: (account) => ({
+      bank_id: account.bank_id || '',
+      account_name: account.account_name,
+      account_number: account.account_number,
+      ifsc_code: account.ifsc_code || '',
+      color: account.color,
+      notes: account.notes || '',
+      opening_balance: account.opening_balance ?? 0,
+      is_default: account.is_default,
+    }),
   })
-
-  const { reset } = form
-
-  useEffect(() => {
-    if (account) {
-      reset({
-        bank_id: account.bank_id || '',
-        account_name: account.account_name,
-        account_number: account.account_number,
-        ifsc_code: account.ifsc_code || '',
-        color: account.color,
-        notes: account.notes || '',
-        opening_balance: account.opening_balance ?? 0,
-        is_default: account.is_default,
-      })
-    }
-  }, [account, reset])
 
   const { updateMutation, deleteMutation } = useEntityMutations<
     Account,
     Parameters<AccountService['update']>[1],
     Account
   >({
-    listQueryKey: ['accounts', businessId],
-    detailQueryKey: ['account', id],
+    listQueryKey: queryKeys.accounts.list(businessId),
+    detailQueryKey: queryKeys.accounts.detail(id),
     update: {
       mutationFn: (data) => accountService.update(id, data),
       updateList: (current, newAccount) =>

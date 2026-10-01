@@ -1,30 +1,27 @@
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { partySchema } from '@/validators'
 import {
   PartyService,
   partyService,
 } from '@/features/parties/services/party.service'
-import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { Party } from '@/types'
+import { useEntityEditor } from '@/hooks/use-entity-editor'
 import { useEntityMutations } from './use-entity-mutations'
+import { queryKeys } from '@/lib/query-keys'
 
 export function useEditParty(id: string, businessId: string | undefined) {
   const router = useRouter()
 
   const {
-    data: party,
+    entity: party,
     isLoading,
     error,
-  } = useQuery({
-    queryKey: ['party', id],
-    queryFn: () => partyService.getById(id),
-  })
-
-  const form = useForm({
-    resolver: zodResolver(partySchema),
+    form,
+  } = useEntityEditor<Party, z.infer<typeof partySchema>>({
+    queryKey: queryKeys.parties.detail(id),
+    fetchFn: () => partyService.getById(id),
+    schema: partySchema,
     defaultValues: {
       name: '',
       contact: '',
@@ -34,31 +31,24 @@ export function useEditParty(id: string, businessId: string | undefined) {
       color: '#007AFF',
       avatar_url: null,
     },
+    toFormValues: (party) => ({
+      name: party.name,
+      contact: party.contact,
+      email: party.email || '',
+      address: party.address || '',
+      notes: party.notes || '',
+      color: party.color,
+      avatar_url: party.avatar_url || null,
+    }),
   })
-
-  const { reset } = form
-
-  useEffect(() => {
-    if (party) {
-      reset({
-        name: party.name,
-        contact: party.contact,
-        email: party.email || '',
-        address: party.address || '',
-        notes: party.notes || '',
-        color: party.color,
-        avatar_url: party.avatar_url || null,
-      })
-    }
-  }, [party, reset])
 
   const { updateMutation, deleteMutation } = useEntityMutations<
     Party,
     Parameters<PartyService['update']>[1],
     Party
   >({
-    listQueryKey: ['parties', businessId],
-    detailQueryKey: ['party', id],
+    listQueryKey: queryKeys.parties.list(businessId),
+    detailQueryKey: queryKeys.parties.detail(id),
     update: {
       mutationFn: (data) => partyService.update(id, data),
       updateList: (current, newParty) =>
