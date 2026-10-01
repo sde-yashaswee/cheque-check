@@ -41,4 +41,17 @@ export abstract class SupabaseRepository {
       throw mapSupabaseError(error)
     }
   }
+
+  /** Like `handle`, but allows `null` as a legitimate result (e.g. `maybeSingle()` lookups). */
+  protected async query<T>(
+    operation: PromiseLike<{ data: T | null; error: any }>,
+  ): Promise<T | null> {
+    const { data, error } = await operation
+
+    if (error) {
+      throw mapSupabaseError(error)
+    }
+
+    return data
+  }
 }

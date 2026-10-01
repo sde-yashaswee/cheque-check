@@ -1,5 +1,4 @@
 import { SupabaseRepository } from './base.repository'
-import { mapSupabaseError } from '@/lib/errors'
 import { TABLES } from '@/lib/supabase/tables'
 
 export interface Entitlement {
@@ -48,12 +47,12 @@ export class SupabaseMonetizationRepository
     const user = userData?.user
     if (!user) return []
 
-    const { data, error } = await this.supabase
-      .from(TABLES.USER_ENTITLEMENTS)
-      .select('*')
-      .eq('user_id', user.id)
-
-    if (error) throw mapSupabaseError(error)
+    const data = await this.query(
+      this.supabase
+        .from(TABLES.USER_ENTITLEMENTS)
+        .select('*')
+        .eq('user_id', user.id),
+    )
     return (data ?? []) as Entitlement[]
   }
 
@@ -62,12 +61,9 @@ export class SupabaseMonetizationRepository
     const user = userData?.user
     if (!user) return []
 
-    const { data, error } = await this.supabase
-      .from(TABLES.USER_QUOTAS)
-      .select('*')
-      .eq('user_id', user.id)
-
-    if (error) throw mapSupabaseError(error)
+    const data = await this.query(
+      this.supabase.from(TABLES.USER_QUOTAS).select('*').eq('user_id', user.id),
+    )
     return (data ?? []) as Quota[]
   }
 
@@ -76,13 +72,13 @@ export class SupabaseMonetizationRepository
     const user = userData?.user
     if (!user) return []
 
-    const { data, error } = await this.supabase
-      .from(TABLES.TRANSACTIONS)
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-
-    if (error) throw mapSupabaseError(error)
+    const data = await this.query(
+      this.supabase
+        .from(TABLES.TRANSACTIONS)
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false }),
+    )
     return (data ?? []) as Transaction[]
   }
 }
