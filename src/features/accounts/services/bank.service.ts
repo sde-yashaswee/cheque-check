@@ -19,10 +19,6 @@ export class BankService {
     private readonly repository: IBankRepository = new SupabaseBankRepository(),
   ) {}
 
-  static async getAll(): Promise<Bank[]> {
-    return getDefaultBankService().getAll()
-  }
-
   async getAll(): Promise<Bank[]> {
     return this.repository.getAll()
   }

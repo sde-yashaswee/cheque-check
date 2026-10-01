@@ -21,52 +21,6 @@ export class ChequeService {
     private readonly repository: IChequeRepository = new SupabaseChequeRepository(),
   ) {}
 
-  static async getAll(businessId: string): Promise<ChequeEntity[]> {
-    return getDefaultChequeService().getAll(businessId)
-  }
-
-  static async getById(id: string): Promise<ChequeEntity> {
-    return getDefaultChequeService().getById(id)
-  }
-
-  static async create(
-    cheque: Omit<
-      Cheque,
-      'id' | 'created_at' | 'updated_at' | 'voice_call_sent' | 'last_call_at'
-    >,
-  ): Promise<ChequeEntity> {
-    return getDefaultChequeService().create(cheque)
-  }
-
-  static async update(
-    id: string,
-    cheque: Partial<
-      Omit<
-        Cheque,
-        | 'id'
-        | 'business_id'
-        | 'status'
-        | 'created_at'
-        | 'updated_at'
-        | 'voice_call_sent'
-        | 'last_call_at'
-      >
-    >,
-  ): Promise<ChequeEntity> {
-    return getDefaultChequeService().update(id, cheque)
-  }
-
-  static async updateStatus(
-    id: string,
-    status: ChequeStatus,
-  ): Promise<ChequeEntity> {
-    return getDefaultChequeService().updateStatus(id, status)
-  }
-
-  static async delete(id: string): Promise<void> {
-    return getDefaultChequeService().delete(id)
-  }
-
   async getAll(businessId: string): Promise<ChequeEntity[]> {
     const rows = await this.repository.getAll(businessId)
     return rows.map((row) => ChequeEntity.fromRow(row))

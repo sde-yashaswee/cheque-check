@@ -19,36 +19,6 @@ export class PartyService {
     private readonly repository: IPartyRepository = new SupabasePartyRepository(),
   ) {}
 
-  static async getAll(businessId: string) {
-    return getDefaultPartyService().getAll(businessId)
-  }
-
-  static async getById(id: string) {
-    return getDefaultPartyService().getById(id)
-  }
-
-  static async create(
-    party: Omit<Party, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>,
-  ) {
-    return getDefaultPartyService().create(party)
-  }
-
-  static async update(
-    id: string,
-    party: Partial<
-      Omit<
-        Party,
-        'id' | 'business_id' | 'created_at' | 'updated_at' | 'deleted_at'
-      >
-    >,
-  ) {
-    return getDefaultPartyService().update(id, party)
-  }
-
-  static async delete(id: string) {
-    return getDefaultPartyService().delete(id)
-  }
-
   async getAll(businessId: string): Promise<Party[]> {
     return this.repository.getAll(businessId)
   }

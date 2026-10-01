@@ -15,10 +15,6 @@ function getDefaultPaymentService(): PaymentService {
 }
 
 export class PaymentService {
-  static async createOrder(productId: PaymentProductId): Promise<PaymentOrder> {
-    return getDefaultPaymentService().createOrder(productId)
-  }
-
   async createOrder(productId: PaymentProductId): Promise<PaymentOrder> {
     const response = await fetch('/api/payments/create-order', {
       method: 'POST',

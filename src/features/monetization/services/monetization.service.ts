@@ -23,18 +23,6 @@ export class MonetizationService {
     private readonly repository: IMonetizationRepository = new SupabaseMonetizationRepository(),
   ) {}
 
-  static async getEntitlements(): Promise<Entitlement[]> {
-    return getDefaultMonetizationService().getEntitlements()
-  }
-
-  static async getQuotas(): Promise<Quota[]> {
-    return getDefaultMonetizationService().getQuotas()
-  }
-
-  static async getTransactions(): Promise<Transaction[]> {
-    return getDefaultMonetizationService().getTransactions()
-  }
-
   async getEntitlements(): Promise<Entitlement[]> {
     return this.repository.getEntitlements()
   }

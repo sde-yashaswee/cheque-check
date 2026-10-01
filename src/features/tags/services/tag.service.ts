@@ -17,34 +17,6 @@ export class TagService {
     private readonly repository: ITagRepository = new SupabaseTagRepository(),
   ) {}
 
-  static getAll(businessId: string) {
-    return getDefaultTagService().getAll(businessId)
-  }
-
-  static create(input: Pick<Tag, 'business_id' | 'name' | 'color'>) {
-    return getDefaultTagService().create(input)
-  }
-
-  static update(id: string, input: Partial<Pick<Tag, 'name' | 'color'>>) {
-    return getDefaultTagService().update(id, input)
-  }
-
-  static delete(id: string) {
-    return getDefaultTagService().delete(id)
-  }
-
-  static getForEntity(entityType: TagEntityType, entityId: string) {
-    return getDefaultTagService().getForEntity(entityType, entityId)
-  }
-
-  static attach(link: TagLink) {
-    return getDefaultTagService().attach(link)
-  }
-
-  static detach(link: TagLink) {
-    return getDefaultTagService().detach(link)
-  }
-
   getAll(businessId: string) {
     return this.repository.getAll(businessId)
   }

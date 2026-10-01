@@ -16,34 +16,6 @@ export class ReportService {
     private readonly repository: IReportRepository = new BrowserReportRepository(),
   ) {}
 
-  static exportToCSV(
-    cheques: ChequeWithRelations[],
-    filename = 'cheques_report.csv',
-  ) {
-    return getDefaultReportService().exportToCSV(cheques, filename)
-  }
-
-  static exportToJSON(
-    cheques: ChequeWithRelations[],
-    filename = 'cheques_report.json',
-  ) {
-    return getDefaultReportService().exportToJSON(cheques, filename)
-  }
-
-  static exportToPDF(
-    cheques: ChequeWithRelations[],
-    filename = 'cheques_report.pdf',
-  ) {
-    return getDefaultReportService().exportToPDF(cheques, filename)
-  }
-
-  static exportToExcel(
-    cheques: ChequeWithRelations[],
-    filename = 'cheques_report.xlsx',
-  ) {
-    return getDefaultReportService().exportToExcel(cheques, filename)
-  }
-
   exportToCSV(
     cheques: ChequeWithRelations[],
     filename = 'cheques_report.csv',
