@@ -3,10 +3,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Tag } from '@/types'
 import { tagService } from '@/features/tags/services/tag.service'
+import { queryKeys } from '@/lib/query-keys'
 
 export function useTags(businessId: string | undefined) {
   const queryClient = useQueryClient()
-  const queryKey = ['tags', businessId]
+  const queryKey = queryKeys.tags.list(businessId)
   const query = useQuery<Tag[]>({
     queryKey,
     queryFn: () => tagService.getAll(businessId!),
@@ -33,7 +34,7 @@ export function useTags(businessId: string | undefined) {
     mutationFn: ({ id, input }) => tagService.update(id, input),
     onSuccess: (tag) => {
       queryClient.invalidateQueries({ queryKey })
-      queryClient.setQueryData(['tag', tag.id], tag)
+      queryClient.setQueryData(queryKeys.tags.detail(tag.id), tag)
     },
   })
 
@@ -41,8 +42,8 @@ export function useTags(businessId: string | undefined) {
     mutationFn: (id) => tagService.delete(id),
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey })
-      queryClient.removeQueries({ queryKey: ['tag', id] })
-      queryClient.invalidateQueries({ queryKey: ['entity-tags'] })
+      queryClient.removeQueries({ queryKey: queryKeys.tags.detail(id) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.entityTags.all() })
     },
   })
 

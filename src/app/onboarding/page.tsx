@@ -33,6 +33,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Combobox } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
+import { queryKeys } from '@/lib/query-keys'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Stepper,
@@ -163,7 +164,9 @@ export default function OnboardingPage() {
         color: formData.businessColor,
         logo_url: formData.businessLogoUrl,
       })
-      await queryClient.invalidateQueries({ queryKey: ['businesses'] })
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.businesses.all(),
+      })
       setActiveBusiness(business)
 
       // 2. Update Profile

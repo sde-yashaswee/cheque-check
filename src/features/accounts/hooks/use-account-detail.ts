@@ -5,6 +5,7 @@ import { ChequeStatus, Cheque } from '@/types'
 import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useMemo, useState } from 'react'
 import { useOptimisticMutation } from './use-optimistic-mutation'
+import { queryKeys } from '@/lib/query-keys'
 
 export type SortBy = 'date' | 'amount'
 export type SortOrder = 'asc' | 'desc'
@@ -20,12 +21,12 @@ export function useAccountDetail(id: string, businessId: string | undefined) {
     isLoading: accountLoading,
     error: accountError,
   } = useQuery({
-    queryKey: ['account', id],
+    queryKey: queryKeys.accounts.detail(id),
     queryFn: () => accountService.getById(id),
   })
 
   const { data: cheques, isLoading: chequesLoading } = useQuery({
-    queryKey: ['cheques', businessId],
+    queryKey: queryKeys.cheques.list(businessId),
     queryFn: () => chequeService.getAll(businessId!),
     enabled: !!businessId,
   })
@@ -35,7 +36,7 @@ export function useAccountDetail(id: string, businessId: string | undefined) {
     { id: string; status: ChequeStatus },
     ChequeEntity
   >({
-    queryKey: ['cheques', businessId],
+    queryKey: queryKeys.cheques.list(businessId),
     mutationFn: ({ id, status }) => chequeService.updateStatus(id, status),
     update: (current, { id, status }) => {
       if (!current) return current

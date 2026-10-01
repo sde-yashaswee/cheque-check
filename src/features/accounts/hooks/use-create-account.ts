@@ -20,6 +20,7 @@ import {
   toAccountDraftFields,
   useDraftController,
 } from '@/features/drafts'
+import { queryKeys } from '@/lib/query-keys'
 
 type AccountFormInput = z.input<typeof accountSchema>
 type AccountFormData = z.output<typeof accountSchema>
@@ -72,7 +73,7 @@ export function useCreateAccount(
   })
 
   const mutation = useEntityCreateMutation<Account, AccountFormData, Account>({
-    queryKey: ['accounts', businessId],
+    queryKey: queryKeys.accounts.list(businessId),
     mutationFn: (data) =>
       accountService.create({
         ...data,
@@ -136,7 +137,9 @@ export function useCreateAccount(
         draft.finishPublish()
         await onCreated?.(created)
         if (publishedDraftId) {
-          queryClient.invalidateQueries({ queryKey: ['accounts', businessId] })
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.accounts.list(businessId),
+          })
           queryClient.invalidateQueries({
             queryKey: draftKeys.list('account', businessId),
           })

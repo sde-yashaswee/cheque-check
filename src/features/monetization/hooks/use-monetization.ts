@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
 import { monetizationService } from '@/features/monetization/services/monetization.service'
 import type { Entitlement, Quota } from '@/repositories/monetization.repository'
+import { queryKeys } from '@/lib/query-keys'
 
 export function useMonetization() {
   const { data: entitlements, isLoading: isLoadingEntitlements } = useQuery<
     Entitlement[]
   >({
-    queryKey: ['entitlements'],
+    queryKey: queryKeys.monetization.entitlements(),
     queryFn: () => monetizationService.getEntitlements(),
   })
 
   const { data: quotas, isLoading: isLoadingQuotas } = useQuery<Quota[]>({
-    queryKey: ['quotas'],
+    queryKey: queryKeys.monetization.quotas(),
     queryFn: () => monetizationService.getQuotas(),
   })
 

@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { Profile } from '@/types'
 import { profileService } from '@/features/profile/services/profile.service'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { queryKeys } from '@/lib/query-keys'
 
 interface ProfileContextType {
   profile: Profile | null
@@ -18,7 +19,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient()
 
   const { data: profile, isLoading } = useQuery({
-    queryKey: ['profile'],
+    queryKey: queryKeys.profile.detail(),
     queryFn: () => profileService.get(),
   })
 
@@ -33,7 +34,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     mutationFn: (newProfile: Partial<Profile>) =>
       profileService.update(newProfile),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile.detail() })
     },
   })
 

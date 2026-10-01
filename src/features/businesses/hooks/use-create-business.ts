@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/hooks/use-business'
 import type { Business } from '@/types'
 import { queueCelebration } from '@/lib/celebrate'
+import { queryKeys } from '@/lib/query-keys'
 
 type BusinessFormData = z.infer<typeof businessSchema>
 
@@ -41,7 +42,7 @@ export function useCreateBusiness({
     BusinessFormData,
     Business
   >({
-    queryKey: ['businesses'],
+    queryKey: queryKeys.businesses.all(),
     mutationFn: (data) =>
       businessService.create({
         ...data,

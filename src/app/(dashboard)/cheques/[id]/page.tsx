@@ -28,6 +28,7 @@ import { chequeDraftService } from '@/features/drafts'
 import { useProfile } from '@/hooks/use-profile'
 import { useSignedMediaUrl } from '@/hooks/use-signed-media-url'
 import { TextTruncate } from '@/components/ui/text-truncate'
+import { queryKeys } from '@/lib/query-keys'
 import { cn } from '@/lib/utils'
 import { ChequeStatus } from '@/types'
 import { StatusPill } from '@/components/ui/status-pill'
@@ -103,7 +104,7 @@ export default function ChequeDetailPage() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [printLayoutOpen, setPrintLayoutOpen] = useState(false)
   const { data: party } = useQuery({
-    queryKey: ['party', cheque?.party_id],
+    queryKey: queryKeys.parties.detail(cheque?.party_id),
     queryFn: () => partyService.getById(cheque!.party_id),
     enabled: !!cheque?.party_id,
   })

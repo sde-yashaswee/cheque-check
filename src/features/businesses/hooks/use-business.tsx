@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useMemo } from 'react'
 import { Business } from '@/types'
 import { businessService } from '@/features/businesses/services/business.service'
 import { useQuery } from '@tanstack/react-query'
+import { queryKeys } from '@/lib/query-keys'
 
 interface BusinessContextType {
   activeBusiness: Business | null
@@ -23,7 +24,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ['businesses'],
+    queryKey: queryKeys.businesses.all(),
     queryFn: () => businessService.getAll(),
   })
 

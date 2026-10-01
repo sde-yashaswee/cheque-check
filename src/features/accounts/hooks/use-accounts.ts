@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { accountService } from '@/features/accounts/services/account.service'
 import { useState, useMemo } from 'react'
 import type { Account } from '@/types'
+import { queryKeys } from '@/lib/query-keys'
 
 export function useAccounts(businessId: string | undefined) {
   const [search, setSearch] = useState('')
@@ -16,7 +17,7 @@ export function useAccounts(businessId: string | undefined) {
     isLoading,
     error,
   } = useQuery<Account[]>({
-    queryKey: ['accounts', businessId],
+    queryKey: queryKeys.accounts.list(businessId),
     queryFn: () => accountService.getAll(businessId!),
     enabled: !!businessId,
   })
