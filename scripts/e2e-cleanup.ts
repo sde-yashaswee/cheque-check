@@ -9,7 +9,7 @@ import { createClient } from '@supabase/supabase-js'
  * `--confirm` and refuses to run against anything that doesn't look like a
  * non-production project, so it can never be pointed at real user data.
  */
-const E2E_EMAIL_PATTERN = /^e2e-.+@e2e\.chequecheck\.test$/
+const E2E_EMAIL_PATTERN = /^e2e-.+@example\.com$/
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY

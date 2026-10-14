@@ -33,11 +33,15 @@ export class ChequesPage {
   /** Step 2: search+select an existing party and account by their unique names. */
   async selectPartyAndAccount(partySearch: string, accountSearch: string) {
     await this.page.getByTestId('cheque-party-combobox').click()
-    await this.page.getByRole('textbox').fill(partySearch)
+    await this.page
+      .getByTestId('cheque-party-combobox-search')
+      .fill(partySearch)
     await this.page.getByRole('option').first().click()
 
     await this.page.getByTestId('cheque-account-combobox').click()
-    await this.page.getByRole('textbox').fill(accountSearch)
+    await this.page
+      .getByTestId('cheque-account-combobox-search')
+      .fill(accountSearch)
     await this.page.getByRole('option').first().click()
 
     await this.page.getByTestId('cheque-step2-continue').click()

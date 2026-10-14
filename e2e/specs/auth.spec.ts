@@ -3,39 +3,33 @@ import { LoginPage } from '../pages/login.page'
 import { SignupPage } from '../pages/signup.page'
 import { OnboardingPage } from '../pages/onboarding.page'
 import { e2eBusinessName, e2eUser } from '../fixtures/test-data'
-import { confirmUserEmail } from '../admin-client'
+import { createConfirmedE2eUser } from '../admin-client'
 
-// This spec drives the real signup/login/logout UI independently of the
-// shared global-setup session, so each test starts with a clean, logged-out context.
+// Each test starts with a clean, logged-out context.
 // Logout must not reuse the shared storageState: Supabase signOut() revokes the
 // session server-side, which would break every other spec running against it.
 test.describe('authentication', () => {
   test.use({ storageState: { cookies: [], origins: [] } })
 
-  test('signup creates an account and redirects to login', async ({ page }) => {
-    const user = e2eUser('signup')
-    page.on('dialog', (dialog) => dialog.accept())
-
+  test('signup form requires name, email, and password', async ({ page }) => {
     const signupPage = new SignupPage(page)
     await signupPage.goto()
-    await signupPage.signup(user.name, user.email, user.password)
 
-    await expect(page).toHaveURL('/login')
+    await expect(signupPage.nameInput).toHaveAttribute('required', '')
+    await expect(signupPage.emailInput).toHaveAttribute('required', '')
+    await expect(signupPage.passwordInput).toHaveAttribute('required', '')
+    await signupPage.submitButton.click()
+    await expect(page).toHaveURL('/signup')
   })
 
   test('login with valid credentials redirects away from /login', async ({
     page,
   }) => {
     const user = e2eUser('login')
-    page.on('dialog', (dialog) => dialog.accept())
-
-    const signupPage = new SignupPage(page)
-    await signupPage.goto()
-    await signupPage.signup(user.name, user.email, user.password)
-    await page.waitForURL('/login')
-    await confirmUserEmail(user.email)
+    await createConfirmedE2eUser(user)
 
     const loginPage = new LoginPage(page)
+    await loginPage.goto()
     await loginPage.login(user.email, user.password)
 
     await expect(page).not.toHaveURL('/login')
@@ -60,6 +54,13 @@ test.describe('authentication', () => {
 
   test('forgot password shows a confirmation message', async ({ page }) => {
     const user = e2eUser('forgot')
+    await page.route('**/auth/v1/recover**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: '{}',
+      }),
+    )
     await page.goto('/forgot-password')
     await page.getByTestId('forgot-password-email-input').fill(user.email)
     await page.getByTestId('forgot-password-submit-button').click()
@@ -75,15 +76,10 @@ test.describe('logout', () => {
 
   test('logs the user out and redirects to login', async ({ page }) => {
     const user = e2eUser('logout')
-    page.on('dialog', (dialog) => dialog.accept())
-
-    const signupPage = new SignupPage(page)
-    await signupPage.goto()
-    await signupPage.signup(user.name, user.email, user.password)
-    await page.waitForURL('/login')
-    await confirmUserEmail(user.email)
+    await createConfirmedE2eUser(user)
 
     const loginPage = new LoginPage(page)
+    await loginPage.goto()
     await loginPage.login(user.email, user.password)
     await expect(page).not.toHaveURL('/login')
 

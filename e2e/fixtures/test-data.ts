@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto'
  * All e2e-created data must be identifiable so `scripts/e2e-cleanup.ts` can
  * safely purge it from the shared staging project without touching real data.
  */
-const E2E_EMAIL_DOMAIN = 'e2e.chequecheck.test'
+const E2E_EMAIL_DOMAIN = 'example.com'
 
 export function uniqueE2eEmail(label = 'user') {
   return `e2e-${label}-${randomUUID()}@${E2E_EMAIL_DOMAIN}`

@@ -18,36 +18,21 @@ function createAdminClient() {
   )
 }
 
-/**
- * Hosted Supabase projects default to requiring email confirmation, which
- * real signups can't complete without an inbox. Force-confirm via the admin
- * API right after signup so login works regardless of the project's auth
- * settings; this is a no-op (idempotent) if confirmation is already off.
- */
-export async function confirmUserEmail(email: string) {
+export async function createConfirmedE2eUser(user: {
+  email: string
+  name: string
+  password: string
+}) {
   const admin = createAdminClient()
-  let page = 1
-
-  while (true) {
-    const { data, error } = await admin.auth.admin.listUsers({
-      page,
-      perPage: 200,
-    })
-    if (error) throw error
-
-    const match = data.users.find((user) => user.email === email)
-    if (match) {
-      const { error: updateError } = await admin.auth.admin.updateUserById(
-        match.id,
-        { email_confirm: true },
-      )
-      if (updateError) throw updateError
-      return
-    }
-
-    if (data.users.length < 200) break
-    page += 1
+  const { data, error } = await admin.auth.admin.createUser({
+    email: user.email,
+    password: user.password,
+    email_confirm: true,
+    user_metadata: { name: user.name },
+  })
+  if (error) throw error
+  if (!data.user) {
+    throw new Error(`Supabase did not create e2e user ${user.email}`)
   }
-
-  throw new Error(`Could not find a newly signed-up user with email ${email}`)
+  return data.user
 }

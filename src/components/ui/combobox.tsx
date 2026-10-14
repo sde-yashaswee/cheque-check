@@ -116,6 +116,7 @@ export function Combobox({
         <Command className="rounded-none">
           <CommandInput
             placeholder={placeholder}
+            data-testid={testId ? `${testId}-search` : undefined}
             className="h-12"
             value={query}
             onValueChange={setQuery}

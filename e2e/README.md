@@ -43,24 +43,20 @@ tests) or `npm run test:e2e:qa:reset-only` (reset only, don't run tests).
 
 ## How sessions work
 
-A `setup` project (`e2e/global.setup.ts`) runs first: it signs up a brand-new
-`e2e-` prefixed user through the real `/signup` UI, completes the onboarding
+A `setup` project (`e2e/global.setup.ts`) runs first: it creates a fresh,
+confirmed `e2e-` user through the Supabase admin API (avoiding hosted email
+confirmation/rate limits), logs in through the real UI, completes the onboarding
 wizard, and saves the authenticated session to `e2e/.auth/user.json`
 (git-ignored). The `chromium` project depends on `setup` and reuses that
 storageState by default, so most feature specs (`cheques`, etc.) start already
 logged in with a business set up.
 
 `auth.spec.ts` and `onboarding.spec.ts` opt out of the shared session
-(`test.use({ storageState: { cookies: [], origins: [] } })`) and drive
-signup/login/logout/onboarding from scratch with their own fresh users, since
-those flows can't be exercised against an already-authenticated/onboarded
-session.
-
-Hosted Supabase projects default to requiring email confirmation, which a
-real signup can't complete without an inbox. `e2e/admin-client.ts`'s
-`confirmUserEmail()` force-confirms each freshly signed-up user via the
-service-role admin API right after signup, so login works regardless of the
-QA project's "Confirm email" setting.
+(`test.use({ storageState: { cookies: [], origins: [] } })`) and create their
+own admin-confirmed users before driving login/logout/onboarding through the
+browser. The signup spec covers native required-field validation; password
+reset stubs only the email-delivery endpoint so the QA project sends no mail.
+Use `example.com` for synthetic user addresses; it is reserved for examples.
 
 ## Data reset & cleanup
 
@@ -69,7 +65,7 @@ every run (see above) — this is the normal path and requires no manual
 cleanup.
 
 **Alternative (a genuinely shared, non-resettable project):**
-`scripts/e2e-cleanup.ts` surgically deletes only `e2e-*@e2e.chequecheck.test`
+`scripts/e2e-cleanup.ts` surgically deletes only `e2e-*@example.com`
 tagged users (FK cascades remove their businesses/cheques/parties/accounts)
 instead of wiping the whole project:
 
@@ -80,6 +76,20 @@ npm run test:e2e:cleanup -- --confirm
 All e2e-created users/businesses/parties/accounts use `e2e-` prefixed
 names/emails (see `e2e/fixtures/test-data.ts`) regardless of which cleanup
 strategy is in play.
+
+## Production deployment gate
+
+The `e2e` job in `.github/workflows/quality.yml` runs on pull requests to
+`main` and on pushes to `main`. To ensure Vercel does not deploy a merge before
+the QA run succeeds, configure the GitHub `main` ruleset to require pull
+requests, disallow direct pushes/bypasses, and require these status checks:
+`Quality / quality`, `Quality / database`, and `Quality / e2e`.
+
+Also enable Vercel's Git deployment check for `Quality / e2e` (and the other
+required checks) under the project's Git deployment settings, or disable
+automatic Git deployments and deploy from a GitHub Actions job that has
+`needs: [quality, database, e2e]`. This repository has no Vercel deployment job,
+so the Vercel project setting is required for a hard deployment gate.
 
 ## Conventions
 
