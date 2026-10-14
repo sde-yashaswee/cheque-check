@@ -17,6 +17,9 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: read
     env:
       FORMAT_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
       HUSKY: 0
@@ -29,59 +32,43 @@ jobs:
       RAZORPAY_KEY_SECRET: ci-razorpay-secret
 
     steps:
-      - name: Check out repository
+      - name: Check Out Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Node.js
+      - name: Set Up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm ci
 
-      - name: Check changed-file formatting
+      - name: Check Changed-File Formatting
         run: npm run format:check
 
       - name: Lint
         run: npm run lint
 
-      - name: Type-check
+      - name: Type-Check
         run: npm run type-check
 
       - name: Test
         run: npm test
 
-      - name: Audit production dependencies
+      - name: Scan For Secrets With Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: 'false'
+
+      - name: Audit Production Dependencies
         run: npm audit --omit=dev --audit-level=high
 
       - name: Build
         run: npm run build
-
-  database:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: 2.117.0
-
-      - name: Start local Supabase
-        run: supabase start
-
-      - name: Apply migrations and seed from scratch
-        run: supabase db reset
-
-      - name: Stop local Supabase
-        if: always()
-        run: supabase stop --no-backup
 
   e2e:
     runs-on: ubuntu-latest
@@ -102,25 +89,25 @@ jobs:
       RAZORPAY_KEY_SECRET: ci-razorpay-secret
       PORT: '3000'
     steps:
-      - name: Check out repository
+      - name: Check Out Repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set Up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm ci
 
-      - name: Install Playwright browsers
+      - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Reset QA database and run e2e suite
+      - name: Reset QA Database And Run E2E Suite
         run: npm run test:e2e:qa
 
-      - name: Upload Playwright report
+      - name: Upload Playwright Report
         if: failure()
         uses: actions/upload-artifact@v4
         with:

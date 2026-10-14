@@ -83,13 +83,17 @@ The `e2e` job in `.github/workflows/quality.yml` runs on pull requests to
 `main` and on pushes to `main`. To ensure Vercel does not deploy a merge before
 the QA run succeeds, configure the GitHub `main` ruleset to require pull
 requests, disallow direct pushes/bypasses, and require these status checks:
-`Quality / quality`, `Quality / database`, and `Quality / e2e`.
+`Quality / quality` and `Quality / e2e`.
 
 Also enable Vercel's Git deployment check for `Quality / e2e` (and the other
 required checks) under the project's Git deployment settings, or disable
 automatic Git deployments and deploy from a GitHub Actions job that has
-`needs: [quality, database, e2e]`. This repository has no Vercel deployment job,
+`needs: [quality, e2e]`. This repository has no Vercel deployment job,
 so the Vercel project setting is required for a hard deployment gate.
+
+For local QA resets, prefer the Supabase **Session pooler** connection string
+for `SUPABASE_DB_URL`; the direct `db.<project-ref>.supabase.co` endpoint may
+not be reachable from IPv4-only networks.
 
 ## Conventions
 
