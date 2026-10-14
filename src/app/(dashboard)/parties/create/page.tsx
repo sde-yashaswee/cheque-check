@@ -378,6 +378,7 @@ export default function CreatePartyPage() {
 
             <Button
               type="button"
+              data-testid="party-step1-continue"
               className="w-full rounded-full h-14 text-lg"
               onClick={nextStep}
               disabled={!watch('name')}
@@ -436,6 +437,7 @@ export default function CreatePartyPage() {
 
             <Button
               type="button"
+              data-testid="party-step2-continue"
               className="w-full rounded-full h-14 text-lg"
               onClick={nextStep}
               disabled={!watch('contact')}
@@ -526,6 +528,7 @@ export default function CreatePartyPage() {
 
             <Button
               type="submit"
+              data-testid="party-submit-button"
               className="w-full rounded-full h-14 text-lg"
               disabled={isSaving || isAvatarUploading}
             >

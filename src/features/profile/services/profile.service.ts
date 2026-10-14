@@ -19,18 +19,6 @@ export class ProfileService {
     private readonly repository: IProfileRepository = new SupabaseProfileRepository(),
   ) {}
 
-  static async get(): Promise<Profile | null> {
-    return getDefaultProfileService().get()
-  }
-
-  static async update(profile: Partial<Profile>): Promise<Profile> {
-    return getDefaultProfileService().update(profile)
-  }
-
-  static async delete(): Promise<void> {
-    return getDefaultProfileService().delete()
-  }
-
   async get(): Promise<Profile | null> {
     return this.repository.get()
   }

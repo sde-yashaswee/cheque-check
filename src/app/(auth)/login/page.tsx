@@ -90,6 +90,7 @@ export default function LoginPage() {
                 leftIcon={Mail}
                 id="email"
                 type="email"
+                data-testid="login-email-input"
                 placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -112,6 +113,7 @@ export default function LoginPage() {
                   leftIcon={Lock}
                   id="password"
                   type={showPassword ? 'text' : 'password'}
+                  data-testid="login-password-input"
                   placeholder={t('passwordPlaceholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -133,6 +135,7 @@ export default function LoginPage() {
             </div>
             <Button
               type="submit"
+              data-testid="login-submit-button"
               className="w-full rounded-full h-12 text-lg"
               disabled={loading}
             >

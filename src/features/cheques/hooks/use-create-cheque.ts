@@ -24,6 +24,7 @@ import {
   useDraftController,
 } from '@/features/drafts'
 import { buildNotifyPartyAction } from '@/features/cheques/lib/notify-party'
+import { queryKeys } from '@/lib/query-keys'
 
 type ChequeFormValues = z.infer<typeof chequeSchema>
 
@@ -89,7 +90,7 @@ export function useCreateCheque(
     ChequeFormValues,
     ChequeEntity
   >({
-    queryKey: businessId ? ['cheques', businessId] : ['cheques'],
+    queryKey: queryKeys.cheques.list(businessId),
     mutationFn: (data: ChequeFormValues) => {
       if (!businessId)
         throw new Error('Select a business before creating a cheque')
@@ -119,7 +120,7 @@ export function useCreateCheque(
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         party: queryClient
-          .getQueryData<Party[]>(['parties', businessId])
+          .getQueryData<Party[]>(queryKeys.parties.list(businessId))
           ?.find((party) => party.id === newCheque.party_id),
       })
       return current ? [optimisticCheque, ...current] : [optimisticCheque]
@@ -179,7 +180,9 @@ export function useCreateCheque(
       )
       draft.finishPublish()
       await onCreated?.(published)
-      queryClient.invalidateQueries({ queryKey: ['cheques', businessId] })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.cheques.list(businessId),
+      })
       queryClient.invalidateQueries({
         queryKey: draftKeys.list('cheque', businessId),
       })

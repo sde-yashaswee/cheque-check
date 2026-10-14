@@ -1,5 +1,4 @@
 import { SupabaseRepository } from '@/repositories/base.repository'
-import { mapSupabaseError } from '@/lib/errors'
 import { TABLES } from '@/lib/supabase/tables'
 
 export interface NpsSubmission {
@@ -19,14 +18,14 @@ export class SupabaseNpsRepository
   implements INpsRepository
 {
   async getLastSubmittedAt(): Promise<Date | null> {
-    const { data, error } = await this.supabase
-      .from(TABLES.NPS_RESPONSES)
-      .select('created_at')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-
-    if (error) throw mapSupabaseError(error)
+    const data = (await this.query(
+      this.supabase
+        .from(TABLES.NPS_RESPONSES)
+        .select('created_at')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    )) as { created_at: string } | null
     return data ? new Date(data.created_at) : null
   }
 

@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Tag, TagEntityType } from '@/types'
 import { tagService } from '@/features/tags/services/tag.service'
+import { queryKeys } from '@/lib/query-keys'
 
 export function useEntityTags(
   entityType: TagEntityType,
   entityId: string | undefined,
 ) {
   const queryClient = useQueryClient()
-  const queryKey = ['entity-tags', entityType, entityId]
+  const queryKey = queryKeys.entityTags.forEntity(entityType, entityId)
   const query = useQuery<Tag[]>({
     queryKey,
     queryFn: () => tagService.getForEntity(entityType, entityId!),
@@ -29,9 +30,9 @@ export function useEntityTags(
     )
     await Promise.all([
       queryClient.invalidateQueries({ queryKey }),
-      queryClient.invalidateQueries({ queryKey: ['entity-tag-map'] }),
-      queryClient.invalidateQueries({ queryKey: ['tags'] }),
-      queryClient.invalidateQueries({ queryKey: ['tag'] }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.entityTagMap.all() }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.tags.all() }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.tags.allDetail() }),
     ])
   }
 
@@ -71,7 +72,7 @@ export function useEntityTagMap(
   entityType: TagEntityType,
 ) {
   const query = useQuery<Record<string, Tag[]>>({
-    queryKey: ['entity-tag-map', businessId, entityType],
+    queryKey: queryKeys.entityTagMap.forBusiness(businessId, entityType),
     queryFn: () => tagService.getTagMap(businessId!, entityType),
     enabled: businessId !== undefined,
     staleTime: 0,

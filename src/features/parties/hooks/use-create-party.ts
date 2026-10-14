@@ -20,6 +20,7 @@ import {
   toPartyDraftFields,
   useDraftController,
 } from '@/features/drafts'
+import { queryKeys } from '@/lib/query-keys'
 
 type PartyFormData = z.infer<typeof partySchema>
 
@@ -69,7 +70,7 @@ export function useCreateParty(
   })
 
   const mutation = useEntityCreateMutation<Party, PartyFormData, Party>({
-    queryKey: ['parties', businessId],
+    queryKey: queryKeys.parties.list(businessId),
     mutationFn: (data) =>
       partyService.create({
         ...data,
@@ -138,7 +139,9 @@ export function useCreateParty(
         draft.finishPublish()
         await onCreated?.(created)
         if (publishedDraftId) {
-          queryClient.invalidateQueries({ queryKey: ['parties', businessId] })
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.parties.list(businessId),
+          })
           queryClient.invalidateQueries({
             queryKey: draftKeys.list('party', businessId),
           })

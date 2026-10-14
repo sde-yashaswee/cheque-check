@@ -1,6 +1,9 @@
 -- Repair rows created before inward cheques explicitly persisted their initial status.
 UPDATE cheques
-SET status = CASE WHEN type = 'Inward' THEN 'Received' ELSE 'Issued' END
+SET status = CASE
+  WHEN type = 'Inward' THEN 'Received'::cheque_status
+  ELSE 'Issued'::cheque_status
+END
 WHERE status IS NULL;
 
 UPDATE cheques SET status = 'Received' WHERE type = 'Inward' AND status = 'Issued';

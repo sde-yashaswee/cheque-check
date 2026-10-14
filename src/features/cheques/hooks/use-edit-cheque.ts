@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { z } from 'zod'
 import { chequeSchema } from '@/validators'
 import { chequeService } from '@/features/cheques/services/cheque.service'
@@ -8,9 +6,10 @@ import { storageService } from '@/services/storage.service'
 import { toast } from '@/components/ui/toast'
 import { useTranslations } from 'next-intl'
 import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
-import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { useEntityEditor } from '@/hooks/use-entity-editor'
 import { useEntityMutations } from './use-entity-mutations'
+import { queryKeys } from '@/lib/query-keys'
 
 type ChequeFormData = z.infer<typeof chequeSchema>
 
@@ -20,16 +19,14 @@ export function useEditCheque(id: string) {
   const tCommon = useTranslations('Common')
 
   const {
-    data: cheque,
+    entity: cheque,
     isLoading,
     error,
-  } = useQuery({
-    queryKey: ['cheque', id],
-    queryFn: () => chequeService.getById(id),
-  })
-
-  const form = useForm<ChequeFormData>({
-    resolver: zodResolver(chequeSchema),
+    form,
+  } = useEntityEditor<ChequeEntity, ChequeFormData>({
+    queryKey: queryKeys.cheques.detail(id),
+    fetchFn: () => chequeService.getById(id),
+    schema: chequeSchema,
     defaultValues: {
       cheque_number: '',
       amount: 0,
@@ -41,34 +38,27 @@ export function useEditCheque(id: string) {
       notes: '',
       image_url: null,
     },
+    toFormValues: (cheque) => ({
+      cheque_number: cheque.cheque_number,
+      amount: cheque.amount,
+      cheque_date: cheque.cheque_date,
+      deposit_date: cheque.deposit_date || '',
+      party_id: cheque.party_id,
+      account_id: cheque.account_id,
+      type: cheque.type,
+      notes: cheque.notes || '',
+      image_url: cheque.image_url || null,
+    }),
   })
-
-  const { reset } = form
-
-  useEffect(() => {
-    if (cheque) {
-      reset({
-        cheque_number: cheque.cheque_number,
-        amount: cheque.amount,
-        cheque_date: cheque.cheque_date,
-        deposit_date: cheque.deposit_date || '',
-        party_id: cheque.party_id,
-        account_id: cheque.account_id,
-        type: cheque.type,
-        notes: cheque.notes || '',
-        image_url: cheque.image_url || null,
-      })
-    }
-  }, [cheque, reset])
 
   const { updateMutation, deleteMutation } = useEntityMutations<
     ChequeEntity,
     ChequeFormData,
     ChequeEntity
   >({
-    listQueryKey: ['cheques', cheque?.business_id],
-    detailQueryKey: ['cheque', id],
-    deleteQueryKeys: [['cheque', id]],
+    listQueryKey: queryKeys.cheques.list(cheque?.business_id),
+    detailQueryKey: queryKeys.cheques.detail(id),
+    deleteQueryKeys: [queryKeys.cheques.detail(id)],
     update: {
       mutationFn: (data) => chequeService.update(id, data),
       updateList: (current, newCheque) =>

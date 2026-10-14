@@ -5,6 +5,7 @@ import { ChequeStatus, ChequeWithRelations } from '@/types'
 import { Cheque as ChequeEntity } from '@/domain/cheque.entity'
 import { useProfile } from './use-profile'
 import { useOptimisticMutation } from './use-optimistic-mutation'
+import { queryKeys } from '@/lib/query-keys'
 
 export type SortBy = 'date' | 'amount'
 export type SortOrder = 'asc' | 'desc'
@@ -21,7 +22,7 @@ export function useCheques(businessId: string | undefined) {
     isLoading,
     error,
   } = useQuery<ChequeWithRelations[]>({
-    queryKey: ['cheques', businessId],
+    queryKey: queryKeys.cheques.list(businessId),
     queryFn: () => chequeService.getAll(businessId!),
     enabled: !!businessId,
   })
@@ -31,7 +32,7 @@ export function useCheques(businessId: string | undefined) {
     { id: string; status: ChequeStatus },
     ChequeEntity
   >({
-    queryKey: ['cheques', businessId],
+    queryKey: queryKeys.cheques.list(businessId),
     mutationFn: ({ id, status }: { id: string; status: ChequeStatus }) =>
       chequeService.updateStatus(id, status),
     update: (current, { id, status }) => {
@@ -49,7 +50,7 @@ export function useCheques(businessId: string | undefined) {
     string,
     void
   >({
-    queryKey: ['cheques', businessId],
+    queryKey: queryKeys.cheques.list(businessId),
     mutationFn: (id: string) => chequeService.delete(id),
     update: (current, id) => {
       if (!current) return current

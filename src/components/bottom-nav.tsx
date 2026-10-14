@@ -2,11 +2,16 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { HugeiconsIcon } from '@hugeicons/react';
-import { Home01Icon as Home, File02Icon as FileText, UserGroupIcon as Users, BankIcon as Landmark } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Home01Icon as Home,
+  File02Icon as FileText,
+  UserGroupIcon as Users,
+  BankIcon as Landmark,
+} from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
-import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 const navItems = [
   { name: 'dashboard', href: '/', icon: Home },
@@ -29,7 +34,15 @@ export function BottomNav() {
 
   // Only show bottom nav on main top-level routes
   const currentPath = optimisticPath || pathname
-  const isMainTab = ['/', '/cheques', '/parties', '/accounts', '/settings', '/businesses', '/features'].includes(pathname)
+  const isMainTab = [
+    '/',
+    '/cheques',
+    '/parties',
+    '/accounts',
+    '/settings',
+    '/businesses',
+    '/features',
+  ].includes(pathname)
 
   if (!isMainTab) {
     return null
@@ -43,18 +56,30 @@ export function BottomNav() {
           <Link
             key={item.name}
             href={item.href}
+            data-testid={`bottom-nav-${item.name}`}
             onClick={() => setOptimisticPath(item.href)}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 transition-all active:scale-95",
-              isActive ?"text-primary":"text-muted-foreground hover:text-foreground"
+              'flex flex-col items-center justify-center gap-1 transition-all active:scale-95',
+              isActive
+                ? 'text-primary'
+                : 'text-muted-foreground hover:text-foreground',
             )}
           >
-            <HugeiconsIcon icon={item.icon} className={cn("h-5 w-5", isActive &&"stroke-[2.5px]")} />
-            <span className={cn("text-[10px] font-semibold tracking-tight", isActive ?"opacity-100":"opacity-70")}>{t(item.name)}</span>
+            <HugeiconsIcon
+              icon={item.icon}
+              className={cn('h-5 w-5', isActive && 'stroke-[2.5px]')}
+            />
+            <span
+              className={cn(
+                'text-[10px] font-semibold tracking-tight',
+                isActive ? 'opacity-100' : 'opacity-70',
+              )}
+            >
+              {t(item.name)}
+            </span>
           </Link>
         )
       })}
     </nav>
   )
 }
-

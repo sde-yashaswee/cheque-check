@@ -258,6 +258,7 @@ export default function CreateAccountPage() {
 
             <Button
               type="button"
+              data-testid="account-step1-continue"
               className="w-full rounded-full h-14 text-lg"
               onClick={nextStep}
               disabled={!watch('bank_id')}
@@ -359,6 +360,7 @@ export default function CreateAccountPage() {
 
             <Button
               type="button"
+              data-testid="account-step2-continue"
               className="w-full rounded-full h-14 text-lg"
               onClick={nextStep}
               disabled={!watch('account_name') || !watch('account_number')}
@@ -407,6 +409,7 @@ export default function CreateAccountPage() {
 
             <Button
               type="submit"
+              data-testid="account-submit-button"
               className="w-full rounded-full h-14 text-lg"
               disabled={isSaving}
             >

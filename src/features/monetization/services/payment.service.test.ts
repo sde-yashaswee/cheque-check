@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { PaymentService } from './payment.service'
+import { paymentService } from './payment.service'
 
 describe('PaymentService', () => {
   afterEach(() => {
@@ -18,7 +18,7 @@ describe('PaymentService', () => {
       }),
     } as Response)
 
-    const result = await PaymentService.createOrder('lifetime_premium')
+    const result = await paymentService.createOrder('lifetime_premium')
 
     expect(fetchSpy).toHaveBeenCalledWith('/api/payments/create-order', {
       method: 'POST',
@@ -41,7 +41,7 @@ describe('PaymentService', () => {
     } as Response)
 
     await expect(
-      PaymentService.createOrder('lifetime_premium'),
+      paymentService.createOrder('lifetime_premium'),
     ).rejects.toThrow('Payment product is unavailable')
   })
 })

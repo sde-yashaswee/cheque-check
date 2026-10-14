@@ -7,6 +7,7 @@ import { useOptimisticMutation } from './use-optimistic-mutation'
 import { buildNotifyPartyAction } from '@/features/cheques/lib/notify-party'
 import { toast } from '@/components/ui/toast'
 import { useTranslations } from 'next-intl'
+import { queryKeys } from '@/lib/query-keys'
 
 export function useChequeActions() {
   const { activeBusiness } = useBusiness()
@@ -19,10 +20,10 @@ export function useChequeActions() {
     { id: string; status: ChequeStatus },
     ChequeEntity
   >({
-    queryKey: activeBusiness?.id ? ['cheques', activeBusiness.id] : ['cheques'],
+    queryKey: queryKeys.cheques.list(activeBusiness?.id),
     additionalMutations: [
       {
-        queryKey: ({ id }) => ['cheque', id],
+        queryKey: ({ id }) => queryKeys.cheques.detail(id),
         update: (current: ChequeEntity | undefined, { id, status }) => {
           if (!current || current.id !== id) return current
           return ChequeEntity.fromRow({ ...current.toJSON(), status })
@@ -54,7 +55,7 @@ export function useChequeActions() {
   })
 
   const deleteMutation = useOptimisticMutation<ChequeEntity[], string, void>({
-    queryKey: activeBusiness?.id ? ['cheques', activeBusiness.id] : ['cheques'],
+    queryKey: queryKeys.cheques.list(activeBusiness?.id),
     mutationFn: (id: string) => chequeService.delete(id),
     update: (current, id) => {
       if (!current) return current

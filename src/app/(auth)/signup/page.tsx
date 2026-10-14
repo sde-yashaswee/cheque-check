@@ -95,6 +95,7 @@ export default function SignupPage() {
               <Input
                 leftIcon={User}
                 id="name"
+                data-testid="signup-name-input"
                 placeholder={t('namePlaceholder')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -108,6 +109,7 @@ export default function SignupPage() {
                 leftIcon={Mail}
                 id="email"
                 type="email"
+                data-testid="signup-email-input"
                 placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -122,6 +124,7 @@ export default function SignupPage() {
                   leftIcon={Lock}
                   id="password"
                   type={showPassword ? 'text' : 'password'}
+                  data-testid="signup-password-input"
                   placeholder={t('passwordPlaceholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -143,6 +146,7 @@ export default function SignupPage() {
             </div>
             <Button
               type="submit"
+              data-testid="signup-submit-button"
               className="w-full rounded-full h-12 text-lg"
               disabled={loading}
             >

@@ -16,34 +16,6 @@ export class AuthService {
     private readonly repository: IAuthRepository = new SupabaseAuthRepository(),
   ) {}
 
-  static loginWithPassword(email: string, password: string) {
-    return getDefaultAuthService().loginWithPassword(email, password)
-  }
-
-  static signupWithPassword(email: string, password: string, name: string) {
-    return getDefaultAuthService().signupWithPassword(email, password, name)
-  }
-
-  static loginWithOAuth(provider: Provider) {
-    return getDefaultAuthService().loginWithOAuth(provider)
-  }
-
-  static signOut() {
-    return getDefaultAuthService().signOut()
-  }
-
-  static resetPassword(email: string) {
-    return getDefaultAuthService().resetPassword(email)
-  }
-
-  static getSession() {
-    return getDefaultAuthService().getSession()
-  }
-
-  static getUser() {
-    return getDefaultAuthService().getUser()
-  }
-
   loginWithPassword(email: string, password: string) {
     return this.repository.loginWithPassword(email, password)
   }

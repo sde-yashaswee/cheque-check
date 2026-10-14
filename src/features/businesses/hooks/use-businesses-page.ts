@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { chequeService } from '@/features/cheques/services/cheque.service'
 import { businessService } from '@/features/businesses/services/business.service'
 import { useState, useMemo, useCallback } from 'react'
+import { queryKeys } from '@/lib/query-keys'
 
 export function useBusinesses() {
   const [search, setSearch] = useState('')
@@ -19,12 +20,12 @@ export function useBusinesses() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => businessService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['businesses'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.businesses.all() })
     },
   })
 
   const { data: allCheques, isLoading: chequesLoading } = useQuery({
-    queryKey: ['all-businesses-cheques'],
+    queryKey: queryKeys.businesses.allCheques(),
     queryFn: async () => {
       const results = await Promise.all(
         businesses.map((b) => chequeService.getAll(b.id)),

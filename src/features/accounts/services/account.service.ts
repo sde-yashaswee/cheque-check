@@ -19,44 +19,6 @@ export class AccountService {
     private readonly repository: IAccountRepository = new SupabaseAccountRepository(),
   ) {}
 
-  static async getAll(businessId: string) {
-    return getDefaultAccountService().getAll(businessId)
-  }
-
-  static async getById(id: string) {
-    return getDefaultAccountService().getById(id)
-  }
-
-  static async create(
-    account: Omit<
-      Account,
-      'id' | 'created_at' | 'updated_at' | 'bank' | 'deleted_at'
-    >,
-  ) {
-    return getDefaultAccountService().create(account)
-  }
-
-  static async update(
-    id: string,
-    account: Partial<
-      Omit<
-        Account,
-        | 'id'
-        | 'business_id'
-        | 'created_at'
-        | 'updated_at'
-        | 'bank'
-        | 'deleted_at'
-      >
-    >,
-  ) {
-    return getDefaultAccountService().update(id, account)
-  }
-
-  static async delete(id: string) {
-    return getDefaultAccountService().delete(id)
-  }
-
   async getAll(businessId: string): Promise<Account[]> {
     return this.repository.getAll(businessId)
   }

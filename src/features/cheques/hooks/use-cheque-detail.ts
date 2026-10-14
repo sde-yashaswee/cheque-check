@@ -7,6 +7,7 @@ import { useProfile } from './use-profile'
 import { buildNotifyPartyAction } from '@/features/cheques/lib/notify-party'
 import { toast } from '@/components/ui/toast'
 import { useTranslations } from 'next-intl'
+import { queryKeys } from '@/lib/query-keys'
 
 export function useChequeDetail(id: string) {
   const { profile } = useProfile()
@@ -18,7 +19,7 @@ export function useChequeDetail(id: string) {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['cheque', id],
+    queryKey: queryKeys.cheques.detail(id),
     queryFn: () => chequeService.getById(id),
   })
 
@@ -27,9 +28,9 @@ export function useChequeDetail(id: string) {
     ChequeStatus,
     ChequeEntity
   >({
-    queryKey: ['cheque', id],
+    queryKey: queryKeys.cheques.detail(id),
     additionalQueryKeys: cheque?.business_id
-      ? [['cheques', cheque.business_id]]
+      ? [queryKeys.cheques.list(cheque.business_id)]
       : [],
     mutationFn: (status: ChequeStatus) =>
       chequeService.updateStatus(id, status),

@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { STORAGE_STATE_PATH } from './e2e/storage-state'
 
 const port = process.env.PORT ?? '3000'
 const localBaseUrl = `http://127.0.0.1:${port}`
@@ -9,7 +10,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   reporter: process.env.CI ? [['html', { open: 'never' }]] : 'list',
   use: {
     baseURL,
@@ -18,16 +19,25 @@ export default defineConfig({
   },
   projects: [
     {
+      name: 'setup',
+      testMatch: /global\.setup\.ts/,
+    },
+    {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
+      use: { ...devices['Desktop Chrome'], storageState: STORAGE_STATE_PATH },
     },
   ],
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: `npm run dev -- --hostname 127.0.0.1 --port ${port}`,
+        // QA runs (scripts/run-e2e-qa.ts) set PLAYWRIGHT_PROD_BUILD to test
+        // against a real production build instead of the dev server.
+        command: process.env.PLAYWRIGHT_PROD_BUILD
+          ? `npm run build && npm run start -- --hostname 127.0.0.1 --port ${port}`
+          : `npm run dev -- --hostname 127.0.0.1 --port ${port}`,
         url: localBaseUrl,
         reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
+        timeout: process.env.PLAYWRIGHT_PROD_BUILD ? 300_000 : 120_000,
       },
 })

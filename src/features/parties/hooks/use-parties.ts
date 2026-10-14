@@ -3,6 +3,7 @@ import { partyService } from '@/features/parties/services/party.service'
 import { chequeService } from '@/features/cheques/services/cheque.service'
 import { useState, useMemo, useCallback } from 'react'
 import type { Party } from '@/types'
+import { queryKeys } from '@/lib/query-keys'
 
 export function useParties(businessId: string | undefined) {
   const [search, setSearch] = useState('')
@@ -14,13 +15,13 @@ export function useParties(businessId: string | undefined) {
     isLoading: partiesLoading,
     error: partiesError,
   } = useQuery<Party[]>({
-    queryKey: ['parties', businessId],
+    queryKey: queryKeys.parties.list(businessId),
     queryFn: () => partyService.getAll(businessId!),
     enabled: !!businessId,
   })
 
   const { data: cheques } = useQuery({
-    queryKey: ['cheques', businessId],
+    queryKey: queryKeys.cheques.list(businessId),
     queryFn: () => chequeService.getAll(businessId!),
     enabled: !!businessId,
   })

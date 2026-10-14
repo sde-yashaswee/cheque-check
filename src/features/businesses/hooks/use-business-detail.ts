@@ -3,6 +3,7 @@ import { businessService } from '@/features/businesses/services/business.service
 import { useCheques } from '@/features/cheques/hooks/use-cheques'
 import { useMemo } from 'react'
 import type { Cheque } from '@/types'
+import { queryKeys } from '@/lib/query-keys'
 
 export function useBusinessDetail(id: string) {
   const {
@@ -10,7 +11,7 @@ export function useBusinessDetail(id: string) {
     isLoading: businessLoading,
     error: businessError,
   } = useQuery({
-    queryKey: ['business', id],
+    queryKey: queryKeys.businesses.detail(id),
     queryFn: () => businessService.getById(id),
   })
 

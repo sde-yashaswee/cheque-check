@@ -10,6 +10,7 @@ import {
   type TagSortBy,
   type TagUsageFilter,
 } from '@/features/tags/lib/tag-list'
+import { queryKeys } from '@/lib/query-keys'
 
 export function useTagList(businessId: string | undefined) {
   const [search, setSearch] = useState('')
@@ -19,7 +20,7 @@ export function useTagList(businessId: string | undefined) {
   const [usage, setUsage] = useState<TagUsageFilter>('all')
 
   const query = useQuery<TagWithUsage[]>({
-    queryKey: ['tags', businessId, 'usage'],
+    queryKey: queryKeys.tags.listWithUsage(businessId),
     queryFn: () => tagService.getAllWithUsage(businessId!),
     enabled: !!businessId,
   })
@@ -63,11 +64,11 @@ export function useTagList(businessId: string | undefined) {
 
 export function useTagDetail(id: string) {
   const tag = useQuery<Tag>({
-    queryKey: ['tag', id],
+    queryKey: queryKeys.tags.detail(id),
     queryFn: () => tagService.getById(id),
   })
   const links = useQuery<TagLink[]>({
-    queryKey: ['tag', id, 'links'],
+    queryKey: queryKeys.tags.links(id),
     queryFn: () => tagService.getLinks(id),
   })
   return {

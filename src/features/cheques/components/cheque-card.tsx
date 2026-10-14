@@ -151,6 +151,7 @@ export function ChequeCard({ cheque, onStatusUpdate, tags }: ChequeCardProps) {
         style={{ x: offset }}
         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
         className="relative z-10 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-card p-5 active:scale-95 transition-transform"
+        data-testid={`cheque-card-${cheque.id}`}
       >
         <Link href={`/cheques/${cheque.id}`} className="absolute inset-0 z-0" />
         <div className="flex justify-between items-start relative z-10 pointer-events-none">
