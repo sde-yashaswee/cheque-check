@@ -1,6 +1,6 @@
 import { Account } from '@/types'
 import { TABLES } from '@/lib/supabase/tables'
-import { SupabaseRepository } from './base.repository'
+import { SupabaseRepository } from '@/repositories/base.repository'
 
 export interface IAccountRepository {
   getAll(businessId: string): Promise<Account[]>

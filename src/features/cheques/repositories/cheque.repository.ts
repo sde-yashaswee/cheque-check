@@ -1,6 +1,6 @@
 import { Cheque, ChequeStatus, ChequeWithRelations } from '@/types'
 import { TABLES } from '@/lib/supabase/tables'
-import { SupabaseRepository } from './base.repository'
+import { SupabaseRepository } from '@/repositories/base.repository'
 
 export interface IChequeRepository {
   getAll(businessId: string): Promise<ChequeWithRelations[]>

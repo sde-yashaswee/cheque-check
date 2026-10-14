@@ -1,6 +1,6 @@
 import { Bank } from '@/types'
 import { TABLES } from '@/lib/supabase/tables'
-import { SupabaseRepository } from './base.repository'
+import { SupabaseRepository } from '@/repositories/base.repository'
 
 export interface IBankRepository {
   getAll(): Promise<Bank[]>

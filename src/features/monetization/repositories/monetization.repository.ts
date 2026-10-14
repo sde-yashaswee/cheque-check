@@ -1,4 +1,4 @@
-import { SupabaseRepository } from './base.repository'
+import { SupabaseRepository } from '@/repositories/base.repository'
 import { TABLES } from '@/lib/supabase/tables'
 
 export interface Entitlement {

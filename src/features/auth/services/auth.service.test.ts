@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { AuthService } from './auth.service'
-import type { IAuthRepository } from '@/repositories/auth.repository'
+import type { IAuthRepository } from '@/features/auth/repositories/auth.repository'
 
 describe('AuthService', () => {
   it('delegates password login to the injected repository', async () => {

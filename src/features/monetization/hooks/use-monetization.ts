@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { monetizationService } from '@/features/monetization/services/monetization.service'
-import type { Entitlement, Quota } from '@/repositories/monetization.repository'
+import type {
+  Entitlement,
+  Quota,
+} from '@/features/monetization/repositories/monetization.repository'
 import { queryKeys } from '@/lib/query-keys'
 
 export function useMonetization() {

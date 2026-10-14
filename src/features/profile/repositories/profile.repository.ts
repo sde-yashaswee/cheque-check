@@ -1,6 +1,6 @@
 import { Profile } from '@/types'
 import { TABLES } from '@/lib/supabase/tables'
-import { SupabaseRepository } from './base.repository'
+import { SupabaseRepository } from '@/repositories/base.repository'
 
 export interface IProfileRepository {
   get(): Promise<Profile | null>

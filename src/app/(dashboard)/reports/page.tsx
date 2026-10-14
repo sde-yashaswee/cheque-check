@@ -3,7 +3,7 @@
 import { useBusiness } from '@/hooks/use-business'
 import { useCheques } from '@/hooks/use-cheques'
 import { useProfile } from '@/hooks/use-profile'
-import { reportService } from '@/services/report.service'
+import { reportService } from '@/features/reports/services/report.service'
 import { Button } from '@/components/ui/button'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {

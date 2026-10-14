@@ -1,7 +1,7 @@
 import { Business } from '@/types'
 import { ValidationError } from '@/lib/errors'
 import { TABLES } from '@/lib/supabase/tables'
-import { SupabaseRepository } from './base.repository'
+import { SupabaseRepository } from '@/repositories/base.repository'
 
 export interface IBusinessRepository {
   getAll(): Promise<Business[]>

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { ReportService } from './report.service'
-import type { IReportRepository } from '@/repositories/report.repository'
+import type { IReportRepository } from '@/features/reports/repositories/report.repository'
 
 describe('ReportService', () => {
   it('delegates CSV exports to the injected repository', () => {
