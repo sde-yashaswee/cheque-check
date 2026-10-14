@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 import { LoginPage } from '../pages/login.page'
 import { SignupPage } from '../pages/signup.page'
 import { e2eBusinessName, e2eUser } from '../fixtures/test-data'
+import { confirmUserEmail } from '../admin-client'
 
 // Own fresh user per test, independent of the shared global-setup session,
 // since onboarding can only be driven once per account.
@@ -18,6 +19,7 @@ test.describe('onboarding', () => {
     await signupPage.goto()
     await signupPage.signup(user.name, user.email, user.password)
     await page.waitForURL('/login')
+    await confirmUserEmail(user.email)
 
     const loginPage = new LoginPage(page)
     await loginPage.login(user.email, user.password)

@@ -1,18 +1,16 @@
 # End-to-end tests
 
-Playwright specs run against a **dedicated staging Supabase project** (not the
-local `supabase start` instance) since hosted staging is the agreed e2e
-backend. Local Supabase is still used for unit tests / `supabase db reset`.
+Playwright specs run against the **hosted QA Supabase project** (`.env.qa`),
+not local `supabase start`. Each run fully resets that project (migrate +
+seed) first, so it's always a clean slate — see `scripts/run-e2e-qa.ts`.
 
-## Setup
+## One-time setup
 
-1. Point `.env.local` at the staging project:
-
-   ```bash
-   NEXT_PUBLIC_SUPABASE_URL=https://<staging-project-ref>.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=<staging-anon-key>
-   SUPABASE_SERVICE_ROLE_KEY=<staging-service-role-key>  # required by the cleanup script only
-   ```
+1. Fill in `.env.qa` (already has `NEXT_PUBLIC_SUPABASE_URL`,
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`). Add the one
+   missing piece, `SUPABASE_DB_URL`: Supabase Dashboard → the QA project →
+   Project Settings → Database → Connection string → **Session pooler** tab,
+   with the real DB password substituted in.
 
 2. Install the browser once:
 
@@ -20,21 +18,28 @@ backend. Local Supabase is still used for unit tests / `supabase db reset`.
    npm run test:e2e:install
    ```
 
-3. (Recommended before a run) purge previous e2e-tagged data:
+## Running
 
-   ```bash
-   npm run test:e2e:cleanup -- --confirm
-   ```
+```bash
+npm run test:e2e:qa
+```
 
-4. Run the suite:
+This single command:
 
-   ```bash
-   npm run test:e2e
-   ```
+1. Loads `.env.qa`.
+2. Refuses to continue if `.env.qa` accidentally points at the same project
+   as `.env.production`.
+3. Runs `supabase db reset --db-url <SUPABASE_DB_URL> --yes` — drops and
+   recreates the QA schema from `supabase/migrations/*`, then runs
+   `supabase/seed.sql` (reference data like banks). No Docker/local Supabase
+   stack required; this talks directly to the hosted Postgres instance.
+4. Runs `playwright test` with `PLAYWRIGHT_PROD_BUILD=1`, which makes
+   Playwright's `webServer` build (`next build`) and start (`next start`) a
+   production server itself, wait for it, and tear it down after — see
+   `playwright.config.ts`.
 
-Set `PLAYWRIGHT_BASE_URL` to run against an already-running server (e.g. a
-production build via `next start`) instead of letting Playwright spawn
-`next dev` locally.
+Flags: `npm run test:e2e:qa -- --skip-reset` (reuse current QA data, just run
+tests) or `npm run test:e2e:qa:reset-only` (reset only, don't run tests).
 
 ## How sessions work
 
@@ -51,15 +56,30 @@ signup/login/logout/onboarding from scratch with their own fresh users, since
 those flows can't be exercised against an already-authenticated/onboarded
 session.
 
-## Data tagging & cleanup
+Hosted Supabase projects default to requiring email confirmation, which a
+real signup can't complete without an inbox. `e2e/admin-client.ts`'s
+`confirmUserEmail()` force-confirms each freshly signed-up user via the
+service-role admin API right after signup, so login works regardless of the
+QA project's "Confirm email" setting.
 
-All e2e-created users use emails matching `e2e-*@e2e.chequecheck.test`
-(see `e2e/fixtures/test-data.ts`), and business/party/account names are
-prefixed `e2e-`. `scripts/e2e-cleanup.ts` finds users matching that email
-pattern via the Supabase admin API and deletes them; FK cascades remove their
-businesses/cheques/parties/accounts. The script refuses to run without
-`--confirm` and refuses to run unless `NEXT_PUBLIC_SUPABASE_URL` looks like a
-staging/local project.
+## Data reset & cleanup
+
+**Primary (QA):** `scripts/run-e2e-qa.ts` fully resets the QA database before
+every run (see above) — this is the normal path and requires no manual
+cleanup.
+
+**Alternative (a genuinely shared, non-resettable project):**
+`scripts/e2e-cleanup.ts` surgically deletes only `e2e-*@e2e.chequecheck.test`
+tagged users (FK cascades remove their businesses/cheques/parties/accounts)
+instead of wiping the whole project:
+
+```bash
+npm run test:e2e:cleanup -- --confirm
+```
+
+All e2e-created users/businesses/parties/accounts use `e2e-` prefixed
+names/emails (see `e2e/fixtures/test-data.ts`) regardless of which cleanup
+strategy is in play.
 
 ## Conventions
 
@@ -69,7 +89,7 @@ staging/local project.
   over text/role selectors for anything inside custom widgets
   (Combobox/Stepper/BankSelector/TagSelector).
 - **Unique data**: always generate emails/names via `e2e/fixtures/test-data.ts`
-  helpers so parallel/repeated runs never collide on the shared staging DB.
+  helpers so parallel/repeated runs never collide.
 
 ## Out of scope
 

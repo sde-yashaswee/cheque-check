@@ -4,6 +4,7 @@ import { SignupPage } from './pages/signup.page'
 import { OnboardingPage } from './pages/onboarding.page'
 import { e2eUser, e2eBusinessName } from './fixtures/test-data'
 import { STORAGE_STATE_PATH } from './storage-state'
+import { confirmUserEmail } from './admin-client'
 
 /**
  * Runs once before the main test suite: signs up a fresh e2e- user through the
@@ -21,6 +22,7 @@ setup('authenticate via signup and onboarding', async ({ page }) => {
   await signupPage.goto()
   await signupPage.signup(user.name, user.email, user.password)
   await page.waitForURL('/login')
+  await confirmUserEmail(user.email)
 
   const loginPage = new LoginPage(page)
   await loginPage.login(user.email, user.password)

@@ -87,13 +87,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     concurrency:
-      # Serialize e2e runs: they share one staging Supabase project and
-      # overlapping runs could race each other's cleanup/data.
-      group: e2e-staging
+      # Serialize e2e runs: they share one QA Supabase project, and each run
+      # fully resets it, so overlapping runs would stomp on each other.
+      group: e2e-qa
     env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.E2E_SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.QA_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.QA_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.QA_SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_DB_URL: ${{ secrets.QA_SUPABASE_DB_URL }}
       NEXT_PUBLIC_LOG_LEVEL: info
       NEXT_PUBLIC_RAZORPAY_KEY_ID: rzp_test_ci
       OPENAI_API_KEY: ci-openai-key
@@ -116,30 +117,8 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Purge previous e2e-tagged data
-        run: npm run test:e2e:cleanup -- --confirm
-
-      - name: Build production bundle
-        run: npm run build
-
-      - name: Start production server
-        run: |
-          nohup npm run start > server.log 2>&1 &
-          disown
-
-      - name: Wait for server
-        run: |
-          for i in $(seq 1 30); do
-            if curl -sf http://127.0.0.1:3000 > /dev/null; then exit 0; fi
-            sleep 2
-          done
-          echo "Server did not become ready in time" >&2
-          exit 1
-
-      - name: Run Playwright tests
-        run: npm run test:e2e
-        env:
-          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+      - name: Reset QA database and run e2e suite
+        run: npm run test:e2e:qa
 
       - name: Upload Playwright report
         if: failure()
@@ -149,5 +128,4 @@ jobs:
           path: |
             playwright-report/
             test-results/
-            server.log
           retention-days: 14

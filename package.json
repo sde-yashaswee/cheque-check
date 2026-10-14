@@ -19,6 +19,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:install": "playwright install chromium",
     "test:e2e:cleanup": "tsx scripts/e2e-cleanup.ts",
+    "test:e2e:qa": "tsx scripts/run-e2e-qa.ts",
+    "test:e2e:qa:reset-only": "tsx scripts/run-e2e-qa.ts --reset-only",
     "format": "node scripts/check-format.mjs --write",
     "format:check": "node scripts/check-format.mjs",
     "prepare": "husky",

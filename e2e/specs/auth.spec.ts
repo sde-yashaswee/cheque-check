@@ -3,6 +3,7 @@ import { LoginPage } from '../pages/login.page'
 import { SignupPage } from '../pages/signup.page'
 import { OnboardingPage } from '../pages/onboarding.page'
 import { e2eBusinessName, e2eUser } from '../fixtures/test-data'
+import { confirmUserEmail } from '../admin-client'
 
 // This spec drives the real signup/login/logout UI independently of the
 // shared global-setup session, so each test starts with a clean, logged-out context.
@@ -32,6 +33,7 @@ test.describe('authentication', () => {
     await signupPage.goto()
     await signupPage.signup(user.name, user.email, user.password)
     await page.waitForURL('/login')
+    await confirmUserEmail(user.email)
 
     const loginPage = new LoginPage(page)
     await loginPage.login(user.email, user.password)
@@ -79,6 +81,7 @@ test.describe('logout', () => {
     await signupPage.goto()
     await signupPage.signup(user.name, user.email, user.password)
     await page.waitForURL('/login')
+    await confirmUserEmail(user.email)
 
     const loginPage = new LoginPage(page)
     await loginPage.login(user.email, user.password)
