@@ -69,8 +69,8 @@ export function useEditParty(id: string, businessId: string | undefined) {
     error,
     isSaving: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
-    onSubmit: form.handleSubmit((data) => {
-      updateMutation.mutate(data)
+    onSubmit: form.handleSubmit(async (data) => {
+      await updateMutation.mutateAsync(data)
       router.back()
     }),
     onDelete: () => {

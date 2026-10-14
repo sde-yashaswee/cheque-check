@@ -83,6 +83,7 @@ export function ChequeFilterBar({
         />
         <Input
           leftIcon={Search}
+          data-testid="cheque-search-input"
           className="rounded-full h-11 bg-canvas-parchment border-none"
           placeholder={t('searchPlaceholder')}
           value={search}
@@ -96,6 +97,7 @@ export function ChequeFilterBar({
             <Button
               variant={isDefault ? 'outline' : 'default'}
               size="icon"
+              data-testid="cheque-filter-trigger"
               className={cn(
                 'rounded-full h-11 w-11 shrink-0',
                 isDefault && 'bg-white',
@@ -122,6 +124,7 @@ export function ChequeFilterBar({
                 {sortOptions.map((option) => (
                   <button
                     key={option.value}
+                    data-testid={`cheque-sort-by-${option.value}`}
                     onClick={() => setSortBy(option.value)}
                     className={cn(
                       'flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all active:scale-[0.98]',
@@ -145,6 +148,7 @@ export function ChequeFilterBar({
                 {orderOptions.map((option) => (
                   <button
                     key={option.value}
+                    data-testid={`cheque-sort-order-${option.value}`}
                     onClick={() => setSortOrder(option.value)}
                     className={cn(
                       'flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-all active:scale-[0.98]',
@@ -168,6 +172,7 @@ export function ChequeFilterBar({
                 {statusOptions.map((s) => (
                   <button
                     key={s.value}
+                    data-testid={`cheque-filter-status-${s.value.toLowerCase()}`}
                     onClick={() => setFilter(s.value as ChequeStatus | 'All')}
                     className={cn(
                       'flex items-center justify-between px-4 py-3 rounded-xl border transition-all active:scale-[0.98]',

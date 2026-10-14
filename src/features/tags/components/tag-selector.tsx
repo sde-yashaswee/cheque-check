@@ -65,6 +65,7 @@ export function TagSelector({
           <Button
             type="button"
             variant="outline"
+            data-testid="tag-selector-trigger"
             className="h-auto min-h-12 w-full justify-between gap-2 rounded-sm border-primary/10 py-2"
           />
         }
@@ -107,6 +108,7 @@ export function TagSelector({
           <div className="flex gap-2">
             <Input
               value={name}
+              data-testid="tag-selector-create-input"
               onChange={(event) => setName(event.target.value)}
               placeholder="New tag"
               onKeyDown={(event) => {
@@ -122,6 +124,7 @@ export function TagSelector({
               onClick={() => void addTag()}
               disabled={!name.trim() || isCreating}
               aria-label="Create tag"
+              data-testid="tag-selector-create-button"
             >
               <HugeiconsIcon icon={Plus} className="h-4 w-4" />
             </Button>
@@ -141,6 +144,7 @@ export function TagSelector({
               <button
                 key={tag.id}
                 type="button"
+                data-testid={`tag-selector-option-${tag.id}`}
                 className="flex w-full items-center justify-between rounded-md px-2 py-2 text-left hover:bg-muted"
                 onClick={() => toggleTag(tag)}
               >

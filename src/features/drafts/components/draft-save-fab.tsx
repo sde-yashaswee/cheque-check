@@ -33,6 +33,7 @@ export function DraftSaveFab({
       onClick={onSave}
       disabled={disabled}
       aria-label="Save draft"
+      data-testid="draft-save-button"
       className={cn(
         'fixed bottom-6 right-6 z-40 flex h-16 w-16 items-center justify-center rounded-full border-4 border-white shadow-lg transition-colors active:scale-95 disabled:active:scale-100 dark:border-zinc-900',
         isSaving && 'bg-zinc-700 text-white',

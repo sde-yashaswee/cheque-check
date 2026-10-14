@@ -243,6 +243,7 @@ export default function TagDetailPage() {
             label: t('deleteTag'),
             icon: Trash2,
             destructive: true,
+            testId: 'tag-detail-delete-trigger',
             onClick: () => setDeleteOpen(true),
           },
         ]}

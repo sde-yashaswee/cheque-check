@@ -260,6 +260,7 @@ export default function EditAccountPage() {
             type="submit"
             className="w-full rounded-full h-14 text-lg"
             disabled={isSaving}
+            data-testid="account-edit-submit-button"
           >
             {isSaving ? tc('saving') : t('updateAccount')}{' '}
             <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
@@ -276,6 +277,7 @@ export default function EditAccountPage() {
               <Button
                 type="button"
                 variant="ghost"
+                data-testid="account-delete-trigger"
                 className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors"
               >
                 <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" />{' '}

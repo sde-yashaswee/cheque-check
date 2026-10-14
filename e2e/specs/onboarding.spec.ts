@@ -49,5 +49,7 @@ test.describe('onboarding', () => {
 
     await expect(page).toHaveURL('/')
     await expect(page.getByTestId('bottom-nav-dashboard')).toBeVisible()
+    await page.goto('/cheques')
+    await expect(page.getByTestId('cheques-empty-state')).toBeVisible()
   })
 })

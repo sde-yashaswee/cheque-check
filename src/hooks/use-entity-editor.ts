@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import {
   useForm,
   type DefaultValues,
@@ -41,12 +41,15 @@ export function useEntityEditor<TEntity, TFormValues extends FieldValues>({
   })
 
   const { reset } = form
+  const entityKey = JSON.stringify(queryKey)
+  const hydratedEntityKey = useRef<string | null>(null)
 
   useEffect(() => {
-    if (entity) {
+    if (entity && hydratedEntityKey.current !== entityKey) {
       reset(toFormValues(entity))
+      hydratedEntityKey.current = entityKey
     }
-  }, [entity, reset, toFormValues])
+  }, [entity, entityKey, reset, toFormValues])
 
   return { entity, isLoading, error, form }
 }

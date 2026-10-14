@@ -226,6 +226,7 @@ export default function CreateBusinessPage() {
               className="w-full rounded-full h-14 text-lg"
               onClick={nextStep}
               disabled={!watch('name')}
+              data-testid="business-step1-continue"
             >
               {tc('continue')}{' '}
               <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
@@ -296,6 +297,7 @@ export default function CreateBusinessPage() {
               className="w-full rounded-full h-14 text-lg"
               onClick={nextStep}
               disabled={!watch('email')}
+              data-testid="business-step2-continue"
             >
               {tc('continue')}{' '}
               <HugeiconsIcon icon={ArrowRight} className="ml-2 h-5 w-5" />
@@ -359,6 +361,7 @@ export default function CreateBusinessPage() {
               type="submit"
               className="w-full rounded-full h-14 text-lg"
               disabled={isSaving}
+              data-testid="business-submit-button"
             >
               {isSaving ? t('creatingBusiness') : t('newBusiness')}{' '}
               <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />

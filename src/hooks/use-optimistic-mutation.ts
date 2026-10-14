@@ -101,7 +101,7 @@ export function useOptimisticMutation<TData, TVariables, TResult>({
       onError?.(error, variables, context)
     },
     onSuccess,
-    onSettled: (_data, _error, variables) => {
+    onSettled: async (_data, _error, variables) => {
       const keysToInvalidate = Array.from(
         new Map(
           [
@@ -116,9 +116,11 @@ export function useOptimisticMutation<TData, TVariables, TResult>({
         ).values(),
       )
 
-      for (const key of keysToInvalidate) {
-        queryClient.invalidateQueries({ queryKey: key })
-      }
+      await Promise.all(
+        keysToInvalidate.map((key) =>
+          queryClient.invalidateQueries({ queryKey: key }),
+        ),
+      )
     },
   })
 }

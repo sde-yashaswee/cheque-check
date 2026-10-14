@@ -77,6 +77,7 @@ export default function EditTagPage() {
             <Button
               type="button"
               variant="ghost"
+              data-testid="tag-delete-trigger"
               className="h-14 w-full rounded-full text-muted-foreground transition-colors hover:text-destructive"
             >
               <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" />

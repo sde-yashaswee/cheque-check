@@ -295,6 +295,7 @@ export function TopNav() {
               <Button
                 variant="ghost"
                 size="icon"
+                data-testid="global-search-trigger"
                 onClick={() => setSearchOpen(true)}
                 className="rounded-full h-9 w-9"
               >
@@ -330,7 +331,11 @@ export function TopNav() {
       {!hideBusinessSwitcher && activeBusiness && (
         <BusinessSwitcher
           trigger={
-            <button className="flex h-8 w-full items-center bg-primary/5 px-4 text-[10px] font-semibold text-primary uppercase tracking-wider backdrop-blur-sm transition-colors hover:bg-primary/10 active:bg-primary/20 cursor-pointer border-b border-primary/5">
+            <button
+              data-testid="business-switcher-trigger"
+              data-active-business-name={activeBusiness.name}
+              className="flex h-8 w-full items-center bg-primary/5 px-4 text-[10px] font-semibold text-primary uppercase tracking-wider backdrop-blur-sm transition-colors hover:bg-primary/10 active:bg-primary/20 cursor-pointer border-b border-primary/5"
+            >
               <span className="relative mr-1.5 flex h-2 w-2 shrink-0">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />

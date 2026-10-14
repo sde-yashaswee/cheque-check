@@ -167,6 +167,7 @@ function NpsForm({
         <div
           role="radiogroup"
           aria-label={t('question')}
+          data-testid="nps-score-group"
           className="grid grid-cols-11 gap-1"
         >
           {SCORES.map((value) => (
@@ -174,6 +175,7 @@ function NpsForm({
               key={value}
               type="button"
               role="radio"
+              data-testid={`nps-score-${value}`}
               aria-checked={score === value}
               data-selected={score === value}
               onClick={() => setScore(value)}
@@ -215,11 +217,17 @@ function NpsForm({
         <Button
           className="h-12 rounded-full"
           disabled={score === null || isSubmitting}
+          data-testid="nps-submit-button"
           onClick={submit}
         >
           {isSubmitting ? t('submitting') : t('submit')}
         </Button>
-        <Button variant="ghost" className="h-10 rounded-full" onClick={onDone}>
+        <Button
+          variant="ghost"
+          data-testid="nps-dismiss-button"
+          className="h-10 rounded-full"
+          onClick={onDone}
+        >
           {t('notNow')}
         </Button>
       </div>

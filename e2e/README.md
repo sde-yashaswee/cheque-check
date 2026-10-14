@@ -1,5 +1,8 @@
 # End-to-end tests
 
+See [TEST-PLAN.md](TEST-PLAN.md) for the severity-, risk-, frequency-, and complexity-ranked
+feature coverage matrix.
+
 Playwright specs run against the **hosted QA Supabase project** (`.env.qa`),
 not local `supabase start`. Each run fully resets that project (migrate +
 seed) first, so it's always a clean slate — see `scripts/run-e2e-qa.ts`.

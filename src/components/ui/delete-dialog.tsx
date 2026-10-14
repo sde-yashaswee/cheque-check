@@ -126,6 +126,7 @@ export function DeleteConfirmationDialog({
             variant="destructive"
             onClick={handleConfirm}
             disabled={inputValue !== confirmName || loading}
+            data-testid="delete-dialog-confirm-button"
             className="w-full rounded-pill h-14 font-bold text-lg"
           >
             {loading ? t('deleting') : t('deletePermanently')}

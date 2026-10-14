@@ -36,3 +36,14 @@ export async function createConfirmedE2eUser(user: {
   }
   return data.user
 }
+
+/** Seeds an active lifetime-premium entitlement directly, bypassing the real Razorpay checkout. */
+export async function grantLifetimePremium(userId: string) {
+  const admin = createAdminClient()
+  const { error } = await admin.from('user_entitlements').insert({
+    user_id: userId,
+    feature_id: 'lifetime_premium',
+    status: 'active',
+  })
+  if (error) throw error
+}

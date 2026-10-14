@@ -275,6 +275,7 @@ export default function BusinessesPage() {
                         <Button
                           variant="ghost"
                           size="icon"
+                          data-testid={`business-delete-trigger-${business.id}`}
                           className="rounded-full h-8 w-8 text-muted-foreground hover:text-destructive transition-colors"
                         >
                           <HugeiconsIcon icon={Trash2} className="h-4 w-4" />

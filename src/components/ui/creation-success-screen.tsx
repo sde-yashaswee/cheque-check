@@ -59,6 +59,7 @@ export function CreationSuccessScreen({
 
       <Button
         onClick={onContinue}
+        data-testid="creation-success-continue"
         className="h-14 w-full max-w-sm rounded-full text-lg font-semibold transition-all hover:scale-105 active:scale-95"
       >
         {ctaLabel}

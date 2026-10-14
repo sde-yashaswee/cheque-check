@@ -18,6 +18,7 @@ export interface SpeedDialAction {
   onClick: () => void
   destructive?: boolean
   disabled?: boolean
+  testId?: string
 }
 
 interface SpeedDialFabProps {
@@ -73,6 +74,7 @@ export function SpeedDialFab({
                   type="button"
                   role="menuitem"
                   disabled={action.disabled}
+                  data-testid={action.testId}
                   onClick={() => {
                     setOpen(false)
                     action.onClick()
@@ -105,6 +107,7 @@ export function SpeedDialFab({
             size="icon"
             aria-label={open ? t('close') : t('moreActions')}
             aria-expanded={open}
+            data-testid="speed-dial-toggle"
             onClick={() => setOpen((value) => !value)}
             className="h-12 w-12 rounded-full shadow-lg ring-1 ring-border"
           >
@@ -112,7 +115,11 @@ export function SpeedDialFab({
           </Button>
         )}
 
-        <Link href={editHref} aria-label={editLabel}>
+        <Link
+          href={editHref}
+          aria-label={editLabel}
+          data-testid="speed-dial-edit-link"
+        >
           <Button
             size="icon"
             tabIndex={-1}

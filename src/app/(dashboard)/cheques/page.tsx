@@ -78,6 +78,7 @@ export default function ChequesPage() {
           emptyState={
             <EmptyState
               icon={ReceiptText}
+              data-testid="cheques-empty-state"
               title={t('noChequesTitle')}
               description={t('noChequesDesc')}
               action={{

@@ -85,6 +85,7 @@ export default function NotificationsPage() {
         <Combobox
           options={warningOptions}
           value={String(profile.default_reminder_days || 3)}
+          testId="notifications-reminder-days"
           onValueChange={(value) =>
             updateProfile({ default_reminder_days: Number(value) })
           }

@@ -140,6 +140,7 @@ export default function ChequeDetailPage() {
       label: t('markAs', { status }),
       icon,
       disabled: isUpdating,
+      testId: `cheque-status-${status.toLowerCase()}`,
       onClick: () => updateStatus(status),
     }))
 
@@ -194,6 +195,7 @@ export default function ChequeDetailPage() {
       label: t('deleteAction'),
       icon: Trash2,
       destructive: true,
+      testId: 'cheque-detail-delete-trigger',
       onClick: () => setDeleteOpen(true),
     },
   ]
@@ -218,12 +220,16 @@ export default function ChequeDetailPage() {
                 'text-4xl font-semibold',
                 cheque.type === 'Outward' ? 'text-primary' : 'text-green-600',
               )}
+              data-testid="cheque-detail-amount"
             >
               {currency}
               {cheque.amount.toLocaleString()}
             </h2>
           </div>
-          <div className="absolute top-4 right-4">
+          <div
+            className="absolute top-4 right-4"
+            data-testid="cheque-detail-status"
+          >
             <StatusPill status={cheque.status} />
           </div>
         </div>

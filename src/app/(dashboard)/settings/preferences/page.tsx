@@ -72,6 +72,7 @@ export default function PreferencesPage() {
             <Combobox
               options={CURRENCY_OPTIONS}
               value={profile.currency}
+              testId="preferences-currency"
               onValueChange={(v) => updateProfile({ currency: v })}
               className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
             />
@@ -100,6 +101,7 @@ export default function PreferencesPage() {
           <Combobox
             options={DATE_FORMAT_OPTIONS}
             value={profile.date_format}
+            testId="preferences-date-format"
             onValueChange={(v) => updateProfile({ date_format: v })}
             className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
           />

@@ -14,7 +14,10 @@ export function LaunchSplash() {
   if (!visible) return null
 
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-primary text-primary-foreground animate-out fade-out duration-300 [animation-delay:600ms] [animation-fill-mode:forwards]">
+    <div
+      data-testid="launch-splash"
+      className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-primary text-primary-foreground animate-out fade-out duration-300 [animation-delay:600ms] [animation-fill-mode:forwards]"
+    >
       <div className="text-3xl font-semibold tracking-tight">ChequeCheck</div>
       <div className="absolute bottom-8 text-xs font-semibold tracking-wider opacity-70">
         v{packageJson.version}

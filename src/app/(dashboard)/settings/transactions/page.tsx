@@ -158,7 +158,7 @@ export default function TransactionsPage() {
   }
 
   return (
-    <div className="max-w-2xl space-y-8 pb-20">
+    <div className="max-w-2xl space-y-8 pb-20" data-testid="transactions-page">
       <div className="flex gap-3">
         <div className="relative flex-1">
           <HugeiconsIcon

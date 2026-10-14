@@ -144,6 +144,7 @@ export function GlobalSearch({
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <CommandInput
         placeholder={t('searchEverything')}
+        data-testid="global-search-input"
         value={query}
         onValueChange={setQuery}
       />
@@ -157,6 +158,8 @@ export function GlobalSearch({
             {filteredCheques.map((c: ChequeWithRelations) => (
               <CommandItem
                 key={c.id}
+                data-testid="global-search-result-cheque"
+                value={`${c.cheque_number} ${c.party?.name || ''} ${c.amount}`}
                 onSelect={() => navigateTo(`/cheques`)}
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer"
               >
@@ -213,6 +216,8 @@ export function GlobalSearch({
             {filteredParties.map((p: Party) => (
               <CommandItem
                 key={p.id}
+                data-testid="global-search-result-party"
+                value={`${p.name} ${p.contact || ''}`}
                 onSelect={() => navigateTo(`/parties/${p.id}`)}
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer"
               >
@@ -281,6 +286,8 @@ export function GlobalSearch({
             {filteredAccounts.map((a: AccountWithRelations) => (
               <CommandItem
                 key={a.id}
+                data-testid="global-search-result-account"
+                value={`${a.bank?.name || ''} ${a.account_name} ${a.account_number}`}
                 onSelect={() => navigateTo(`/accounts/${a.id}`)}
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer"
               >

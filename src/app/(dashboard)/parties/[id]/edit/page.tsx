@@ -259,6 +259,7 @@ export default function EditPartyPage() {
             type="submit"
             className="w-full rounded-full h-14 text-lg"
             disabled={isSaving}
+            data-testid="party-edit-submit-button"
           >
             {isSaving ? tCommon('saving') : t('updateParty')}{' '}
             <HugeiconsIcon icon={Check} className="ml-2 h-5 w-5" />
@@ -275,6 +276,7 @@ export default function EditPartyPage() {
               <Button
                 type="button"
                 variant="ghost"
+                data-testid="party-delete-trigger"
                 className="w-full rounded-full h-14 text-muted-foreground hover:text-destructive transition-colors"
               >
                 <HugeiconsIcon icon={Trash2} className="mr-2 h-5 w-5" />{' '}

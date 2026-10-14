@@ -32,5 +32,12 @@ test.describe('cheques', () => {
     await chequesPage.finishAndSubmit(depositDate)
 
     await expect(page.getByText(partyName).first()).toBeVisible()
+    await page.getByTestId('cheque-search-input').fill(chequeNumber)
+    await expect(page.locator('[data-testid^="cheque-card-"]')).toHaveCount(1)
+    await page.getByTestId('cheque-filter-trigger').click()
+    await page.getByTestId('cheque-filter-status-issued').click()
+    await expect(page.locator('[data-testid^="cheque-card-"]')).toHaveCount(1)
+    await page.getByTestId('cheque-search-input').fill('no-matching-cheque')
+    await expect(page.locator('[data-testid^="cheque-card-"]')).toHaveCount(0)
   })
 })

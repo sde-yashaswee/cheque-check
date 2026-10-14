@@ -99,7 +99,10 @@ export default function ReportsPage() {
 
   if (!isLoadingMonetization && !isLifetimePremium) {
     return (
-      <div className="max-w-2xl space-y-8 pb-20 pt-2">
+      <div
+        className="max-w-2xl space-y-8 pb-20 pt-2"
+        data-testid="reports-premium-gate"
+      >
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-display-sm font-semibold tracking-tight">
@@ -129,7 +132,10 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="max-w-2xl space-y-8 pb-20 pt-2">
+    <div
+      className="max-w-2xl space-y-8 pb-20 pt-2"
+      data-testid="reports-content"
+    >
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-display-sm font-semibold tracking-tight">
@@ -142,6 +148,7 @@ export default function ReportsPage() {
             render={
               <Button
                 className="rounded-full gap-2"
+                data-testid="reports-export-trigger"
                 disabled={!cheques || cheques.length === 0}
               />
             }
@@ -155,6 +162,7 @@ export default function ReportsPage() {
             </p>
             <button
               type="button"
+              data-testid="reports-export-csv"
               className="w-full rounded-md px-2 py-2 text-left text-sm hover:bg-muted"
               onClick={() => handleExport('csv')}
             >
@@ -162,6 +170,7 @@ export default function ReportsPage() {
             </button>
             <button
               type="button"
+              data-testid="reports-export-json"
               className="w-full rounded-md px-2 py-2 text-left text-sm hover:bg-muted"
               onClick={() => handleExport('json')}
             >
@@ -169,6 +178,7 @@ export default function ReportsPage() {
             </button>
             <button
               type="button"
+              data-testid="reports-export-pdf"
               className="w-full rounded-md px-2 py-2 text-left text-sm hover:bg-muted"
               onClick={() => handleExport('pdf')}
             >
@@ -176,6 +186,7 @@ export default function ReportsPage() {
             </button>
             <button
               type="button"
+              data-testid="reports-export-excel"
               className="w-full rounded-md px-2 py-2 text-left text-sm hover:bg-muted"
               onClick={() => handleExport('excel')}
             >

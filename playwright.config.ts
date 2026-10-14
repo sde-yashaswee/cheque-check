@@ -4,13 +4,16 @@ import { STORAGE_STATE_PATH } from './e2e/storage-state'
 const port = process.env.PORT ?? '3000'
 const localBaseUrl = `http://127.0.0.1:${port}`
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? localBaseUrl
+const workers = Number(
+  process.env.PLAYWRIGHT_WORKERS ?? (process.env.PLAYWRIGHT_PROD_BUILD ? 1 : 8),
+)
 
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
-  workers: 1,
+  workers,
   reporter: process.env.CI ? [['html', { open: 'never' }]] : 'list',
   use: {
     baseURL,

@@ -38,7 +38,11 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
       <DialogTrigger
         render={
           trigger || (
-            <button className="flex items-center gap-2 rounded-pill bg-canvas-parchment px-4 py-2 text-sm font-semibold transition-transform active:scale-95 dark:bg-surface-tile-1">
+            <button
+              data-testid="business-switcher-trigger"
+              data-active-business-name={activeBusiness?.name}
+              className="flex items-center gap-2 rounded-pill bg-canvas-parchment px-4 py-2 text-sm font-semibold transition-transform active:scale-95 dark:bg-surface-tile-1"
+            >
               <HugeiconsIcon icon={ChevronDown} className="h-4 w-4" />
               <div className="flex items-center gap-2">
                 <EntityAvatar
@@ -70,6 +74,7 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
           </div>
           <CommandInput
             placeholder={t('searchBusiness')}
+            data-testid="business-switcher-search"
             className="h-14 border-none"
           />
           <CommandList className="max-h-[350px] p-2">
@@ -133,6 +138,7 @@ export function BusinessSwitcher({ trigger }: BusinessSwitcherProps) {
             <Link
               href="/businesses/create"
               onClick={() => setOpen(false)}
+              data-testid="business-switcher-add-business"
               className="flex items-center gap-3 px-4 py-4 text-primary hover:bg-primary/5 rounded-xl"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">

@@ -96,6 +96,7 @@ export function TagForm({
       <div className="flex flex-col gap-3 pt-4">
         <Button
           type="submit"
+          data-testid="tag-form-submit-button"
           className="h-14 w-full rounded-full text-lg"
           disabled={!trimmedName || isSaving}
         >
