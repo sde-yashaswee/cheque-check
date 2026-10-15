@@ -56,6 +56,7 @@ test.describe('cheque lifecycle', () => {
     await expect(status).toContainText('Issued')
 
     await page.getByTestId('speed-dial-toggle').click()
+    await expect(page.getByTestId('cheque-status-received')).toHaveCount(0)
     await page.getByTestId('cheque-status-cleared').click()
     await expect(status).toContainText('Cleared')
 
@@ -70,6 +71,64 @@ test.describe('cheque lifecycle', () => {
     await expect(page.getByTestId('cheque-detail-amount')).toContainText(
       '2,500',
     )
+  })
+
+  test('swipes right to clear and left to bounce cheques', async ({ page }) => {
+    const partyName = uniqueE2eName('party')
+    const accountName = uniqueE2eName('account')
+    const accountNumber = uniqueChequeNumber() + uniqueChequeNumber()
+    const clearedNumber = uniqueChequeNumber()
+    const bouncedNumber = uniqueChequeNumber()
+
+    await new PartiesPage(page).createParty(partyName, E2E_PHONE)
+    await new AccountsPage(page).createAccount(accountName, accountNumber)
+    const chequesPage = new ChequesPage(page)
+    for (const chequeNumber of [clearedNumber, bouncedNumber]) {
+      await chequesPage.createCheque({
+        partyName,
+        accountSearch: accountNumber.slice(-4),
+        chequeNumber,
+      })
+    }
+    await chequesPage.goto()
+
+    for (const [chequeNumber, direction, expectedStatus] of [
+      [clearedNumber, 1, 'Cleared'],
+      [bouncedNumber, -1, 'Bounced'],
+    ] as const) {
+      const card = page
+        .locator('[data-testid^="cheque-card-"]')
+        .filter({ hasText: `#${chequeNumber}` })
+      await expect(card).toBeVisible()
+      const bounds = await card.boundingBox()
+      if (!bounds) throw new Error(`Cheque ${chequeNumber} is not positioned`)
+
+      const startX = bounds.x + bounds.width / 2
+      const y = bounds.y + bounds.height / 2
+      await card.dispatchEvent('mousedown', {
+        bubbles: true,
+        button: 0,
+        clientX: startX,
+        clientY: y,
+      })
+      await card.dispatchEvent('mousemove', {
+        bubbles: true,
+        clientX: startX + direction * 180,
+        clientY: y,
+      })
+      await expect(card).toHaveAttribute(
+        'data-swipe-direction',
+        direction > 0 ? 'clear' : 'bounce',
+      )
+      await card.dispatchEvent('mouseup', {
+        bubbles: true,
+        button: 0,
+        clientX: startX + direction * 180,
+        clientY: y,
+      })
+
+      await expect(card).toContainText(expectedStatus)
+    }
   })
 
   test('deletes a cheque after its number is confirmed', async ({ page }) => {

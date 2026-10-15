@@ -223,6 +223,7 @@ export default function BusinessesPage() {
           {filteredBusinesses?.map((business) => (
             <div
               key={business.id}
+              data-testid={`business-card-${business.id}`}
               onClick={() => setActiveBusiness(business)}
               className={cn(
                 'group relative overflow-hidden rounded-lg border p-6 transition-all active:scale-95 cursor-pointer',
@@ -285,6 +286,7 @@ export default function BusinessesPage() {
                   </div>
                   <Link
                     href={`/businesses/${business.id}`}
+                    data-testid="business-detail-link"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <HugeiconsIcon

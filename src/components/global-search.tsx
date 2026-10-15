@@ -183,6 +183,8 @@ export function GlobalSearch({
             {filteredChequeDrafts.slice(0, 3).map((c: ChequeDraft) => (
               <CommandItem
                 key={`draft-${c.id}`}
+                data-testid="global-search-result-cheque-draft"
+                value={`${c.cheque_number || ''} ${c.party?.name || ''} ${c.amount ?? ''}`}
                 onSelect={() =>
                   navigateTo(`${DRAFT_CREATE_PATHS.cheque}?draftId=${c.id}`)
                 }
@@ -248,6 +250,8 @@ export function GlobalSearch({
             {filteredPartyDrafts.slice(0, 3).map((p: PartyDraft) => (
               <CommandItem
                 key={`draft-${p.id}`}
+                data-testid="global-search-result-party-draft"
+                value={`${p.name || ''} ${p.contact || ''}`}
                 onSelect={() =>
                   navigateTo(`${DRAFT_CREATE_PATHS.party}?draftId=${p.id}`)
                 }
@@ -319,6 +323,8 @@ export function GlobalSearch({
             {filteredAccountDrafts.slice(0, 3).map((a: AccountDraft) => (
               <CommandItem
                 key={`draft-${a.id}`}
+                data-testid="global-search-result-account-draft"
+                value={`${a.bank?.name || ''} ${a.account_name || ''} ${a.account_number || ''}`}
                 onSelect={() =>
                   navigateTo(`${DRAFT_CREATE_PATHS.account}?draftId=${a.id}`)
                 }

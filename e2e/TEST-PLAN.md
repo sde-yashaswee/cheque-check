@@ -28,17 +28,16 @@ severity; it increases the number of branches and assertions expected in the spe
 
 Core cheque lifecycle. Breakage here means incorrect financial state or a blocked daily workflow.
 
-| Flow                                                                    | Risk | Freq          | Complexity | Spec                                           |
-| ----------------------------------------------------------------------- | ---- | ------------- | ---------- | ---------------------------------------------- |
-| Signup/login/logout/forgot-password                                     | 3    | 3             | 2          | `auth.spec.ts` (existing)                      |
-| Onboarding wizard + first-run empty cheque list                         | 3    | 1 (once/user) | 2          | `onboarding.spec.ts` (existing)                |
-| Cheque create (Outward/Inward, invalid-value blocking)                  | 3    | 3             | 3          | `cheques.spec.ts`, `cheque-management.spec.ts` |
-| Cheque status transition via detail actions + pending-status correction | 3    | 3             | 3          | `cheque-management.spec.ts`                    |
-| Cheque edit                                                             | 3    | 2             | 2          | `cheque-management.spec.ts`                    |
-| Cheque delete (type-to-confirm)                                         | 3    | 2             | 2          | `cheque-management.spec.ts`                    |
-| Party create/edit/delete                                                | 2    | 3             | 2          | `parties.spec.ts`                              |
-| Account (bank account) create/edit/delete                               | 2    | 3             | 2          | `accounts.spec.ts`                             |
-| Business switching + per-business data isolation                        | 3    | 2             | 2          | `businesses.spec.ts`                           |
+| Flow                                                                            | Risk | Freq          | Complexity | Spec                                           |
+| ------------------------------------------------------------------------------- | ---- | ------------- | ---------- | ---------------------------------------------- |
+| Signup/login/logout/forgot-password                                             | 3    | 3             | 2          | `auth.spec.ts` (existing)                      |
+| Onboarding wizard + first-run empty cheque list                                 | 3    | 1 (once/user) | 2          | `onboarding.spec.ts` (existing)                |
+| Cheque create (Outward/Inward, invalid-value blocking)                          | 3    | 3             | 3          | `cheques.spec.ts`, `cheque-management.spec.ts` |
+| Cheque status transition via swipe + detail actions + pending-status correction | 3    | 3             | 3          | `cheque-management.spec.ts`                    |
+| Cheque edit                                                                     | 3    | 2             | 2          | `cheque-management.spec.ts`                    |
+| Cheque delete (type-to-confirm)                                                 | 3    | 2             | 2          | `cheque-management.spec.ts`                    |
+| Per-business data isolation when switching active business                      | 3    | 2             | 3          | `businesses.spec.ts`                           |
+| Dashboard current balance + today's cheque list                                 | 3    | 3             | 2          | `dashboard.spec.ts`                            |
 
 ## P1 — High
 
@@ -47,23 +46,28 @@ Frequently used supporting flows; broken state degrades UX but has a workaround.
 | Flow                                                        | Risk | Freq | Complexity | Spec                  |
 | ----------------------------------------------------------- | ---- | ---- | ---------- | --------------------- |
 | Cheque list filter/search/sort (status, party, date/amount) | 2    | 3    | 2          | `cheques.spec.ts`     |
-| Cheque draft: save mid-flow, resume, publish                | 2    | 2    | 3          | `drafts.spec.ts`      |
+| Cheque/party/account drafts: save, resume, publish          | 2    | 2    | 3          | `drafts.spec.ts`      |
 | Tags: create, assign to cheque, verify linked cheque        | 2    | 2    | 2          | `tags.spec.ts`        |
+| Party create/edit/delete                                    | 2    | 3    | 2          | `parties.spec.ts`     |
+| Account create/edit/delete                                  | 2    | 3    | 2          | `accounts.spec.ts`    |
+| Business create/edit/delete                                 | 2    | 1    | 3          | `businesses.spec.ts`  |
 | Global search across cheques/parties/accounts               | 2    | 2    | 2          | `search.spec.ts`      |
 | Settings > Preferences (currency/date format propagation)   | 2    | 1    | 2          | `preferences.spec.ts` |
-| Second business creation via switcher + context switching   | 2    | 1    | 2          | `businesses.spec.ts`  |
 | Reports: chart + CSV/JSON/PDF/Excel export (premium-gated)  | 2    | 2    | 3          | `reports.spec.ts`     |
+| Settings > Preferences language switch (locale propagation) | 2    | 1    | 2          | `locale.spec.ts`      |
 
 ## P2 — Medium
 
 Occasional configuration/management flows; workarounds exist.
 
-| Flow                                                | Risk | Freq | Complexity | Spec                    |
-| --------------------------------------------------- | ---- | ---- | ---------- | ----------------------- |
-| Settings > Notifications (reminder-day save)        | 1    | 1    | 1          | `settings-misc.spec.ts` |
-| Settings > Transactions route and history view load | 1    | 1    | 1          | `settings-misc.spec.ts` |
-| Feedback / NPS prompt                               | 1    | 1    | 2          | `feedback.spec.ts`      |
-| Premium paywall correctness for non-premium users   | 2    | 1    | 1          | `reports.spec.ts`       |
+| Flow                                                           | Risk | Freq | Complexity | Spec                                             |
+| -------------------------------------------------------------- | ---- | ---- | ---------- | ------------------------------------------------ |
+| Settings > Notifications (reminder-day save)                   | 1    | 1    | 1          | `settings-misc.spec.ts`                          |
+| Settings > Notifications (channel state persists after reload) | 1    | 1    | 2          | `settings-misc.spec.ts`, `notifications.spec.ts` |
+| Settings > Transactions route and history view load            | 1    | 1    | 1          | `settings-misc.spec.ts`                          |
+| Feedback / NPS prompt                                          | 1    | 1    | 2          | `feedback.spec.ts`                               |
+| Premium paywall correctness for non-premium users              | 2    | 1    | 1          | `reports.spec.ts`                                |
+| Tags: edit/delete existing tag                                 | 2    | 1    | 2          | `tags.spec.ts`                                   |
 
 ## P3 — Low
 
@@ -72,6 +76,8 @@ Static/informational, cosmetic only, rarely changes.
 | Flow                                                         | Risk | Freq | Complexity | Spec                   |
 | ------------------------------------------------------------ | ---- | ---- | ---------- | ---------------------- |
 | About / Help & Support / Privacy Policy / Terms / What's New | 1    | 1    | 1          | `static-pages.spec.ts` |
+| Calculator widget (open, compute, reset, close)              | 1    | 2    | 1          | `calculator.spec.ts`   |
+| PWA service worker registration                              | 1    | 1    | 1          | `pwa.spec.ts`          |
 
 ## Out of scope (unchanged from `e2e/README.md`)
 
@@ -92,3 +98,11 @@ directly via `grantLifetimePremium()` in `e2e/admin-client.ts` rather than drivi
   shared type-to-confirm delete flow used by cheques/parties/accounts/businesses/tags. The
   confirm-name input already has `id="confirm_name"`, consistent with the rest of the app's form
   selectors.
+- `src/app/(dashboard)/settings/preferences/page.tsx`: `testId="preferences-language"` and
+  `testId="preferences-time-format"` on the two Combobox fields that previously had none
+  (currency/date-format already had testids).
+- `src/app/(dashboard)/settings/notifications/page.tsx`: `data-testid` per channel `Switch`
+  (`notifications-toggle-${channel.key}`) so each channel can be targeted individually instead
+  of only `getByRole('switch').first()`.
+- `src/app/onboarding/page.tsx`: `data-testid="onboarding-back-button"` on the stepper's back
+  button (previously unreachable except by icon).

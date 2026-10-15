@@ -20,6 +20,14 @@ export class BusinessesPage {
     await this.page.getByTestId('business-switcher-trigger').click()
   }
 
+  async openByName(name: string) {
+    const card = this.page
+      .locator('[data-testid^="business-card-"]')
+      .filter({ hasText: name })
+    await expect(card).toBeVisible()
+    await card.getByTestId('business-detail-link').click()
+  }
+
   /** Opens the switcher, searches by name, and selects the first matching business. */
   async switchTo(businessName: string) {
     await this.openSwitcher()

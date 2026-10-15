@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test'
 import { AccountsPage } from '../pages/accounts.page'
-import { uniqueChequeNumber, uniqueE2eName } from '../fixtures/test-data'
+import { ChequesPage } from '../pages/cheques.page'
+import { PartiesPage } from '../pages/parties.page'
+import {
+  E2E_PHONE,
+  uniqueChequeNumber,
+  uniqueE2eName,
+} from '../fixtures/test-data'
 
 // Uses the shared authenticated + onboarded session from global.setup.ts.
 test.describe('accounts', () => {
@@ -36,5 +42,36 @@ test.describe('accounts', () => {
     await expect(
       page.getByRole('link').filter({ hasText: updatedName }),
     ).toHaveCount(0)
+  })
+
+  test('soft-deletes an account without removing its linked cheque', async ({
+    page,
+  }) => {
+    const partyName = uniqueE2eName('party')
+    const accountName = uniqueE2eName('account')
+    const accountNumber = uniqueChequeNumber() + uniqueChequeNumber()
+    const chequeNumber = uniqueChequeNumber()
+    const accountsPage = new AccountsPage(page)
+
+    await new PartiesPage(page).createParty(partyName, E2E_PHONE)
+    await accountsPage.createAccount(accountName, accountNumber)
+    await new ChequesPage(page).createCheque({
+      partyName,
+      accountSearch: accountNumber.slice(-4),
+      chequeNumber,
+    })
+
+    await accountsPage.openByName(accountName)
+    await page.getByTestId('speed-dial-edit-link').click()
+    await page.getByTestId('account-delete-trigger').click()
+    await page.locator('#confirm_name').fill(accountName)
+    await page.getByTestId('delete-dialog-confirm-button').click()
+
+    await page.goto('/accounts')
+    await expect(
+      page.getByRole('link').filter({ hasText: accountName.slice(0, 15) }),
+    ).toHaveCount(0)
+    await page.goto('/cheques')
+    await expect(page.getByText(`#${chequeNumber}`).first()).toBeVisible()
   })
 })
