@@ -273,6 +273,7 @@ export default function OnboardingPage() {
                 size="icon"
                 onClick={prevStep}
                 disabled={step === 1}
+                data-testid="onboarding-back-button"
                 className="rounded-full h-8 w-8 shrink-0 hover:bg-canvas-parchment"
               >
                 <HugeiconsIcon icon={ArrowLeft} className="h-4 w-4" />

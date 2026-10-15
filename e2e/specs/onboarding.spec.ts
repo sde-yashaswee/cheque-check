@@ -52,4 +52,20 @@ test.describe('onboarding', () => {
     await page.goto('/cheques')
     await expect(page.getByTestId('cheques-empty-state')).toBeVisible()
   })
+
+  test('navigating back to step 1 preserves the entered business name', async ({
+    page,
+  }) => {
+    await signInAndReachOnboarding(page)
+
+    const businessName = e2eBusinessName('back-nav')
+    await page.getByTestId('onboarding-business-name-input').fill(businessName)
+    await page.getByTestId('onboarding-step1-continue').click()
+    await expect(page.getByTestId('onboarding-step2-continue')).toBeVisible()
+
+    await page.getByTestId('onboarding-back-button').click()
+    await expect(
+      page.getByTestId('onboarding-business-name-input'),
+    ).toHaveValue(businessName)
+  })
 })
