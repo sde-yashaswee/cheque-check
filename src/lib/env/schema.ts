@@ -14,6 +14,7 @@ export const publicEnvSchema = z.object({
   NEXT_PUBLIC_RAZORPAY_KEY_ID: optionalString,
   NEXT_PUBLIC_SENTRY_DSN: optionalString,
   NEXT_PUBLIC_WHATSAPP_SUPPORT_NUMBER: optionalString,
+  NEXT_PUBLIC_CLARITY_PROJECT_ID: optionalString,
 })
 
 export const openAiEnvSchema = z.object({

@@ -8,6 +8,7 @@ const result = publicEnvSchema.safeParse({
   NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   NEXT_PUBLIC_WHATSAPP_SUPPORT_NUMBER:
     process.env.NEXT_PUBLIC_WHATSAPP_SUPPORT_NUMBER,
+  NEXT_PUBLIC_CLARITY_PROJECT_ID: process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID,
 })
 
 if (!result.success) {
