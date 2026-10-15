@@ -84,6 +84,7 @@ export default function PreferencesPage() {
             <Combobox
               options={LANGUAGE_OPTIONS}
               value={profile.language}
+              testId="preferences-language"
               onValueChange={(v) => {
                 updateProfile({ language: v })
                 document.cookie = `NEXT_LOCALE=${v}; path=/; max-age=31536000`
@@ -115,6 +116,7 @@ export default function PreferencesPage() {
             <Combobox
               options={TIME_FORMAT_OPTIONS}
               value={profile.time_format || '12h'}
+              testId="preferences-time-format"
               onValueChange={(v) => updateProfile({ time_format: v })}
               className="h-14 bg-canvas-parchment dark:bg-surface-tile-1 border-none rounded-sm text-lg"
             />

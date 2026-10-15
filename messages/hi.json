@@ -51,6 +51,16 @@
       "pickDates": "तारीखें चुनें"
     }
   },
+  "Navigation": {
+    "dashboard": "डैशबोर्ड",
+    "cheques": "चेक",
+    "parties": "पार्टियाँ",
+    "accounts": "खाते",
+    "businesses": "व्यवसाय",
+    "settings": "सेटिंग्स",
+    "features": "विशेषताएं",
+    "signOut": "साइन आउट"
+  },
   "Settings": {
     "general": "सामान्य",
     "management": "प्रबंधन",
@@ -128,7 +138,8 @@
     "voiceCallSummary": "वॉयस कॉल सारांश",
     "enableDailyCall": "दैनिक कॉल सक्षम करें",
     "phoneNumber": "फ़ोन नंबर",
-    "phoneNumberPlaceholder": "+91 00000 00000"
+    "phoneNumberPlaceholder": "+91 00000 00000",
+    "appDescription": "अपने व्यवसाय के चेक प्रबंधित करने का सबसे पेशेवर तरीका।"
   },
   "Drafts": {
     "title": "ड्राफ्ट",

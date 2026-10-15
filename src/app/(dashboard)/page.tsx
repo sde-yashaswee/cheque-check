@@ -148,6 +148,7 @@ export default function HomePage() {
                   currentBalance > 0 && 'text-emerald-200',
                   currentBalance < 0 && 'text-rose-200',
                 )}
+                data-testid="dashboard-current-balance"
               >
                 {formatAmount(currentBalance)}
               </p>

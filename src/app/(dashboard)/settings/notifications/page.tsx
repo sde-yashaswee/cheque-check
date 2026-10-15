@@ -73,6 +73,7 @@ export default function NotificationsPage() {
                 updateProfile({ [channel.key]: checked })
               }
               aria-label={channel.label}
+              data-testid={`notifications-toggle-${channel.key}`}
             />
           </div>
         ))}

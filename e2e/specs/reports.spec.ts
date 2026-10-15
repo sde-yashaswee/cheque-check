@@ -64,4 +64,24 @@ test.describe('premium reports', () => {
       expect(download.suggestedFilename().endsWith(extension)).toBe(true)
     }
   })
+
+  test('export is disabled for a premium user with no cheques yet', async ({
+    page,
+  }) => {
+    const user = e2eUser('reports-empty')
+    const createdUser = await createConfirmedE2eUser(user)
+    await grantLifetimePremium(createdUser.id)
+
+    const login = new LoginPage(page)
+    await login.goto()
+    await login.login(user.email, user.password)
+    await page.waitForURL('/onboarding')
+    await new OnboardingPage(page).completeWithDefaults(
+      e2eBusinessName('reports-empty'),
+    )
+    await page.waitForURL('/')
+
+    await page.goto('/reports')
+    await expect(page.getByTestId('reports-export-trigger')).toBeDisabled()
+  })
 })

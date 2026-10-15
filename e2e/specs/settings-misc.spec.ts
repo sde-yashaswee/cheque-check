@@ -1,6 +1,24 @@
 import { expect, test } from '@playwright/test'
 
 test.describe('settings', () => {
+  test('persists a notification channel toggle across reload', async ({
+    page,
+  }) => {
+    await page.goto('/settings/notifications')
+    const partySms = page.getByRole('switch').first()
+    const original = await partySms.getAttribute('aria-checked')
+    expect(original).toMatch(/^(true|false)$/)
+    const changed = original === 'true' ? 'false' : 'true'
+
+    await partySms.click()
+    await expect(partySms).toHaveAttribute('aria-checked', changed)
+    await page.reload()
+    await expect(partySms).toHaveAttribute('aria-checked', changed)
+
+    await partySms.click()
+    await expect(partySms).toHaveAttribute('aria-checked', original!)
+  })
+
   test('saves a reminder lead-time preference', async ({ page }) => {
     await page.goto('/settings/notifications')
     const reminderDays = page.getByTestId('notifications-reminder-days')

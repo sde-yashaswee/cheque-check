@@ -51,4 +51,20 @@ test.describe('preferences', () => {
     await page.getByTestId('preferences-date-format').click()
     await page.getByRole('option', { name: 'DD/MM/YYYY' }).click()
   })
+
+  test('time format selection is saved across a reload', async ({ page }) => {
+    await page.goto('/settings/preferences')
+    const timeFormat = page.getByTestId('preferences-time-format')
+    await expect(timeFormat).toContainText('12-hour (AM/PM)')
+
+    await timeFormat.click()
+    await page.getByRole('option', { name: '24-hour' }).click()
+    await expect(timeFormat).toContainText('24-hour')
+
+    await page.reload()
+    await expect(timeFormat).toContainText('24-hour')
+
+    await timeFormat.click()
+    await page.getByRole('option', { name: '12-hour (AM/PM)' }).click()
+  })
 })
