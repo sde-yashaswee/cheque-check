@@ -35,7 +35,9 @@ import { useTranslations } from 'next-intl'
 
 export default function TransactionsPage() {
   const t = useTranslations('Transactions')
-  const { transactions, isLoading } = useTransactions()
+  const tp = useTranslations('Premium')
+  const tf = useTranslations('Features')
+  const { transactions, isLoading, error, refresh } = useTransactions()
   const [searchQuery, setSearchQuery] = useState('')
   const [filterType, setFilterType] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -106,8 +108,8 @@ export default function TransactionsPage() {
         }
       case 'authorized':
         return {
-          icon: Success,
-          color: 'text-green-500 bg-green-500/10 border-green-500/20',
+          icon: Pending,
+          color: 'text-primary bg-primary/10 border-primary/20',
         }
       case 'failed':
         return {
@@ -156,6 +158,16 @@ export default function TransactionsPage() {
         return status
     }
   }
+
+  if (error)
+    return (
+      <div role="alert" className="space-y-4 rounded-lg border p-5">
+        <p className="text-sm">{tf('activityFailed')}</p>
+        <Button variant="outline" size="pill" onClick={() => void refresh()}>
+          {tp('retry')}
+        </Button>
+      </div>
+    )
 
   return (
     <div className="max-w-2xl space-y-8 pb-20" data-testid="transactions-page">
