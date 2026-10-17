@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { getRazorpayPublicKey } from '@/lib/env/client'
 import { type PaymentProductId } from '@/lib/payments'
 import { paymentService } from '@/features/monetization/services/payment.service'
@@ -17,6 +17,7 @@ type RazorpayCheckout = new (options: {
   description: string
   order_id: string
   handler: (response: RazorpaySuccess) => void
+  modal: { ondismiss: () => void }
   theme: { color: string }
 }) => { open: () => void }
 
@@ -28,6 +29,12 @@ declare global {
 
 export function useRazorpay() {
   const [isProcessing, setIsProcessing] = useState(false)
+  const processing = useRef(false)
+
+  const finish = () => {
+    processing.current = false
+    setIsProcessing(false)
+  }
 
   const processPayment = async ({
     productId,
@@ -36,6 +43,8 @@ export function useRazorpay() {
     productId: PaymentProductId
     onSuccess?: () => void
   }) => {
+    if (processing.current) return
+    processing.current = true
     setIsProcessing(true)
     try {
       const order = await paymentService.createOrder(productId)
@@ -46,17 +55,20 @@ export function useRazorpay() {
         name: 'Cheque Check',
         description: order.name,
         order_id: order.id,
-        handler: () => onSuccess?.(),
+        handler: () => {
+          finish()
+          onSuccess?.()
+        },
+        modal: { ondismiss: finish },
         theme: { color: '#000000' },
       })
       checkout.open()
     } catch (error) {
+      finish()
       console.error('Payment error:', error)
       alert(
         error instanceof Error ? error.message : 'Failed to initiate payment',
       )
-    } finally {
-      setIsProcessing(false)
     }
   }
 
