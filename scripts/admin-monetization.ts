@@ -2,16 +2,15 @@ import { config } from 'dotenv'
 config({ path: '.env.local' })
 import { createClient } from '@supabase/supabase-js'
 import { TABLES } from '../src/lib/supabase/tables'
+import {
+  ALL_ENTITLEMENT_STATUSES,
+  ALL_FEATURE_IDS,
+  METERED_FEATURE_IDS,
+  type FeatureId,
+} from '../src/features/monetization/constants'
 // @ts-ignore
 import { Select, Input, Confirm, NumberPrompt } from 'enquirer'
 
-type FeatureType =
-  | 'ai_scan'
-  | 'voice_reminder'
-  | 'lifetime_premium'
-  | 'ai_scanner_sub'
-  | 'voice_reminder_sub'
-type EntitlementStatus = 'active' | 'expired' | 'canceled'
 type TransactionStatus =
   'created' | 'authorized' | 'captured' | 'refunded' | 'failed'
 type TransactionType = 'lifetime' | 'subscription' | 'top_up'
@@ -134,24 +133,17 @@ async function manageEntitlements(userId: string) {
 
   if (action === 'Back') return
 
-  const features: FeatureType[] = [
-    'ai_scan',
-    'voice_reminder',
-    'lifetime_premium',
-    'ai_scanner_sub',
-    'voice_reminder_sub',
-  ]
   const featureId = (await new Select({
     name: 'feature',
     message: 'Select Feature:',
-    choices: features,
-  }).run()) as FeatureType
+    choices: ALL_FEATURE_IDS,
+  }).run()) as FeatureId
 
   if (action === 'Add/Update Feature') {
     const status = await new Select({
       name: 'status',
       message: 'Status:',
-      choices: ['active', 'expired', 'canceled'],
+      choices: ALL_ENTITLEMENT_STATUSES,
     }).run()
 
     const isLifetime = await new Confirm({
@@ -222,12 +214,11 @@ async function manageQuotas(userId: string) {
 
   if (action === 'Back') return
 
-  const features: FeatureType[] = ['ai_scan', 'voice_reminder']
   const featureId = (await new Select({
     name: 'feature',
     message: 'Select Feature Quota:',
-    choices: features,
-  }).run()) as FeatureType
+    choices: METERED_FEATURE_IDS,
+  }).run()) as FeatureId
 
   const currentQuota = quotas?.find((q) => q.feature_id === featureId)
 
@@ -293,18 +284,11 @@ async function manageTransactions(userId: string) {
       message: 'Type:',
       choices: ['lifetime', 'subscription', 'top_up'],
     }).run()) as TransactionType
-    const features: FeatureType[] = [
-      'ai_scan',
-      'voice_reminder',
-      'lifetime_premium',
-      'ai_scanner_sub',
-      'voice_reminder_sub',
-    ]
     const featureId = (await new Select({
       name: 'feature',
       message: 'Feature:',
-      choices: features,
-    }).run()) as FeatureType
+      choices: ALL_FEATURE_IDS,
+    }).run()) as FeatureId
     const amount = await new NumberPrompt({
       name: 'amount',
       message: 'Amount in INR:',

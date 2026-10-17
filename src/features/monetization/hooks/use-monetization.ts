@@ -4,6 +4,10 @@ import type {
   Entitlement,
   Quota,
 } from '@/features/monetization/repositories/monetization.repository'
+import {
+  ENTITLEMENT_STATUS,
+  FEATURE_IDS,
+} from '@/features/monetization/constants'
 import { queryKeys } from '@/lib/query-keys'
 
 export function useMonetization() {
@@ -21,15 +25,18 @@ export function useMonetization() {
 
   const isLifetimePremium = entitlements?.some(
     (e: Entitlement) =>
-      e.feature_id === 'lifetime_premium' && e.status === 'active',
+      e.feature_id === FEATURE_IDS.LIFETIME_PREMIUM &&
+      e.status === ENTITLEMENT_STATUS.ACTIVE,
   )
   const hasAiScannerSub = entitlements?.some(
     (e: Entitlement) =>
-      e.feature_id === 'ai_scanner_sub' && e.status === 'active',
+      e.feature_id === FEATURE_IDS.AI_SCANNER_SUB &&
+      e.status === ENTITLEMENT_STATUS.ACTIVE,
   )
   const hasVoiceReminderSub = entitlements?.some(
     (e: Entitlement) =>
-      e.feature_id === 'voice_reminder_sub' && e.status === 'active',
+      e.feature_id === FEATURE_IDS.VOICE_REMINDER_SUB &&
+      e.status === ENTITLEMENT_STATUS.ACTIVE,
   )
 
   const getQuota = (featureId: string) => {
@@ -38,7 +45,8 @@ export function useMonetization() {
 
   const checkEntitlement = (featureId: string) => {
     return entitlements?.some(
-      (e: Entitlement) => e.feature_id === featureId && e.status === 'active',
+      (e: Entitlement) =>
+        e.feature_id === featureId && e.status === ENTITLEMENT_STATUS.ACTIVE,
     )
   }
 

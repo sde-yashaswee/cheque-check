@@ -1,5 +1,6 @@
 import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { TABLES } from '../../_shared/tables.ts'
+import { FEATURE_IDS } from '../../_shared/feature-ids.ts'
 import { ClaimedJob, DispatchCheque, DispatchProfile } from '../types.ts'
 
 const RETRY_BACKOFF_MINUTES = [10, 30, 120]
@@ -57,7 +58,7 @@ export class DispatcherDatabaseService {
   async consumeVoiceQuota(userId: string): Promise<boolean> {
     const { data, error } = await this.supabase.rpc('admin_increment_quota', {
       p_user_id: userId,
-      p_feature_id: 'voice_reminder',
+      p_feature_id: FEATURE_IDS.VOICE_REMINDER,
     })
     if (error) throw error
     return Boolean(data)

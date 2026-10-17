@@ -1,12 +1,7 @@
 import { z } from 'zod'
+import { ProductIdSchema } from '@/features/monetization/constants'
 
-export const PaymentProductIdSchema = z.enum([
-  'lifetime_premium',
-  'ai_scanner_30d',
-  'voice_reminder_30d',
-  'ai_scan_250',
-  'voice_reminder_100',
-])
+export const PaymentProductIdSchema = ProductIdSchema
 
 export type PaymentProductId = z.infer<typeof PaymentProductIdSchema>
 

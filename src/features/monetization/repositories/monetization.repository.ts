@@ -1,18 +1,22 @@
 import { SupabaseRepository } from '@/repositories/base.repository'
 import { TABLES } from '@/lib/supabase/tables'
+import type {
+  EntitlementStatus,
+  FeatureId,
+} from '@/features/monetization/constants'
 
 export interface Entitlement {
   id: string
   user_id: string
-  feature_id: string
-  status: 'active' | 'expired' | 'canceled'
+  feature_id: FeatureId
+  status: EntitlementStatus
   valid_until: string | null
 }
 
 export interface Quota {
   id: string
   user_id: string
-  feature_id: string
+  feature_id: FeatureId
   used: number
   limit: number
   reset_at: string | null
@@ -27,7 +31,7 @@ export interface Transaction {
   currency: string
   status: 'created' | 'authorized' | 'captured' | 'refunded' | 'failed'
   type: 'lifetime' | 'subscription' | 'top_up'
-  feature_id: string
+  feature_id: FeatureId
   created_at: string
   updated_at: string
 }
