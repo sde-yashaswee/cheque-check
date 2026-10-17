@@ -131,8 +131,12 @@ should import from the relevant feature entry point.
   resulting `src/types/database.types.ts` update.
 - Use `TABLES` from `src/lib/supabase/tables.ts` for every table reference so
   editor completion and schema drift errors remain available.
-- Deploy `razorpay-webhook` and `send-reminders` Edge Functions separately from
-  the Next.js application.
+- Deploy `razorpay-webhook`, `notifications-scheduler`, and
+  `notifications-dispatcher` Edge Functions separately from the Next.js
+  application (`npm run supabase:functions:deploy`). The notification
+  functions also require two one-time Supabase Vault secrets (`project_url`,
+  `service_role_key`) so `pg_cron` can authenticate to them - see the comment
+  at the top of `supabase/migrations/20261017000000_notification_platform.sql`.
 
 `supabase/seed.sql` contains idempotent bank reference data. The reset command
 requires the linked project ref to be in `supabase/.dev-projects.json` or the
