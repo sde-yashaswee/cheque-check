@@ -41,10 +41,12 @@ import { tagService } from '@/features/tags/services/tag.service'
 import { storageService } from '@/services/storage.service'
 import { validateImageFile } from '@/lib/storage'
 import { CreationSuccessScreen } from '@/components/ui/creation-success-screen'
+import { usePremiumAction } from '@/features/monetization/components/premium-gate'
 
 export default function CreatePartyPage() {
   const t = useTranslations('Parties')
   const tCommon = useTranslations('Common')
+  const premium = usePremiumAction()
   const router = useRouter()
   const searchParams = useSearchParams()
   const returnTo = getSafeChequeReturnTo(searchParams.get('returnTo'))
@@ -95,6 +97,7 @@ export default function CreatePartyPage() {
   }, [initialDraftId, prefill, setValue])
   const defaultPhoneCountry = useDefaultPhoneCountry()
   const importContact = async () => {
+    if (!premium.requireAccess('contact-import')) return
     const contacts = (
       navigator as Navigator & {
         contacts?: {

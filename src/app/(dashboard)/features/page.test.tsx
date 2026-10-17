@@ -22,6 +22,7 @@ import messages from '../../../../messages/en.json'
 import hindi from '../../../../messages/hi.json'
 import hinglish from '../../../../messages/hi-en.json'
 import FeaturesPage from './page'
+import type { PremiumState } from '@/features/monetization/lib/premium-access'
 
 const mocks = vi.hoisted(() => ({
   update: vi.fn(),
@@ -37,6 +38,8 @@ let quotas: Quota[] = []
 let accessError: Error | null = null
 let loading = false
 let processing = false
+let premiumState: PremiumState | null = null
+let finitePremium = false
 
 afterEach(cleanup)
 
@@ -55,6 +58,22 @@ vi.mock('@/hooks/use-monetization', () => ({
     entitlements: [],
     isLoading: loading,
     error: accessError,
+    getEntitlementState: (id: string) =>
+      subscribed.includes(id) ? 'active' : 'free',
+  }),
+}))
+vi.mock('@/features/monetization/hooks/use-premium-access', () => ({
+  usePremiumAccess: () => ({
+    state: premiumState ?? (premium ? 'active' : 'free'),
+    hasAccess: premium,
+    hasLifetimePurchase:
+      premium && premiumState !== 'trialing' && !finitePremium,
+    canUse: () => premium,
+    isLoading: loading,
+    validUntil:
+      premiumState === 'trialing' || finitePremium
+        ? '2099-01-01T00:00:00Z'
+        : null,
   }),
 }))
 vi.mock('@/hooks/use-razorpay', () => ({
@@ -151,6 +170,8 @@ beforeEach(() => {
     updated_at: '',
   }
   premium = false
+  premiumState = null
+  finitePremium = false
   subscribed = []
   quotas = []
   accessError = null
@@ -163,6 +184,94 @@ beforeEach(() => {
 })
 
 describe('Features page', () => {
+  it('does not offer a checkout that would be rejected for an existing finite active grant', async () => {
+    premium = true
+    finitePremium = true
+    renderPage()
+    expect(
+      await screen.findByRole('link', {
+        name: messages.Premium.contactSupport,
+      }),
+    ).toHaveAttribute('href', '/settings/help-and-support')
+    expect(
+      screen.queryByRole('button', {
+        name: messages.Features.getLifetimePremium,
+      }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('switch', { name: messages.Features.receivingMode }),
+    ).toBeInTheDocument()
+  })
+  it.each([
+    ['created', 'paymentCreatedHelp'],
+    ['authorized', 'paymentAuthorizedHelp'],
+    ['captured', 'paymentCapturedHelp'],
+    ['failed', 'paymentFailedHelp'],
+    ['refunded', 'paymentRefundedHelp'],
+  ] as const)(
+    'explains %s payment without treating it as Premium access',
+    async (status, help) => {
+      mocks.transactions.mockResolvedValue([
+        {
+          id: 'order',
+          user_id: 'user',
+          feature_id: FEATURE_IDS.LIFETIME_PREMIUM,
+          type: 'lifetime',
+          status,
+          amount: 30000,
+          currency: 'INR',
+          razorpay_order_id: 'order_example',
+          razorpay_payment_id: null,
+          created_at: '2026-10-17T00:00:00Z',
+          updated_at: '2026-10-17T00:00:00Z',
+        } satisfies Transaction,
+      ])
+      renderPage()
+      expect(
+        await screen.findByText(messages.Features[help]),
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByRole('switch', { name: messages.Features.receivingMode }),
+      ).not.toBeInTheDocument()
+      expect(
+        screen.getByRole('link', { name: messages.Premium.openTools }),
+      ).toHaveAttribute('href', '/premium')
+    },
+  )
+
+  it('offers purchase during a granted trial without hiding trial access', async () => {
+    premium = true
+    premiumState = 'trialing'
+    renderPage()
+    expect(
+      await screen.findByText(messages.Premium.labels.trialing),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', {
+        name: messages.Features.getLifetimePremium,
+      }),
+    ).toBeEnabled()
+    expect(
+      screen.getByRole('switch', { name: messages.Features.receivingMode }),
+    ).toBeInTheDocument()
+  })
+
+  it.each(['paused', 'canceled', 'expired'] as const)(
+    'explains %s access and preserves the Premium tool entry',
+    async (state) => {
+      premiumState = state
+      renderPage()
+      expect(
+        await screen.findByText(messages.Premium.states[state]),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('link', { name: messages.Premium.openTools }),
+      ).toHaveAttribute('href', '/premium')
+      expect(
+        screen.queryByRole('switch', { name: messages.Features.receivingMode }),
+      ).not.toBeInTheDocument()
+    },
+  )
   it('keeps locked purchase actions clear and sends the correct product', async () => {
     renderPage()
     expect(

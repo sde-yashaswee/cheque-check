@@ -25,10 +25,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useTranslations } from 'next-intl'
 import { useChequeActions } from '@/hooks/use-cheque-actions'
 import {
-  buildChequeUpdateMessage,
   isPartySmsEnabled,
-  openPartySms,
+  preparePartySms,
 } from '@/features/cheques/lib/notify-party'
+import { usePremiumAction } from '@/features/monetization/components/premium-gate'
 
 const DeleteConfirmationDialog = dynamic(
   () =>
@@ -56,6 +56,7 @@ export function ChequeCard({ cheque, onStatusUpdate, tags }: ChequeCardProps) {
   const [offset, setOffset] = useState(0)
   const [swiping, setSwiping] = useState<'clear' | 'bounce' | null>(null)
   const { profile } = useProfile()
+  const premium = usePremiumAction()
   const { deleteCheque } = useChequeActions()
 
   const currency = profile?.currency || '₹'
@@ -245,13 +246,18 @@ export function ChequeCard({ cheque, onStatusUpdate, tags }: ChequeCardProps) {
         {cheque.party?.contact && isPartySmsEnabled(profile) && (
           <button
             type="button"
-            className="pointer-events-auto mt-3 flex items-center gap-1 text-xs font-semibold text-primary"
+            className="pointer-events-auto relative z-10 mt-3 flex min-h-11 items-center gap-1 text-xs font-semibold text-primary"
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()
-              openPartySms(
+              if (!premium.requireAccess('notify-party')) return
+              void preparePartySms(
+                t('notifyParty'),
                 cheque.party!.contact!,
-                buildChequeUpdateMessage(cheque, cheque.party!, currency),
+                cheque,
+                cheque.party!,
+                currency,
+                premium.accessRequiredMessage,
               )
             }}
           >

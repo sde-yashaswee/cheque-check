@@ -25,6 +25,7 @@ import {
 } from '@/features/drafts'
 import { buildNotifyPartyAction } from '@/features/cheques/lib/notify-party'
 import { queryKeys } from '@/lib/query-keys'
+import { usePremiumAction } from '@/features/monetization/components/premium-gate'
 
 type ChequeFormValues = z.infer<typeof chequeSchema>
 
@@ -50,6 +51,7 @@ export function useCreateCheque(
   const t = useTranslations('Cheques')
   const tc = useTranslations('Common')
   const { profile } = useProfile()
+  const premium = usePremiumAction()
 
   const form = useForm<ChequeFormValues>({
     resolver: zodResolver(chequeSchema),
@@ -129,6 +131,8 @@ export function useCreateCheque(
         created,
         profile,
         t('notifyParty'),
+        premium.canUse('notify-party'),
+        premium.accessRequiredMessage,
       )
       toast.add({
         title: tc('success'),
@@ -188,6 +192,8 @@ export function useCreateCheque(
         published,
         profile,
         t('notifyParty'),
+        premium.canUse('notify-party'),
+        premium.accessRequiredMessage,
       )
       toast.add({
         title: tc('success'),
@@ -248,6 +254,8 @@ export function useCreateCheque(
     continueAfterSuccess: () => router.push('/cheques'),
     draft,
     onSubmit: form.handleSubmit(async (data) => {
+      if (data.type === 'Inward' && !premium.requireAccess('inward-tracking'))
+        return
       const publishedDraftId = await draft.beginPublish()
       if (publishedDraftId) {
         await publishDraft(publishedDraftId, data)

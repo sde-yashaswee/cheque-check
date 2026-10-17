@@ -22,6 +22,8 @@ import { monetizationService } from '@/features/monetization/services/monetizati
 import type { Transaction } from '@/features/monetization/repositories/monetization.repository'
 import { getPaymentProductIcon } from '@/features/monetization/lib/payment-product-icons'
 import type { Profile } from '@/types'
+import { usePremiumAccess } from '@/features/monetization/hooks/use-premium-access'
+import { PREMIUM_FEATURES } from '@/features/monetization/lib/premium-access'
 
 function FeatureStatus({
   children,
@@ -47,6 +49,8 @@ export default function FeaturesPage() {
   const t = useTranslations('Features')
   const tc = useTranslations('Common')
   const tt = useTranslations('Transactions')
+  const tp = useTranslations('Premium')
+  const premium = usePremiumAccess()
   const format = useFormatter()
   const queryClient = useQueryClient()
   const { profile, updateProfile, isLoading: isLoadingProfile } = useProfile()
@@ -57,11 +61,18 @@ export default function FeaturesPage() {
     entitlements,
     isLoading,
     error,
+    getEntitlementState,
   } = useMonetization()
   const { processPayment, isProcessing } = useRazorpay()
   const transactions = useQuery<Transaction[]>({
     queryKey: queryKeys.monetization.transactions(),
     queryFn: () => monetizationService.getTransactions(),
+    refetchInterval: (query) =>
+      query.state.data?.some(
+        (entry) => entry.status === 'created' || entry.status === 'authorized',
+      )
+        ? 15_000
+        : false,
   })
   const [profilePhone, setProfilePhone] = useState<string>()
   const [saving, setSaving] = useState<string | null>(null)
@@ -219,7 +230,9 @@ export default function FeaturesPage() {
             <div className="grid gap-6 bg-canvas-parchment p-5 @min-[640px]:grid-cols-[1fr_auto] @min-[640px]:items-center @min-[640px]:p-8">
               <div className="space-y-3">
                 <FeatureStatus active={!!isLifetimePremium}>
-                  {isLifetimePremium ? t('owned') : t('oneTimeLabel')}
+                  {premium.state === 'free'
+                    ? t('oneTimeLabel')
+                    : tp(`labels.${premium.state}`)}
                 </FeatureStatus>
                 <h2
                   id="lifetime-title"
@@ -232,10 +245,17 @@ export default function FeaturesPage() {
                 </p>
               </div>
               <div className="space-y-3 @min-[640px]:max-w-64">
-                {isLifetimePremium ? (
+                {premium.hasLifetimePurchase ? (
                   <p className="text-sm font-semibold">
                     {t('alreadyUnlocked')}
                   </p>
+                ) : premium.state === 'paused' || premium.state === 'active' ? (
+                  <Link
+                    href="/settings/help-and-support"
+                    className="inline-flex min-h-11 items-center text-sm text-primary"
+                  >
+                    {tp('contactSupport')}
+                  </Link>
                 ) : (
                   <>
                     <p className="text-2xl font-semibold tracking-tight">
@@ -244,7 +264,11 @@ export default function FeaturesPage() {
                     <Button
                       size="pill"
                       className="h-auto min-h-11 w-full whitespace-normal py-3 font-normal"
-                      disabled={isProcessing}
+                      disabled={
+                        isProcessing ||
+                        premium.isLoading ||
+                        premium.state === 'error'
+                      }
                       onClick={() =>
                         processPayment({
                           productId: PRODUCT_IDS.LIFETIME_PREMIUM,
@@ -261,6 +285,27 @@ export default function FeaturesPage() {
                 </p>
               </div>
             </div>
+            {premium.state !== 'free' && (
+              <div className="space-y-2 border-t px-5 py-4 text-sm leading-relaxed @min-[640px]:px-8">
+                <p role={premium.state === 'error' ? 'alert' : undefined}>
+                  {tp(`states.${premium.state}`)}
+                </p>
+                {premium.validUntil && premium.hasAccess && (
+                  <p className="text-muted-foreground">
+                    {tp(
+                      premium.state === 'trialing'
+                        ? 'trialUntil'
+                        : 'accessUntil',
+                      {
+                        date: format.dateTime(new Date(premium.validUntil), {
+                          dateStyle: 'medium',
+                        }),
+                      },
+                    )}
+                  </p>
+                )}
+              </div>
+            )}
             <div className="divide-y px-5 @min-[640px]:px-8">
               <div className="flex items-start justify-between gap-4 py-6">
                 <div className="min-w-0 space-y-1">
@@ -317,6 +362,35 @@ export default function FeaturesPage() {
                 )}
               </div>
             </div>
+            <div className="space-y-4 border-t p-5 @min-[640px]:p-8">
+              <h3 className="text-lg font-semibold">{tp('benefitsTitle')}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {tp('benefitsDescription')}
+              </p>
+              <ul className="grid gap-3 text-sm @min-[640px]:grid-cols-2">
+                {PREMIUM_FEATURES.filter(
+                  (feature) =>
+                    feature !== 'inward-tracking' && feature !== 'reports',
+                ).map((feature) => (
+                  <li key={feature} className="flex items-start gap-2">
+                    <span aria-hidden className="text-primary">
+                      +
+                    </span>
+                    {tp(`features.${feature}`)}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/premium"
+                className="inline-flex min-h-11 items-center gap-1 text-sm text-primary hover:underline"
+              >
+                {tp('openTools')}{' '}
+                <HugeiconsIcon icon={ArrowRight01Icon} className="size-4" />
+              </Link>
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                {tp('coreUnaffected')}
+              </p>
+            </div>
           </section>
 
           <section aria-labelledby="addons-title" className="space-y-5">
@@ -344,6 +418,16 @@ export default function FeaturesPage() {
                 const paused = isVoice && !profile.voice_call_enabled
                 const needsPhone =
                   isVoice && !isValidE164Phone(profile.phone ?? '')
+                const entitlementState = getEntitlementState(
+                  addon.subscriptionId,
+                )
+                const accessBlocked =
+                  entitlementState === 'paused' ||
+                  entitlementState === 'canceled'
+                const showEntitlementState =
+                  accessBlocked ||
+                  entitlementState === 'expired' ||
+                  entitlementState === 'trialing'
                 const status = !hasAccess
                   ? 'notEnabled'
                   : remaining === 0
@@ -371,7 +455,9 @@ export default function FeaturesPage() {
                           />
                         </div>
                         <FeatureStatus active={status === 'ready'}>
-                          {t(status)}
+                          {showEntitlementState
+                            ? tp(`labels.${entitlementState}`)
+                            : t(status)}
                         </FeatureStatus>
                       </div>
                       <div className="space-y-2">

@@ -8,12 +8,15 @@ import { buildNotifyPartyAction } from '@/features/cheques/lib/notify-party'
 import { toast } from '@/components/ui/toast'
 import { useTranslations } from 'next-intl'
 import { queryKeys } from '@/lib/query-keys'
+import { usePremiumAccess } from '@/features/monetization/hooks/use-premium-access'
 
 export function useChequeActions() {
   const { activeBusiness } = useBusiness()
   const { profile } = useProfile()
+  const premium = usePremiumAccess()
   const t = useTranslations('Cheques')
   const tc = useTranslations('Common')
+  const tp = useTranslations('Premium')
 
   const updateStatusMutation = useOptimisticMutation<
     ChequeEntity[],
@@ -44,6 +47,8 @@ export function useChequeActions() {
         updated,
         profile,
         t('notifyParty'),
+        premium.canUse('notify-party'),
+        tp('states.free'),
       )
       toast.add({
         title: tc('success'),

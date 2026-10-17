@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -13,21 +14,48 @@ import {
 import { useTranslations } from 'next-intl'
 import {
   defaultPrintLayout,
-  getPrintLayout,
-  savePrintLayout,
+  getPrintLayout as getLocalPrintLayout,
   type PrintLayout,
 } from '@/features/cheques/lib/print-cheque'
+import {
+  PremiumGate,
+  usePremiumAction,
+} from '@/features/monetization/components/premium-gate'
+import {
+  getPrintLayout,
+  savePrintLayout,
+} from '@/features/premium-workspace/services/workspace.service'
+import { toast } from '@/components/ui/toast'
 
-const fields: Array<{ key: keyof PrintLayout; label: string }> = [
-  { key: 'payeeX', label: 'Payee X' },
-  { key: 'payeeY', label: 'Payee Y' },
-  { key: 'amountX', label: 'Amount X' },
-  { key: 'amountY', label: 'Amount Y' },
-  { key: 'dateX', label: 'Date X' },
-  { key: 'dateY', label: 'Date Y' },
-  { key: 'chequeNumberX', label: 'Cheque number X' },
-  { key: 'chequeNumberY', label: 'Cheque number Y' },
+const fields: Array<keyof PrintLayout> = [
+  'payeeX',
+  'payeeY',
+  'amountX',
+  'amountY',
+  'dateX',
+  'dateY',
+  'chequeNumberX',
+  'chequeNumberY',
 ]
+
+const layoutQueryKey = (accountId: string) => [
+  'premium-workspace',
+  'print-layout',
+  accountId,
+]
+
+function layoutInputs(layout: PrintLayout): Record<keyof PrintLayout, string> {
+  return {
+    payeeX: String(layout.payeeX),
+    payeeY: String(layout.payeeY),
+    amountX: String(layout.amountX),
+    amountY: String(layout.amountY),
+    dateX: String(layout.dateX),
+    dateY: String(layout.dateY),
+    chequeNumberX: String(layout.chequeNumberX),
+    chequeNumberY: String(layout.chequeNumberY),
+  }
+}
 
 export function PrintLayoutEditor({
   accountId,
@@ -46,20 +74,6 @@ export function PrintLayoutEditor({
     if (!isControlled) setUncontrolledOpen(value)
     onOpenChange?.(value)
   }
-  const [layout, setLayout] = useState<PrintLayout>(() =>
-    getPrintLayout(accountId),
-  )
-
-  const update = (key: keyof PrintLayout, value: string) => {
-    setLayout((current) => ({ ...current, [key]: Number(value) || 0 }))
-  }
-
-  const reset = () => setLayout(defaultPrintLayout)
-
-  const save = () => {
-    savePrintLayout(accountId, layout)
-    setOpen(false)
-  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -74,32 +88,142 @@ export function PrintLayoutEditor({
         <DialogHeader>
           <DialogTitle>{t('configurePrint')}</DialogTitle>
         </DialogHeader>
-        <p className="text-xs text-muted-foreground">
-          {t('printCoordinatesHelp')}
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          {fields.map(({ key, label }) => (
-            <label key={key} className="space-y-1 text-xs font-semibold">
-              {label} (mm)
-              <Input
-                type="number"
-                min="0"
-                step="1"
-                value={layout[key]}
-                onChange={(event) => update(key, event.target.value)}
-              />
-            </label>
-          ))}
-        </div>
-        <div className="flex justify-between gap-2">
-          <Button type="button" variant="ghost" onClick={reset}>
-            {t('resetPrintLayout')}
-          </Button>
-          <Button type="button" onClick={save}>
-            {t('savePrintLayout')}
-          </Button>
-        </div>
+        <PremiumGate feature="cheque-printing">
+          <PrintLayoutLoader
+            accountId={accountId}
+            onSaved={() => setOpen(false)}
+          />
+        </PremiumGate>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function PrintLayoutLoader({
+  accountId,
+  onSaved,
+}: {
+  accountId: string
+  onSaved: () => void
+}) {
+  const tp = useTranslations('Premium')
+  const query = useQuery({
+    queryKey: layoutQueryKey(accountId),
+    queryFn: () => getPrintLayout(accountId),
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
+  })
+  if (query.isPending || query.isFetching)
+    return <p role="status">{tp('loading')}</p>
+  if (query.isError)
+    return (
+      <div role="alert" className="space-y-3">
+        <p>{query.error.message}</p>
+        <Button onClick={() => void query.refetch()}>{tp('retry')}</Button>
+      </div>
+    )
+  return (
+    <PrintLayoutForm
+      key={accountId}
+      accountId={accountId}
+      initialLayout={query.data ?? getLocalPrintLayout(accountId)}
+      onSaved={onSaved}
+    />
+  )
+}
+
+function PrintLayoutForm({
+  accountId,
+  initialLayout,
+  onSaved,
+}: {
+  accountId: string
+  initialLayout: PrintLayout
+  onSaved: () => void
+}) {
+  const t = useTranslations('Cheques')
+  const tc = useTranslations('Common')
+  const premium = usePremiumAction()
+  const queryClient = useQueryClient()
+  const [layout, setLayout] = useState(() => layoutInputs(initialLayout))
+  const [isSaving, setIsSaving] = useState(false)
+
+  const save = async () => {
+    if (isSaving) return
+    const parsed = { ...initialLayout }
+    for (const key of fields) {
+      const value = Number(layout[key])
+      if (
+        !layout[key].trim() ||
+        !Number.isFinite(value) ||
+        value < 0 ||
+        value > (key.endsWith('X') ? 210 : 297)
+      ) {
+        toast.add({
+          title: tc('error'),
+          description: t('printCoordinatesInvalid'),
+          type: 'error',
+        })
+        return
+      }
+      parsed[key] = value
+    }
+    setIsSaving(true)
+    try {
+      if (!(await premium.verifyAccess('cheque-printing'))) return
+      await savePrintLayout(accountId, parsed)
+      queryClient.setQueryData(layoutQueryKey(accountId), parsed)
+      onSaved()
+    } catch (error) {
+      toast.add({
+        title: tc('error'),
+        description: error instanceof Error ? error.message : tc('error'),
+        type: 'error',
+      })
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-muted-foreground">
+        {t('printCoordinatesHelp')}
+      </p>
+      <div className="grid grid-cols-2 gap-3">
+        {fields.map((key) => (
+          <label key={key} className="space-y-1 text-xs font-semibold">
+            {t(`printFields.${key}`)} (mm)
+            <Input
+              type="number"
+              min="0"
+              max={key.endsWith('X') ? 210 : 297}
+              step="1"
+              value={layout[key]}
+              onChange={(event) =>
+                setLayout((current) => ({
+                  ...current,
+                  [key]: event.target.value,
+                }))
+              }
+              disabled={isSaving}
+            />
+          </label>
+        ))}
+      </div>
+      <div className="flex justify-between gap-2">
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={isSaving}
+          onClick={() => setLayout(layoutInputs(defaultPrintLayout))}
+        >
+          {t('resetPrintLayout')}
+        </Button>
+        <Button type="button" disabled={isSaving} onClick={() => void save()}>
+          {t('savePrintLayout')}
+        </Button>
+      </div>
+    </div>
   )
 }

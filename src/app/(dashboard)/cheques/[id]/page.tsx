@@ -37,13 +37,17 @@ import { useTranslations } from 'next-intl'
 import { useRedirectIfDraft } from '@/features/drafts'
 import { partyService } from '@/features/parties/services/party.service'
 import {
-  buildChequeUpdateMessage,
   isPartySmsEnabled,
-  openPartySms,
+  preparePartySms,
 } from '@/features/cheques/lib/notify-party'
-import { downloadChequePrintPdf } from '@/features/cheques/lib/print-cheque'
+import {
+  downloadChequePrintPdf,
+  getPrintLayout as getLocalPrintLayout,
+} from '@/features/cheques/lib/print-cheque'
+import { getPrintLayout } from '@/features/premium-workspace/services/workspace.service'
 import { PrintLayoutEditor } from '@/features/cheques/components/print-layout-editor'
 import { EntityTagsSection } from '@/features/tags/components/tag-chips'
+import { usePremiumAction } from '@/features/monetization/components/premium-gate'
 
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import 'react-photo-view/dist/react-photo-view.css'
@@ -96,6 +100,7 @@ export default function ChequeDetailPage() {
   const tc = useTranslations('Common')
   const { id } = useParams() as { id: string }
   const { profile } = useProfile()
+  const premium = usePremiumAction()
   const currency = profile?.currency || '₹'
 
   const { cheque, isLoading, updateStatus, isUpdating } = useChequeDetail(id)
@@ -145,13 +150,14 @@ export default function ChequeDetailPage() {
     }))
 
   const duplicateCheque = async () => {
+    if (!(await premium.verifyAccess('duplicate-cheque'))) return
     try {
       const draft = await chequeDraftService.create(cheque.business_id, {
         party_id: cheque.party_id,
         account_id: cheque.account_id,
         amount: cheque.amount,
-        cheque_date: cheque.cheque_date,
-        deposit_date: cheque.deposit_date,
+        cheque_date: new Date().toISOString().split('T')[0],
+        deposit_date: null,
         type: cheque.type,
         notes: cheque.notes,
       })
@@ -168,23 +174,47 @@ export default function ChequeDetailPage() {
           {
             label: t('notifyParty'),
             icon: Message,
-            onClick: () =>
-              openPartySms(
+            onClick: () => {
+              if (!premium.requireAccess('notify-party')) return
+              void preparePartySms(
+                t('notifyParty'),
                 party.contact,
-                buildChequeUpdateMessage(cheque, party, currency),
-              ),
+                cheque,
+                party,
+                currency,
+                premium.accessRequiredMessage,
+              )
+            },
           },
         ]
       : []),
     {
       label: t('printCheque'),
       icon: Download,
-      onClick: () => void downloadChequePrintPdf(cheque, currency),
+      onClick: async () => {
+        if (!(await premium.verifyAccess('cheque-printing'))) return
+        try {
+          const layout = await getPrintLayout(cheque.account_id)
+          downloadChequePrintPdf(
+            cheque,
+            currency,
+            layout ?? getLocalPrintLayout(cheque.account_id),
+          )
+        } catch (error) {
+          toast.add({
+            title: tc('error'),
+            description: error instanceof Error ? error.message : tc('error'),
+            type: 'error',
+          })
+        }
+      },
     },
     {
       label: t('configurePrint'),
       icon: PrintSettings,
-      onClick: () => setPrintLayoutOpen(true),
+      onClick: () => {
+        if (premium.requireAccess('cheque-printing')) setPrintLayoutOpen(true)
+      },
     },
     {
       label: t('duplicate'),

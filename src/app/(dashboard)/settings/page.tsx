@@ -46,6 +46,7 @@ interface SettingsSection {
 
 export default function SettingsPage() {
   const t = useTranslations('Settings')
+  const tp = useTranslations('Premium')
   const { profile, isLoading: profileLoading } = useProfile()
   const { handleLogout } = useSettings()
   const { isLoading: monetizationLoading } = useMonetization()
@@ -71,6 +72,12 @@ export default function SettingsPage() {
       title: t('general'),
       icon: LayoutGrid,
       items: [
+        {
+          name: tp('openTools'),
+          description: tp('benefitsTitle'),
+          icon: Zap,
+          href: '/premium',
+        },
         {
           name: t('preferences'),
           description: t('preferencesDesc'),

@@ -60,6 +60,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { BankSelector } from '@/components/bank-selector'
 import { ScanStore } from '@/lib/scan-store'
 import { useProfile } from '@/hooks/use-profile'
+import { usePremiumAction } from '@/features/monetization/components/premium-gate'
 import { buildChequeReturnTo } from '@/lib/cheque-draft'
 import { TagSelector } from '@/features/tags/components/tag-selector'
 import { tagService } from '@/features/tags/services/tag.service'
@@ -75,6 +76,7 @@ export default function CreateChequePage() {
   const t = useTranslations('Cheques')
   const tCommon = useTranslations('Common')
   const tDrafts = useTranslations('Drafts')
+  const premium = usePremiumAction()
   const searchParams = useSearchParams()
   const typeParam = searchParams.get('type')
   const imageUrlParam = searchParams.get('imageUrl')
@@ -396,9 +398,14 @@ export default function CreateChequePage() {
               </Label>
               <Tabs
                 value={watch('type')}
-                onValueChange={(value) =>
+                onValueChange={(value) => {
+                  if (
+                    value === 'Inward' &&
+                    !premium.requireAccess('inward-tracking')
+                  )
+                    return
                   setUserValue('type', value as 'Outward' | 'Inward')
-                }
+                }}
               >
                 <TabsList className="h-14 w-full rounded-lg bg-canvas-parchment p-1">
                   <TabsTrigger

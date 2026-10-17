@@ -12,7 +12,6 @@ import {
   FilterIcon as Filter,
   Calendar01Icon as Calendar,
   Building03Icon,
-  LockPasswordIcon,
 } from '@hugeicons/core-free-icons'
 import { useChequeStats } from '@/hooks/use-cheque-stats'
 import { DataState } from '@/components/ui/data-state'
@@ -23,10 +22,12 @@ import { StatusPill } from '@/components/ui/status-pill'
 import { format } from 'date-fns'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
-import { useMonetization } from '@/hooks/use-monetization'
-import { PremiumModal } from '@/components/premium-modal'
-import { useRouter } from 'next/navigation'
+import {
+  PremiumGate,
+  usePremiumAction,
+} from '@/features/monetization/components/premium-gate'
 import { useState } from 'react'
+import { toast } from '@/components/ui/toast'
 import {
   Popover,
   PopoverContent,
@@ -45,16 +46,22 @@ const ChequeStatsChart = dynamic(
 )
 
 export default function ReportsPage() {
+  return (
+    <PremiumGate feature="reports" testId="reports-premium-gate">
+      <ReportsContent />
+    </PremiumGate>
+  )
+}
+
+function ReportsContent() {
   const t = useTranslations('Dashboard')
   const tr = useTranslations('Reports')
   const tc = useTranslations('Common')
-  const router = useRouter()
   const [exportOpen, setExportOpen] = useState(false)
 
   const { activeBusiness } = useBusiness()
   const { profile } = useProfile()
-  const { isLifetimePremium, isLoading: isLoadingMonetization } =
-    useMonetization()
+  const premium = usePremiumAction()
 
   const {
     cheques,
@@ -70,7 +77,7 @@ export default function ReportsPage() {
     bouncedCount,
   } = useChequeStats(cheques)
 
-  const isLoading = chequesLoading || isLoadingMonetization
+  const isLoading = chequesLoading
 
   const currency = profile?.currency || '₹'
 
@@ -81,8 +88,10 @@ export default function ReportsPage() {
     { name: t('bounced'), value: bouncedCount, color: '#FF3B30' },
   ].filter((d) => d.value > 0)
 
-  const handleExport = (format: 'csv' | 'json' | 'pdf' | 'excel') => {
-    if (cheques && isLifetimePremium) {
+  const handleExport = async (format: 'csv' | 'json' | 'pdf' | 'excel') => {
+    if (!(await premium.verifyAccess('reports'))) return
+    if (!cheques) return
+    try {
       const baseName = `cheques_report_${activeBusiness?.name || 'export'}`
       if (format === 'json') {
         reportService.exportToJSON(cheques, `${baseName}.json`)
@@ -94,41 +103,13 @@ export default function ReportsPage() {
         reportService.exportToCSV(cheques, `${baseName}.csv`)
       }
       setExportOpen(false)
+    } catch (error) {
+      toast.add({
+        title: tc('error'),
+        description: error instanceof Error ? error.message : tc('error'),
+        type: 'error',
+      })
     }
-  }
-
-  if (!isLoadingMonetization && !isLifetimePremium) {
-    return (
-      <div
-        className="max-w-2xl space-y-8 pb-20 pt-2"
-        data-testid="reports-premium-gate"
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-display-sm font-semibold tracking-tight">
-              {tr('title')}
-            </h1>
-            <p className="text-body text-muted-foreground">{tr('subtitle')}</p>
-          </div>
-        </div>
-        <EmptyState
-          icon={LockPasswordIcon}
-          title={tc('premiumFeature')}
-          description={tr('premiumDescription')}
-          action={{
-            label: tr('viewFeatures'),
-            onClick: () => router.push('/features'),
-          }}
-        />
-        <PremiumModal
-          open={!isLoadingMonetization && !isLifetimePremium}
-          onOpenChange={() => {}}
-          featureName={tr('premiumFeatureName')}
-          description={tr('premiumAccessDescription')}
-          onCloseRedirect="/settings"
-        />
-      </div>
-    )
   }
 
   return (

@@ -19,6 +19,7 @@ import { useEntityTagMap } from '@/features/tags/hooks/use-entity-tags'
 
 export default function ChequesPage() {
   const t = useTranslations('Cheques')
+  const tp = useTranslations('Premium')
   const { activeBusiness } = useBusiness()
   const businessId = activeBusiness?.id
 
@@ -60,6 +61,12 @@ export default function ChequesPage() {
       />
 
       <DraftsLink entity="cheque" />
+      <Link
+        href="/premium"
+        className="inline-flex min-h-11 items-center text-sm text-primary hover:underline"
+      >
+        {tp('openTools')}
+      </Link>
 
       <div className="space-y-4">
         <DataState

@@ -62,6 +62,7 @@ import { useEntityTagMap } from '@/features/tags/hooks/use-entity-tags'
 export default function PartyDetailPage() {
   const t = useTranslations('Parties')
   const tCommon = useTranslations('Common')
+  const tp = useTranslations('Premium')
   const tc = tCommon
   const { id } = useParams() as { id: string }
   const { activeBusiness } = useBusiness()
@@ -164,6 +165,12 @@ export default function PartyDetailPage() {
 
   return (
     <div className="max-w-2xl space-y-8 pb-28">
+      <Link
+        href={`/premium?partyId=${encodeURIComponent(id)}#party-statements`}
+        className="inline-flex min-h-11 items-center text-sm text-primary hover:underline"
+      >
+        {tp('features.party-statements')}
+      </Link>
       <div className="rounded-lg border bg-card p-6 space-y-6 relative overflow-hidden border-primary/5">
         <div className="flex justify-between items-start relative z-10">
           <div className="flex items-center gap-4">

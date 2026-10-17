@@ -1,5 +1,7 @@
 'use client'
 
+import { usePremiumAction } from '@/features/monetization/components/premium-gate'
+
 import { useEditCheque } from '@/hooks/use-edit-cheque'
 import { useParties } from '@/hooks/use-parties'
 import { useAccounts } from '@/hooks/use-accounts'
@@ -68,6 +70,7 @@ export default function EditChequePage() {
     onSubmit,
     onDelete,
   } = useEditCheque(id)
+  const premium = usePremiumAction()
 
   const {
     register,
@@ -81,6 +84,12 @@ export default function EditChequePage() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (
+      watch('type') === 'Inward' &&
+      cheque?.type !== 'Inward' &&
+      !premium.requireAccess('inward-tracking')
+    )
+      return
     if (await form.trigger()) {
       try {
         await tagsDraft.commit()
@@ -205,7 +214,15 @@ export default function EditChequePage() {
             </Label>
             <Tabs
               value={watch('type')}
-              onValueChange={(value) => setField('type', value as string)}
+              onValueChange={(value) => {
+                if (
+                  value === 'Inward' &&
+                  cheque?.type !== 'Inward' &&
+                  !premium.requireAccess('inward-tracking')
+                )
+                  return
+                setField('type', value as string)
+              }}
             >
               <TabsList className="h-14 w-full rounded-lg bg-canvas-parchment p-1">
                 <TabsTrigger

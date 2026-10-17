@@ -51,6 +51,7 @@ export default function HomePage() {
   const tDashboard = useTranslations('Dashboard')
   const tCheques = useTranslations('Cheques')
   const tCommon = useTranslations('Common')
+  const tp = useTranslations('Premium')
   const { activeBusiness } = useBusiness()
   const { profile } = useProfile()
   const router = useRouter()
@@ -105,6 +106,12 @@ export default function HomePage() {
 
   return (
     <div className="max-w-2xl space-y-8 pb-20 pt-2">
+      <Link
+        href="/premium#consolidated-dashboard"
+        className="inline-flex min-h-11 items-center text-sm text-primary hover:underline"
+      >
+        {tp('features.consolidated-dashboard')}
+      </Link>
       <DataState
         isLoading={isLoading}
         data={activeBusiness ? [activeBusiness] : []}
