@@ -195,8 +195,6 @@ export interface Database {
           status: Database['public']['Enums']['cheque_status'] | null
           type: Database['public']['Enums']['cheque_type'] | null
           notes: string | null
-          voice_call_sent: boolean | null
-          last_call_at: string | null
           image_url: string | null
           is_draft: boolean
           created_at: string | null
@@ -230,22 +228,92 @@ export interface Database {
           },
         ]
       }
-      reminder_logs: {
+      notification_jobs: {
         Row: {
           id: string
-          cheque_id: string
-          type: Database['public']['Enums']['reminder_type']
-          status: Database['public']['Enums']['reminder_status'] | null
-          provider_response: Json | null
-          created_at: string | null
+          user_id: string
+          business_id: string | null
+          channel: 'voice' | 'whatsapp' | 'email' | 'push' | 'sms'
+          purpose: string
+          payload: Json
+          scheduled_at: string
+          status:
+            | 'pending'
+            | 'processing'
+            | 'sent'
+            | 'failed'
+            | 'skipped'
+            | 'cancelled'
+          attempts: number
+          last_error: string | null
+          idempotency_key: string
+          created_at: string
+          updated_at: string
         }
         Insert: Partial<
-          Database['public']['Tables']['reminder_logs']['Row']
+          Database['public']['Tables']['notification_jobs']['Row']
         > & {
-          cheque_id: string
-          type: Database['public']['Enums']['reminder_type']
+          user_id: string
+          channel: 'voice' | 'whatsapp' | 'email' | 'push' | 'sms'
+          purpose: string
+          idempotency_key: string
         }
-        Update: Partial<Database['public']['Tables']['reminder_logs']['Row']>
+        Update: Partial<
+          Database['public']['Tables']['notification_jobs']['Row']
+        >
+        Relationships: []
+      }
+      notification_logs: {
+        Row: {
+          id: string
+          job_id: string | null
+          user_id: string
+          channel: 'voice' | 'whatsapp' | 'email' | 'push' | 'sms'
+          purpose: string
+          recipient: string | null
+          status: 'success' | 'failed'
+          provider: string
+          provider_message_id: string | null
+          provider_response: Json | null
+          error: string | null
+          created_at: string
+        }
+        Insert: Partial<
+          Database['public']['Tables']['notification_logs']['Row']
+        > & {
+          user_id: string
+          channel: 'voice' | 'whatsapp' | 'email' | 'push' | 'sms'
+          purpose: string
+          status: 'success' | 'failed'
+          provider: string
+        }
+        Update: Partial<
+          Database['public']['Tables']['notification_logs']['Row']
+        >
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          endpoint: string
+          p256dh: string
+          auth: string
+          user_agent: string | null
+          created_at: string
+          last_seen_at: string
+        }
+        Insert: Partial<
+          Database['public']['Tables']['push_subscriptions']['Row']
+        > & {
+          user_id: string
+          endpoint: string
+          p256dh: string
+          auth: string
+        }
+        Update: Partial<
+          Database['public']['Tables']['push_subscriptions']['Row']
+        >
         Relationships: []
       }
       user_entitlements: {
@@ -413,12 +481,23 @@ export interface Database {
         }
         Returns: boolean
       }
+      claim_notification_jobs: {
+        Args: {
+          p_batch_size: number
+        }
+        Returns: Database['public']['Tables']['notification_jobs']['Row'][]
+      }
+      admin_increment_quota: {
+        Args: {
+          p_user_id: string
+          p_feature_id: Database['public']['Enums']['feature_type']
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       cheque_status: 'Issued' | 'Received' | 'Cleared' | 'Bounced'
       cheque_type: 'Outward' | 'Inward'
-      reminder_type: 'Push' | 'Voice' | 'SMS'
-      reminder_status: 'Pending' | 'Success' | 'Failed'
       feature_type:
         | 'ai_scan'
         | 'voice_reminder'

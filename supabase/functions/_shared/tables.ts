@@ -7,10 +7,12 @@ export const TABLES = {
   BANKS: 'banks',
   ACCOUNTS: 'accounts',
   CHEQUES: 'cheques',
-  REMINDER_LOGS: 'reminder_logs',
   USER_ENTITLEMENTS: 'user_entitlements',
   USER_QUOTAS: 'user_quotas',
   TRANSACTIONS: 'transactions',
   PAYMENT_PRODUCTS: 'payment_products',
   API_RATE_LIMITS: 'api_rate_limits',
+  NOTIFICATION_JOBS: 'notification_jobs',
+  NOTIFICATION_LOGS: 'notification_logs',
+  PUSH_SUBSCRIPTIONS: 'push_subscriptions',
 } as const

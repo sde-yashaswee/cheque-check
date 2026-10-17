@@ -120,8 +120,6 @@ export interface Cheque {
   type: ChequeType
   notes: string | null
   image_url: string | null
-  voice_call_sent: boolean
-  last_call_at: string | null
   is_draft?: boolean
   created_at: string
   updated_at: string
@@ -141,6 +139,43 @@ export interface ChequeWithRelations extends Cheque {
     icon?: string
     bank?: { name: string; logo_url?: string | null }
   }
+}
+
+export type NotificationChannel =
+  'voice' | 'whatsapp' | 'email' | 'push' | 'sms'
+
+export type NotificationJobStatus =
+  'pending' | 'processing' | 'sent' | 'failed' | 'skipped' | 'cancelled'
+
+export interface NotificationJob {
+  id: string
+  user_id: string
+  business_id: string | null
+  channel: NotificationChannel
+  purpose: string
+  payload: Record<string, unknown>
+  scheduled_at: string
+  status: NotificationJobStatus
+  attempts: number
+  last_error: string | null
+  idempotency_key: string
+  created_at: string
+  updated_at: string
+}
+
+export interface NotificationLog {
+  id: string
+  job_id: string | null
+  user_id: string
+  channel: NotificationChannel
+  purpose: string
+  recipient: string | null
+  status: 'success' | 'failed'
+  provider: string
+  provider_message_id: string | null
+  provider_response: Record<string, unknown> | null
+  error: string | null
+  created_at: string
 }
 
 type DraftBase = {
