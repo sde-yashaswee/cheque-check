@@ -115,8 +115,6 @@ export function useCreateCheque(
         notes: newCheque.notes || null,
         remind_before_days: profile?.default_reminder_days ?? null,
         status: ChequeEntity.initialStatusFor(newCheque.type),
-        voice_call_sent: false,
-        last_call_at: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         party: queryClient

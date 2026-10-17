@@ -32,10 +32,7 @@ export class ChequeService {
   }
 
   async create(
-    cheque: Omit<
-      Cheque,
-      'id' | 'created_at' | 'updated_at' | 'voice_call_sent' | 'last_call_at'
-    >,
+    cheque: Omit<Cheque, 'id' | 'created_at' | 'updated_at'>,
   ): Promise<ChequeEntity> {
     const created = await this.repository.create(cheque)
     return ChequeEntity.fromRow(created as ChequeWithRelations)
@@ -46,13 +43,7 @@ export class ChequeService {
     cheque: Partial<
       Omit<
         Cheque,
-        | 'id'
-        | 'business_id'
-        | 'status'
-        | 'created_at'
-        | 'updated_at'
-        | 'voice_call_sent'
-        | 'last_call_at'
+        'id' | 'business_id' | 'status' | 'created_at' | 'updated_at'
       >
     >,
   ): Promise<ChequeEntity> {

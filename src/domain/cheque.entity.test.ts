@@ -22,8 +22,6 @@ describe('Cheque entity', () => {
       type: 'Outward',
       notes: null,
       image_url: null,
-      voice_call_sent: false,
-      last_call_at: null,
       created_at: '2025-01-01T00:00:00.000Z',
       updated_at: '2025-01-01T00:00:00.000Z',
     })
@@ -58,8 +56,6 @@ describe('Cheque entity', () => {
       type: 'Outward',
       notes: null,
       image_url: null,
-      voice_call_sent: false,
-      last_call_at: null,
       created_at: '2024-01-01T00:00:00.000Z',
       updated_at: '2024-01-01T00:00:00.000Z',
     })

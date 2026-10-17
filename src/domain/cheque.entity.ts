@@ -72,14 +72,6 @@ export class Cheque {
     return this.row.image_url
   }
 
-  get voice_call_sent(): boolean {
-    return this.row.voice_call_sent
-  }
-
-  get last_call_at(): string | null {
-    return this.row.last_call_at
-  }
-
   get created_at(): string {
     return this.row.created_at
   }

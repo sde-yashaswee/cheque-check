@@ -6,23 +6,14 @@ export interface IChequeRepository {
   getAll(businessId: string): Promise<ChequeWithRelations[]>
   getById(id: string): Promise<ChequeWithRelations>
   create(
-    input: Omit<
-      Cheque,
-      'id' | 'created_at' | 'updated_at' | 'voice_call_sent' | 'last_call_at'
-    >,
+    input: Omit<Cheque, 'id' | 'created_at' | 'updated_at'>,
   ): Promise<Cheque>
   update(
     id: string,
     input: Partial<
       Omit<
         Cheque,
-        | 'id'
-        | 'business_id'
-        | 'status'
-        | 'created_at'
-        | 'updated_at'
-        | 'voice_call_sent'
-        | 'last_call_at'
+        'id' | 'business_id' | 'status' | 'created_at' | 'updated_at'
       >
     >,
   ): Promise<Cheque>
@@ -60,10 +51,7 @@ export class SupabaseChequeRepository
   }
 
   async create(
-    input: Omit<
-      Cheque,
-      'id' | 'created_at' | 'updated_at' | 'voice_call_sent' | 'last_call_at'
-    >,
+    input: Omit<Cheque, 'id' | 'created_at' | 'updated_at'>,
   ): Promise<Cheque> {
     return this.handle(
       this.supabase.from(TABLES.CHEQUES).insert([input]).select().single(),
@@ -75,13 +63,7 @@ export class SupabaseChequeRepository
     input: Partial<
       Omit<
         Cheque,
-        | 'id'
-        | 'business_id'
-        | 'status'
-        | 'created_at'
-        | 'updated_at'
-        | 'voice_call_sent'
-        | 'last_call_at'
+        'id' | 'business_id' | 'status' | 'created_at' | 'updated_at'
       >
     >,
   ): Promise<Cheque> {
