@@ -146,16 +146,22 @@ async function manageEntitlements(userId: string) {
       choices: ALL_ENTITLEMENT_STATUSES,
     }).run()
 
-    const isLifetime = await new Confirm({
-      name: 'isLifetime',
-      message: 'Is this a lifetime entitlement?',
-    }).run()
+    const isLifetime =
+      status !== 'trialing' &&
+      (await new Confirm({
+        name: 'isLifetime',
+        message: 'Is this a lifetime entitlement?',
+      }).run())
 
     let validUntil = null
     if (!isLifetime) {
       const days = await new NumberPrompt({
         name: 'days',
         message: 'Valid for how many days?',
+        validate: (value: number) =>
+          Number.isInteger(value) && value > 0
+            ? true
+            : 'Enter a positive whole number of days.',
       }).run()
       const date = new Date()
       date.setDate(date.getDate() + days)

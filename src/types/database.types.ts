@@ -11,6 +11,49 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      premium_workspace_print_layouts: {
+        Row: {
+          account_id: string
+          user_id: string
+          layout: Json
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          user_id: string
+          layout: Json
+          updated_at?: string
+        }
+        Update: Partial<
+          Database['public']['Tables']['premium_workspace_print_layouts']['Row']
+        >
+        Relationships: []
+      }
+      premium_workspace_tools: {
+        Row: {
+          id: string
+          user_id: string
+          business_id: string
+          kind: 'cheque-template' | 'saved-view' | 'message-template'
+          name: string
+          payload: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: Partial<
+          Database['public']['Tables']['premium_workspace_tools']['Row']
+        > & {
+          user_id: string
+          business_id: string
+          kind: 'cheque-template' | 'saved-view' | 'message-template'
+          name: string
+          payload: Json
+        }
+        Update: Partial<
+          Database['public']['Tables']['premium_workspace_tools']['Row']
+        >
+        Relationships: []
+      }
       profiles: {
         Row: {
           id: string
@@ -451,6 +494,73 @@ export interface Database {
     }
     Views: Record<string, never>
     Functions: {
+      premium_workspace_assert_owner: {
+        Args: { requested_business: string }
+        Returns: undefined
+      }
+      premium_workspace_validate_payload: {
+        Args: {
+          requested_business: string
+          requested_kind: string
+          requested_payload: Json
+        }
+        Returns: Json
+      }
+      has_lifetime_premium: {
+        Args: Record<string, never>
+        Returns: boolean
+      }
+      premium_workspace_print_layout: {
+        Args: { requested_account: string; requested_layout?: Json }
+        Returns: Json
+      }
+      premium_workspace_save_tool: {
+        Args: {
+          requested_business: string
+          requested_kind: string
+          requested_name: string
+          requested_payload: Json
+          requested_id?: string
+        }
+        Returns: Database['public']['Tables']['premium_workspace_tools']['Row']
+      }
+      premium_workspace_apply_tool: {
+        Args: { requested_id: string }
+        Returns: Json
+      }
+      premium_workspace_delete_tool: {
+        Args: { requested_id: string }
+        Returns: undefined
+      }
+      premium_workspace_message: {
+        Args: { requested_business?: string }
+        Returns: string | null
+      }
+      premium_workspace_import: {
+        Args: {
+          requested_business: string
+          requested_kind: string
+          requested_rows: Json
+        }
+        Returns: number
+      }
+      premium_workspace_bulk_status: {
+        Args: {
+          requested_business: string
+          requested_ids: string[]
+          requested_status: Database['public']['Enums']['cheque_status']
+        }
+        Returns: number
+      }
+      premium_workspace_snapshot: {
+        Args: {
+          requested_businesses: string[]
+          requested_party?: string
+          requested_from?: string
+          requested_to?: string
+        }
+        Returns: Json
+      }
       record_payment_order: {
         Args: {
           order_user_id: string
@@ -504,7 +614,8 @@ export interface Database {
         | 'lifetime_premium'
         | 'ai_scanner_sub'
         | 'voice_reminder_sub'
-      entitlement_status: 'active' | 'expired' | 'canceled'
+      entitlement_status:
+        'active' | 'expired' | 'canceled' | 'trialing' | 'paused'
       transaction_status:
         'created' | 'authorized' | 'captured' | 'refunded' | 'failed'
       transaction_type: 'lifetime' | 'subscription' | 'top_up'
