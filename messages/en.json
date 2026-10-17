@@ -496,7 +496,13 @@
     "addonPrice": "₹50/month ({count} {unit})",
     "scans": "scans",
     "calls": "calls",
-    "addOnServices": "Add-on Services"
+    "addOnServices": "Add-on Services",
+    "sendTestCall": "Send test call",
+    "sendingTestCall": "Sending test call...",
+    "testCallSent": "Test call placed! Check your phone.",
+    "testCallQueued": "Test call queued, it'll arrive shortly.",
+    "testCallFailed": "Could not place the test call.",
+    "testCallHelp": "Uses 1 call from your Voice Reminder quota."
   },
   "Reports": {
     "title": "Reports",

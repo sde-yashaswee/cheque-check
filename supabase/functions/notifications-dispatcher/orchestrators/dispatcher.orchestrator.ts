@@ -1,6 +1,7 @@
 import { DispatcherDatabaseService } from '../services/database.service.ts'
 import { TwilioVoiceService } from '../../_shared/twilio-voice.service.ts'
 import { Logger } from '../../_shared/logger.ts'
+import { NOTIFICATION_PURPOSE } from '../../_shared/notifications.ts'
 import { ClaimedJob, DispatchCheque, DispatchResult } from '../types.ts'
 
 export interface TestModeConfig {
@@ -51,9 +52,15 @@ export class DispatcherOrchestrator {
       return { jobId: job.id, status: 'skipped' }
     }
 
-    const cheques = await this.db.fetchCheques(job.payload.cheque_ids ?? [])
     const language = profile.language || 'en'
-    const message = this.buildMessage(profile.name || 'User', cheques, language)
+    const isSample = job.purpose === NOTIFICATION_PURPOSE.SAMPLE_VOICE_TEST
+    const message = isSample
+      ? this.buildSampleMessage(profile.name || 'User', language)
+      : this.buildMessage(
+          profile.name || 'User',
+          await this.db.fetchCheques(job.payload.cheque_ids ?? []),
+          language,
+        )
     const twiml = this.twilio.generateTwiML(message, language)
     const to = this.testMode.enabled ? this.testMode.phone : profile.phone
 
@@ -123,5 +130,13 @@ export class DispatcherOrchestrator {
       .join(', and ')
 
     return `Hello ${name}, this is a reminder from Cheque Check. You have ${bankSummaries} today. Please ensure your accounts are sufficiently funded.`
+  }
+
+  private buildSampleMessage(name: string, language: string): string {
+    if (language === 'hi') {
+      return `नमस्ते ${name}, यह चेक चेक की तरफ से एक टेस्ट कॉल है। अगर आपने यह कॉल सुनी, तो आपकी वॉइस रिमाइंडर सेटिंग सही से काम कर रही है।`
+    }
+
+    return `Hello ${name}, this is a test call from Cheque Check. If you can hear this, your Voice Reminder setup is working correctly.`
   }
 }

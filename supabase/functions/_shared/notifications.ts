@@ -7,6 +7,7 @@ export type NotificationChannel =
 
 export const NOTIFICATION_PURPOSE = {
   CHEQUE_REMINDER: 'cheque_reminder',
+  SAMPLE_VOICE_TEST: 'sample_voice_test',
 } as const
 
 /** Reminder slots within a day, keyed by profiles.reminders_per_day (1-3). */

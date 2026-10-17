@@ -32,9 +32,12 @@ import { useState } from 'react'
 import { PhoneInput } from '@/components/ui/phone-input'
 import { isValidE164Phone } from '@/lib/phone'
 import { getPaymentProductIcon } from '@/features/monetization/lib/payment-product-icons'
+import { FEATURE_IDS, PRODUCT_IDS } from '@/features/monetization/constants'
+import { toast } from '@/components/ui/toast'
 
 export default function FeaturesPage() {
   const t = useTranslations('Features')
+  const tc = useTranslations('Common')
   const { profile, updateProfile } = useProfile()
   const {
     isLifetimePremium,
@@ -44,17 +47,45 @@ export default function FeaturesPage() {
   } = useMonetization()
   const { processPayment, isProcessing } = useRazorpay()
   const [profilePhone, setProfilePhone] = useState<string>()
+  const [isSendingTestCall, setIsSendingTestCall] = useState(false)
 
-  const aiQuota = getQuota('ai_scan')
-  const voiceQuota = getQuota('voice_reminder')
+  const aiQuota = getQuota(FEATURE_IDS.AI_SCAN)
+  const voiceQuota = getQuota(FEATURE_IDS.VOICE_REMINDER)
+
+  async function sendTestCall() {
+    setIsSendingTestCall(true)
+    try {
+      const response = await fetch('/api/notifications/test-voice', {
+        method: 'POST',
+      })
+      const body = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(body.error || t('testCallFailed'))
+      }
+      toast.add({
+        title: tc('success'),
+        description: body.queued ? t('testCallQueued') : t('testCallSent'),
+        type: 'success',
+      })
+    } catch (error) {
+      toast.add({
+        title: tc('error'),
+        description:
+          error instanceof Error ? error.message : t('testCallFailed'),
+        type: 'error',
+      })
+    } finally {
+      setIsSendingTestCall(false)
+    }
+  }
 
   const lifetimeFeatures = [
     {
       id: 'receiving_mode',
-      productId: 'lifetime_premium',
+      productId: PRODUCT_IDS.LIFETIME_PREMIUM,
       name: t('receivingMode'),
       description: t('receivingModeDesc'),
-      icon: getPaymentProductIcon('lifetime_premium'),
+      icon: getPaymentProductIcon(PRODUCT_IDS.LIFETIME_PREMIUM),
       checked: !!profile?.received_cheques_enabled,
       onChange: (val: boolean) =>
         updateProfile({ received_cheques_enabled: val }),
@@ -65,36 +96,38 @@ export default function FeaturesPage() {
   const addonFeatures = [
     {
       id: 'ai_scanner',
-      productId: 'ai_scanner_30d',
-      topUpProductId: 'ai_scan_250',
+      productId: PRODUCT_IDS.AI_SCANNER_30D,
+      topUpProductId: PRODUCT_IDS.AI_SCAN_250,
       name: t('aiScanner'),
       description: t('aiScannerDesc'),
-      icon: getPaymentProductIcon('ai_scanner_30d'),
-      subscriptionId: 'ai_scanner_sub',
-      quotaId: 'ai_scan',
+      icon: getPaymentProductIcon(PRODUCT_IDS.AI_SCANNER_30D),
+      subscriptionId: FEATURE_IDS.AI_SCANNER_SUB,
+      quotaId: FEATURE_IDS.AI_SCAN,
       quota: aiQuota,
       price: t('addonPrice', { count: 250, unit: t('scans') }),
       checked: undefined,
       onChange: undefined,
       extra: undefined,
-      onUnlock: () => processPayment({ productId: 'ai_scanner_30d' }),
-      onTopUp: () => processPayment({ productId: 'ai_scan_250' }),
+      onUnlock: () => processPayment({ productId: PRODUCT_IDS.AI_SCANNER_30D }),
+      onTopUp: () => processPayment({ productId: PRODUCT_IDS.AI_SCAN_250 }),
     },
     {
       id: 'voice_calls',
-      productId: 'voice_reminder_30d',
-      topUpProductId: 'voice_reminder_100',
+      productId: PRODUCT_IDS.VOICE_REMINDER_30D,
+      topUpProductId: PRODUCT_IDS.VOICE_REMINDER_100,
       name: t('voiceReminder'),
       description: t('voiceReminderDesc'),
-      icon: getPaymentProductIcon('voice_reminder_30d'),
-      subscriptionId: 'voice_reminder_sub',
-      quotaId: 'voice_reminder',
+      icon: getPaymentProductIcon(PRODUCT_IDS.VOICE_REMINDER_30D),
+      subscriptionId: FEATURE_IDS.VOICE_REMINDER_SUB,
+      quotaId: FEATURE_IDS.VOICE_REMINDER,
       quota: voiceQuota,
       price: t('addonPrice', { count: 100, unit: t('calls') }),
       checked: !!profile?.voice_call_enabled,
       onChange: (val: boolean) => updateProfile({ voice_call_enabled: val }),
-      onUnlock: () => processPayment({ productId: 'voice_reminder_30d' }),
-      onTopUp: () => processPayment({ productId: 'voice_reminder_100' }),
+      onUnlock: () =>
+        processPayment({ productId: PRODUCT_IDS.VOICE_REMINDER_30D }),
+      onTopUp: () =>
+        processPayment({ productId: PRODUCT_IDS.VOICE_REMINDER_100 }),
       extra: (
         <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
           <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -114,6 +147,24 @@ export default function FeaturesPage() {
           />
           <p className="text-[10px] text-muted-foreground font-medium italic">
             {t('countryCodeHelp')}
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-1"
+            disabled={
+              isSendingTestCall ||
+              !(profilePhone ?? profile?.phone) ||
+              !isValidE164Phone(profilePhone ?? profile?.phone ?? '') ||
+              (voiceQuota?.limit ?? 0) <= (voiceQuota?.used ?? 0)
+            }
+            onClick={sendTestCall}
+          >
+            {isSendingTestCall ? t('sendingTestCall') : t('sendTestCall')}
+          </Button>
+          <p className="text-[10px] text-muted-foreground">
+            {t('testCallHelp')}
           </p>
         </div>
       ),
