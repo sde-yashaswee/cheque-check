@@ -1,11 +1,11 @@
-import { TwilioConfig } from '../types.ts'
+export interface TwilioConfig {
+  accountSid: string
+  authToken: string
+  fromNumber: string
+}
 
 export class TwilioVoiceService {
-  private config: TwilioConfig
-
-  constructor(config: TwilioConfig) {
-    this.config = config
-  }
+  constructor(private config: TwilioConfig) {}
 
   async initiateCall(
     to: string,
@@ -51,7 +51,6 @@ export class TwilioVoiceService {
   }
 
   generateTwiML(message: string, language: string = 'en'): string {
-    // Map application languages to Twilio languages.
     // 'Polly.Aditi' is an Indian English/Hindi bilingual voice, perfect for both.
     const twilioLang = language === 'hi' ? 'hi-IN' : 'en-IN'
     const goodbye = language === 'hi' ? 'धन्यवाद।' : 'Goodbye.'
