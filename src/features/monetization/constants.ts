@@ -27,6 +27,8 @@ export const METERED_FEATURE_IDS: FeatureId[] = [
 
 export const ENTITLEMENT_STATUS = {
   ACTIVE: 'active',
+  TRIALING: 'trialing',
+  PAUSED: 'paused',
   EXPIRED: 'expired',
   CANCELED: 'canceled',
 } as const

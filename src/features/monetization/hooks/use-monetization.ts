@@ -4,31 +4,21 @@ import type {
   Entitlement,
   Quota,
 } from '@/features/monetization/repositories/monetization.repository'
-import {
-  ENTITLEMENT_STATUS,
-  FEATURE_IDS,
-} from '@/features/monetization/constants'
+import { FEATURE_IDS } from '@/features/monetization/constants'
 import { queryKeys } from '@/lib/query-keys'
+import { useEntitlements } from './use-entitlements'
+import {
+  entitlementHasAccess,
+  resolvePremiumState,
+} from '../lib/premium-access'
 
 export function useMonetization() {
   const {
     data: entitlements,
     isLoading: isLoadingEntitlements,
     error: entitlementsError,
-  } = useQuery<Entitlement[]>({
-    queryKey: queryKeys.monetization.entitlements(),
-    queryFn: async () => {
-      const data: Entitlement[] = await monetizationService.getEntitlements()
-      const now = Date.now()
-      return data.map((entitlement) =>
-        entitlement.status === ENTITLEMENT_STATUS.ACTIVE &&
-        entitlement.valid_until !== null &&
-        new Date(entitlement.valid_until).getTime() <= now
-          ? { ...entitlement, status: ENTITLEMENT_STATUS.EXPIRED }
-          : entitlement,
-      )
-    },
-  })
+    dataUpdatedAt,
+  } = useEntitlements()
 
   const {
     data: quotas,
@@ -39,7 +29,10 @@ export function useMonetization() {
     queryFn: () => monetizationService.getQuotas(),
   })
 
-  const isActive = (e: Entitlement) => e.status === ENTITLEMENT_STATUS.ACTIVE
+  const isActive = (e: Entitlement) =>
+    !entitlementsError &&
+    entitlementHasAccess(e, dataUpdatedAt) &&
+    (e.feature_id === FEATURE_IDS.LIFETIME_PREMIUM || e.status === 'active')
 
   const isLifetimePremium = entitlements?.some(
     (e: Entitlement) =>
@@ -74,5 +67,14 @@ export function useMonetization() {
     hasVoiceReminderSub,
     getQuota,
     checkEntitlement,
+    getEntitlementState: (featureId: string) =>
+      isLoadingEntitlements
+        ? 'loading'
+        : entitlementsError
+          ? 'error'
+          : resolvePremiumState(
+              entitlements?.find((entry) => entry.feature_id === featureId),
+              dataUpdatedAt,
+            ),
   }
 }
