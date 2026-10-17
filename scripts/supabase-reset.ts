@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { execFileSync } from 'node:child_process'
+import { createRequire } from 'node:module'
 import { confirm, input } from '@inquirer/prompts'
 
 const root = resolve(import.meta.dirname, '..')
@@ -8,8 +9,15 @@ const trackedAllowlist = resolve(root, 'supabase/.dev-projects.json')
 const localAllowlist = resolve(root, 'supabase/.dev-projects.local.json')
 const linkedProjectFile = resolve(root, 'supabase/.temp/project-ref')
 
+// Resolve the CLI entry point and invoke it via `node` directly instead of
+// the npx.cmd shim: on Windows, spawning a .cmd file routes args through
+// cmd.exe, which can fail with EINVAL. Node's own argv handling has no such
+// issue (same fix as scripts/run-e2e-qa.ts).
+const require = createRequire(import.meta.url)
+const supabaseCliEntry = require.resolve('supabase/dist/supabase.js')
+
 function runSupabase(args: string[], capture = true) {
-  return execFileSync('npx.cmd', ['supabase', ...args], {
+  return execFileSync(process.execPath, [supabaseCliEntry, ...args], {
     cwd: root,
     encoding: 'utf8',
     stdio: capture ? ['ignore', 'pipe', 'inherit'] : 'inherit',
