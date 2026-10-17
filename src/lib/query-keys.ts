@@ -30,6 +30,7 @@ export const queryKeys = {
     detail: () => ['profile'] as const,
   },
   monetization: {
+    transactions: () => ['transactions'] as const,
     entitlements: () => ['entitlements'] as const,
     quotas: () => ['quotas'] as const,
   },

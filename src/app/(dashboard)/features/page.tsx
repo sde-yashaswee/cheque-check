@@ -1,56 +1,129 @@
 'use client'
 
-import { useProfile } from '@/hooks/use-profile'
-import { Switch } from '@/components/ui/switch'
+import { useState } from 'react'
+import Link from 'next/link'
+import { useFormatter, useTranslations } from 'next-intl'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { HugeiconsIcon } from '@hugeicons/react'
-import {
-  UserIcon as User,
-  Mail01Icon as Mail,
-  LockPasswordIcon as Lock,
-  CallIcon as Phone,
-  Calendar03Icon as Calendar,
-  HashtagIcon as Hash,
-  Note01Icon as Note,
-  Building03Icon as Building,
-  Wallet01Icon as Wallet,
-  Search01Icon as Search,
-  Location01Icon as Location,
-  TextFontIcon as TextIcon,
-  CheckmarkCircle01Icon as CheckCircle2,
-  AiImageIcon as AiIcon,
-  PackageIcon,
-  ZapIcon,
-} from '@hugeicons/core-free-icons'
-import { Input } from '@/components/ui/input'
+import { ArrowRight01Icon, RefreshIcon } from '@hugeicons/core-free-icons'
+import { useProfile } from '@/hooks/use-profile'
 import { useMonetization } from '@/hooks/use-monetization'
 import { useRazorpay } from '@/hooks/use-razorpay'
+import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
-import { useTranslations } from 'next-intl'
-import { useState } from 'react'
 import { PhoneInput } from '@/components/ui/phone-input'
-import { isValidE164Phone } from '@/lib/phone'
-import { getPaymentProductIcon } from '@/features/monetization/lib/payment-product-icons'
-import { FEATURE_IDS, PRODUCT_IDS } from '@/features/monetization/constants'
 import { toast } from '@/components/ui/toast'
+import { isValidE164Phone } from '@/lib/phone'
+import { queryKeys } from '@/lib/query-keys'
+import { cn } from '@/lib/utils'
+import { FEATURE_IDS, PRODUCT_IDS } from '@/features/monetization/constants'
+import { monetizationService } from '@/features/monetization/services/monetization.service'
+import type { Transaction } from '@/features/monetization/repositories/monetization.repository'
+import { getPaymentProductIcon } from '@/features/monetization/lib/payment-product-icons'
+import type { Profile } from '@/types'
+
+function FeatureStatus({
+  children,
+  active = false,
+}: {
+  children: React.ReactNode
+  active?: boolean
+}) {
+  return (
+    <span
+      className={cn(
+        'inline-flex max-w-full items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-xs font-semibold',
+        active && 'bg-primary/10 text-primary',
+      )}
+    >
+      <span className="size-1.5 shrink-0 rounded-full bg-current" />
+      {children}
+    </span>
+  )
+}
 
 export default function FeaturesPage() {
   const t = useTranslations('Features')
   const tc = useTranslations('Common')
-  const { profile, updateProfile } = useProfile()
+  const tt = useTranslations('Transactions')
+  const format = useFormatter()
+  const queryClient = useQueryClient()
+  const { profile, updateProfile, isLoading: isLoadingProfile } = useProfile()
   const {
     isLifetimePremium,
     checkEntitlement,
     getQuota,
-    isLoading: isLoadingMonetization,
+    entitlements,
+    isLoading,
+    error,
   } = useMonetization()
   const { processPayment, isProcessing } = useRazorpay()
+  const transactions = useQuery<Transaction[]>({
+    queryKey: queryKeys.monetization.transactions(),
+    queryFn: () => monetizationService.getTransactions(),
+  })
   const [profilePhone, setProfilePhone] = useState<string>()
+  const [saving, setSaving] = useState<string | null>(null)
   const [isSendingTestCall, setIsSendingTestCall] = useState(false)
-
-  const aiQuota = getQuota(FEATURE_IDS.AI_SCAN)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [phoneError, setPhoneError] = useState(false)
+  const phone = profilePhone ?? profile?.phone ?? ''
+  const phoneChanged = phone !== (profile?.phone ?? '')
+  const validPhone = isValidE164Phone(phone)
   const voiceQuota = getQuota(FEATURE_IDS.VOICE_REMINDER)
+  const remainingCalls = Math.max(
+    0,
+    (voiceQuota?.limit ?? 0) - (voiceQuota?.used ?? 0),
+  )
+
+  function notifyError(error: unknown) {
+    toast.add({
+      title: tc('error'),
+      description: error instanceof Error ? error.message : t('updateFailed'),
+      type: 'error',
+    })
+  }
+
+  async function saveProfile(key: string, changes: Partial<Profile>) {
+    setSaving(key)
+    try {
+      await updateProfile(changes)
+      toast.add({
+        title: tc('success'),
+        description: t('settingsSaved'),
+        type: 'success',
+      })
+    } catch (error) {
+      notifyError(error)
+    } finally {
+      setSaving(null)
+    }
+  }
+
+  async function refreshAccess() {
+    setIsRefreshing(true)
+    try {
+      await Promise.all([
+        queryClient.invalidateQueries(
+          { queryKey: queryKeys.monetization.entitlements() },
+          { throwOnError: true },
+        ),
+        queryClient.invalidateQueries(
+          { queryKey: queryKeys.monetization.quotas() },
+          { throwOnError: true },
+        ),
+        queryClient.invalidateQueries(
+          { queryKey: queryKeys.monetization.transactions() },
+          { throwOnError: true },
+        ),
+      ])
+    } catch (error) {
+      notifyError(error)
+    } finally {
+      setIsRefreshing(false)
+    }
+  }
 
   async function sendTestCall() {
     setIsSendingTestCall(true)
@@ -58,340 +131,651 @@ export default function FeaturesPage() {
       const response = await fetch('/api/notifications/test-voice', {
         method: 'POST',
       })
-      const body = await response.json().catch(() => ({}))
-      if (!response.ok) {
-        throw new Error(body.error || t('testCallFailed'))
-      }
+      const body = await response.json()
+      if (!response.ok) throw new Error(body.error || t('testCallFailed'))
       toast.add({
         title: tc('success'),
         description: body.queued ? t('testCallQueued') : t('testCallSent'),
         type: 'success',
       })
-    } catch (error) {
-      toast.add({
-        title: tc('error'),
-        description:
-          error instanceof Error ? error.message : t('testCallFailed'),
-        type: 'error',
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.monetization.quotas(),
       })
+    } catch (error) {
+      notifyError(error)
     } finally {
       setIsSendingTestCall(false)
     }
   }
 
-  const lifetimeFeatures = [
+  const addons = [
     {
-      id: 'receiving_mode',
-      productId: PRODUCT_IDS.LIFETIME_PREMIUM,
-      name: t('receivingMode'),
-      description: t('receivingModeDesc'),
-      icon: getPaymentProductIcon(PRODUCT_IDS.LIFETIME_PREMIUM),
-      checked: !!profile?.received_cheques_enabled,
-      onChange: (val: boolean) =>
-        updateProfile({ received_cheques_enabled: val }),
-      price: t('receivingPrice'),
-    },
-  ]
-
-  const addonFeatures = [
-    {
-      id: 'ai_scanner',
-      productId: PRODUCT_IDS.AI_SCANNER_30D,
-      topUpProductId: PRODUCT_IDS.AI_SCAN_250,
+      id: 'ai',
       name: t('aiScanner'),
       description: t('aiScannerDesc'),
-      icon: getPaymentProductIcon(PRODUCT_IDS.AI_SCANNER_30D),
+      productId: PRODUCT_IDS.AI_SCANNER_30D,
+      topUpProductId: PRODUCT_IDS.AI_SCAN_250,
       subscriptionId: FEATURE_IDS.AI_SCANNER_SUB,
       quotaId: FEATURE_IDS.AI_SCAN,
-      quota: aiQuota,
-      price: t('addonPrice', { count: 250, unit: t('scans') }),
-      checked: undefined,
-      onChange: undefined,
-      extra: undefined,
-      onUnlock: () => processPayment({ productId: PRODUCT_IDS.AI_SCANNER_30D }),
-      onTopUp: () => processPayment({ productId: PRODUCT_IDS.AI_SCAN_250 }),
+      count: 250,
+      unit: t('scans'),
     },
     {
-      id: 'voice_calls',
-      productId: PRODUCT_IDS.VOICE_REMINDER_30D,
-      topUpProductId: PRODUCT_IDS.VOICE_REMINDER_100,
+      id: 'voice',
       name: t('voiceReminder'),
       description: t('voiceReminderDesc'),
-      icon: getPaymentProductIcon(PRODUCT_IDS.VOICE_REMINDER_30D),
+      productId: PRODUCT_IDS.VOICE_REMINDER_30D,
+      topUpProductId: PRODUCT_IDS.VOICE_REMINDER_100,
       subscriptionId: FEATURE_IDS.VOICE_REMINDER_SUB,
       quotaId: FEATURE_IDS.VOICE_REMINDER,
-      quota: voiceQuota,
-      price: t('addonPrice', { count: 100, unit: t('calls') }),
-      checked: !!profile?.voice_call_enabled,
-      onChange: (val: boolean) => updateProfile({ voice_call_enabled: val }),
-      onUnlock: () =>
-        processPayment({ productId: PRODUCT_IDS.VOICE_REMINDER_30D }),
-      onTopUp: () =>
-        processPayment({ productId: PRODUCT_IDS.VOICE_REMINDER_100 }),
-      extra: (
-        <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-          <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            {t('yourPhoneNumber')}
-          </label>
-          <PhoneInput
-            key={profile?.id}
-            value={profilePhone ?? profile?.phone ?? ''}
-            onChange={setProfilePhone}
-            onBlur={() => {
-              if (profilePhone === undefined) return
-              if (profilePhone && !isValidE164Phone(profilePhone)) return
-              updateProfile({ phone: profilePhone || null })
-            }}
-            aria-invalid={!!profilePhone && !isValidE164Phone(profilePhone)}
-            className="h-11 rounded-lg"
-          />
-          <p className="text-[10px] text-muted-foreground font-medium italic">
-            {t('countryCodeHelp')}
-          </p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="mt-1"
-            disabled={
-              isSendingTestCall ||
-              !(profilePhone ?? profile?.phone) ||
-              !isValidE164Phone(profilePhone ?? profile?.phone ?? '') ||
-              (voiceQuota?.limit ?? 0) <= (voiceQuota?.used ?? 0)
-            }
-            onClick={sendTestCall}
-          >
-            {isSendingTestCall ? t('sendingTestCall') : t('sendTestCall')}
-          </Button>
-          <p className="text-[10px] text-muted-foreground">
-            {t('testCallHelp')}
-          </p>
-        </div>
-      ),
+      count: 100,
+      unit: t('calls'),
     },
   ] as const
 
-  if (isLoadingMonetization) {
-    return <div className="p-8">{t('loading')}</div>
-  }
-
   return (
-    <div className="max-w-2xl space-y-12 pb-20">
-      {/* Lifetime Premium Section */}
-      <section className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h2 className="text-xl font-bold tracking-tight">
-              {t('lifetimePremium')}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {t('oneTimePurchase')}
-            </p>
-          </div>
-          {isLifetimePremium ? (
-            <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-none px-3 py-1">
-              {t('activeSubscription')}
-            </Badge>
-          ) : (
-            <span className="text-sm font-semibold text-primary">
-              {t('receivingPrice')}
-            </span>
-          )}
+    <div
+      className="@container mx-auto w-full min-w-0 max-w-5xl space-y-10 pb-24 pt-2"
+      data-testid="features-page"
+    >
+      <header className="max-w-2xl space-y-3">
+        <p className="text-sm font-semibold text-primary">{t('pageEyebrow')}</p>
+        <h1 className="font-heading text-[28px] font-semibold leading-[1.1] tracking-tight @min-[420px]:text-[34px] @min-[640px]:text-[40px]">
+          {t('pageTitle')}
+        </h1>
+        <p className="text-[17px] leading-relaxed text-muted-foreground">
+          {t('pageDescription')}
+        </p>
+        <a
+          href="#feature-activity"
+          className="inline-flex min-h-11 items-center gap-1 text-sm text-primary hover:underline"
+        >
+          {t('trackPayments')}{' '}
+          <HugeiconsIcon icon={ArrowRight01Icon} className="size-4" />
+        </a>
+      </header>
+
+      {isLoading || isLoadingProfile ? (
+        <div role="status" className="rounded-lg bg-canvas-parchment p-6">
+          {t('loading')}
         </div>
-
-        {!isLifetimePremium && (
-          <div className="bg-primary/5 border border-primary/10 rounded-xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <h3 className="font-bold">{t('upgradeNow')}</h3>
-              <p className="text-sm text-muted-foreground">
-                {t('lifetimeAccess')}
-              </p>
-            </div>
-            <Button
-              onClick={() => processPayment({ productId: 'lifetime_premium' })}
-              disabled={isProcessing}
-              className="w-full sm:w-auto"
-            >
-              <HugeiconsIcon icon={ZapIcon} className="w-4 h-4 mr-2" />
-              {t('getLifetimePremium')}
-            </Button>
-          </div>
-        )}
-
-        <div className="grid gap-4">
-          {lifetimeFeatures.map((feature) => (
-            <div
-              key={feature.id}
-              className="group relative flex flex-col gap-4 rounded-xl border bg-card p-6 transition-all hover:border-primary/20 border-primary/5"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <HugeiconsIcon icon={feature.icon} className="h-5 w-5" />
-                </div>
-                {!isLifetimePremium && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-yellow-100 text-yellow-800 border-none"
-                  >
-                    {t('locked')}
-                  </Badge>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                <h3 className="font-bold">{feature.name}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {feature.description}
+      ) : error || !profile ? (
+        <div role="alert" className="space-y-4 rounded-lg border p-6">
+          <p>{t('loadFailed')}</p>
+          <Button
+            variant="outline"
+            size="pill"
+            onClick={() => window.location.reload()}
+          >
+            {t('tryAgain')}
+          </Button>
+        </div>
+      ) : (
+        <>
+          <section
+            aria-labelledby="lifetime-title"
+            className="overflow-hidden rounded-lg border bg-card"
+          >
+            <div className="grid gap-6 bg-canvas-parchment p-5 @min-[640px]:grid-cols-[1fr_auto] @min-[640px]:items-center @min-[640px]:p-8">
+              <div className="space-y-3">
+                <FeatureStatus active={!!isLifetimePremium}>
+                  {isLifetimePremium ? t('owned') : t('oneTimeLabel')}
+                </FeatureStatus>
+                <h2
+                  id="lifetime-title"
+                  className="text-2xl font-semibold tracking-tight @min-[640px]:text-3xl"
+                >
+                  {t('lifetimePremium')}
+                </h2>
+                <p className="max-w-lg text-[17px] leading-relaxed text-muted-foreground">
+                  {t('lifetimeAccess')}
                 </p>
               </div>
-
-              {isLifetimePremium && (
-                <div className="mt-2 flex items-center justify-between border-t pt-4 border-primary/5">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    {t('enableFeature')}
-                  </span>
-                  <Switch
-                    checked={feature.checked}
-                    onCheckedChange={feature.onChange}
-                  />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Add-on Services Section */}
-      <section className="space-y-6">
-        <div className="space-y-1">
-          <h2 className="text-xl font-bold tracking-tight">
-            {t('addOnServices')}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Monthly subscriptions for high-value services.
-          </p>
-        </div>
-
-        <div className="grid gap-6">
-          {addonFeatures.map((addon) => {
-            const isSubscribed = checkEntitlement(addon.subscriptionId)
-            const hasQuota = (addon.quota?.limit || 0) > 0
-            const isLocked = !isSubscribed && !hasQuota
-
-            return (
-              <div
-                key={addon.id}
-                className="relative flex flex-col gap-4 rounded-xl border bg-card p-6 transition-all border-primary/5"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <HugeiconsIcon icon={addon.icon} className="h-6 w-6" />
-                  </div>
-                  {isSubscribed ? (
-                    <Badge className="bg-primary/10 text-primary border-none">
-                      {t('activeSubscription')}
-                    </Badge>
-                  ) : isLocked ? (
-                    <Badge
-                      variant="secondary"
-                      className="bg-yellow-100 text-yellow-800 border-none"
-                    >
-                      {t('locked')}
-                    </Badge>
-                  ) : (
-                    <Badge
-                      variant="secondary"
-                      className="bg-blue-100 text-blue-800 border-none"
-                    >
-                      {t('trialAccess')}
-                    </Badge>
-                  )}
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-bold text-lg">{addon.name}</h3>
-                      {!isSubscribed && (
-                        <span className="text-sm font-medium text-primary">
-                          {addon.price}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {addon.description}
+              <div className="space-y-3 @min-[640px]:max-w-64">
+                {isLifetimePremium ? (
+                  <p className="text-sm font-semibold">
+                    {t('alreadyUnlocked')}
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-2xl font-semibold tracking-tight">
+                      {t('receivingPrice')}
                     </p>
+                    <Button
+                      size="pill"
+                      className="h-auto min-h-11 w-full whitespace-normal py-3 font-normal"
+                      disabled={isProcessing}
+                      onClick={() =>
+                        processPayment({
+                          productId: PRODUCT_IDS.LIFETIME_PREMIUM,
+                          onSuccess: refreshAccess,
+                        })
+                      }
+                    >
+                      {t('getLifetimePremium')}
+                    </Button>
+                  </>
+                )}
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {t('oneTimePurchase')}
+                </p>
+              </div>
+            </div>
+            <div className="divide-y px-5 @min-[640px]:px-8">
+              <div className="flex items-start justify-between gap-4 py-6">
+                <div className="min-w-0 space-y-1">
+                  <h3 className="text-[17px] font-semibold">
+                    {t('receivingMode')}
+                  </h3>
+                  <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
+                    {t('receivingModeDesc')}
+                  </p>
+                  <p className="pt-2 text-xs font-semibold">
+                    {isLifetimePremium
+                      ? profile.received_cheques_enabled
+                        ? t('inwardEnabled')
+                        : t('inwardDisabled')
+                      : t('includedPremium')}
+                  </p>
+                </div>
+                {isLifetimePremium && (
+                  <div className="flex min-h-11 shrink-0 items-center">
+                    <Switch
+                      checked={!!profile.received_cheques_enabled}
+                      disabled={saving !== null}
+                      onCheckedChange={(value) =>
+                        saveProfile('inward', {
+                          received_cheques_enabled: value,
+                        })
+                      }
+                      aria-label={t('receivingMode')}
+                    />
                   </div>
+                )}
+              </div>
+              <div className="flex flex-col items-start justify-between gap-3 py-6 @min-[640px]:flex-row @min-[640px]:items-center">
+                <div className="space-y-1">
+                  <h3 className="text-[17px] font-semibold">
+                    {t('reportsTitle')}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {t('reportsDescription')}
+                  </p>
+                </div>
+                {isLifetimePremium ? (
+                  <Link
+                    href="/reports"
+                    className="inline-flex min-h-11 shrink-0 items-center gap-1 text-sm text-primary hover:underline"
+                  >
+                    {t('openReports')}{' '}
+                    <HugeiconsIcon icon={ArrowRight01Icon} className="size-4" />
+                  </Link>
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    {t('includedPremium')}
+                  </span>
+                )}
+              </div>
+            </div>
+          </section>
 
-                  {/* Quota Progress - Shown if subscribed OR has trial quota */}
-                  {(isSubscribed || hasQuota) && addon.quota && (
-                    <div className="space-y-2 rounded-lg bg-primary/5 p-4">
-                      <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
-                        <span className="text-muted-foreground">
-                          {t('currentUsage')}
-                        </span>
-                        <span className="text-primary">
-                          {addon.quota.used} / {addon.quota.limit}
-                        </span>
+          <section aria-labelledby="addons-title" className="space-y-5">
+            <div className="space-y-2">
+              <h2
+                id="addons-title"
+                className="text-2xl font-semibold tracking-tight"
+              >
+                {t('addOnServices')}
+              </h2>
+              <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                {t('addOnServicesDescription')}
+              </p>
+            </div>
+            <div className="grid items-start gap-5 @min-[640px]:grid-cols-2">
+              {addons.map((addon) => {
+                const subscribed = !!checkEntitlement(addon.subscriptionId)
+                const quota = getQuota(addon.quotaId)
+                const hasAccess = subscribed || (quota?.limit ?? 0) > 0
+                const remaining = Math.max(
+                  0,
+                  (quota?.limit ?? 0) - (quota?.used ?? 0),
+                )
+                const isVoice = addon.id === 'voice'
+                const paused = isVoice && !profile.voice_call_enabled
+                const needsPhone =
+                  isVoice && !isValidE164Phone(profile.phone ?? '')
+                const status = !hasAccess
+                  ? 'notEnabled'
+                  : remaining === 0
+                    ? 'outOfCredits'
+                    : paused
+                      ? 'paused'
+                      : needsPhone
+                        ? 'setupRequired'
+                        : 'ready'
+                const entitlement = entitlements?.find(
+                  (e) => e.feature_id === addon.subscriptionId,
+                )
+                return (
+                  <article
+                    key={addon.id}
+                    aria-labelledby={`${addon.id}-title`}
+                    className="min-w-0 rounded-lg border bg-card"
+                  >
+                    <div className="space-y-5 p-5 @min-[640px]:p-6">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex size-11 items-center justify-center rounded-md bg-canvas-parchment text-primary">
+                          <HugeiconsIcon
+                            icon={getPaymentProductIcon(addon.productId)}
+                            className="size-6"
+                          />
+                        </div>
+                        <FeatureStatus active={status === 'ready'}>
+                          {t(status)}
+                        </FeatureStatus>
                       </div>
-                      <Progress
-                        value={(addon.quota.used / addon.quota.limit) * 100}
-                        className="h-2"
-                      />
-                      {isSubscribed && (
-                        <div className="flex justify-end pt-1">
-                          <button
-                            onClick={addon.onTopUp}
-                            className="text-xs font-bold text-primary hover:underline flex items-center"
-                          >
-                            <HugeiconsIcon
-                              icon={getPaymentProductIcon(addon.topUpProductId)}
-                              className="w-3 h-3 mr-1"
-                            />
-                            {t('buyTopUp')}
-                          </button>
+                      <div className="space-y-2">
+                        <h3
+                          id={`${addon.id}-title`}
+                          className="text-xl font-semibold tracking-tight"
+                        >
+                          {addon.name}
+                        </h3>
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                          {addon.description}
+                        </p>
+                      </div>
+                      {!subscribed && (
+                        <div className="space-y-1">
+                          <p className="text-[17px] font-semibold">
+                            {t('monthlyPrice')}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {t('includedUsage', {
+                              count: addon.count,
+                              unit: addon.unit,
+                            })}
+                          </p>
                         </div>
                       )}
-                    </div>
-                  )}
 
-                  {/* Settings / Extra - Only shown if subscribed */}
-                  {isSubscribed && addon.onChange && (
-                    <div className="space-y-4 border-t pt-4 border-primary/5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                          {t('enableService')}
-                        </span>
-                        <Switch
-                          checked={addon.checked}
-                          onCheckedChange={addon.onChange}
-                        />
+                      {hasAccess && (
+                        <div className="space-y-3 rounded-md bg-canvas-parchment p-4">
+                          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                            <p className="text-sm font-semibold">
+                              {t('remainingUsage', {
+                                count: remaining,
+                                unit: addon.unit,
+                              })}
+                            </p>
+                            <span className="text-xs text-muted-foreground">
+                              {subscribed
+                                ? t('activeSubscription')
+                                : t('trialAccess')}
+                            </span>
+                          </div>
+                          <Progress
+                            value={
+                              quota?.limit
+                                ? Math.min(
+                                    100,
+                                    Math.max(
+                                      0,
+                                      (quota.used / quota.limit) * 100,
+                                    ),
+                                  )
+                                : 0
+                            }
+                            role="progressbar"
+                            aria-label={`${addon.name}: ${t('currentUsage')}`}
+                            aria-valuemin={0}
+                            aria-valuemax={quota?.limit || 1}
+                            aria-valuenow={Math.min(
+                              quota?.used ?? 0,
+                              quota?.limit || 1,
+                            )}
+                          />
+                          <p className="text-xs leading-relaxed text-muted-foreground">
+                            {t('usedUsage', {
+                              used: quota?.used ?? 0,
+                              limit: quota?.limit ?? 0,
+                              unit: addon.unit,
+                            })}
+                          </p>
+                          {subscribed && entitlement?.valid_until && (
+                            <p className="text-xs text-muted-foreground">
+                              {t('accessUntil', {
+                                date: format.dateTime(
+                                  new Date(entitlement.valid_until),
+                                  { dateStyle: 'medium' },
+                                ),
+                              })}
+                            </p>
+                          )}
+                          {quota?.reset_at &&
+                            quota.reset_at !== entitlement?.valid_until && (
+                              <p className="text-xs text-muted-foreground">
+                                {t('quotaReset', {
+                                  date: format.dateTime(
+                                    new Date(quota.reset_at),
+                                    { dateStyle: 'medium' },
+                                  ),
+                                })}
+                              </p>
+                            )}
+                          {remaining === 0 && (
+                            <p className="text-sm leading-relaxed">
+                              {subscribed
+                                ? t('topUpToContinue')
+                                : t('subscribeToContinue')}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {subscribed ? (
+                        <Button
+                          size="pill"
+                          variant="outline"
+                          className="h-auto min-h-11 w-full whitespace-normal py-3 font-normal"
+                          disabled={isProcessing}
+                          onClick={() =>
+                            processPayment({
+                              productId: addon.topUpProductId,
+                              onSuccess: refreshAccess,
+                            })
+                          }
+                        >
+                          {t('topUpOffer', {
+                            count: addon.count,
+                            unit: addon.unit,
+                          })}
+                        </Button>
+                      ) : (
+                        <Button
+                          size="pill"
+                          className="h-auto min-h-11 w-full whitespace-normal py-3 font-normal"
+                          disabled={isProcessing}
+                          onClick={() =>
+                            processPayment({
+                              productId: addon.productId,
+                              onSuccess: refreshAccess,
+                            })
+                          }
+                        >
+                          {hasAccess
+                            ? t('upgradeSubscription')
+                            : t('enableAddon')}
+                        </Button>
+                      )}
+                      {!subscribed && hasAccess && (
+                        <p className="text-xs leading-relaxed text-muted-foreground">
+                          {t('topUpRequiresSubscription')}
+                        </p>
+                      )}
+                      {hasAccess && !isVoice && remaining > 0 && (
+                        <Link
+                          href="/cheques/create"
+                          className="inline-flex min-h-11 items-center gap-1 text-sm text-primary hover:underline"
+                        >
+                          {t('scanCheque')}{' '}
+                          <HugeiconsIcon
+                            icon={ArrowRight01Icon}
+                            className="size-4"
+                          />
+                        </Link>
+                      )}
+                    </div>
+
+                    {isVoice && hasAccess && (
+                      <div className="space-y-5 border-t p-5 @min-[640px]:p-6">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="space-y-1">
+                            <label
+                              htmlFor="voice-enabled"
+                              className="text-sm font-semibold"
+                            >
+                              {t('enableService')}
+                            </label>
+                            <p className="text-xs leading-relaxed text-muted-foreground">
+                              {profile.voice_call_enabled
+                                ? t('voiceEnabledHelp')
+                                : t('voicePausedHelp')}
+                            </p>
+                          </div>
+                          <div className="flex min-h-11 shrink-0 items-center">
+                            <Switch
+                              id="voice-enabled"
+                              aria-label={t('enableService')}
+                              checked={!!profile.voice_call_enabled}
+                              disabled={saving !== null || isSendingTestCall}
+                              onCheckedChange={(value) =>
+                                saveProfile('voice', {
+                                  voice_call_enabled: value,
+                                })
+                              }
+                            />
+                          </div>
+                        </div>
+                        <form
+                          className="space-y-3"
+                          onSubmit={(event) => {
+                            event.preventDefault()
+                            if (!validPhone) {
+                              setPhoneError(true)
+                              return
+                            }
+                            setPhoneError(false)
+                            void saveProfile('phone', { phone })
+                          }}
+                        >
+                          <label
+                            htmlFor="voice-phone"
+                            className="text-sm font-semibold"
+                          >
+                            {t('yourPhoneNumber')}
+                          </label>
+                          <PhoneInput
+                            id="voice-phone"
+                            value={phone}
+                            onChange={(value) => {
+                              setProfilePhone(value)
+                              setPhoneError(false)
+                            }}
+                            disabled={saving !== null || isSendingTestCall}
+                            aria-invalid={
+                              phoneError || (!!phone && !validPhone)
+                            }
+                            className="h-12 rounded-md"
+                          />
+                          <p className="text-xs leading-relaxed text-muted-foreground">
+                            {t('countryCodeHelp')}
+                          </p>
+                          {(phoneError || (!!phone && !validPhone)) && (
+                            <p
+                              role="alert"
+                              className="text-sm text-destructive"
+                            >
+                              {tc('invalidPhone')}
+                            </p>
+                          )}
+                          {(phoneChanged || needsPhone) && (
+                            <Button
+                              type="submit"
+                              variant="outline"
+                              size="pill"
+                              className="w-full font-normal"
+                              disabled={
+                                saving !== null ||
+                                !phoneChanged ||
+                                isSendingTestCall
+                              }
+                            >
+                              {saving === 'phone'
+                                ? t('savingPhone')
+                                : t('savePhone')}
+                            </Button>
+                          )}
+                        </form>
+                        <div className="space-y-2">
+                          <Button
+                            variant="outline"
+                            size="pill"
+                            className="w-full font-normal"
+                            disabled={
+                              isSendingTestCall ||
+                              saving !== null ||
+                              !profile.voice_call_enabled ||
+                              !validPhone ||
+                              phoneChanged ||
+                              remainingCalls === 0
+                            }
+                            onClick={sendTestCall}
+                          >
+                            {isSendingTestCall
+                              ? t('sendingTestCall')
+                              : t('sendTestCall')}
+                          </Button>
+                          <p className="text-xs leading-relaxed text-muted-foreground">
+                            {phoneChanged
+                              ? t('saveBeforeTest')
+                              : !validPhone
+                                ? t('saveValidPhone')
+                                : !profile.voice_call_enabled
+                                  ? t('enableBeforeTest')
+                                  : t('testCallHelp')}
+                          </p>
+                        </div>
                       </div>
-                      {addon.checked && addon.extra}
-                    </div>
-                  )}
+                    )}
+                  </article>
+                )
+              })}
+            </div>
+          </section>
+        </>
+      )}
 
-                  {!isSubscribed && (
-                    <Button
-                      className="w-full mt-2"
-                      variant={isLocked ? 'default' : 'outline'}
-                      onClick={addon.onUnlock}
-                      disabled={isProcessing}
-                    >
-                      <HugeiconsIcon
-                        icon={getPaymentProductIcon(addon.productId)}
-                        className="w-4 h-4 mr-2"
-                      />
-                      {isLocked
-                        ? t('subscribeFor', { price: addon.price })
-                        : t('upgradeSubscription')}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            )
-          })}
+      <section
+        id="feature-activity"
+        aria-labelledby="activity-title"
+        className="scroll-mt-24 space-y-5 border-t pt-8"
+      >
+        <div className="flex flex-col justify-between gap-3 @min-[640px]:flex-row @min-[640px]:items-center">
+          <div className="space-y-2">
+            <h2
+              id="activity-title"
+              className="text-xl font-semibold tracking-tight"
+            >
+              {t('activityTitle')}
+            </h2>
+            <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
+              {t('activityDescription')}
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="pill"
+            disabled={isRefreshing || transactions.isFetching}
+            onClick={refreshAccess}
+            className="self-start font-normal"
+          >
+            <HugeiconsIcon
+              icon={RefreshIcon}
+              className={cn(
+                'size-4',
+                isRefreshing && 'motion-safe:animate-spin',
+              )}
+            />{' '}
+            {t('refreshStatus')}
+          </Button>
         </div>
+        <div aria-live="polite">
+          {transactions.isPending ? (
+            <p role="status" className="text-sm text-muted-foreground">
+              {t('loadingActivity')}
+            </p>
+          ) : transactions.isError ? (
+            <p role="alert" className="text-sm text-destructive">
+              {t('activityFailed')}
+            </p>
+          ) : !transactions.data?.length ? (
+            <p className="rounded-lg bg-canvas-parchment p-5 text-sm text-muted-foreground">
+              {t('noActivity')}
+            </p>
+          ) : (
+            <ul className="divide-y rounded-lg border px-5 @min-[640px]:px-6">
+              {transactions.data.slice(0, 3).map((transaction) => {
+                const name =
+                  transaction.feature_id === FEATURE_IDS.LIFETIME_PREMIUM
+                    ? t('lifetimePremium')
+                    : transaction.feature_id === FEATURE_IDS.AI_SCAN ||
+                        transaction.feature_id === FEATURE_IDS.AI_SCANNER_SUB
+                      ? t('aiScanner')
+                      : t('voiceReminder')
+                return (
+                  <li key={transaction.id} className="space-y-3 py-5">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="min-w-0 space-y-1">
+                        <p className="text-sm font-semibold">{name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {tt(
+                            transaction.type === 'top_up'
+                              ? 'topUp'
+                              : transaction.type === 'lifetime'
+                                ? 'lifetimePremium'
+                                : 'subscription',
+                          )}{' '}
+                          &middot;{' '}
+                          {format.dateTime(new Date(transaction.created_at), {
+                            dateStyle: 'medium',
+                          })}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <span className="text-sm tabular-nums">
+                          {format.number(transaction.amount / 100, {
+                            style: 'currency',
+                            currency: transaction.currency,
+                          })}
+                        </span>
+                        <FeatureStatus
+                          active={transaction.status === 'captured'}
+                        >
+                          {tt(transaction.status)}
+                        </FeatureStatus>
+                      </div>
+                    </div>
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      {t(
+                        transaction.status === 'captured'
+                          ? 'paymentCapturedHelp'
+                          : transaction.status === 'authorized'
+                            ? 'paymentAuthorizedHelp'
+                            : transaction.status === 'created'
+                              ? 'paymentCreatedHelp'
+                              : transaction.status === 'failed'
+                                ? 'paymentFailedHelp'
+                                : 'paymentRefundedHelp',
+                      )}
+                    </p>
+                    <p className="break-all text-xs text-muted-foreground">
+                      {tt('orderId')}:{' '}
+                      {transaction.razorpay_order_id ?? transaction.id}
+                    </p>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </div>
+        <Link
+          href="/settings/transactions"
+          className="inline-flex min-h-11 items-center gap-1 text-sm text-primary hover:underline"
+        >
+          {t('allTransactions')}{' '}
+          <HugeiconsIcon icon={ArrowRight01Icon} className="size-4" />
+        </Link>
       </section>
     </div>
   )

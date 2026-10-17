@@ -53,6 +53,18 @@ flowchart LR
 
 ## 3. User preferences the system respects
 
+On the Features page, Voice Reminder access, the daily-call switch, and phone
+setup are separate controls. Users with subscription or trial credits can
+configure their phone even while daily calls are off. Phone edits require
+**Save phone number**; test calls stay disabled until the saved number is valid,
+the service is on, and call credits remain. Switching calls off does not pause
+the paid access period. Test calls consume the same quota as scheduled calls.
+
+The page also shows remaining credits, subscription access dates, and eligible
+top-ups. **Purchases & activation** lists recent payment orders and their actual
+transaction statuses. **Refresh status** reloads payments, entitlements, and
+quotas; checkout success alone is not treated as confirmed feature activation.
+
 | Preference              | Column                                                                                                    | Where it's used                                                                                                                                                                      |
 | ----------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Phone number            | `profiles.phone`                                                                                          | Dispatcher refuses to call if null; Scheduler skips the profile entirely if null                                                                                                     |

@@ -110,5 +110,10 @@ not be reachable from IPv4-only networks.
 
 ## Out of scope
 
+`features.spec.ts` checks feature management, phone-save gating, purchase-status
+display, and alignment at 320px, 390px, and 1280px. Profile, entitlement, quota,
+and transaction responses are intercepted so these checks do not change a
+user's real plan or place calls.
+
 Google/Facebook OAuth, Razorpay payments, OpenAI OCR cheque-scan extraction,
 and reminder (email/SMS) sending are not covered by this suite.
